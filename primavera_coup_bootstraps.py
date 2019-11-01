@@ -28,7 +28,7 @@ filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 
 n_choice = 30
 n_bootstrap = 500
-filo = open(cart_out + 'res_bootstrap_v7_500_relent2.p', 'wb')
+filo = open(cart_out + 'res_bootstrap_v7_500_relent2_nosig.p', 'wb')
 
 model_names = ['AWI-CM-1-1-LR', 'AWI-CM-1-1-HR', 'CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'CNRM-CM6-1', 'CNRM-CM6-1-HR', 'EC-Earth3P', 'EC-Earth3P-HR', 'ECMWF-IFS-LR', 'ECMWF-IFS-MR', 'ECMWF-IFS-HR', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR', 'HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM', 'HadGEM3-GC31-HH']
 
@@ -135,14 +135,14 @@ for mod in model_names_all:
                 centroids.append(np.mean(pcs[okla], axis = 0))
             centroids = np.stack(centroids)
 
-            sig = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 200)
+            #sig = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 200)
             # if sig < 10:
             #     sig2 = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 1000)
             #     print('RECHECK ', sig, sig2, sig3)
 
             varopt = ctl.calc_varopt_molt(pcs, centroids, labels)
             autocorr = ctl.calc_autocorr_wlag(pcs, dates, out_lag1 = True)
-            bootstraps['significance'].append(sig)
+            #bootstraps['significance'].append(sig)
             bootstraps['varopt'].append(varopt)
             bootstraps['autocorr'].append(autocorr)
 
