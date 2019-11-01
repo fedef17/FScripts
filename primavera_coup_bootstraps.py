@@ -28,7 +28,7 @@ filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 
 n_choice = 30
 n_bootstrap = 500
-filo = open(cart_out + 'res_bootstrap_v7_rmshi_500.p', 'wb')
+filo = open(cart_out + 'res_bootstrap_v7_500_relent2.p', 'wb')
 
 model_names = ['AWI-CM-1-1-LR', 'AWI-CM-1-1-HR', 'CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'CNRM-CM6-1', 'CNRM-CM6-1-HR', 'EC-Earth3P', 'EC-Earth3P-HR', 'ECMWF-IFS-LR', 'ECMWF-IFS-MR', 'ECMWF-IFS-HR', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR', 'HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM', 'HadGEM3-GC31-HH']
 
@@ -165,6 +165,8 @@ for mod in model_names_all:
             for reg in range(4):
                 okclu = labels == reg
                 okpc = pcs[okclu, :]
+                for comp in range(4):
+                    okpc[:, comp] = okpc[:, comp] - centroids[reg, comp] + ref_cen[reg, comp]
                 kufu = ctl.calc_pdf(okpc[:, :3].T)
                 zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
                 zi = zi/np.max(zi)
