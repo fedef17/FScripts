@@ -18,6 +18,12 @@ from datetime import datetime
 from scipy import stats
 import pandas as pd
 
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 14
 #######################################
 cart_out = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/jet_and_blocking/'
 if not os.path.exists(cart_out): os.mkdir(cart_out)
@@ -27,6 +33,8 @@ filogen = cart + 'out_prima_coup_v6_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 
 cart_jet = '/data-hobbes/fabiano/PRIMAVERA/jetlat_panos/hist-1950/'
 fil_jet = 'JetLatDist_850hPa_{}_hist-1950_DJF.npy'
+
+file_ERA = '/home/fabiano/Research/lavori/Jet_latitude/jli_ERA_1957_2014.npy'
 
 cart_bloc = '/data-hobbes/fabiano/PRIMAVERA/Reinhard_blocking/all_hist-1950/'
 fil_bloc = 'bf.5day.daily.daily_mean.{}.{}.hist-1950.r1i1p1f1.v20170915.{}-{}.nc'
@@ -51,6 +59,29 @@ colors = ctl.color_set(len(model_names), sns_palette = 'Paired')
 colors_wERA = colors + ['black']
 # colors_wERA2 = np.array(colors_wERA)
 # colors_wERA2[0:-1:2] = colors_wERA2[1::2]
+
+colors = ctl.color_set((len(model_coups)+1)*2, sns_palette = 'Paired')
+colorscoup = [np.mean([col1, col2], axis = 0) for col1, col2 in zip(colors[:-1:2], colors[1::2])]
+color_main = []
+for col2 in colors[1::2]:
+    color_main += [col2, col2]
+
+mr_cos = np.where(np.array(vers) == 'MR')[0]
+for gi in mr_cos:
+    colors.insert(gi, np.mean(colors[gi-1:gi+1], axis = 0))
+    color_main.insert(gi, colors[gi+1])
+
+colors_wERA = colors + ['black']
+color_main.append('black')
+
+##### no AWI:
+colors_wERA = colors_wERA[2:]
+color_main = color_main[2:]
+colorscoup = colorscoup[1:]
+
+ens_names = ['LR', 'HR']
+ens_colors = ['teal', 'indianred']
+
 
 regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
 
@@ -108,6 +139,7 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
     patnames = ['NAO +', 'Sc. Blocking', 'Atl. Ridge', 'NAO -']
 
     jetlat_comp = dict()
+    jetlat_q = dict()
     # first for the jet
     fig_all = plt.figure(figsize = (16, 12))
     ax_all = plt.subplot()
@@ -141,18 +173,19 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
         fil_ok = fil_jet.format(mod)
         # if mod == 'HadGEM3-GC31-LL-stoc':
         #     fil_ok = fil_jet.format('HadGEM3-GC31-LL')
-        if mod == 'ERA':
-            fil_ok = 'JetLatDist_850hPa_NCEP_DJF.npy'
         print(fil_ok)
         # elif mod == 'EC-Earth3P':
         #     print('Missing 1991')
         #     continue
 
-        if not os.path.exists(cart_jet + fil_ok):
+        if mod != 'ERA' and not os.path.exists(cart_jet + fil_ok):
             print('waiting for panos..\n\n')
             continue
 
-        jetind = np.load(cart_jet + fil_ok)[0]
+        if mod == 'ERA':
+            jetind = np.load(file_ERA)
+        else:
+            jetind = np.load(cart_jet + fil_ok)[0]
         jetlat_comp[(mod, 'all', tag)] = jetind
 
         modmem = mod + '_' + mem
@@ -163,12 +196,12 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
         else:
             regind = results[modmem]['labels']
             dates = results[modmem]['dates']
+            dates_pdh = pd.to_datetime(dates)
+            okdat = ~((dates_pdh.month == 2) & (dates_pdh.day == 29))
+            print('Num leap days : {}'.format(len(regind) - np.sum(okdat)))
+            regind = regind[okdat]
+            dates = dates[okdat]
 
-        dates_pdh = pd.to_datetime(dates)
-        okdat = ~((dates_pdh.month == 2) & (dates_pdh.day == 29))
-        print('Num leap days : {}'.format(len(regind) - np.sum(okdat)))
-        regind = regind[okdat]
-        dates = dates[okdat]
 
         if 'HadGEM' in mod:
             # 31 31 28 (panos); 30 31 28 (io)
@@ -185,6 +218,9 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
         elif mod == 'EC-Earth3P':
             jetind = jetind[1260:] # the first day is 01-12-1964, the last is 28/02/2014
             data1 = pd.to_datetime('{}1201'.format(1964), format='%Y%m%d')
+            data2 = pd.to_datetime('{}0228'.format(2014), format='%Y%m%d')
+        elif mod == 'ERA':
+            data1 = pd.to_datetime('{}1201'.format(1957), format='%Y%m%d')
             data2 = pd.to_datetime('{}0228'.format(2014), format='%Y%m%d')
         else:
             # Skip the first 7 seasons (panos data start from 1950): 7*90 = 630
@@ -231,9 +267,9 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
     # ctl.custom_legend(fig, colors_wERA, model_names_all)
     ctl.custom_legend(fig, colors_wERA2[0::2], model_coups + ['OBS'])
     ctl.custom_legend(fig_HR, colors_wERA2[0::2], model_coups + ['OBS'])
-    fig.suptitle('Jet Latitude and Weather Regimes (SR)')
+    #fig.suptitle('Jet Latitude and Weather Regimes (SR)')
     fig.savefig(cart_out + 'jetlat_compos_LR{}.pdf'.format(tag))
-    fig_HR.suptitle('Jet Latitude and Weather Regimes (HR)')
+    #fig_HR.suptitle('Jet Latitude and Weather Regimes (HR)')
     fig_HR.savefig(cart_out + 'jetlat_compos_HR{}.pdf'.format(tag))
     # fig.savefig(cart_out + 'jetlat_compos_wECEstream2.pdf')
 
@@ -278,7 +314,7 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colors_wERA, model_names_all)
 
-    fig.suptitle('Relative entropy of jet lat composites')
+    #fig.suptitle('Relative entropy of jet lat composites')
     fig.savefig(cart_out + 'jetlat_compos_relent{}.pdf'.format(tag))
 
 
@@ -327,7 +363,74 @@ for results, tag in zip([results_refEOF, results_refCLUS, results_refEOF_2], [''
     ctl.custom_legend(fig_all, colors_wERA, model_names_all)
     ax2.axhline(0.0, color = 'grey')
 
-    fig_all.suptitle('Relative entropy of jet lat')
+    #fig_all.suptitle('Relative entropy of jet lat')
     fig_all.savefig(cart_out + 'jetlat_allregs_relent{}.pdf'.format(tag))
 
-    pickle.dump(relent_all, open(cart_out + 'jetdist_relent{}.p'.format(tag), 'wb'))
+    # box plot
+    fig = plt.figure(figsize = (16, 12))
+    axes = []
+    for reg in range(4):
+        ax = plt.subplot(2, 2, reg+1)
+        axes.append(ax)
+        #ax.set_xlabel('Latitude')
+        ax.set_ylabel('Latitude')
+        ax.set_title(patnames[reg])
+        ax.set_xticks([])
+        #ax.grid()
+
+    for reg in range(4):
+        allpercs = dict()
+        for cos in ['mean', 'ens_std', 'p10', 'p25', 'p50', 'p75', 'p90', 'ens_min', 'ens_max']:
+            allpercs[cos] = []
+        for mod, col, vv in zip(model_names_all, colors_wERA, vers):
+            okjet = jetlat_comp[(mod, reg, tag)]
+
+            for qq in [10, 25, 50, 75, 90]:
+                allpercs['p{}'.format(qq)].append(np.percentile(okjet, qq))
+            allpercs['mean'].append(np.mean(okjet))
+            allpercs['ens_std'].append(0.0)
+            allpercs['ens_min'].append(allpercs['mean'])
+            allpercs['ens_max'].append(allpercs['mean'])
+
+        ctl.primavera_boxplot_on_ax(axes[reg], allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
+
+    #fig.suptitle('Distribution of jet latitude')
+    fig.savefig(cart_out + 'jetlat_distribution_compos{}.pdf'.format(tag))
+
+
+    # box plot
+    fig = plt.figure(figsize = (16, 12))
+    ax = plt.subplot(111)
+    ax.set_ylabel('Latitude')
+    ax.set_xticks([])
+
+    allpercs = dict()
+    for cos in ['mean', 'ens_std', 'p10', 'p25', 'p50', 'p75', 'p90', 'ens_min', 'ens_max']:
+        allpercs[cos] = []
+    for mod, col, vv in zip(model_names_all, colors_wERA, vers):
+        okjet = jetlat_comp[(mod, 'all', tag)]
+
+        for qq in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(qq)].append(np.percentile(okjet, qq))
+        allpercs['mean'].append(np.mean(okjet))
+        allpercs['ens_std'].append(0.0)
+        allpercs['ens_min'].append(allpercs['mean'])
+        allpercs['ens_max'].append(allpercs['mean'])
+        jetlat_q[(mod, 'mean')] = np.mean(okjet)
+        jetlat_q[(mod, 'median')] = np.median(okjet)
+        jetlat_q[(mod, 'q90')] = np.percentile(okjet, 90)
+        jetlat_q[(mod, 'q10')] = np.percentile(okjet, 10)
+        jetlat_q[(mod, 'q25')] = np.percentile(okjet, 25)
+        jetlat_q[(mod, 'q75')] = np.percentile(okjet, 75)
+
+    ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors)
+
+    ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
+
+    #fig.suptitle('Distribution of jet latitude')
+    fig.savefig(cart_out + 'jetlat_distribution_allregs{}.pdf'.format(tag))
+
+    pickle.dump(jetlat_q, open(cart_out + 'jetlat_q_all{}.p'.format(tag), 'wb'))

@@ -95,7 +95,8 @@ for reg in range(4):
 
 ##
 #allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'RMS', 'patcor', 'filt_relative_entropy', 'filt_RMS', 'filt_patcor']
-allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
+# allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
+allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
 
 for mod in model_names_all:
     print(mod)

@@ -11,15 +11,29 @@ import pickle
 import climtools_lib as ctl
 #import climdiags as cd
 
+from importlib import reload
 from matplotlib.colors import LogNorm
 
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 15
 #######################################
 cart_in = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/figures_bootstraps_v7/'
-cart_out = cart_in + 'v7_rmshi_500/'
-if not os.path.exists(cart_out): os.mkdir(cart_out)
 
-#filon = open(cart_in + 'res_bootstrap_v7.p', 'rb')
-filon = open(cart_in + 'res_bootstrap_v7_rmshi_500.p', 'rb')
+plot_sig = True
+plot_mean = True
+
+if plot_sig:
+    cart_out = cart_in + 'v7_rmshi_500/'
+    if not os.path.exists(cart_out): os.mkdir(cart_out)
+    filon = open(cart_in + 'res_bootstrap_v7_rmshi_500.p', 'rb')
+else:
+    cart_out = cart_in + 'v7_final/'
+    if not os.path.exists(cart_out): os.mkdir(cart_out)
+    filon = open(cart_in + 'res_bootstrap_v7_500_relent2_nosig.p', 'rb')
 
 vtag = 'v7'
 cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_{}/'.format(vtag)
@@ -29,7 +43,7 @@ results, results_ref = pickle.load(open(filogen, 'rb'))
 results.pop('HadGEM3-GC31-LL_r1i1p2f1')
 results.pop('EC-Earth3P_r1i1p1f1')
 results.pop('EC-Earth3P-HR_r1i1p1f1')
-allresmembers = results.keys()
+allresmembers = list(results.keys())
 del results
 
 ##############################################################
@@ -62,7 +76,10 @@ nmods = len(model_names_all)
 
 allnams = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
 alltits = ['Sharpness of regime structure', 'Optimal variance ratio', 'lag-1 autocorrelation', 'Regime frequency', 'Centroid distance to reference in phase space', 'Average residence time', '90th percentile of residence time', 'Transition matrix', 'Regime centroid', 'Relative entropy of cluster cloud in phase space', 'Pattern correlation of cluster centroid in phase space', 'Centroid distance to reference in phase space (5-day filter)', 'Relative entropy of cluster cloud in phase space (5-day filter)', 'Pattern correlation of cluster centroid in phase space (5-day filter)']
+allylabels = ['sharpness', 'optimal ratio', 'lag-1 autocorrelation', 'frequency', 'centroid distance (m)', 'resid. time (days)', 'resid. time (days)', 'trans. probability', 'centroid (m)', 'rel. entropy', 'patt. corr.', 'centroid distance (m)', 'rel. entropy', 'patt. corr.']
+
 alltits = dict(zip(allnams, alltits))
+allylabels = dict(zip(allnams, allylabels))
 
 bootstri = dict()
 for mod in model_names_all:
@@ -83,7 +100,7 @@ for mod in model_names_all:
 
     #bootstraps_all = pickle.load(filon) # new version
     #allmems = list(bootstraps_all.keys())
-    allkeysss = bootstraps_all[allmems[0]].keys()
+    allkeysss = list(bootstraps_all[allmems[0]].keys())
 
     # list of all boot means
     for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
@@ -106,12 +123,20 @@ for mod in model_names_all:
         bootstraps_all['boot_mean'][ke] = np.mean(bootstraps_all['boot_mean'][ke], axis = 0)
         bootstraps_all['boot_std'][ke] = np.std(np.concatenate([bootstraps_all[mem][ke] for mem in allmems]), axis = 0)
 
-        if bootstraps_all[allmems[0]][ke].ndim == 1:
+        ndim = bootstraps_all[allmems[0]][ke].ndim
+        if ndim == 1:
             for cos, num in zip(['p10', 'p25', 'p50', 'p75', 'p90'], [10, 25, 50, 75, 90]):
                 bootstraps_all['boot_'+cos][ke] = np.percentile(np.concatenate([bootstraps_all[mem][ke] for mem in allmems]), num)
-        elif bootstraps_all[allmems[0]][ke].ndim == 2:
+
+            # bootstraps_all['ens_min'][ke] = np.min([np.percentile(bootstraps_all[mem][ke], 50) for mem in allmems])
+            # bootstraps_all['ens_max'][ke] = np.max([np.percentile(bootstraps_all[mem][ke], 50) for mem in allmems])
+            #print(ndim, type(bootstraps_all['ens_min'][ke]))
+        elif ndim == 2:
             for cos, num in zip(['p10', 'p25', 'p50', 'p75', 'p90'], [10, 25, 50, 75, 90]):
                 bootstraps_all['boot_'+cos][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), num) for reg in range(4)])
+            # bootstraps_all['ens_min'][ke] = np.array([np.min([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(4)])
+            # bootstraps_all['ens_max'][ke] = np.array([np.max([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(4)])
+            #print(ndim, type(bootstraps_all['ens_min'][ke]))
         else:
             for cos, num in zip(['p10', 'p25', 'p50', 'p75', 'p90'], [10, 25, 50, 75, 90]):
                 bootstraps_all['boot_'+cos][ke] = np.zeros((4,4))
@@ -119,14 +144,20 @@ for mod in model_names_all:
                     for j in range(4):
                         bootstraps_all['boot_'+cos][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), num)
 
+                        # if cos == 'p50':
+                        #     bootstraps_all['ens_min'][ke][i,j] = np.min([np.percentile(bootstraps_all[mem][ke][:, i, j], 50) for mem in allmems])
+                        #     bootstraps_all['ens_max'][ke][i,j] = np.max([np.percentile(bootstraps_all[mem][ke][:, i, j], 50) for mem in allmems])
+            #print(ndim, type(bootstraps_all['ens_min'][ke]))
+
     bootstri[mod] = bootstraps_all
+
 
 # colors = ctl.color_set(len(model_names), sns_palette = 'Paired') + [cm.colors.ColorConverter.to_rgb('black')]
 nam = 'significance'
 regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
 
 #plt.style.use('seaborn-whitegrid')
-plt.style.use('default')
+#plt.style.use('default')
 plt.rc('axes', axisbelow=True)
 #plt.ion()
 
@@ -134,21 +165,24 @@ ens_names = ['LR', 'HR']
 ens_colors = ['teal', 'indianred']
 
 allfigs = []
-for nam in ['significance', 'varopt', 'autocorr']:
-    fig, ax = plt.subplots(figsize=(16,12))
+if plot_sig:
+    for nam in ['significance', 'varopt', 'autocorr']:
+        fig, ax = plt.subplots(figsize=(16,12))
 
-    allpercs = dict()
-    for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
-        allpercs[cos] = [bootstri[mod]['boot_'+cos][nam] for mod in model_names_all]
-    for cos in ['ens_min', 'ens_max', 'ens_std']:
-        allpercs[cos] = [bootstri[mod][cos][nam] for mod in model_names_all]
+        allpercs = dict()
+        for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
+            allpercs[cos] = [bootstri[mod]['boot_'+cos][nam] for mod in model_names_all]
+        for cos in ['ens_min', 'ens_max', 'ens_std']:
+            allpercs[cos] = [bootstri[mod][cos][nam] for mod in model_names_all]
 
-    ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors)
+        ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, plot_mean = plot_mean)
+        ax.set_ylabel(allylabels[nam])
 
-    plt.title(alltits[nam])
-    ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
-    fig.savefig(cart_out + '{}_bootstraps_v7.pdf'.format(nam))
-    allfigs.append(fig)
+        #plt.title(alltits[nam])
+        #fig.suptitle(alltits[nam], fontsize = titlefont)
+        ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
+        fig.savefig(cart_out + '{}_bootstraps_v7.pdf'.format(nam))
+        allfigs.append(fig)
 
 
 for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
@@ -163,14 +197,15 @@ for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'relative_en
         for cos in ['ens_min', 'ens_max', 'ens_std']:
             allpercs[cos] = [bootstri[mod][cos][nam][ii] for mod in model_names_all]
 
-        ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5)
+        ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5, plot_mean = plot_mean)
 
         ax.set_title(reg)
+        ax.set_ylabel(allylabels[nam])
         axes.append(ax)
 
     ctl.adjust_ax_scale(axes)
 
-    fig.suptitle(alltits[nam])
+    #fig.suptitle(alltits[nam], fontsize = titlefont)
     plt.subplots_adjust(top = 0.9)
 
     ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
@@ -198,18 +233,19 @@ for ireg, reg in enumerate(regnam):
         for cos in ['ens_min', 'ens_max', 'ens_std']:
             allpercs[cos] = [bootstri[mod][cos][nam][ireg, ii] for mod in model_names_all]
 
-        ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5)
+        ctl.primavera_boxplot_on_ax(ax, allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5, plot_mean = plot_mean)
         if ireg == ii:
-            ctl.primavera_boxplot_on_ax(ax_pers_2[ii], allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5)
+            ctl.primavera_boxplot_on_ax(ax_pers_2[ii], allpercs, model_names_all, colors_wERA, color_main, vers, ens_names, ens_colors, wi = 0.5, plot_mean = plot_mean)
 
         ax.set_title('trans {} -> {}'.format(regnam[ireg], regnam[ii]))
+        ax.set_ylabel(allylabels[nam])
         if ii != ireg:
             axes_diff.append(ax)
         else:
             axes_pers.append(ax)
             axes_pers.append(ax_pers_2[ii])
 
-    fig.suptitle(alltits[nam])
+    #fig.suptitle(alltits[nam], fontsize = titlefont)
     plt.subplots_adjust(top = 0.9)
 
     ctl.custom_legend(fig, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
@@ -223,7 +259,7 @@ for fig, ireg in zip(figs, range(4)):
     fig.savefig(cart_out + '{}_reg{}_bootstraps_v7.pdf'.format(nam, ireg))
 
 
-fig_pers.suptitle('Regime persistence probability')
+#fig_pers.suptitle('Regime persistence probability', fontsize = titlefont)
 plt.subplots_adjust(top = 0.9)
 
 ctl.custom_legend(fig_pers, colors_wERA + ens_colors, model_names_all + ens_names, ncol = 6)
@@ -259,7 +295,7 @@ allfigs.append(fig_pers)
 #         ax.axhline(allp90[-1][0], color = 'grey', alpha = 0.6, ls = '--')
 #         ax.axhline(allp90[-1][1], color = 'grey', alpha = 0.6, ls = '--')
 #
-#     fig.suptitle(alltits[nam])
+#     fig.suptitle(alltits[nam], fontsize = titlefont)
 #     plt.subplots_adjust(top = 0.9)
 #
 #     ctl.custom_legend(fig, colors, model_names_all)
