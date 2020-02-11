@@ -29,3 +29,5 @@ import iris
 
 import climtools_lib as ctl
 import climdiags as cd
+
+from importlib import reload

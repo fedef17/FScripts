@@ -72,7 +72,7 @@ n_yrs = [5, 1]
 
 reg_names_all = [['NAO+', 'SBL', 'AR', 'NAO-'], ['PT', 'PNA-', 'PNA+', 'AR']]
 
-seasons = ['DJFM', 'DJ', 'FM']
+seasons = ['DJFM', 'DJ', 'FM', 'DJF']
 
 ref_corrs = dict()
 ref_freqs_posneg = dict()
@@ -94,13 +94,13 @@ for indexname, file_ref, file_mod, filogen, reg_names, n_yr in zip(indexes, file
     amv_nyr = np.array(ctl.running_mean(amv_ref_yr, n_yr))
     amvc = amv_nyr[~np.isnan(amv_nyr)]
 
-    fig_all = plt.figure(figsize = (48,12))
+    fig_all = plt.figure(figsize = (16,12))
     ax_all = []
-    for i in range(3): ax_all.append(fig_all.add_subplot(1, 3, i+1))
+    for i in range(4): ax_all.append(fig_all.add_subplot(2, 2, i+1))
 
-    fig_all_ul = plt.figure(figsize = (48,12))
+    fig_all_ul = plt.figure(figsize = (16,12))
     ax_all_ul = []
-    for i in range(3): ax_all_ul.append(fig_all_ul.add_subplot(1, 3, i+1))
+    for i in range(4): ax_all_ul.append(fig_all_ul.add_subplot(2, 2, i+1))
 
     for ise, seas in enumerate(seasons):
         y1 = 1958
@@ -132,7 +132,7 @@ for indexname, file_ref, file_mod, filogen, reg_names, n_yr in zip(indexes, file
             yealen = yealen[oks]
 
             rco = ctl.Rcorr(amvc, freq)
-            ref_corrs[(indexname, reg)] = rco
+            ref_corrs[(indexname, reg, seas)] = rco
 
             ax.set_title('Corr {}: {:5.2f}'.format(reg, rco))
             ax.plot(yealen, freq, color = 'steelblue')
@@ -210,7 +210,7 @@ for indexname, file_ref, file_mod, filogen, reg_names, n_yr in zip(indexes, file
             # freqs_lo = freq_seas[lo_amv]
             freqs_hi = freq[hi_amv]
             freqs_lo = freq[lo_amv]
-            ref_freqs_posneg[(indexname, reg)] = np.array([np.mean(freqs_hi), np.mean(freqs_lo)])
+            ref_freqs_posneg[(indexname, reg, seas)] = np.array([np.mean(freqs_hi), np.mean(freqs_lo)])
 
             allfr.append(freqs_hi)
             allfr.append(freqs_lo)
@@ -256,7 +256,7 @@ for indexname, file_ref, file_mod, filogen, reg_names, n_yr in zip(indexes, file
             # freqs_lo = freq_seas[lo_amv]
             freqs_hi = freq[hi_amv]
             freqs_lo = freq[lo_amv]
-            ref_freqs_terc[(indexname, reg)] = np.array([np.mean(freqs_hi), np.mean(freqs_lo)])
+            ref_freqs_terc[(indexname, reg, seas)] = np.array([np.mean(freqs_hi), np.mean(freqs_lo)])
 
             allfr.append(freqs_hi)
             allfr.append(freqs_lo)
