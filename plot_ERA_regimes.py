@@ -29,28 +29,48 @@ cmappa = colors.ListedColormap(colo)
 cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
 
-cart = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/'
-fil = 'out_ERA_DJF_EAT_4clus_4pcs_1957-2014.p'
+cart = '/home/fabiano/Research/lavori/CMIP6/cmip6_hist/'
+cart_out = '/home/fabiano/Research/lavori/CMIP6/Results_v2/'
+# cart = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/'
+# fil = 'out_ERA_DJF_EAT_4clus_4pcs_1957-2014.p'
+fil_EAT = 'out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF_dtr.p'
+fil_PNA = 'out_cmip6_hist_NDJFM_PNA_4clus_4pcs_1964-2014_refEOF_dtr.p'
 
-result_obs = pickle.load(open(cart+fil, 'rb'))
+results = dict()
+_, results['EAT'] = pickle.load(open(cart+fil_EAT, 'rb'))
+_, results['PNA'] = pickle.load(open(cart+fil_PNA, 'rb'))
+del _
 
-patt_ref = result_obs['cluspattern']
-freq_ref = result_obs['freq_clus']
-lat = result_obs['lat']
-lon = result_obs['lon']
-patnames = ['NAO +', 'Sc. Blocking', 'Atl. Ridge', 'NAO -']
+patnames = dict()
+patnames['EAT'] = ['NAO +', 'Scand. Blocking', 'Atlantic Ridge', 'NAO -']
+patnames['PNA'] = ['Pacific Trough', 'PNA +', 'PNA -', 'Alaskan Ridge']
 
-clatlo = (70, -20)
+clatlo = dict()
+clatlo['EAT'] = (70, -20)
+clatlo['PNA'] = (70, 210)
 
 clevels = np.arange(-135., 136., 30.)
 
-# plt.rcParams['lines.dashed_pattern'] = [5, 5]
+plt.rcParams['lines.dashed_pattern'] = [5, 5]
 # for proj, blat in zip(['nearside', 'Npolar', 'Nstereo'], [0, 5, 25]):
 #     print(proj)
-#     filename = cart+'Allclus_OBSERVED_{}.pdf'.format(proj)
-#     figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo, cmap = cmappa, title = 'Observed weather regimes', subtitles = patnames, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7)
-#
-#
+proj = 'nearside'
+blat = 0
+
+for area in ['EAT', 'PNA']:
+    result_obs = results[area]
+    patt_ref = result_obs['cluspattern']
+    freq_ref = result_obs['freq_clus']
+    lat = result_obs['lat']
+    lon = result_obs['lon']
+    subtits = [pat+' ({:4.1f}%)'.format(fre) for pat, fre in zip(patnames[area], freq_ref)]
+
+    filename = cart_out + 'Allclus_OBSERVED_{}.pdf'.format(area)
+    figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo[area], cmap = cmappa, title = '', subtitles = subtits, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7)
+
+
+sys.exit()
+
 cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7/'
 filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 results, results_ref = pickle.load(open(filogen, 'rb'))
