@@ -431,6 +431,20 @@ for area in ['EAT', 'PNA']:
     xi_grid, yi_grid = np.meshgrid(xss, xss)
 
     print('hist')
+    okpcs_all = []
+    for modmem in results_hist.keys():
+        okpc = results_hist[modmem]['pcs'][:, :2]
+        okpcs_all.append(okpc)
+
+    okpc = np.concatenate(okpcs_all, axis = 0)
+    cent = np.mean(okpc, axis = 0)
+
+    kufu = ctl.calc_pdf(okpc.T)
+
+    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    zi = zi/np.max(zi)
+    pdfssp[('hist', 'all')] = zi
+
     for reg in range(numclus):
         print(reg)
         okpcs_all = []
@@ -455,6 +469,20 @@ for area in ['EAT', 'PNA']:
         ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
 
     for ssp, col in zip(allssps, colsim[1:]):
+        okpcs_all = []
+        for modmem in results_ssp[ssp].keys():
+            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+            okpcs_all.append(okpc)
+
+        okpc = np.concatenate(okpcs_all, axis = 0)
+        cent = np.mean(okpc, axis = 0)
+
+        kufu = ctl.calc_pdf(okpc.T)
+
+        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+        zi = zi/np.max(zi)
+        pdfssp[(ssp, 'all')] = zi
+
         for reg in range(numclus):
             print(ssp, reg)
             okpcs_all = []
@@ -480,4 +508,4 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
 
-    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_{}.pdf'.format(area), 'wb'))
+    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_{}.p'.format(area), 'wb'))
