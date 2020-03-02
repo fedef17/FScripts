@@ -443,12 +443,13 @@ for area in ['EAT', 'PNA']:
         cent = np.mean(okpc, axis = 0)
 
         kufu = ctl.calc_pdf(okpc.T)
-        pdfssp[('hist', reg)] = kufu
+        #pdfssp[('hist', reg)] = kufu
 
         cmappa = ctl.custom_alphagradient_cmap(colsim[0])
 
         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
         zi = zi/np.max(zi)
+        pdfssp[('hist', reg)] = zi
 
         cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)#, linewidths = lw)
         ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
@@ -466,15 +467,17 @@ for area in ['EAT', 'PNA']:
             cent = np.mean(okpc, axis = 0)
 
             kufu = ctl.calc_pdf(okpc.T)
-            pdfssp[(ssp, reg)] = kufu
 
             cmappa = ctl.custom_alphagradient_cmap(col)
 
             zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
             zi = zi/np.max(zi)
+            pdfssp[(ssp, reg)] = zi
 
             cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)
             ax.scatter(cent[0], cent[1], color = col, s = 10, marker = 'x')
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
+
+    pickle.dump(pdfssp, cart_out + 'pdfs_refCLUS_{}.pdf'.format(area))
