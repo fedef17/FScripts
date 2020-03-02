@@ -480,4 +480,4 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
 
-    pickle.dump(pdfssp, cart_out + 'pdfs_refCLUS_{}.pdf'.format(area))
+    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_{}.pdf'.format(area), 'wb'))
