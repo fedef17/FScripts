@@ -437,7 +437,10 @@ for area in ['EAT', 'PNA']:
 
     print('hist')
     okpcs_all = []
-    for modmem in results_hist.keys():
+    #for modmem in results_hist.keys():
+    for mod in mod_hist:
+        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+        modmem = np.sort(allmems)[0]
         dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
         okpc = results_hist[modmem]['pcs'][:, :2]
@@ -454,7 +457,11 @@ for area in ['EAT', 'PNA']:
     pdfssp[('hist', 'all_last20')] = zi
 
     okpcs_all = []
-    for modmem in results_hist.keys():
+    #for modmem in results_hist.keys():
+    for mod in mod_hist:
+        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+        modmem = np.sort(allmems)[0]
+
         okpc = results_hist[modmem]['pcs'][:, :2]
         okpcs_all.append(okpc)
 
@@ -470,7 +477,10 @@ for area in ['EAT', 'PNA']:
     for reg in range(numclus):
         print(reg)
         okpcs_all = []
-        for modmem in results_hist.keys():
+        #for mod in mod_hist:
+        for mod in mod_hist:
+            allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+            modmem = np.sort(allmems)[0]
             okclus = results_hist[modmem]['labels'] == reg
             okpc = results_hist[modmem]['pcs'][okclus, :2]
             okpcs_all.append(okpc)
@@ -492,7 +502,10 @@ for area in ['EAT', 'PNA']:
 
     for ssp, col in zip(allssps, colsim[1:]):
         okpcs_all = []
-        for modmem in results_ssp[ssp].keys():
+        #for modmem in results_ssp[ssp].keys():
+        for mod in mod_ssp[ssp]:
+            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+            modmem = np.sort(allmems)[0]
             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
@@ -509,7 +522,10 @@ for area in ['EAT', 'PNA']:
         pdfssp[(ssp, 'all_last20')] = zi
 
         okpcs_all = []
-        for modmem in results_ssp[ssp].keys():
+        #for modmem in results_ssp[ssp].keys():
+        for mod in mod_ssp[ssp]:
+            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+            modmem = np.sort(allmems)[0]
             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
             okpcs_all.append(okpc)
 
@@ -525,7 +541,10 @@ for area in ['EAT', 'PNA']:
         for reg in range(numclus):
             print(ssp, reg)
             okpcs_all = []
-            for modmem in results_ssp[ssp].keys():
+            #for modmem in results_ssp[ssp].keys():
+            for mod in mod_ssp[ssp]:
+                allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+                modmem = np.sort(allmems)[0]
                 okclus = results_ssp[ssp][modmem]['labels'] == reg
                 okpc = results_ssp[ssp][modmem]['pcs'][okclus, :2]
                 okpcs_all.append(okpc)
