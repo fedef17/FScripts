@@ -66,6 +66,11 @@ for area in ['EAT', 'PNA']:
     for ssp in allssps:
         mod_ssp[ssp] = np.unique([cos.split('_')[0] for cos in results_ssp[ssp].keys()])
 
+    print('keeping only models used in ssps')
+    print(mod_hist)
+    mod_hist = [mod for mod in mod_hist if np.any([mod in mod_ssp for ssp in allssps])]
+    print(mod_hist)
+
     ### Voglio: freqs, resid_time, resid_time_90, eff_centroids_ssp, centroids_hist (e patcor, rms)
     freqs = dict() # tot50 e last20
     residtimes = dict() # mean e p90
@@ -427,7 +432,7 @@ for area in ['EAT', 'PNA']:
     fig = plt.figure(figsize = (16,12))
     ax = fig.add_subplot(111)
 
-    xss = np.linspace(-2000., 2000., 201)
+    xss = np.linspace(-2500., 2500., 201)
     xi_grid, yi_grid = np.meshgrid(xss, xss)
 
     print('hist')
@@ -438,6 +443,20 @@ for area in ['EAT', 'PNA']:
         okpc = results_hist[modmem]['pcs'][:, :2]
         okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
         okpcs_all.append(okpcok)
+
+    okpc = np.concatenate(okpcs_all, axis = 0)
+    cent = np.mean(okpc, axis = 0)
+
+    kufu = ctl.calc_pdf(okpc.T)
+
+    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    zi = zi/np.max(zi)
+    pdfssp[('hist', 'all_last20')] = zi
+
+    okpcs_all = []
+    for modmem in results_hist.keys():
+        okpc = results_hist[modmem]['pcs'][:, :2]
+        okpcs_all.append(okpc)
 
     okpc = np.concatenate(okpcs_all, axis = 0)
     cent = np.mean(okpc, axis = 0)
@@ -479,6 +498,20 @@ for area in ['EAT', 'PNA']:
             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
             okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
             okpcs_all.append(okpcok)
+
+        okpc = np.concatenate(okpcs_all, axis = 0)
+        cent = np.mean(okpc, axis = 0)
+
+        kufu = ctl.calc_pdf(okpc.T)
+
+        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+        zi = zi/np.max(zi)
+        pdfssp[(ssp, 'all_last20')] = zi
+
+        okpcs_all = []
+        for modmem in results_ssp[ssp].keys():
+            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+            okpcs_all.append(okpc)
 
         okpc = np.concatenate(okpcs_all, axis = 0)
         cent = np.mean(okpc, axis = 0)
