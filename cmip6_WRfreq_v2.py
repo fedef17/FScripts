@@ -68,7 +68,7 @@ for area in ['EAT', 'PNA']:
 
     print('keeping only models used in ssps')
     print(mod_hist)
-    mod_hist = [mod for mod in mod_hist if np.any([mod in mod_ssp for ssp in allssps])]
+    mod_hist = [mod for mod in mod_hist if np.any([mod in mod_ssp[ssp] for ssp in allssps])]
     print(mod_hist)
 
     ### Voglio: freqs, resid_time, resid_time_90, eff_centroids_ssp, centroids_hist (e patcor, rms)
