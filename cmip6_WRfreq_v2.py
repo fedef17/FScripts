@@ -433,8 +433,11 @@ for area in ['EAT', 'PNA']:
     print('hist')
     okpcs_all = []
     for modmem in results_hist.keys():
+        dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+        dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
         okpc = results_hist[modmem]['pcs'][:, :2]
-        okpcs_all.append(okpc)
+        okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
+        okpcs_all.append(okpcok)
 
     okpc = np.concatenate(okpcs_all, axis = 0)
     cent = np.mean(okpc, axis = 0)
@@ -471,8 +474,11 @@ for area in ['EAT', 'PNA']:
     for ssp, col in zip(allssps, colsim[1:]):
         okpcs_all = []
         for modmem in results_ssp[ssp].keys():
+            dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+            dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-            okpcs_all.append(okpc)
+            okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+            okpcs_all.append(okpcok)
 
         okpc = np.concatenate(okpcs_all, axis = 0)
         cent = np.mean(okpc, axis = 0)
@@ -508,4 +514,4 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
 
-    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_{}.p'.format(area), 'wb'))
+    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_last20_{}.p'.format(area), 'wb'))
