@@ -428,88 +428,168 @@ for area in ['EAT', 'PNA']:
     fig.savefig(cart_out + 'Phasespace_allssp_refCLUS_{}.pdf'.format(area))
 
 
-    print('Building pdfs...')
+    # print('Building pdfs...')
+    # fig = plt.figure(figsize = (16,12))
+    # ax = fig.add_subplot(111)
+    #
+    # xss = np.linspace(-2500., 2500., 201)
+    # xi_grid, yi_grid = np.meshgrid(xss, xss)
+    #
+    # print('hist')
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     modmem = np.sort(allmems)[0]
+    #     dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+    #     dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+    #     okpc = results_hist[modmem]['pcs'][:, :2]
+    #     okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
+    #     okpcs_all.append(okpcok)
+    #
+    # okpc = np.concatenate(okpcs_all, axis = 0)
+    # cent = np.mean(okpc, axis = 0)
+    #
+    # kufu = ctl.calc_pdf(okpc.T)
+    #
+    # zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    # zi = zi/np.max(zi)
+    # pdfssp[('hist', 'all_last20')] = zi
+    #
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     modmem = np.sort(allmems)[0]
+    #
+    #     okpc = results_hist[modmem]['pcs'][:, :2]
+    #     okpcs_all.append(okpc)
+    #
+    # okpc = np.concatenate(okpcs_all, axis = 0)
+    # cent = np.mean(okpc, axis = 0)
+    #
+    # kufu = ctl.calc_pdf(okpc.T)
+    #
+    # zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    # zi = zi/np.max(zi)
+    # pdfssp[('hist', 'all')] = zi
+    #
+    # for reg in range(numclus):
+    #     print(reg)
+    #     okpcs_all = []
+    #     #for mod in mod_hist:
+    #     for mod in mod_hist:
+    #         allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         okclus = results_hist[modmem]['labels'] == reg
+    #         okpc = results_hist[modmem]['pcs'][okclus, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #     #pdfssp[('hist', reg)] = kufu
+    #
+    #     cmappa = ctl.custom_alphagradient_cmap(colsim[0])
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[('hist', reg)] = zi
+    #
+    #     cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)#, linewidths = lw)
+    #     ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
+    #
+    # for ssp, col in zip(allssps, colsim[1:]):
+    #     okpcs_all = []
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+    #         dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+    #         okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #         okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+    #         okpcs_all.append(okpcok)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[(ssp, 'all_last20')] = zi
+    #
+    #     okpcs_all = []
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[(ssp, 'all')] = zi
+    #
+    #     for reg in range(numclus):
+    #         print(ssp, reg)
+    #         okpcs_all = []
+    #         #for modmem in results_ssp[ssp].keys():
+    #         for mod in mod_ssp[ssp]:
+    #             allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #             modmem = np.sort(allmems)[0]
+    #             okclus = results_ssp[ssp][modmem]['labels'] == reg
+    #             okpc = results_ssp[ssp][modmem]['pcs'][okclus, :2]
+    #             okpcs_all.append(okpc)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #         cent = np.mean(okpc, axis = 0)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         cmappa = ctl.custom_alphagradient_cmap(col)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         pdfssp[(ssp, reg)] = zi
+    #
+    #         cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)
+    #         ax.scatter(cent[0], cent[1], color = col, s = 10, marker = 'x')
+    #
+    # ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    # fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
+    #
+    # pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_last20_{}.p'.format(area), 'wb'))
+
+
+    print('Building pdfs for each model...')
+    modpdf = dict()
+
     fig = plt.figure(figsize = (16,12))
     ax = fig.add_subplot(111)
 
-    xss = np.linspace(-2500., 2500., 201)
+    xss = np.linspace(-3000., 3000., 301)
     xi_grid, yi_grid = np.meshgrid(xss, xss)
 
     print('hist')
     okpcs_all = []
     #for modmem in results_hist.keys():
     for mod in mod_hist:
+        print(mod)
         allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        modmem = np.sort(allmems)[0]
-        dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
-        dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
-        okpc = results_hist[modmem]['pcs'][:, :2]
-        okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
-        okpcs_all.append(okpcok)
-
-    okpc = np.concatenate(okpcs_all, axis = 0)
-    cent = np.mean(okpc, axis = 0)
-
-    kufu = ctl.calc_pdf(okpc.T)
-
-    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-    zi = zi/np.max(zi)
-    pdfssp[('hist', 'all_last20')] = zi
-
-    okpcs_all = []
-    #for modmem in results_hist.keys():
-    for mod in mod_hist:
-        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        modmem = np.sort(allmems)[0]
-
-        okpc = results_hist[modmem]['pcs'][:, :2]
-        okpcs_all.append(okpc)
-
-    okpc = np.concatenate(okpcs_all, axis = 0)
-    cent = np.mean(okpc, axis = 0)
-
-    kufu = ctl.calc_pdf(okpc.T)
-
-    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-    zi = zi/np.max(zi)
-    pdfssp[('hist', 'all')] = zi
-
-    for reg in range(numclus):
-        print(reg)
         okpcs_all = []
-        #for mod in mod_hist:
-        for mod in mod_hist:
-            allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            okclus = results_hist[modmem]['labels'] == reg
-            okpc = results_hist[modmem]['pcs'][okclus, :2]
-            okpcs_all.append(okpc)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-        #pdfssp[('hist', reg)] = kufu
-
-        cmappa = ctl.custom_alphagradient_cmap(colsim[0])
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        pdfssp[('hist', reg)] = zi
-
-        cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)#, linewidths = lw)
-        ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
-
-    for ssp, col in zip(allssps, colsim[1:]):
-        okpcs_all = []
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
-            dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-            okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+        for modmem in allmems:
+            dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+            dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+            okpc = results_hist[modmem]['pcs'][:, :2]
+            okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
             okpcs_all.append(okpcok)
 
         okpc = np.concatenate(okpcs_all, axis = 0)
@@ -519,14 +599,11 @@ for area in ['EAT', 'PNA']:
 
         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
         zi = zi/np.max(zi)
-        pdfssp[(ssp, 'all_last20')] = zi
+        modpdf[('hist', mod, 'last20')] = zi
 
         okpcs_all = []
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+        for modmem in allmems:
+            okpc = results_hist[modmem]['pcs'][:, :2]
             okpcs_all.append(okpc)
 
         okpc = np.concatenate(okpcs_all, axis = 0)
@@ -536,34 +613,42 @@ for area in ['EAT', 'PNA']:
 
         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
         zi = zi/np.max(zi)
-        pdfssp[(ssp, 'all')] = zi
+        modpdf[('hist', mod, 'tot50')] = zi
 
-        for reg in range(numclus):
-            print(ssp, reg)
+    for ssp, col in zip(allssps, colsim[1:]):
+        print(ssp)
+        #for modmem in results_ssp[ssp].keys():
+        for mod in mod_ssp[ssp]:
+            print(mod)
             okpcs_all = []
-            #for modmem in results_ssp[ssp].keys():
-            for mod in mod_ssp[ssp]:
-                allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-                modmem = np.sort(allmems)[0]
-                okclus = results_ssp[ssp][modmem]['labels'] == reg
-                okpc = results_ssp[ssp][modmem]['pcs'][okclus, :2]
-                okpcs_all.append(okpc)
+            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+            for modmem in allmems:
+                dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+                okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+                okpcs_all.append(okpcok)
 
             okpc = np.concatenate(okpcs_all, axis = 0)
-            cent = np.mean(okpc, axis = 0)
 
             kufu = ctl.calc_pdf(okpc.T)
 
-            cmappa = ctl.custom_alphagradient_cmap(col)
+            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+            zi = zi/np.max(zi)
+            modpdf[(ssp, mod, 'last20')] = zi
+
+            okpcs_all = []
+            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+            for modmem in allmems:
+                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+                okpcs_all.append(okpc)
+
+            okpc = np.concatenate(okpcs_all, axis = 0)
+
+            kufu = ctl.calc_pdf(okpc.T)
 
             zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
             zi = zi/np.max(zi)
-            pdfssp[(ssp, reg)] = zi
+            modpdf[(ssp, mod, 'tot50')] = zi
 
-            cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)
-            ax.scatter(cent[0], cent[1], color = col, s = 10, marker = 'x')
-
-    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
-    fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
-
-    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_last20_{}.p'.format(area), 'wb'))
+    pickle.dump(modpdf, open(cart_out + 'modpdfs_refCLUS_{}.p'.format(area), 'wb'))
