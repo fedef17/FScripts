@@ -167,8 +167,8 @@ for area in ['EAT', 'PNA']:
             residtime_ssp[(ssp, 'all', 'trend', reg)] = np.array([residtime_ssp[(ssp, mem, 'trend', reg)] for mem in okmods])
             residtime_ssp[(ssp, 'all', 'errtrend', reg)] = np.array([residtime_ssp[(ssp, mem, 'errtrend', reg)] for mem in okmods])
 
-    allsims = ['hist', 'ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
-    colsim = ctl.color_set(6)
+    allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
+    colsim = ctl.color_set(5)
 
     reg_names = reg_names_area[area]
 
