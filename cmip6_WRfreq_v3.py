@@ -20,9 +20,11 @@ from scipy import stats
 import pandas as pd
 
 #############################################################################
+if os.uname()[1] == 'hobbes':
+    cart_in = '/home/fabiano/Research/lavori/CMIP6/'
+elif os.uname()[1] == 'ff-clevo':
+    cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 
-cart_in = '/home/fabiano/Research/lavori/CMIP6/'
-cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 cart_out_orig = cart_in + 'Results_v3/'
 ctl.mkdir(cart_out_orig)
 
@@ -125,8 +127,6 @@ for area in ['EAT', 'PNA']:
 
         fig.savefig(cart_out + 'models_freq10_{}_{}.pdf'.format(area, ssp))
 
-        continue
-
         for mod in mod_ssp[ssp]:
             allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
             ## Attach all members labels
@@ -180,7 +180,6 @@ for area in ['EAT', 'PNA']:
                 residtime_ssp[(ssp, mod, 'trend', reg)] = m
                 residtime_ssp[(ssp, mod, 'errtrend', reg)] = err_m
 
-    continue
 
     for ssp in allssps:
         for reg in range(4):

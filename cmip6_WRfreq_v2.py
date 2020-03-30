@@ -21,8 +21,11 @@ import pandas as pd
 
 #############################################################################
 
-cart_in = '/home/fabiano/Research/lavori/CMIP6/'
-cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
+if os.uname()[1] == 'hobbes':
+    cart_in = '/home/fabiano/Research/lavori/CMIP6/'
+elif os.uname()[1] == 'ff-clevo':
+    cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
+
 cart_out_orig = cart_in + 'Results_v3/'
 ctl.mkdir(cart_out_orig)
 
@@ -127,7 +130,25 @@ for area in ['EAT', 'PNA']:
             allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
             ## Attach all members labels
             alllabs = np.concatenate([results_ssp[ssp][mem]['labels'] for mem in allmems])
-            freqs[(ssp, mod, 'tot50')] = ctl.calc_clus_freq(alllabs, numclus)
+
+            alllabs_20 = []
+            alltimes_20 = []
+            for mem in allmems:
+                dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
+                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+                labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
+                alllabs_20.append(labs)
+                restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+                alltimes_20.append(restim)
+
+            alllabs_20 = np.concatenate(alllabs_20)
+            alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
+            freqs[(ssp, mod, 'tot50')] = ctl.calc_clus_freq(alllabs_20, numclus)
+
+            for reg in range(numclus):
+                # alltimes = np.concatenate([results_ssp[ssp][mem]['resid_times'][reg] for mem in allmems])
+                residtimes[(ssp, mod, 'mean', reg)] = np.mean(alltimes_20[reg])
+                residtimes[(ssp, mod, 'p90', reg)] = np.percentile(alltimes_20[reg], 90)
 
             alllabs_20 = []
             alltimes_20 = []
@@ -146,11 +167,6 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, mod, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
 
             freqs[(ssp, mod, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
-
-            for reg in range(numclus):
-                alltimes = np.concatenate([results_ssp[ssp][mem]['resid_times'][reg] for mem in allmems])
-                residtimes[(ssp, mod, 'mean', reg)] = np.mean(alltimes)
-                residtimes[(ssp, mod, 'p90', reg)] = np.percentile(alltimes, 90)
 
             for reg in range(numclus):
                 eff_centroids[(ssp, mod, reg)] = np.mean([results_ssp[ssp][mem]['eff_centroids'][reg] for mem in allmems], axis = 0)
@@ -178,8 +194,8 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
 
-    pickle.dump([freqs, residtimes, eff_centroids, patterns_refEOF], open(cart_out + 'allresults_dicts_{}.p'.format(area), 'wb'))
-    freqs, residtimes, eff_centroids, patterns_refEOF = pickle.load(open(cart_out + 'allresults_dicts_{}.p'.format(area), 'rb'))
+    pickle.dump([freqs, residtimes, eff_centroids, patterns_refEOF], open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'wb'))
+    freqs, residtimes, eff_centroids, patterns_refEOF = pickle.load(open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'rb'))
 
     #### Grafico con tutti gli ssp
     allsims = ['hist', 'ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
