@@ -319,8 +319,8 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
 
-    pickle.dump([freqs, residtimes, eff_centroids, patterns_refEOF], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
-    freqs, residtimes, eff_centroids, patterns_refEOF = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+    pickle.dump([freqs, residtimes], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
+    freqs, residtimes = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
     #### Grafico con tutti gli ssp
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
