@@ -110,7 +110,7 @@ for area in ['EAT', 'PNA']:
                 if mem not in results_ssp[ssp].keys(): continue
                 seasfr, yr = ctl.calc_seasonal_clus_freq(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], numclus)
                 seas10 = np.array(ctl.running_mean(seasfr[reg, :], 10))
-                ax.plot(yr, seas10, label = mod)
+                ax.plot(yr, seas10, label = mem)
                 cosi.append(seas10)
 
             coso = np.mean(cosi, axis = 0)
@@ -308,7 +308,7 @@ for area in ['EAT', 'PNA']:
         freqs[(ssp, 'all', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')] for mod in okmods])
 
         # rel
-        modoks = [mod for mod in mod_hist if mod in okmods]
+        modoks = okmods
         freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
         freqs[(ssp, 'rel', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')]-freqs[('hist', mod, 'last20')] for mod in modoks])
 
