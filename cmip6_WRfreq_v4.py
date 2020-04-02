@@ -258,17 +258,44 @@ for area in ['EAT', 'PNA']:
             cosi = []
             for mem in okmods:
                 seas10 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 10))
-                ax.plot(yr, seas10)
+                #ax.plot(yr, seas10)
                 cosi.append(seas10)
             coso = np.mean(cosi, axis = 0)
+            coserr = np.std(cosi, axis = 0)
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
             ax.plot(yr, coso, color = 'black', linewidth = 3)
 
             seas10ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 10))
-            ax.plot(yr_ref, seas10ref, color = 'lightsteelblue', linewidth = 3, linestyle = '--')
+            ax.plot(yr_ref, seas10ref, color = 'red', linewidth = 2, linestyle = '--')
 
             ax.set_title(reg_names_area[area][reg])
+            ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
 
         fig.savefig(cart_out + 'long_freq10_{}_{}_e_hist.pdf'.format(area, ssp))
+
+    pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_{}_v4.p'.format(area), 'wb'))
+
+    cart_out_nc = cart_out + 'clus_freq_index/'
+    ctl.mkdir(cart_out_nc)
+    cart_out_nc_ok = cart_out_nc + '{}_NDJFM/'.format(area)
+    ctl.mkdir(cart_out_nc_ok)
+    for sim in allsims:
+        for mod in okmods:
+            outfil = cart_out_nc_ok + 'clus_freq_NDJFM_{}_{}_{}.nc'.format(area, sim, mod)
+
+            var = [seasfreq[(sim, mem, reg)] for reg in np.arange(4)]
+            if sim == 'hist':
+                yrs = np.arange(1964, 2014)
+            else:
+                yrs = np.arange(2015, 2100)
+
+            dates = np.array([pd.to_datetime('{}1101'.format(year), format='%Y%m%d').to_pydatetime() for year in yrs])
+
+            long_names = []
+            for i, fre in enumerate(var):
+                long_names.append('clus {} frequency'.format(i))
+
+            ctl.save_iris_N_timeseries(outfil, var, dates = dates, time_units = 'day since 1850-01-01 00:00:00 UTC', time_cal = 'proleptic_gregorian', long_names = long_names)
 
     #################### la parte di v2
     freqs = dict() # tot50 e last20
