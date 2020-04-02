@@ -81,6 +81,7 @@ for area in ['EAT', 'PNA']:
     print(okmods)
 
     runfreq = dict()
+    seasfreq = dict()
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
@@ -88,6 +89,7 @@ for area in ['EAT', 'PNA']:
         cosi = []
         for mem in okmods:
             seasfr, yr = ctl.calc_seasonal_clus_freq(results_hist[mem]['labels'], results_hist[mem]['dates'], numclus)
+            seasfreq[('hist', mem, reg)] = seasfr[reg, :]
             seas10 = np.array(ctl.running_mean(seasfr[reg, :], 10))
             ax.plot(yr, seas10)
             cosi.append(seas10)
@@ -109,6 +111,7 @@ for area in ['EAT', 'PNA']:
             for mem in okmods:
                 if mem not in results_ssp[ssp].keys(): continue
                 seasfr, yr = ctl.calc_seasonal_clus_freq(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], numclus)
+                seasfreq[(ssp, mem, reg)] = seasfr[reg, :]
                 seas10 = np.array(ctl.running_mean(seasfr[reg, :], 10))
                 ax.plot(yr, seas10, label = mem)
                 cosi.append(seas10)
@@ -242,6 +245,30 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
     fig.savefig(cart_out + 'allssps_freq10_{}.pdf'.format(area))
 
+
+    seasfr, yr_ref = ctl.calc_seasonal_clus_freq(results_ref['labels'], results_ref['dates'], numclus)
+    for reg in range(4):
+        seasfreq[('hist', 'ref', reg)] = seasfr[reg, :]
+
+    yr = np.arange(1965, 2100)
+    for ssp in allssps:
+        fig = plt.figure(figsize = (16,12))
+        for reg in range(4):
+            ax = fig.add_subplot(2, 2, reg+1)
+            cosi = []
+            for mem in okmods:
+                seas10 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 10))
+                ax.plot(yr, seas10)
+                cosi.append(seas10)
+            coso = np.mean(cosi, axis = 0)
+            ax.plot(yr, coso, color = 'black', linewidth = 3)
+
+            seas10ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 10))
+            ax.plot(yr_ref, seas10ref, color = 'lightsteelblue', linewidth = 3, linestyle = '--')
+
+            ax.set_title(reg_names_area[area][reg])
+
+        fig.savefig(cart_out + 'long_freq10_{}_{}_e_hist.pdf'.format(area, ssp))
 
     #################### la parte di v2
     freqs = dict() # tot50 e last20
