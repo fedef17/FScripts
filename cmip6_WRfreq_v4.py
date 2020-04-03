@@ -284,7 +284,7 @@ for area in ['EAT', 'PNA']:
             ax = fig.add_subplot(2, 2, reg+1)
             cosi = []
             for mem in okmods:
-                seas20 = np.array(ctl.running_mean(np.conatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
+                seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
                 #ax.plot(yr, seas10)
                 cosi.append(seas20)
             coso = np.mean(cosi, axis = 0)
