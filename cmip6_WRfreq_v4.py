@@ -275,6 +275,31 @@ for area in ['EAT', 'PNA']:
             ax.set_title(reg_names_area[area][reg])
             ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
 
+        fig.savefig(cart_out + 'long_lanc20_{}_{}_e_hist.pdf'.format(area, ssp))
+
+    yr = np.arange(1965, 2100)
+    for ssp in allssps:
+        fig = plt.figure(figsize = (16,12))
+        for reg in range(4):
+            ax = fig.add_subplot(2, 2, reg+1)
+            cosi = []
+            for mem in okmods:
+                seas20 = np.array(ctl.running_mean(np.conatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
+                #ax.plot(yr, seas10)
+                cosi.append(seas20)
+            coso = np.mean(cosi, axis = 0)
+            runfreq[(ssp, 'run20', reg)] = coso
+            coserr = np.std(cosi, axis = 0)
+            runfreq[(ssp, 'run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
+            ax.plot(yr, coso, color = 'black', linewidth = 3)
+
+            seas20ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 20))
+            ax.plot(yr_ref, seas20ref, color = 'red', linewidth = 2, linestyle = '--')
+
+            ax.set_title(reg_names_area[area][reg])
+            ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
+
         fig.savefig(cart_out + 'long_freq20_{}_{}_e_hist.pdf'.format(area, ssp))
 
 
@@ -291,6 +316,20 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
     fig.savefig(cart_out + 'allssps_lanc20_{}.pdf'.format(area))
+
+    fig = plt.figure(figsize = (16,12))
+    for reg in range(4):
+        ax = fig.add_subplot(2, 2, reg+1)
+        for col, ssp in zip(colsim[1:], allssps):
+            coso = runfreq[(ssp, 'run20', reg)]
+            coserr = runfreq[(ssp, 'run20err', reg)]
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.05)
+            ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
+        ax.set_title(reg_names_area[area][reg])
+        ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
+
+    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+    fig.savefig(cart_out + 'allssps_freq20_{}.pdf'.format(area))
 
     pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_{}_v4.p'.format(area), 'wb'))
 
