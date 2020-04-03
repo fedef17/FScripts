@@ -258,7 +258,7 @@ for area in ['EAT', 'PNA']:
             cosi = []
             for mem in okmods:
                 #seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
-                seas20 = np.array(ctl.lowpass_lanczos(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 10))
+                seas20 = np.array(ctl.lowpass_lanczos(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 15))
                 #ax.plot(yr, seas10)
                 cosi.append(seas20)
             coso = np.mean(cosi, axis = 0)
@@ -269,7 +269,7 @@ for area in ['EAT', 'PNA']:
             ax.plot(yr, coso, color = 'black', linewidth = 3)
 
             #seas20ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 20))
-            seas20ref = np.array(ctl.lowpass_lanczos(seasfreq[('hist', 'ref', reg)], 10))
+            seas20ref = np.array(ctl.lowpass_lanczos(seasfreq[('hist', 'ref', reg)], 15))
             ax.plot(yr_ref, seas20ref, color = 'red', linewidth = 2, linestyle = '--')
 
             ax.set_title(reg_names_area[area][reg])
