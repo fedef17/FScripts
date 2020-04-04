@@ -40,7 +40,9 @@ for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
-    results_hist, results_ref = pickle.load(open(file_hist.format(area), 'rb'))
+    results = pickle.load(open(file_hist.format(area), 'rb'))
+    results_hist = results['models']
+    results_ref = results['reference']
 
     # Erasing incomplete runs
     avlen = np.max([results_hist[ke]['labels'] for ke in results_hist.keys()])
