@@ -51,6 +51,8 @@ for area in ['EAT', 'PNA']:
             del results_hist[ke]
 
     okmods = [cos for cos in results_hist.keys()]
+    print(okmods)
+    print(len(okmods))
 
     runfreq = dict()
     seasfreq = dict()
@@ -101,3 +103,26 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names_area[area][reg])
 
     fig.savefig(cart_out + 'long_run20_{}_hist.pdf'.format(area))
+
+
+    fig = plt.figure(figsize = (16,12))
+    for reg in range(4):
+        ax = fig.add_subplot(2, 2, reg+1)
+        cosi = []
+        for mem in okmods:
+            seas20 = np.array(ctl.running_mean(seasfreq[('hist', mem, reg)], 20))
+            metot = np.mean(seasfreq[('hist', mem, reg)])
+            cosi.append(seas20-metot)
+        coso = np.mean(cosi, axis = 0)
+        runfreq[('run20anom', reg)] = coso
+        coserr = np.std(cosi, axis = 0)
+        runfreq[('run20erranom', reg)] = coserr/np.sqrt(len(okmods)-1)
+        ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
+        ax.plot(yr, coso, color = 'black', linewidth = 3)
+
+        seas20ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 20))-np.mean(seasfreq[('hist', 'ref', reg)])
+        ax.plot(yr_ref, seas20ref, color = 'red', linewidth = 2, linestyle = '--')
+
+        ax.set_title(reg_names_area[area][reg])
+
+    fig.savefig(cart_out + 'long_run20anom_{}_hist.pdf'.format(area))
