@@ -45,7 +45,7 @@ for area in ['EAT', 'PNA']:
     results_ref = results['reference']
 
     # Erasing incomplete runs
-    avlen = np.max([results_hist[ke]['labels'] for ke in results_hist.keys()])
+    avlen = np.max([len(results_hist[ke]['labels']) for ke in results_hist.keys()])
     for ke in tuple(results_hist.keys()):
         if len(results_hist[ke]['labels']) < 0.9*avlen:
             del results_hist[ke]
