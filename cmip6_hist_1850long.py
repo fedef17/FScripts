@@ -50,7 +50,7 @@ for area in ['EAT', 'PNA']:
         if len(results_hist[ke]['labels']) < 0.9*avlen:
             del results_hist[ke]
 
-    okmods = np.unique([cos.split('_')[0] for cos in results_hist.keys()])
+    okmods = [cos for cos in results_hist.keys()]
 
     runfreq = dict()
     seasfreq = dict()
