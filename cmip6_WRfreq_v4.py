@@ -309,7 +309,7 @@ for area in ['EAT', 'PNA']:
         for col, ssp in zip(colsim[1:], allssps):
             coso = runfreq[(ssp, 'lanc20', reg)]
             coserr = runfreq[(ssp, 'lanc20err', reg)]
-            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.05)
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
             ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
         ax.set_title(reg_names_area[area][reg])
         ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
@@ -323,7 +323,7 @@ for area in ['EAT', 'PNA']:
         for col, ssp in zip(colsim[1:], allssps):
             coso = runfreq[(ssp, 'run20', reg)]
             coserr = runfreq[(ssp, 'run20err', reg)]
-            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.05)
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
             ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
         ax.set_title(reg_names_area[area][reg])
         ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
