@@ -89,9 +89,9 @@ for area in ['EAT', 'PNA']:
             seas20 = np.array(ctl.running_mean(seasfreq[('hist', mem, reg)], 20))
             cosi.append(seas20)
         coso = np.mean(cosi, axis = 0)
-        runfreq[(ssp, 'run20', reg)] = coso
+        runfreq[('run20', reg)] = coso
         coserr = np.std(cosi, axis = 0)
-        runfreq[(ssp, 'run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
+        runfreq[('run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
         ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
         ax.plot(yr, coso, color = 'black', linewidth = 3)
 
