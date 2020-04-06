@@ -51,6 +51,8 @@ for area in ['EAT']:#, 'PNA']:
     results_hist = results['models']
     results_ref = results['reference']
 
+    yr0 = 1950
+    yr1 = 2005
     yr = np.arange(1950, 2005)
 
     # Erasing incomplete runs
@@ -71,14 +73,15 @@ for area in ['EAT']:#, 'PNA']:
         ax = fig.add_subplot(2, 2, reg+1)
         cosi = []
         for mem in okmods:
-            seasfr, yr = ctl.calc_seasonal_clus_freq(results_hist[mem]['labels'], results_hist[mem]['dates'], numclus)
+            labok, datok = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], ctl.range_years(yr0, yr1))
+            seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('hist', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
-            ax.plot(yr, seas20)
             if len(seas20) == len(yr):
+                ax.plot(yr, seas20)
                 cosi.append(seas20)
             else:
-                print(mem, 'too short')
+                print(mem, len(seas20), 'too short')
         coso = np.mean(cosi, axis = 0)
         runfreq[('hist', reg)] = coso
         ax.plot(yr, coso, color = 'black', linewidth = 3)
@@ -124,20 +127,23 @@ for area in ['EAT']:#, 'PNA']:
 
     okmods = [cos for cos in results_ssp.keys()]
     yr = np.arange(2005, 2100)
+    yr0 = 2005
+    yr1 = 2100
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
         cosi = []
         for mem in okmods:
-            seasfr, yr = ctl.calc_seasonal_clus_freq(results_ssp[mem]['labels'], results_ssp[mem]['dates'], numclus)
+            labok, datok = ctl.sel_time_range(results_ssp[mem]['labels'], results_ssp[mem]['dates'], ctl.range_years(yr0, yr1))
+            seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
-            ax.plot(yr, seas20)
             if len(seas20) == len(yr):
+                ax.plot(yr, seas20)
                 cosi.append(seas20)
             else:
-                print(mem, 'too short')
+                print(mem, len(seas20), 'too short')
             cosi.append(seas20)
         coso = np.mean(cosi, axis = 0)
         runfreq[('rcp85', reg)] = coso
