@@ -77,6 +77,7 @@ for area in ['EAT']:#, 'PNA']:
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('hist', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
+            print(mem, len(seas20))
             if len(seas20) == len(yr):
                 ax.plot(yr, seas20)
                 cosi.append(seas20)
@@ -126,8 +127,8 @@ for area in ['EAT']:#, 'PNA']:
     results_ssp = results['models']
 
     okmods = [cos for cos in results_ssp.keys()]
-    yr = np.arange(2005, 2100)
-    yr0 = 2005
+    yr = np.arange(2006, 2100)
+    yr0 = 2006
     yr1 = 2100
 
     fig = plt.figure(figsize = (16,12))
@@ -139,6 +140,7 @@ for area in ['EAT']:#, 'PNA']:
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
+            print(mem, len(seas20))
             if len(seas20) == len(yr):
                 ax.plot(yr, seas20)
                 cosi.append(seas20)
