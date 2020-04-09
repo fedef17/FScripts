@@ -53,7 +53,11 @@ regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
 
 ################################################################################
 
-results, results_ref = pickle.load(open(filogen, 'rb'))
+# results, results_ref = pickle.load(open(filogen, 'rb'))
+restot = pickle.load(open(filogen, 'rb'))
+results = restot['models']
+results_ref = restot['reference']
+
 results['ERA_0'] = results_ref
 
 all_mods = np.array([ke.split('_')[0] for ke in results.keys()])
