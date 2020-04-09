@@ -21,24 +21,33 @@ plt.rcParams['figure.titlesize'] = titlefont
 plt.rcParams['axes.titlesize'] = 18
 plt.rcParams['axes.labelsize'] = 15
 #######################################
-cart_in = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/figures_bootstraps_v7/'
+cart_in = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/figures_bootstraps_v7_NOREF/'
 
 plot_sig = True
 plot_mean = True
 
-if plot_sig:
-    cart_out = cart_in + 'v7_rmshi_500/'
-    if not os.path.exists(cart_out): os.mkdir(cart_out)
-    filon = open(cart_in + 'res_bootstrap_v7_rmshi_500.p', 'rb')
-else:
-    cart_out = cart_in + 'v7_final/'
-    if not os.path.exists(cart_out): os.mkdir(cart_out)
-    filon = open(cart_in + 'res_bootstrap_v7_500_relent2_nosig.p', 'rb')
+# if plot_sig:
+#     cart_out = cart_in + 'v7_rmshi_500/'
+#     if not os.path.exists(cart_out): os.mkdir(cart_out)
+#     filon = open(cart_in + 'res_bootstrap_v7_rmshi_500.p', 'rb')
+# else:
+#     cart_out = cart_in + 'v7_final/'
+#     if not os.path.exists(cart_out): os.mkdir(cart_out)
+#     filon = open(cart_in + 'res_bootstrap_v7_500_relent2_nosig.p', 'rb')
+
+cart_out = cart_in + 'v7_NOREF/'
+if not os.path.exists(cart_out): os.mkdir(cart_out)
+filon = open(cart_in + 'res_bootstrap_v7_NOREF.p', 'rb')
 
 vtag = 'v7'
-cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_{}/'.format(vtag)
-filogen = cart + 'out_prima_coup_{}_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'.format(vtag)
-results, results_ref = pickle.load(open(filogen, 'rb'))
+# cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_{}/'.format(vtag)
+# filogen = cart + 'out_prima_coup_{}_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'.format(vtag)
+# results, results_ref = pickle.load(open(filogen, 'rb'))
+cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_{}_NOREF/'.format(vtag)
+filogen = cart + 'out_prima_coup_{}_NOREF_DJF_EAT_4clus_4pcs_1957-2014.p'.format(vtag)
+restot = pickle.load(open(filogen, 'rb'))
+results = restot['models']
+results_ref = restot['reference']
 
 results.pop('HadGEM3-GC31-LL_r1i1p2f1')
 results.pop('EC-Earth3P_r1i1p1f1')

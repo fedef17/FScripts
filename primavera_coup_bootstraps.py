@@ -18,17 +18,22 @@ from datetime import datetime
 from scipy import stats
 
 #######################################
-cart_out = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/figures_bootstraps_v7/'
+cart_out = '/home/fabiano/Research/articoli/Papers/primavera_regimes/figures/figures_bootstraps_v7_NOREF/'
 if not os.path.exists(cart_out): os.mkdir(cart_out)
 
-cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7/'
-filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
+# cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7/'
+# filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
+cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7_NOREF/'
+filogen = cart + 'out_prima_coup_v7_NOREF_DJF_EAT_4clus_4pcs_1957-2014.p'
 # cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7_rmshi/'
 # filogen = cart + 'out_prima_coup_v7_rmshi_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 
 n_choice = 30
-n_bootstrap = 500
-filo = open(cart_out + 'res_bootstrap_v7_500_relent2_nosig.p', 'wb')
+#n_bootstrap = 500
+n_bootstrap = 100
+
+#filo = open(cart_out + 'res_bootstrap_v7_500_relent2_nosig.p', 'wb')
+filo = open(cart_out + 'res_bootstrap_v7_NOREF.p', 'wb')
 
 model_names = ['AWI-CM-1-1-LR', 'AWI-CM-1-1-HR', 'CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'CNRM-CM6-1', 'CNRM-CM6-1-HR', 'EC-Earth3P', 'EC-Earth3P-HR', 'ECMWF-IFS-LR', 'ECMWF-IFS-MR', 'ECMWF-IFS-HR', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR', 'HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM', 'HadGEM3-GC31-HH']
 
@@ -95,8 +100,8 @@ for reg in range(4):
 
 ##
 #allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'RMS', 'patcor', 'filt_relative_entropy', 'filt_RMS', 'filt_patcor']
-# allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
-allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
+allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
+#allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
 
 for mod in model_names_all:
     print(mod)
@@ -136,18 +141,18 @@ for mod in model_names_all:
                 centroids.append(np.mean(pcs[okla], axis = 0))
             centroids = np.stack(centroids)
 
-            #sig = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 200)
+            sig = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 200)
             # if sig < 10:
             #     sig2 = ctl.clusters_sig(pcs, centroids, labels, dates, nrsamp = 1000)
             #     print('RECHECK ', sig, sig2, sig3)
 
             varopt = ctl.calc_varopt_molt(pcs, centroids, labels)
             autocorr = ctl.calc_autocorr_wlag(pcs, dates, out_lag1 = True)
-            #bootstraps['significance'].append(sig)
+            bootstraps['significance'].append(sig)
             bootstraps['varopt'].append(varopt)
             bootstraps['autocorr'].append(autocorr)
 
-            bootstraps['freq'].append(ctl.calc_clus_freq(labels))
+            bootstraps['freq'].append(ctl.calc_clus_freq(labels, 4))
 
             centdist = np.array([ctl.distance(centroids[iclu], ref_cen[iclu]) for iclu in range(4)])
             bootstraps['dist_cen'].append(centdist)
