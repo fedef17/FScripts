@@ -341,7 +341,7 @@ for area in ['EAT', 'PNA']:
         for mod in okmods:
             outfil = cart_out_nc_ok + 'clus_freq_NDJFM_{}_{}_{}.nc'.format(area, sim, mod)
 
-            var = [seasfreq[(sim, mem, reg)] for reg in np.arange(4)]
+            var = [seasfreq[(sim, mod, reg)] for reg in np.arange(4)]
             if sim == 'hist':
                 yrs = np.arange(1964, 2014)
             else:
