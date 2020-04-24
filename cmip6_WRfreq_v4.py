@@ -571,13 +571,15 @@ for area in ['EAT', 'PNA']:
         allpercs['ens_max'] = [np.percentile(freqs[(ssp, 'all', 'last20')][:, reg], 75) for ssp in allsims]
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        print('AAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        print(allsims)
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = True, plot_minmax = True)
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
 
         ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
 
-    ctl.adjust_ax_scale(axes)
+    #ctl.adjust_ax_scale(axes)
     axes = []
     # qui ci metto il trend
     for reg in range(4):
