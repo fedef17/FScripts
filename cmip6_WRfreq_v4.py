@@ -575,13 +575,9 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
 
-        ax2.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
-        ctl.boxplot_on_ax(ax2, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = False, plot_minmax = True)
-        ax2.set_xticks([])
-        ax2.set_title(reg_names[reg])
-        ax2.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
 
-    #ctl.adjust_ax_scale(axes)
+    ctl.adjust_ax_scale(axes)
     axes = []
     # qui ci metto il trend
     for reg in range(4):
