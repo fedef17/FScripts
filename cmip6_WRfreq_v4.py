@@ -550,6 +550,63 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box.pdf'.format(area, cos))
 
+
+    figall = plt.figure(figsize = (28,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 4, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+        #allpercs['mean'] = [np.mean(freqs[(ssp, 'all', cos)][:, reg]) for ssp in allsims]
+        # qui ci metto invece della mean la median del last20
+        allpercs['mean'] = [np.median(freqs[(ssp, 'all', 'last20')][:, reg]) for ssp in allsims]
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, 'all', cos)][:, reg], nu) for ssp in allsims]
+
+        # qui ci metto invece del min e max i percentili del last20
+        allpercs['ens_min'] = [np.percentile(freqs[(ssp, 'all', 'last20')][:, reg], 25) for ssp in allsims]
+        allpercs['ens_max'] = [np.percentile(freqs[(ssp, 'all', 'last20')][:, reg], 75) for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = True, plot_minmax = True)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+
+        ax2.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        ctl.boxplot_on_ax(ax2, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = False, plot_minmax = True)
+        ax2.set_xticks([])
+        ax2.set_title(reg_names[reg])
+        ax2.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+
+    #ctl.adjust_ax_scale(axes)
+    axes = []
+    # qui ci metto il trend
+    for reg in range(4):
+        ax = figall.add_subplot(2, 4, 4 + reg + 1)
+        allpercs = dict()
+        # allpercs['mean'] = [np.mean(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', pio, cos, reg)], nu) for ssp in allsims[1:]]
+
+        # allpercs['ens_min'] = [np.min(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+        # allpercs['ens_max'] = [np.max(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+
+        ctl.boxplot_on_ax(ax, allpercs, allsims[1:], colsim[1:], plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        axes.append(ax)
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'WRfreq_allssp_{}_8box_wtrend.pdf'.format(area, cos))
+
+
     fig = plt.figure(figsize = (16,12))
     axes = []
 
