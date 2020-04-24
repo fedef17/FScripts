@@ -575,6 +575,7 @@ for area in ['EAT', 'PNA']:
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = False, plot_minmax = True)
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
+        if reg == 0: ax.set_ylabel('Regime frequency')
 
         ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
 
@@ -596,6 +597,7 @@ for area in ['EAT', 'PNA']:
 
         ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
+        if reg == 0: ax.set_ylabel('Trend in regime frequency (1/yr)')
         axes.append(ax)
 
     ctl.adjust_ax_scale(axes)
