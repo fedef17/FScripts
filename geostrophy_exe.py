@@ -61,6 +61,7 @@ for i, lev in enumerate(levs):
 
     laplzg = ctl.calc_gradient_2d(grad_zg[lev][0], lat, lon)[0] + ctl.calc_gradient_2d(grad_zg[lev][1], lat, lon)[1]
     vortg[lev] = 1/f * laplzg
+    vortg[lev][np.isinf(vortg[lev])] = np.nan
 
     grad_ta[lev] = ctl.calc_gradient_2d(ta[i], lat, lon)
 
