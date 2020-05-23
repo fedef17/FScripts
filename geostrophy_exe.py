@@ -44,6 +44,7 @@ lon = ucoords['lon']
 
 Om = 2*np.pi/86400.
 f = 2*Om*np.sin(np.deg2rad(lat))
+f = np.reshape(np.repeat(f, 480), (241,480))
 
 levs = np.array([850, 500, 200, 50, 30])
 
