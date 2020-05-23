@@ -71,7 +71,7 @@ vt = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev][0] for lev1, lev2 in zip(le
 tam = np.mean(ta, axis = 0)
 
 figs = []
-for i, lev in levs:
+for i, lev in enumerate(levs):
     fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [u[i], v[i]], title = 'real winds - lev {} hPa'.format(lev), plot_anomalies = False)
     figs.append(fig)
     fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [ug[lev], vg[lev]], title = 'geostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False)
