@@ -44,7 +44,7 @@ lon = ucoords['lon']
 
 Om = 2*np.pi/86400.
 f = 2*Om*np.sin(np.deg2rad(lat))
-f = np.reshape(np.repeat(f, 480), (241,480))
+f = np.reshape(np.repeat(f, len(lon)), zg[0].shape)
 
 levs = np.array([850, 500, 200, 50, 30])
 
@@ -73,19 +73,19 @@ tam = np.mean(ta, axis = 0)
 
 figs = []
 for i, lev in enumerate(levs):
-    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [u[i], v[i]], title = 'real winds - lev {} hPa'.format(lev), plot_anomalies = False)
+    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [u[i], v[i]], title = 'real winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = (-100, 60, 20, 90), quiver_scale = 1000)
     figs.append(fig)
-    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [ug[lev], vg[lev]], title = 'geostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False)
+    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [ug[lev], vg[lev]], title = 'geostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = (-100, 60, 20, 90), quiver_scale = 1000)
     figs.append(fig)
-    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [u[i] - ug[lev], v[i] - vg[lev]], title = 'ageostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False)
+    fig = ctl.plot_map_contour(zg[i], lat, lon, add_vector_field = [u[i] - ug[lev], v[i] - vg[lev]], title = 'ageostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = (-100, 60, 20, 90), quiver_scale = 1000)
     figs.append(fig)
-    fig = ctl.plot_map_contour(vortg[lev], lat, lon, add_contour_field = pv[i], title = 'geostrophic vort and PV - lev {} hPa'.format(lev), plot_anomalies = False)
+    fig = ctl.plot_map_contour(vortg[lev], lat, lon, add_contour_field = pv[i], title = 'geostrophic vort and PV - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = (-100, 60, 20, 90))
     figs.append(fig)
 
-fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ut, vt], title = 'temperature and thermal wind', plot_anomalies = False)
+fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ut, vt], title = 'temperature and thermal wind', plot_anomalies = False, plot_margins = (-100, 60, 20, 90), quiver_scale = 1000)
 figs.append(fig)
 
-fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [u[-1]-ug[levs[0]]-ut, v[-1]-vg[levs[0]]-vt], title = 'wind at height minus thermal wind', plot_anomalies = False)
+fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [u[-1]-ug[levs[0]]-ut, v[-1]-vg[levs[0]]-vt], title = 'wind at height minus thermal wind', plot_anomalies = False, plot_margins = (-100, 60, 20, 90), quiver_scale = 1000)
 figs.append(fig)
 
 ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)
