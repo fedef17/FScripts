@@ -34,7 +34,7 @@ v = v[-3, ...]
 ta, tacoords, _ = ctl.readxDncfield(filnam.format('ta', 'ta'))
 ta = ta[-3, ...]
 zg, zgcoords, _ = ctl.readxDncfield(filnam.format('zg', 'zg'))
-zg = zg[-3, ...]
+zg = 9.80665*zg[-3, ...]
 pv, pvcoords, _ = ctl.readxDncfield(filnam.format('pv', 'pv'))
 pv = pv[-3, ...]
 
@@ -66,8 +66,8 @@ for i, lev in enumerate(levs):
     grad_ta[lev] = ctl.calc_gradient_2d(ta[i], lat, lon)
 
 R = 8.31
-ut = np.sum([ R/f * np.log(lev1/lev2) * grad_ta[lev][1] for lev1, lev2 in zip(levs[:-1], levs[1:])])
-vt = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev][0] for lev1, lev2 in zip(levs[:-1], levs[1:])])
+ut = np.sum([ R/f * np.log(lev1/lev2) * grad_ta[lev][1] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
+vt = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev][0] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
 
 tam = np.mean(ta, axis = 0)
 
