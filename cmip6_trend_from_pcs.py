@@ -88,3 +88,51 @@ for modmem in okmods:
     cose[('hist std', mod)] = zgstd
 
 pickle.dump(cose, open(cart_out_orig + 'zgtrends_ssp585.p', 'wb'))
+
+
+area = (-180, 180, 20, 90)
+
+trendsanom = []
+trendsstateddy = []
+hatchs = []
+for modmem in okmods:
+    mod, mem = modmem.split('_')
+    trend = cose[('trend', mod)].squeeze()
+    errtrend = cose[('errtrend', mod)].squeeze()
+
+    zonme = ctl.zonal_mean(trend)
+    stat_eddy_trend = np.empty_like(trend)
+    for i in range(trend.shape[0]):
+        stat_eddy_trend[i,:] = trend[i,:]-zonme[i]
+
+    trend_area, lat_area, lon_area = ctl.sel_area(lat, lon, trend, area)
+    trend_anom = trend-np.mean(trend_area)
+    trendsanom.append(trend_anom)
+    trendsstateddy.append(stat_eddy_trend)
+
+    hatchs.append(np.abs(trend_anom) > errtrend)
+
+allmods = [modmem.split('_')[0] for modmem in okmods]
+#meanfields = [cose[('hist mean', mod)] for mod in allmods]
+
+meanfields = []
+stateddies = []
+for mod in allmods:
+    mf = cose[('hist mean', mod)].squeeze()
+    zonme = ctl.zonal_mean(mf)
+    stat_eddy = np.empty_like(trend)
+    for i in range(trend.shape[0]):
+        stat_eddy[i,:] = mf[i,:]-zonme[i]
+
+    meanfields.append(mf)
+    stateddies.append(stat_eddy)
+
+
+filename = cart_out_orig + 'trend_anom_ssp585.pdf'
+ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,12))
+
+filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,12))
+
+filename = cart_out_orig + 'stateddies_hist.pdf'
+ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), fix_subplots_shape = (7, 2), figsize = (15,12))
