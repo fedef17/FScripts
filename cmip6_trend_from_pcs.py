@@ -64,3 +64,27 @@ cartmon_ssp = '/data-hobbes/fabiano/CMIP6/ssp585_mon_zg/'
 
 filssp = 'zg_Amon_ssp585_{}_{}_2015-2100.nc'
 filhist = 'zg_{}_mon.nc'
+
+season = 'NDJFM'
+
+cose = dict()
+for modmem in okmods:
+    mod, mem = modmem.split('_')
+    zgssp, coords, _ = ctl.readxDncfield(cartmon_ssp + filssp.format(mod, mem))
+    lat = coords['lat']
+    lon = coords['lon']
+    dates = coords['dates']
+    trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season)
+
+    zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
+    lat = coords['lat']
+    lon = coords['lon']
+    dates = coords['dates']
+    zgmean, zgstd = ctl.seasonal_climatology(zghist, dates, season, dates_range = ctl.range_years(1964,2014))
+
+    cose[('trend', mod)] = trendssp
+    cose[('errtrend', mod)] = errtrendssp
+    cose[('hist mean', mod)] = zgmean
+    cose[('hist std', mod)] = zgstd
+
+pickle.dump(cose, open(cart_out + 'zgtrends_ssp585.p', 'w'))
