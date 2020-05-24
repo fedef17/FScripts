@@ -87,4 +87,4 @@ for modmem in okmods:
     cose[('hist mean', mod)] = zgmean
     cose[('hist std', mod)] = zgstd
 
-pickle.dump(cose, open(cart_out + 'zgtrends_ssp585.p', 'w'))
+pickle.dump(cose, open(cart_out_orig + 'zgtrends_ssp585.p', 'w'))
