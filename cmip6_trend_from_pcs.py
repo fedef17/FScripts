@@ -75,7 +75,7 @@ for modmem in okmods:
     lon = coords['lon']
     dates = coords['dates']
     #trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season)
-    trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season, remove_global_trend = True, global_deg = 3, global_area = 'NML')
+    trendssp, errtrendssp, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season, remove_global_trend = True, global_deg = 3, global_area = 'NML')
 
     zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
     lat = coords['lat']
