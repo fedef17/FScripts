@@ -110,7 +110,7 @@ for modmem in okmods:
     trendsanom.append(trend_anom)
     trendsstateddy.append(stat_eddy_trend)
 
-    hatchs.append(np.abs(trend_anom) > errtrend)
+    hatchs.append(np.abs(trend_anom) > 2*errtrend)
 
 allmods = [modmem.split('_')[0] for modmem in okmods]
 #meanfields = [cose[('hist mean', mod)] for mod in allmods]
@@ -129,10 +129,13 @@ for mod in allmods:
 
 
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
-ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
+ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year', verbose = True)
+
+filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
+ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (70, -20), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
 ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
 
 filename = cart_out_orig + 'stateddies_hist.pdf'
-ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-100,100), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm')
+ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm')
