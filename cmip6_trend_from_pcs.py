@@ -75,7 +75,7 @@ for modmem in okmods:
     lon = coords['lon']
     dates = coords['dates']
     #trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season)
-    zg_noglob, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, season, deg = 3, area = 'NML')
+    zg_noglob, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, zgssp, dates, season, deg = 3, area = 'NML')
 
     trend, errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, None)
 
