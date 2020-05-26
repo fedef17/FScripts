@@ -75,7 +75,13 @@ for modmem in okmods:
     lon = coords['lon']
     dates = coords['dates']
     #trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season)
-    trendssp, errtrendssp, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season, remove_global_trend = True, global_deg = 3, global_area = 'NML')
+    zg_noglob, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, season, deg = 3, area = 'NML')
+
+    trend, errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, None)
+
+    zg_noglob_zonme = ctl.zonal_mean(zg_noglob)
+    zg_se = zg_noglob - zg_noglob_zonme[..., np.newaxis]
+    se_trend, se_errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, None)
 
     zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
     lat = coords['lat']
@@ -83,8 +89,10 @@ for modmem in okmods:
     dates = coords['dates']
     zgmean, zgstd = ctl.seasonal_climatology(zghist, dates, season, dates_range = ctl.range_years(1964,2014))
 
-    cose[('trend', mod)] = trendssp
-    cose[('errtrend', mod)] = errtrendssp
+    cose[('trend', mod)] = trend
+    cose[('errtrend', mod)] = errtrend
+    cose[('se_trend', mod)] = trend
+    cose[('se_errtrend', mod)] = errtrend
     cose[('hist mean', mod)] = zgmean
     cose[('hist std', mod)] = zgstd
 
@@ -96,22 +104,27 @@ area = (-180, 180, 20, 90)
 trendsanom = []
 trendsstateddy = []
 hatchs = []
+hatchs_se = []
 for modmem in okmods:
     mod, mem = modmem.split('_')
     trend = cose[('trend', mod)].squeeze()
     errtrend = cose[('errtrend', mod)].squeeze()
 
-    zonme = ctl.zonal_mean(trend)
-    stat_eddy_trend = np.empty_like(trend)
-    for i in range(trend.shape[0]):
-        stat_eddy_trend[i,:] = trend[i,:]-zonme[i]
+    # zonme = ctl.zonal_mean(trend)
+    # stat_eddy_trend = np.empty_like(trend)
+    # for i in range(trend.shape[0]):
+    #     stat_eddy_trend[i,:] = trend[i,:]-zonme[i]
 
-    trend_area, lat_area, lon_area = ctl.sel_area(lat, lon, trend, area)
-    trend_anom = trend-np.mean(trend_area)
-    trendsanom.append(trend_anom)
+    stat_eddy_trend = cose[('se_trend', mod)].squeeze()
+    se_errtrend = cose[('se_errtrend', mod)].squeeze()
+
+    # trend_area, lat_area, lon_area = ctl.sel_area(lat, lon, trend, area)
+    # trend_anom = trend-np.mean(trend_area)
+    trendsanom.append(trend)
     trendsstateddy.append(stat_eddy_trend)
 
-    hatchs.append(np.abs(trend_anom) > 2*errtrend)
+    hatchs.append(np.abs(trend) > 2*errtrend)
+    hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
 
 allmods = [modmem.split('_')[0] for modmem in okmods]
 #meanfields = [cose[('hist mean', mod)] for mod in allmods]
@@ -121,13 +134,10 @@ stateddies = []
 for mod in allmods:
     mf = cose[('hist mean', mod)].squeeze()
     zonme = ctl.zonal_mean(mf)
-    stat_eddy = np.empty_like(trend)
-    for i in range(trend.shape[0]):
-        stat_eddy[i,:] = mf[i,:]-zonme[i]
+    stat_eddy = mf - zonme[:, np.newaxis]
 
     meanfields.append(mf)
     stateddies.append(stat_eddy)
-
 
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year', verbose = True)
@@ -136,7 +146,10 @@ filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
-ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
+
+filename = cart_out_orig + 'trend_stateddy_ssp585_EAT.pdf'
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_hatching = hatchs_se, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'stateddies_hist.pdf'
 ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm')
