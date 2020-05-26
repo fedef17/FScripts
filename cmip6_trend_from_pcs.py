@@ -91,8 +91,8 @@ for modmem in okmods:
 
     cose[('trend', mod)] = trend
     cose[('errtrend', mod)] = errtrend
-    cose[('se_trend', mod)] = trend
-    cose[('se_errtrend', mod)] = errtrend
+    cose[('se_trend', mod)] = se_trend
+    cose[('se_errtrend', mod)] = se_errtrend
     cose[('hist mean', mod)] = zgmean
     cose[('hist std', mod)] = zgstd
 
