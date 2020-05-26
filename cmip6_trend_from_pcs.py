@@ -153,3 +153,6 @@ ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=Tru
 
 filename = cart_out_orig + 'stateddies_hist.pdf'
 ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm')
+
+filename = cart_out_orig + 'trend_stateddy_ssp585_whist.pdf'
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_contour_field = stateddies, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
