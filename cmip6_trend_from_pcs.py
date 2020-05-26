@@ -140,16 +140,16 @@ for mod in allmods:
     stateddies.append(stat_eddy)
 
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
-ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year', verbose = True)
+ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-5,5), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
-ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
+ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-5,5), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
-ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-5,5), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm/year')
 
 filename = cart_out_orig + 'trend_stateddy_ssp585_EAT.pdf'
-ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_hatching = hatchs_se, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-5,5), add_hatching = hatchs_se, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods, cb_label = 'm/year', verbose = True)
 
 filename = cart_out_orig + 'stateddies_hist.pdf'
 ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods, cb_label = 'm')
