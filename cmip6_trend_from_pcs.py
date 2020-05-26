@@ -77,11 +77,11 @@ for modmem in okmods:
     #trendssp, errtrendssp = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, season)
     zg_noglob, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, zgssp, dates, season, deg = 3, area = 'NML')
 
-    trend, errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, None)
+    trend, errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zg_noglob, dates, None)
 
     zg_noglob_zonme = ctl.zonal_mean(zg_noglob)
     zg_se = zg_noglob - zg_noglob_zonme[..., np.newaxis]
-    se_trend, se_errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zgssp, dates, None)
+    se_trend, se_errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zg_se, dates, None)
 
     zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
     lat = coords['lat']
