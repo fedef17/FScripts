@@ -75,7 +75,7 @@ for i, lev in enumerate(levs):
 
     grad_ta[lev] = ctl.calc_gradient_2d(ta_[i], lat, lon)
 
-    if i < len(levs):
+    if i < len(levs)-1:
         ut_lev[lev] = R/f * np.log(lev/levs[i+1]) * grad_ta[lev][1]
         vt_lev[lev] = -R/f * np.log(lev/levs[i+1]) * grad_ta[lev][0]
 
@@ -101,7 +101,7 @@ for i, lev in enumerate(levs):
     fig = ctl.plot_map_contour(pv_[i], lat, lon, title = 'potential vorticity - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
 
-    if i < len(levs):
+    if i < len(levs)-1:
         fig = ctl.plot_map_contour(ta_[i], lat, lon, add_vector_field = [ut_lev[lev], vt_lev[lev]], title = 'temperature and thermal wind - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
         figs.append(fig)
 
