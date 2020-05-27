@@ -40,7 +40,8 @@ lon = ucoords['lon']
 
 Om = 2*np.pi/86400.
 f = 2*Om*np.sin(np.deg2rad(lat))
-f = np.reshape(np.repeat(f, len(lon)), zg[0].shape)
+f = f[:, np.newaxis]
+#f = np.reshape(np.repeat(f, len(lon)), zg[0,0].shape)
 
 levs = np.array([850, 500, 200, 50, 30])
 
