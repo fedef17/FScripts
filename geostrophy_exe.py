@@ -100,12 +100,12 @@ for i, lev in enumerate(levs):
     figs.append(fig)
     fig = ctl.plot_map_contour(pv_[i], lat, lon, title = 'potential vorticity - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
-    
+
     if i < len(levs):
         fig = ctl.plot_map_contour(ta_[i], lat, lon, add_vector_field = [ut_lev[lev], vt_lev[lev]], title = 'temperature and thermal wind - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
         figs.append(fig)
 
-        fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ug[levs[i+1]]-ug[lev], vg[levs[i+1]]-vg[lev]], title = 'vertical wind shear - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
+        fig = ctl.plot_map_contour(ta_[i], lat, lon, add_vector_field = [ug[levs[i+1]]-ug[lev], vg[levs[i+1]]-vg[lev]], title = 'vertical wind shear - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
         figs.append(fig)
 
 ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)
