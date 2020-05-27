@@ -81,22 +81,23 @@ tam = np.mean(ta_, axis = 0)
 
 quiver_scale = 500
 vec_every = 10
+figsize = (24,12)
 
 figs = []
 for i, lev in enumerate(levs):
-    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [u_[i], v_[i]], title = 'real winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [u_[i], v_[i]], title = 'real winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
-    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [ug[lev], vg[lev]], title = 'geostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [ug[lev], vg[lev]], title = 'geostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
-    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [u_[i] - ug[lev], v_[i] - vg[lev]], title = 'ageostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+    fig = ctl.plot_map_contour(zg_[i], lat, lon, add_vector_field = [u_[i] - ug[lev], v_[i] - vg[lev]], title = 'ageostrophic winds - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
-    fig = ctl.plot_map_contour(vortg[lev], lat, lon, add_contour_field = pv_[i], title = 'geostrophic vort and PV - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+    fig = ctl.plot_map_contour(vortg[lev], lat, lon, add_contour_field = pv_[i], title = 'geostrophic vort and PV - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
     figs.append(fig)
 
-fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ut, vt], title = 'temperature and thermal wind', plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ut, vt], title = 'temperature and thermal wind', plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
 figs.append(fig)
 
-fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [u_[-1]-ug[levs[0]]-ut, v_[-1]-vg[levs[0]]-vt], title = 'wind at height minus thermal wind', plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = (15, 20))
+fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [u_[-1]-ug[levs[0]]-ut, v_[-1]-vg[levs[0]]-vt], title = 'wind at height minus thermal wind', plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
 figs.append(fig)
 
 ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)
