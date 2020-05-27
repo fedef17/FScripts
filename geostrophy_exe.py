@@ -102,4 +102,4 @@ figs.append(fig)
 fig = ctl.plot_map_contour(tam, lat, lon, add_vector_field = [ug[levs[-1]]-ug[levs[0]], vg[levs[-1]]-vg[levs[0]]], title = 'wind at height minus surface wind', plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
 figs.append(fig)
 
-ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)s
+ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)
