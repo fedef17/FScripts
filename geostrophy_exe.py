@@ -39,6 +39,7 @@ lat_orig = ucoords['lat']
 lon_orig = ucoords['lon']
 
 levs = np.array([850, 500, 200, 50, 30])
+area = (-180, 180, 10, 85)
 
 #for da in np.arange(365):
 da = -3
@@ -60,7 +61,6 @@ vg = dict()
 vortg = dict()
 grad_ta = dict()
 
-area = (-180, 180, 10, 85)
 
 for i, lev in enumerate(levs):
     grad_zg[lev] = ctl.calc_gradient_2d(zg_[i], lat, lon)
