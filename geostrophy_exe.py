@@ -75,7 +75,7 @@ R = 8.31
 ut = np.sum([R/f * np.log(lev1/lev2) * grad_ta[lev1][1] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
 vt = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev1][0] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
 
-tam = np.mean(ta, axis = 0)
+tam = np.mean(ta_, axis = 0)
 
 quiver_scale = 500
 vec_every = 10
