@@ -126,10 +126,12 @@ for modmem in okmods:
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
 
+NSIG = 11 # number of models to consider response significant
+
 trendsanom.append(np.mean(trendsanom, axis = 0))
-hatchs.append(np.sum([np.sign(tre) == np.sign(trendsanom[-1]) for tre in trendsanom[:-1]], axis = 0) >= 10)
+hatchs.append(np.sum([np.sign(tre) == np.sign(trendsanom[-1]) for tre in trendsanom[:-1]], axis = 0) >= NSIG)
 trendsstateddy.append(np.mean(trendsstateddy, axis = 0))
-hatchs_se.append(np.sum([np.sign(tre) == np.sign(trendsstateddy[-1]) for tre in trendsstateddy[:-1]], axis = 0) >= 10)
+hatchs_se.append(np.sum([np.sign(tre) == np.sign(trendsstateddy[-1]) for tre in trendsstateddy[:-1]], axis = 0) >= NSIG)
 
 allmods = [modmem.split('_')[0] for modmem in okmods]
 #meanfields = [cose[('hist mean', mod)] for mod in allmods]
