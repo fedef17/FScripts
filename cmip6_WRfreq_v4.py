@@ -25,13 +25,18 @@ if os.uname()[1] == 'hobbes':
 elif os.uname()[1] == 'ff-clevo':
     cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 
-cart_out_orig = cart_in + 'Results_v4/'
+dtrtyp = 'dtrloc'
+
+if dtrtyp == 'dtr':
+    cart_out_orig = cart_in + 'Results_v4/'
+else:
+    cart_out_orig = cart_in + 'Results_v4_dtrloc/'
 ctl.mkdir(cart_out_orig)
 
 file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
 file_hist = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
 #file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF.p'
-gen_file_ssp = cart_in + 'cmip6_{}/out_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
+gen_file_ssp = cart_in + 'cmip6_{}/out_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_{}.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -59,7 +64,7 @@ for area in ['EAT', 'PNA']:
 
     results_ssp = dict()
     for ssp in allssps:
-        results_ssp[ssp] = pickle.load(open(gen_file_ssp.format(ssp, ssp, area), 'rb'))['models']
+        results_ssp[ssp] = pickle.load(open(gen_file_ssp.format(ssp, ssp, area, dtrtyp), 'rb'))['models']
 
         # Erasing incomplete runs
         for ke in tuple(results_ssp[ssp].keys()):
