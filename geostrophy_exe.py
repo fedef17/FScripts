@@ -63,7 +63,7 @@ grad_ta = dict()
 ut_lev = dict()
 vt_lev = dict()
 
-R = 8.31
+R = 287 # 8.31 divided by atmospheric MM = 28.8 g/mol
 for i, lev in enumerate(levs):
     grad_zg[lev] = ctl.calc_gradient_2d(zg_[i], lat, lon)
     ug[lev] = -1/f * grad_zg[lev][1]
