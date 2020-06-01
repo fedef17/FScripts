@@ -73,9 +73,8 @@ for i, lev in enumerate(levs):
     vortg[lev] = 1/f * laplzg
     vortg[lev][np.isinf(vortg[lev])] = np.nan
 
-    grad_ta[lev] = ctl.calc_gradient_2d(ta_[i], lat, lon)
-
     if i < len(levs)-1:
+        grad_ta[lev] = ctl.calc_gradient_2d(np.mean([ta_[i],ta_[i+1]], axis = 0), lat, lon)
         ut_lev[lev] = R/f * np.log(lev/levs[i+1]) * grad_ta[lev][1]
         vt_lev[lev] = -R/f * np.log(lev/levs[i+1]) * grad_ta[lev][0]
 
@@ -86,7 +85,7 @@ tam = np.mean(ta_, axis = 0)
 
 quiver_scale = 1000
 vec_every = 10
-figsize = (24,12)
+figsize = (16,8)
 
 figs = []
 for i, lev in enumerate(levs):
@@ -106,6 +105,9 @@ for i, lev in enumerate(levs):
         figs.append(fig)
 
         fig = ctl.plot_map_contour(ta_[i], lat, lon, add_vector_field = [ug[levs[i+1]]-ug[lev], vg[levs[i+1]]-vg[lev]], title = 'vertical wind shear - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
+        figs.append(fig)
+
+        fig = ctl.plot_map_contour(ta_[i], lat, lon, add_vector_field = [ug[levs[i+1]]-ug[lev]-ut_lev[lev], vg[levs[i+1]]-vg[lev]-vt_lev[lev]], title = 'residual - lev {} hPa'.format(lev), plot_anomalies = False, plot_margins = area, quiver_scale = quiver_scale, vec_every = vec_every, plot_type = 'pcolormesh', figsize = figsize)
         figs.append(fig)
 
 ctl.plot_pdfpages(cart_out + 'geostrophy_exe.pdf', figs)
