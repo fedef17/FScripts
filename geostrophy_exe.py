@@ -75,11 +75,11 @@ for i, lev in enumerate(levs):
 
     if i < len(levs)-1:
         grad_ta[lev] = ctl.calc_gradient_2d(np.mean([ta_[i],ta_[i+1]], axis = 0), lat, lon)
-        ut_lev[lev] = R/f * np.log(lev/levs[i+1]) * grad_ta[lev][1]
-        vt_lev[lev] = -R/f * np.log(lev/levs[i+1]) * grad_ta[lev][0]
+        ut_lev[lev] = -R/f * np.log(lev/levs[i+1]) * grad_ta[lev][1]
+        vt_lev[lev] = R/f * np.log(lev/levs[i+1]) * grad_ta[lev][0]
 
 ut = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev1][1] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
-vt = np.sum([-R/f * np.log(lev1/lev2) * grad_ta[lev1][0] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
+vt = np.sum([R/f * np.log(lev1/lev2) * grad_ta[lev1][0] for lev1, lev2 in zip(levs[:-1], levs[1:])], axis = 0)
 
 tam = np.mean(ta_, axis = 0)
 
