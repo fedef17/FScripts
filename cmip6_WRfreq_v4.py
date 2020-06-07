@@ -43,6 +43,9 @@ reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
 reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 
+clatlo = dict()
+clatlo['EAT'] = (70., -20.)
+clatlo['PNA'] = (70., -120.)
 
 #allssps = 'ssp119 ssp126 ssp245 ssp370 ssp585'.split()
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
@@ -780,3 +783,19 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'Restime_allssp_{}_8box_wtrend.pdf'.format(area, cos))
+
+
+    cart_patt = cart_out + 'patterns/'
+    ctl.mkdit(cart_patt)
+    for ssp in allssps:
+        filenam = cart_out + 'Pattern_meandiff_{}.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+
+        filenam = cart_out + 'Pattern_spreaddiff_{}.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+
+        filenam = cart_out + 'Pattern_meandiff_{}_last20.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+
+        filenam = cart_out + 'Pattern_spreaddiff_{}_last20.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
