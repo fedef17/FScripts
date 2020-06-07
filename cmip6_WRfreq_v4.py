@@ -784,6 +784,8 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'Restime_allssp_{}_8box_wtrend.pdf'.format(area, cos))
 
+    lat = results_ref['lat']
+    lon = results_ref['lon']
 
     cart_patt = cart_out + 'patterns/'
     ctl.mkdir(cart_patt)
