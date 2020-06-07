@@ -376,7 +376,7 @@ for area in ['EAT', 'PNA']:
         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
         alllabs_20, dats = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], (dat1, dat2))
 
-        alltimes_20, _, _ = ctl.calc_regime_residtimes(labs, dats)
+        alltimes_20, _, _ = ctl.calc_regime_residtimes(alllabs_20, dats)
 
         for reg in range(numclus):
             residtimes[('hist', mem, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
@@ -414,6 +414,7 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, mem, 'p90_last20', reg)] = np.percentile(restim[reg], 90)
 
     ##### salvo le distrib per ogni ssp. Quelle assolute (con tutti i modelli) e quelle relative (solo con i modelli che ci sono anche in hist)
+    ### questo è cambiato, uso gli stessi modelli per tutto
     freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in okmods])
     freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in okmods])
     for reg in range(numclus):
@@ -700,3 +701,56 @@ for area in ['EAT', 'PNA']:
         ctl.custom_legend(figall, colsim, allsims, ncol = 3)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         figall.savefig(cart_out + 'Restime_allssp_{}_{}_8box.pdf'.format(area, pio))
+
+    figall = plt.figure(figsize = (28,12))
+    axes = []
+    for reg in range(4):
+        ax = figall.add_subplot(2, 4, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+        #allpercs['mean'] = [np.mean(freqs[(ssp, 'all', cos)][:, reg]) for ssp in allsims]
+        # qui ci metto invece della mean la median del last20
+        allpercs['mean'] = [np.median(residtimes[(ssp, 'all', 'mean_last20', reg)]) for ssp in allsims]
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', 'mean', reg)], nu) for ssp in allsims]
+
+        # qui ci metto invece del min e max i percentili del last20
+        allpercs['ens_min'] = [np.percentile(residtimes[(ssp, 'all', 'mean_last20', reg)], 25) for ssp in allsims]
+        allpercs['ens_max'] = [np.percentile(residtimes[(ssp, 'all', 'mean_last20', reg)], 75) for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = True, plot_ensmeans = False, plot_minmax = True)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        if reg == 0: ax.set_ylabel('Persistence (days)')
+
+        ax.scatter(0, np.mean(results_ref['resid_times'][reg]), color = 'black', marker = '*', s = 5)
+
+    #ctl.adjust_ax_scale(axes)
+    axes = []
+    # qui ci metto il trend
+    for reg in range(4):
+        ax = figall.add_subplot(2, 4, 4 + reg + 1)
+        allpercs = dict()
+        # allpercs['mean'] = [np.mean(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(residtime_ssp[(ssp, 'all', 'trend', reg)], nu) for ssp in allsims[1:]]
+
+        # allpercs['ens_min'] = [np.min(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+        # allpercs['ens_max'] = [np.max(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
+
+        ctl.boxplot_on_ax(ax, allpercs, allsims[1:], colsim[1:], plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        if reg == 0: ax.set_ylabel('Trend in persistence (days/yr)')
+        axes.append(ax)
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'Restime_allssp_{}_8box_wtrend.pdf'.format(area, cos))
