@@ -363,6 +363,7 @@ for area in ['EAT', 'PNA']:
     #################### la parte di v2
     freqs = dict() # tot50 e last20
     residtimes = dict() # mean e p90
+    patterns = dict()
 
     for mem in okmods:
         freqs[('hist', mem, 'tot50')] = ctl.calc_clus_freq(results_hist[mem]['labels'], numclus)
@@ -372,16 +373,21 @@ for area in ['EAT', 'PNA']:
             residtimes[('hist', mem, 'mean', reg)] = np.mean(alltimes)
             residtimes[('hist', mem, 'p90', reg)] = np.percentile(alltimes, 90)
 
+        patterns[('hist', mem, 'tot50')] = results_hist[mem]['eff_centroids']
+
         dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
         alllabs_20, dats = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], (dat1, dat2))
+        pcs, dats = ctl.sel_time_range(results_hist[mem]['pcs'], results_hist[mem]['dates'], (dat1, dat2))
 
         alltimes_20, _, _ = ctl.calc_regime_residtimes(alllabs_20, dats)
+        effcen = ctl.calc_effective_centroids(pcs, alllabs_20, numclus)
 
         for reg in range(numclus):
             residtimes[('hist', mem, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
             residtimes[('hist', mem, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
 
+        patterns[('hist', mem, 'last20')] = effcen
         freqs[('hist', mem, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
 
     for ssp in allssps:
@@ -393,7 +399,10 @@ for area in ['EAT', 'PNA']:
             labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
 
             restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+            pcs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['pcs'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
+            effcen = ctl.calc_effective_centroids(pcs, labs, numclus)
 
+            patterns[('hist', mem, 'tot50')] = effcen
             freqs[(ssp, mem, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
 
             for reg in range(numclus):
@@ -407,6 +416,10 @@ for area in ['EAT', 'PNA']:
 
             restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
 
+            pcs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['pcs'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
+            effcen = ctl.calc_effective_centroids(pcs, labs, numclus)
+            patterns[('hist', mem, 'last20')] = effcen
+
             freqs[(ssp, mem, 'last20')] = ctl.calc_clus_freq(labs, numclus)
 
             for reg in range(numclus):
@@ -417,6 +430,12 @@ for area in ['EAT', 'PNA']:
     ### questo è cambiato, uso gli stessi modelli per tutto
     freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in okmods])
     freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in okmods])
+
+    for cos in ['last20', 'tot50']:
+        patterns[('hist', 'mean', cos)] = np.mean([patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
+        patterns[('hist', 'std', cos)] = np.std([patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
+
+
     for reg in range(numclus):
         for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
             residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in okmods])
@@ -424,6 +443,13 @@ for area in ['EAT', 'PNA']:
     for ssp in allssps:
         freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in okmods])
         freqs[(ssp, 'all', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')] for mod in okmods])
+
+        for cos in ['last20', 'tot50']:
+            patterns[(ssp, 'mean', cos)] = np.mean([patterns[(ssp, mod, cos)] for mod in okmods], axis = 0)
+            patterns[(ssp, 'std', cos)] = np.std([patterns[(ssp, mod, cos)] for mod in okmods], axis = 0)
+
+            patterns[(ssp, 'mean_diff', cos)] = np.mean([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
+            patterns[(ssp, 'std_diff', cos)] = np.std([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
 
         # rel
         modoks = okmods
@@ -437,8 +463,8 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
 
-    pickle.dump([freqs, residtimes], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
-    freqs, residtimes = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+    pickle.dump([freqs, residtimes, patterns], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
+    freqs, residtimes, patterns = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
     #### Grafico con tutti gli ssp
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
