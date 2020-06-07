@@ -405,7 +405,7 @@ for area in ['EAT', 'PNA']:
             pcs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['pcs'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
             effcen = ctl.calc_effective_centroids(pcs, labs, numclus)
 
-            patterns[('hist', mem, 'tot50')] = effcen
+            patterns[(ssp, mem, 'tot50')] = effcen
             freqs[(ssp, mem, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
 
             for reg in range(numclus):
@@ -421,7 +421,7 @@ for area in ['EAT', 'PNA']:
 
             pcs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['pcs'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
             effcen = ctl.calc_effective_centroids(pcs, labs, numclus)
-            patterns[('hist', mem, 'last20')] = effcen
+            patterns[(ssp, mem, 'last20')] = effcen
 
             freqs[(ssp, mem, 'last20')] = ctl.calc_clus_freq(labs, numclus)
 
