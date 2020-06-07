@@ -786,7 +786,7 @@ for area in ['EAT', 'PNA']:
 
 
     cart_patt = cart_out + 'patterns/'
-    ctl.mkdit(cart_patt)
+    ctl.mkdir(cart_patt)
     for ssp in allssps:
         filenam = cart_out + 'Pattern_meandiff_{}.pdf'.format(ssp)
         cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
