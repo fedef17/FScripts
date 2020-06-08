@@ -186,7 +186,7 @@ for area in ['EAT', 'PNA']:
             residtime_ssp[(ssp, 'all', 'errtrend', reg)] = np.array([residtime_ssp[(ssp, mem, 'errtrend', reg)] for mem in okmods])
 
 
-    pickle.dump([trend_ssp, residtime_ssp], open(cart_out + 'trends_wrfreq_e_restime.p', 'wb'))
+    pickle.dump([trend_ssp, residtime_ssp], open(cart_out + 'trends_wrfreq_e_restime_{}.p'.format(area), 'wb'))
 
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
     colsim = ctl.color_set(5)
