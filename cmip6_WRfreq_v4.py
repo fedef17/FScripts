@@ -185,6 +185,9 @@ for area in ['EAT', 'PNA']:
             residtime_ssp[(ssp, 'all', 'trend', reg)] = np.array([residtime_ssp[(ssp, mem, 'trend', reg)] for mem in okmods])
             residtime_ssp[(ssp, 'all', 'errtrend', reg)] = np.array([residtime_ssp[(ssp, mem, 'errtrend', reg)] for mem in okmods])
 
+
+    pickle.dump([trend_ssp, residtime_ssp], open(cart_out + 'trends_wrfreq_e_restime.p'))
+
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
     colsim = ctl.color_set(5)
 
@@ -801,13 +804,13 @@ for area in ['EAT', 'PNA']:
     ctl.mkdir(cart_patt)
     for ssp in allssps:
         filenam = cart_patt + 'Pattern_meandiff_{}.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-15., 15.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
         filenam = cart_patt + 'Pattern_spreaddiff_{}.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-15., 15.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
         filenam = cart_patt + 'Pattern_meandiff_{}_last20.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-15., 15.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
         filenam = cart_patt + 'Pattern_spreaddiff_{}_last20.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-15., 15.), names = reg_names_area[area], plot_type = 'pcolormesh')
