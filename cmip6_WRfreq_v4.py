@@ -465,6 +465,9 @@ for area in ['EAT', 'PNA']:
 
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
+    for ke in patterns.keys():
+        gigi = patterns[ke][..., np.newaxis, np.newaxis] * results_ref['eofs_ref_pcs'][np.newaxis, ...]
+        patterns[ke] = np.sum(gigi, axis = 1)
 
     pickle.dump([freqs, residtimes, patterns], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
     freqs, residtimes, patterns = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
@@ -784,8 +787,8 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'Restime_allssp_{}_8box_wtrend.pdf'.format(area, cos))
 
-    lat = results_ref['lat']
-    lon = results_ref['lon']
+    lat = results_ref['lat_area']
+    lon = results_ref['lon_area']
 
     cart_patt = cart_out + 'patterns/'
     ctl.mkdir(cart_patt)
