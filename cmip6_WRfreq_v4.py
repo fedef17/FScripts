@@ -800,14 +800,14 @@ for area in ['EAT', 'PNA']:
     cart_patt = cart_out + 'patterns/'
     ctl.mkdir(cart_patt)
     for ssp in allssps:
-        filenam = cart_out + 'Pattern_meandiff_{}.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+        filenam = cart_patt + 'Pattern_meandiff_{}.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
-        filenam = cart_out + 'Pattern_spreaddiff_{}.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+        filenam = cart_patt + 'Pattern_spreaddiff_{}.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'tot50')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
-        filenam = cart_out + 'Pattern_meandiff_{}_last20.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+        filenam = cart_patt + 'Pattern_meandiff_{}_last20.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'mean_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
 
-        filenam = cart_out + 'Pattern_spreaddiff_{}_last20.pdf'.format(ssp)
-        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area])
+        filenam = cart_patt + 'Pattern_spreaddiff_{}_last20.pdf'.format(ssp)
+        cd.plot_regimes(lat, lon, patterns[(ssp, 'std_diff', 'last20')], filenam, clatlo = clatlo[area], cbar_range = (-27., 27.), names = reg_names_area[area], plot_type = 'pcolormesh')
