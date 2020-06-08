@@ -636,7 +636,7 @@ for area in ['EAT', 'PNA']:
         # allpercs['mean'] = [np.mean(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
 
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', 'trend', 'seafreq', reg)], nu) for ssp in allsims[1:]]
+            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)], nu) for ssp in allsims[1:]]
 
         # allpercs['ens_min'] = [np.min(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
         # allpercs['ens_max'] = [np.max(trend_ssp[(ssp, 'all', pio, cos, reg)]) for ssp in allsims[1:]]
