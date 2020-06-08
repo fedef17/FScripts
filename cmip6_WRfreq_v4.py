@@ -19,13 +19,20 @@ from datetime import datetime
 from scipy import stats
 import pandas as pd
 
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 15
+
 #############################################################################
 if os.uname()[1] == 'hobbes':
     cart_in = '/home/fabiano/Research/lavori/CMIP6/'
 elif os.uname()[1] == 'ff-clevo':
     cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 
-dtrtyp = 'dtrloc'
+dtrtyp = 'dtr'
 
 if dtrtyp == 'dtr':
     cart_out_orig = cart_in + 'Results_v4/'
