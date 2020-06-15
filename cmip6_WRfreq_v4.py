@@ -32,6 +32,7 @@ if os.uname()[1] == 'hobbes':
 elif os.uname()[1] == 'ff-clevo':
     cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 
+yr10 = 5 # length of running mean
 dtrtyp = 'dtr'
 
 if dtrtyp == 'dtr':
@@ -105,7 +106,7 @@ for area in ['EAT', 'PNA']:
         for mem in okmods:
             seasfr, yr = ctl.calc_seasonal_clus_freq(results_hist[mem]['labels'], results_hist[mem]['dates'], numclus)
             seasfreq[('hist', mem, reg)] = seasfr[reg, :]
-            seas10 = np.array(ctl.running_mean(seasfr[reg, :], 10))
+            seas10 = np.array(ctl.running_mean(seasfr[reg, :], yr10))
             ax.plot(yr, seas10)
             cosi.append(seas10)
         coso = np.mean(cosi, axis = 0)
@@ -127,7 +128,7 @@ for area in ['EAT', 'PNA']:
                 if mem not in results_ssp[ssp].keys(): continue
                 seasfr, yr = ctl.calc_seasonal_clus_freq(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], numclus)
                 seasfreq[(ssp, mem, reg)] = seasfr[reg, :]
-                seas10 = np.array(ctl.running_mean(seasfr[reg, :], 10))
+                seas10 = np.array(ctl.running_mean(seasfr[reg, :], yr10))
                 ax.plot(yr, seas10, label = mem)
                 cosi.append(seas10)
 
@@ -151,7 +152,7 @@ for area in ['EAT', 'PNA']:
                 trend_ssp[(ssp, mem, 'trend', 'seafreq', reg)] = m
                 trend_ssp[(ssp, mem, 'errtrend', 'seafreq', reg)] = err_m
 
-                seas10 = ctl.running_mean(seasfr[reg, :], 10)
+                seas10 = ctl.running_mean(seasfr[reg, :], yr10)
                 m, c, err_m, err_c = ctl.linear_regre_witherr(np.array(yr[~np.isnan(seas10)]), np.array(seas10[~np.isnan(seas10)]))
                 trend_ssp[(ssp, mem, 'trend', 'freq10', reg)] = m
                 trend_ssp[(ssp, mem, 'errtrend', 'freq10', reg)] = err_m
