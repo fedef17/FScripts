@@ -73,12 +73,21 @@ for ke in results_old:
 
             results[ke]['labels'] = labels
             results[ke]['centroids'] = centroids
+        else:
+            results[ke] = results_old[ke]
+            results[ke]['pcs'] = nures[ke]['pcs']
+            results[ke]['dates'] = ctl.adjust_360day_dates(nures[ke]['time'])
+
+            perm = ctl.match_pc_sets(refcen, nures[ke][4]['centroids'])
+            centroids, labels = ctl.change_clus_order(nures[ke][4]['centroids'], nures[ke][4]['states'], perm)
+
+            results[ke]['labels'] = labels
+            results[ke]['centroids'] = centroids
     else:
         print('{} NOT FOUND!!!! Skipping.....'.format(ke))
 
 results['ERA_0'] = results_ref
 
-sys.exit()
 
 n_choice = 30
 n_bootstrap = 200
@@ -159,6 +168,9 @@ allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_ti
 
 for mod in model_names_all:
     print(mod)
+    if mod not in all_mods:
+        print('Skipping....')
+        continue
     whos_mod = all_mods == mod
     ok_mems = np.sort(all_mems[whos_mod])
 
