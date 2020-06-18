@@ -37,7 +37,7 @@ with open(cart_out + 'ERA20C_u_clusters.pkl', 'rb') as fil:
 
 refres['time'] = refres_nofil['time']
 
-refcen = gigiref[4]['centroids'][:,:4]/9.81 # these should be the counterparts of the original regimes in the residual phase space
+refcen = refres[4]['centroids'][:,:4]/9.81 # these should be the counterparts of the original regimes in the residual phase space
 refpcs, refdat = ctl.sel_time_range(refres['pcs'], refres['time'], ctl.range_years(1954, 2010))
 refpcs = refpcs/9.81
 reflab, _ = ctl.sel_time_range(refres[4]['states'], refres['time'], ctl.range_years(1954, 2010))
