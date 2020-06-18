@@ -18,7 +18,7 @@ from datetime import datetime
 
 from scipy import stats
 import pandas as pd
-import pymannkendall as mk
+#import pymannkendall as mk
 
 #############################################################################
 if os.uname()[1] == 'hobbes':
