@@ -49,9 +49,10 @@ refcen, reflab = ctl.change_clus_order(refcen, reflab, perm)
 
 ##############################################################################
 
-restot = pickle.load(open(filogen, 'rb'))
-results_old = restot['models']
-results_ref = restot['reference']
+# restot = pickle.load(open(filogen, 'rb'))
+# results_old = restot['models']
+# results_ref = restot['reference']
+results_old, results_ref = ctl.load_wrtool(filogen)
 
 results_ref['dates'] = refdat
 results_ref['pcs'] = refpcs
