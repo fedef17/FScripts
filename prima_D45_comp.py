@@ -58,9 +58,10 @@ for ke in results_pres:
             continue
 
         var, coords, aux_info = ctl.read_iris_nc(filo)
+        var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
 
         for comp_moment in ['mean', 'std', 'percentile']:
-            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var, coords['dates'], results_pres[ke]['labels'], results_pres[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
+            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_pres[ke]['labels'], results_pres[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
             composites[(temp, mod, varnam, comp_moment)] = comps
 
 
@@ -76,9 +77,10 @@ for ke in results_fut:
             continue
 
         var, coords, aux_info = ctl.read_iris_nc(filo)
+        var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
 
         for comp_moment in ['mean', 'std', 'percentile']:
-            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var, coords['dates'], results_fut[ke]['labels'], results_fut[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
+            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_fut[ke]['labels'], results_fut[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
             composites[(temp, mod, varnam, comp_moment)] = comps
 
 with open(cart_out + 'composites_taspr.p', 'wb') as filonz:
