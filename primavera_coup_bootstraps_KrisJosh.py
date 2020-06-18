@@ -76,7 +76,13 @@ for ke in results_old:
         else:
             results[ke] = results_old[ke]
             results[ke]['pcs'] = nures[ke]['pcs']
-            results[ke]['dates'] = ctl.adjust_360day_dates(nures[ke]['time'])
+            if 'HadGEM3-GC31' in ke:
+                results[ke]['dates'] = ctl.adjust_360day_dates(nures[ke]['time'])
+            elif ke == 'CNRM-CM6-1-HR_r1i1p1f2':
+                results[ke]['dates'] = nures[ke]['time']
+            else:
+                print(ke)
+                raise ValueError('no rule')
 
             perm = ctl.match_pc_sets(refcen, nures[ke][4]['centroids'])
             centroids, labels = ctl.change_clus_order(nures[ke][4]['centroids'], nures[ke][4]['states'], perm)
