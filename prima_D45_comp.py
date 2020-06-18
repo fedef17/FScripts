@@ -34,7 +34,7 @@ results_pres, results_ref = ctl.load_wrtool(cart_in + fil_pres)
 results_fut, _ = ctl.load_wrtool(cart_in + fil_fut)
 
 cart_data = '/nas/PRIMAVERA/Stream1/'
-filtas = 'highresSST-{}/{}/{}/day/{}/{}_day_{}_highresSST-{}_{}_gr_*_r25_rc.nc'
+filtas = 'highresSST-{}/{}/{}/day/{}/{}_day_{}_highresSST-{}_{}_*_r25_rc.nc'
 #filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem)
 
 composites = dict()
