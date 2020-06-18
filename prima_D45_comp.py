@@ -30,8 +30,8 @@ elif os.uname()[1] == 'ff-clevo':
 fil_pres = 'prima_D45_pres/out_prima_D45_pres_DJF_EAT_4clus_4pcs_1979-2014_refEOF_dtr.p'
 fil_fut = 'prima_D45_fut/out_prima_D45_fut_DJF_EAT_4clus_4pcs_2015-2050_refEOF_dtr.p'
 
-results_pres, results_ref = ctl.load_wrtool(fil_pres)
-results_fut, _ = ctl.load_wrtool(fil_pres)
+results_pres, results_ref = ctl.load_wrtool(cart_in + fil_pres)
+results_fut, _ = ctl.load_wrtool(cart_in + fil_fut)
 
 cart_data = '/nas/PRIMAVERA/Stream1/'
 filtas = 'highresSST-{}/{}/{}/day/{}/{}_day_{}_highresSST-{}_{}_gr_*_r25_rc.nc'
