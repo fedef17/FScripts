@@ -97,7 +97,7 @@ results['ERA_0'] = results_ref
 
 
 n_choice = 30
-n_bootstrap = 200
+n_bootstrap = 100
 
 #filo = open(cart_out + 'res_bootstrap_v7_500_relent2_nosig.p', 'wb')
 filo = open(cart_out + 'res_bootstrap_v7_KJ.p', 'wb')
