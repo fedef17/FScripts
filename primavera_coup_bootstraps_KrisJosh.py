@@ -38,9 +38,11 @@ with open(cart_out + 'ERA20C_u_clusters.pkl', 'rb') as fil:
 refres['time'] = refres_nofil['time']
 
 refcen = refres[4]['centroids'][:,:4]/9.81 # these should be the counterparts of the original regimes in the residual phase space
-refpcs, refdat = ctl.sel_time_range(refres['pcs'], refres['time'], ctl.range_years(1954, 2010))
-refpcs = refpcs/9.81
-reflab, _ = ctl.sel_time_range(refres[4]['states'], refres['time'], ctl.range_years(1954, 2010))
+# refpcs, refdat = ctl.sel_time_range(refres['pcs'], refres['time'], ctl.range_years(1954, 2010))
+# reflab, _ = ctl.sel_time_range(refres[4]['states'], refres['time'], ctl.range_years(1954, 2010))
+refpcs = refres['pcs'][-5144:]/9.81
+reflab = refres[4]['states'][-5144:]
+refdat = refres['time'][-5144:]
 
 perm = np.array([0, 2, 3, 1])
 refcen, reflab = ctl.change_clus_order(refcen, reflab, perm)
