@@ -225,7 +225,7 @@ for varnam in ['tas', 'pr']:
     compfut[(varnam, 'LR')] = np.mean(comps, axis = 0)
     comps = []
     for mod in okmods_hist_H[:-1]:
-        comps.append(composites[('future', mod, varnam, 'mean')]-composites[('present', 'ref', varnam, 'mean')])
+        comps.append(composites[('future', mod, varnam, 'mean')]-composites[('present', mod, varnam, 'mean')])
         print('CHECK', mod, np.mean(composites[('present', mod, varnam, 'mean')]))
     compfut[(varnam, 'HR')] = np.mean(comps, axis = 0)
 
