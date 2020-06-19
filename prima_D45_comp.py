@@ -145,7 +145,7 @@ freqs[('fut', 'LRstd')] = np.std(cose_L, axis = 0)
 keall = [('pres', 'LR'), ('pres', 'HR'), ('fut', 'LR'), ('fut', 'HR')]
 laball = ['_'.join(ke) for ke in keall]
 colors = ctl.color_set(4)
-regnames = ['NAO+', 'SBL', 'AR', 'NAO-']
+regnames = ['NAO+', 'SBL', 'NAO-', 'AR']
 
 freq_ref = results_ref['freq_clus']
 fig = plt.figure(figsize=(16,12))
@@ -204,7 +204,7 @@ for varnam in ['tas', 'pr']:
     ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
 
 cbar_range['tas'] = (-2, 2)
-cbar_range['pr'] = (-2e-3, 2e-3)
+cbar_range['pr'] = (-2, 2)
 
 for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
