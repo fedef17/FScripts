@@ -259,7 +259,8 @@ for varnam in ['tas', 'pr']:
     compfut[(varnam, 'diff')] = compfut[(varnam, 'HR')]-compfut[(varnam, 'LR')]
 
 for varnam in ['tas', 'pr']:
-    for cos in ['LR', 'HR', 'diff']:
+    for cos in ['LR', 'HR']:#, 'diff']:
         fields = compfut[(varnam, cos)]
+        contfields = compcomp[('present', varnam, cos)]
         filnam = cart_out + 'comp_futchange_{}_{}.pdf'.format(varnam, cos)
-        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam], add_contour_field = contfields)
