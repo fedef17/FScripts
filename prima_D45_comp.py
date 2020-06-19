@@ -37,19 +37,19 @@ cart_data = '/nas/PRIMAVERA/Stream1/'
 filtas = 'highresSST-{}/{}/{}/day/{}/{}_day_{}_highresSST-{}_{}_*_r25_rc.nc'
 #filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem)
 
-composites = dict()
-mod = 'ref'
-temp = 'present'
-file_ref = dict()
-file_ref['tas'] = '/data-hobbes/fabiano/OBS/ERA/ERAInterim/ERAInt_daily_1979-2018_167_r25.nc'
-file_ref['pr'] = '/data-hobbes/fabiano/OBS/ERA/ERAInterim/ERAInt_daily_1979-2018_228_pr_daysum_ok_r25.nc'
-for varnam in ['tas', 'pr']:
-    var, coords, aux_info = ctl.read_iris_nc(file_ref[varnam])
-    var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
-
-    for comp_moment in ['mean', 'std', 'percentile']:
-        comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_ref['labels'], results_ref['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
-        composites[(temp, mod, varnam, comp_moment)] = comps
+# composites = dict()
+# mod = 'ref'
+# temp = 'present'
+# file_ref = dict()
+# file_ref['tas'] = '/data-hobbes/fabiano/OBS/ERA/ERAInterim/ERAInt_daily_1979-2018_167_r25.nc'
+# file_ref['pr'] = '/data-hobbes/fabiano/OBS/ERA/ERAInterim/ERAInt_daily_1979-2018_228_pr_daysum_ok_r25.nc'
+# for varnam in ['tas', 'pr']:
+#     var, coords, aux_info = ctl.read_iris_nc(file_ref[varnam])
+#     var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
+#
+#     for comp_moment in ['mean', 'std', 'percentile']:
+#         comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_ref['labels'], results_ref['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
+#         composites[(temp, mod, varnam, comp_moment)] = comps
 
 
 # for ke in results_pres:
