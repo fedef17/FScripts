@@ -104,12 +104,12 @@ okmods_hist_H = okmods_H[1:] + ['ECMWF-IFS-HR']
 # Freq difference
 freqs = dict()
 
+cose_H = []
+cose_L = []
 for ke in results_pres:
-    cose_H = []
     for mod in okmods_H:
         if mod == ke.split('_')[0]:
             cose_H.append(results_pres[ke]['freq_clus'])
-    cose_L = []
     for mod in okmods_L:
         if mod == ke.split('_')[0]:
             cose_L.append(results_pres[ke]['freq_clus'])
@@ -119,12 +119,12 @@ freqs[('pres', 'LR')] = np.mean(cose_L, axis = 0)
 freqs[('pres', 'HRstd')] = np.std(cose_H, axis = 0)
 freqs[('pres', 'LRstd')] = np.std(cose_L, axis = 0)
 
+cose_H = []
+cose_L = []
 for ke in results_fut:
-    cose_H = []
     for mod in okmods_H:
         if mod == ke.split('_')[0]:
             cose_H.append(results_fut[ke]['freq_clus'])
-    cose_L = []
     for mod in okmods_L:
         if mod == ke.split('_')[0]:
             cose_L.append(results_fut[ke]['freq_clus'])
