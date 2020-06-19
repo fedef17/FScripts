@@ -193,7 +193,7 @@ cblab['pr'] = 'Daily prec (mm)'
 
 for varnam in ['tas', 'pr']:
     fields = composites[('present', 'ref', varnam, 'mean')]
-    filnam = cart_out + 'refcomp_{}_{}.pdf'.format(varnam, cos)
+    filnam = cart_out + 'refcomp_{}.pdf'.format(varnam)
     ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = [20,80,-20,60], cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
 
 for varnam in ['tas', 'pr']:
