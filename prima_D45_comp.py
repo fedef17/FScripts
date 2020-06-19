@@ -186,7 +186,7 @@ cmaps['tas'] = 'RdBu_r'
 cmaps['pr'] = 'BrBG'
 cbar_range = dict()
 cbar_range['tas'] = (-5, 5)
-cbar_range['pr'] = (-3e-3, 3e-3)
+cbar_range['pr'] = (-3, 3)
 lat = results_ref['lat']
 lon = results_ref['lon']
 cblab = dict()
@@ -196,7 +196,10 @@ cblab['pr'] = 'Daily prec (mm)'
 margs = [-30,70, 20,80]
 
 for varnam in ['tas', 'pr']:
-    fields = composites[('present', 'ref', varnam, 'mean')]
+    if varnam == 'tas':
+        fields = composites[('present', 'ref', varnam, 'mean')]
+    else:
+        fields = 1000*composites[('present', 'ref', varnam, 'mean')]
     filnam = cart_out + 'refcomp_{}.pdf'.format(varnam)
     ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
 
@@ -205,7 +208,10 @@ cbar_range['pr'] = (-2e-3, 2e-3)
 
 for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
-        fields = compdiffs[(varnam, cos)]
+        if varnam == 'tas':
+            fields = compdiffs[(varnam, cos)]
+        else:
+            fields = 1000*compdiffs[(varnam, cos)]
         filnam = cart_out + 'comp_diff_{}_{}.pdf'.format(varnam, cos)
         ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
 
@@ -228,6 +234,9 @@ for varnam in ['tas', 'pr']:
 
 for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
-        fields = compfut[(varnam, cos)]
+        if varnam == 'tas':
+            fields = compfut[(varnam, cos)]
+        else:
+            fields = 1000*compfut[(varnam, cos)]
         filnam = cart_out + 'comp_futchange_{}_{}.pdf'.format(varnam, cos)
         ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
