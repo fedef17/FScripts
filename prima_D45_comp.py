@@ -97,6 +97,8 @@ with open(cart_out + 'composites_taspr.p', 'rb') as filonz:
 # Riporto tutto alle anomalie
 for ke in composites:
     composites[ke] = composites[ke]-np.mean(composites[ke], axis = 0)
+with open(cart_out + 'composites_taspr_anom.p', 'wb') as filonz:
+    pickle.dump(composites, filonz)
 
 # plots
 okmods = ['CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'EC-Earth3P', 'EC-Earth3P-HR', 'HadGEM3-GC31-LM', 'HadGEM3-GC31-MM', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR']
