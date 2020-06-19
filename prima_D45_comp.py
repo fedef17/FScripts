@@ -163,13 +163,13 @@ compdiffs = dict()
 for varnam in ['tas', 'pr']:
     comps = []
     for mod in okmods_hist_L:
-        comps.append(composites[('pres', mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
-        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+        comps.append(composites[('present', mod, varnam, 'mean')]-composites[('present', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('present', mod, varnam, 'mean')]))
     compdiffs[(varnam, 'LR')] = np.mean(comps, axis = 0)
     comps = []
     for mod in okmods_hist_H:
-        comps.append(composites[('pres', mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
-        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+        comps.append(composites[('present', mod, varnam, 'mean')]-composites[('present', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('present', mod, varnam, 'mean')]))
     compdiffs[(varnam, 'HR')] = np.mean(comps, axis = 0)
 
 for varnam in ['tas', 'pr']:
@@ -195,13 +195,13 @@ compfut = dict()
 for varnam in ['tas', 'pr']:
     comps = []
     for mod in okmods_hist_L[:-1]:
-        comps.append(composites[('fut', mod, varnam, 'mean')]-composites[('pres', mod, varnam, 'mean')])
-        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+        comps.append(composites[('future', mod, varnam, 'mean')]-composites[('present', mod, varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('present', mod, varnam, 'mean')]))
     compfut[(varnam, 'LR')] = np.mean(comps, axis = 0)
     comps = []
     for mod in okmods_hist_H[:-1]:
-        comps.append(composites[(fut, mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
-        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+        comps.append(composites[('future', mod, varnam, 'mean')]-composites[('present', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('present', mod, varnam, 'mean')]))
     compfut[(varnam, 'HR')] = np.mean(comps, axis = 0)
 
 for varnam in ['tas', 'pr']:
