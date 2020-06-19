@@ -181,6 +181,20 @@ for varnam in ['tas', 'pr']:
 for varnam in ['tas', 'pr']:
     compdiffs[(varnam, 'diff')] = compdiffs[(varnam, 'HR')]-compdiffs[(varnam, 'LR')]
 
+
+compcomp = dict()
+for cos in ['present', 'future']:
+    for varnam in ['tas', 'pr']:
+        comps = []
+        for mod in okmods_hist_L[:-1]:
+            comps.append(composites[(cos, mod, varnam, 'mean')])
+        compcomp[(cos, varnam, 'LR')] = np.mean(comps, axis = 0)
+        comps = []
+        for mod in okmods_hist_H[:-1]:
+            comps.append(composites[(cos, mod, varnam, 'mean')])
+        compcomp[(cos, varnam, 'HR')] = np.mean(comps, axis = 0)
+
+
 cmaps = dict()
 cmaps['tas'] = 'RdBu_r'
 cmaps['pr'] = 'BrBG'
@@ -194,6 +208,24 @@ cblab['tas'] = 'Temperature (K)'
 cblab['pr'] = 'Daily prec (mm)'
 
 margs = [-30,70, 20,80]
+
+for varnam in ['tas', 'pr']:
+    if varnam == 'tas':
+        fields = composites[('present', 'ref', varnam, 'mean')]
+    else:
+        fields = 1000*composites[('present', 'ref', varnam, 'mean')]
+    filnam = cart_out + 'refcomp_{}.pdf'.format(varnam)
+    ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
+
+for cos in ['present', 'future']:
+    for resol in ['LR', 'HR']:
+        for varnam in ['tas', 'pr']:
+            if varnam == 'tas':
+                fields = compcomp[(cos, varnam, resol)]
+            else:
+                fields = 1000*compcomp[(cos, varnam, resol)]
+            filnam = cart_out + 'modcomp_{}_{}_{}.pdf'.format(varnam, cos, resol)
+            ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
 
 for varnam in ['tas', 'pr']:
     if varnam == 'tas':
