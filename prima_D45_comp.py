@@ -20,6 +20,14 @@ from scipy import stats
 import pandas as pd
 #import pymannkendall as mk
 
+plt.rcParams['lines.dashed_pattern'] = [5, 5]
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 18
+
 #############################################################################
 if os.uname()[1] == 'hobbes':
     cart_in = '/home/fabiano/Research/lavori/WeatherRegimes/'
@@ -263,4 +271,4 @@ for varnam in ['tas', 'pr']:
         fields = compfut[(varnam, cos)]
         contfields = compcomp[('present', varnam, cos)]
         filnam = cart_out + 'comp_futchange_{}_{}.pdf'.format(varnam, cos)
-        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam], add_contour_field = contfields)
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam], add_contour_field = contfields, n_lines = 8)
