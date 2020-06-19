@@ -183,6 +183,9 @@ cbar_range['tas'] = (-5, 5)
 cbar_range['pr'] = (-5, 5)
 lat = results_ref['lat']
 lon = results_ref['lon']
+cblab = dict()
+cblab['tas'] = 'Temperature (K)'
+cblab['pr'] = 'Daily prec (mm)'
 
 for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
