@@ -244,10 +244,11 @@ cbar_range['tas'] = (-2, 2)
 cbar_range['pr'] = (-2, 2)
 
 for varnam in ['tas', 'pr']:
-    for cos in ['LR', 'HR', 'diff']:
+    for cos in ['LR', 'HR']:#, 'diff']:
         fields = compdiffs[(varnam, cos)]
+        contfields = composites[('present', 'ref', varnam, 'mean')]
         filnam = cart_out + 'comp_diff_{}_{}.pdf'.format(varnam, cos)
-        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam])#, plot_type = 'pcolormesh')
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = margs, cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = False, lw_contour = 0.7, cbar_range = cbar_range[varnam], add_contour_field = contfields, n_lines = 8)
 
 # Fut composite - Hist composite (HR, LR)
 compfut = dict()
