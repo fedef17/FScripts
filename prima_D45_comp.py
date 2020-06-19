@@ -51,50 +51,164 @@ for varnam in ['tas', 'pr']:
         comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_ref['labels'], results_ref['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
         composites[(temp, mod, varnam, comp_moment)] = comps
 
-# results_all = dict()
+
 # for ke in results_pres:
-#     mod = ke.split('_')[0]
-#     results_all[mod+'_pres'] = results_pres[ke]
+#     temp = 'present'
+#     mod, mem = ke.split('_')
+#     for varnam in ['tas', 'pr']:
+#         listafilo = ctl.find_file(cart_data, filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem))
+#         if len(listafilo) > 0:
+#             filo = listafilo[0]
+#         else:
+#             print('NOT FOUND: ', temp, mod, varnam)
+#             continue
+#
+#         var, coords, aux_info = ctl.read_iris_nc(filo)
+#         var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
+#
+#         for comp_moment in ['mean', 'std', 'percentile']:
+#             comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_pres[ke]['labels'], results_pres[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
+#             composites[(temp, mod, varnam, comp_moment)] = comps
+#
+#
 # for ke in results_fut:
-#     mod = ke.split('_')[0]
-#     results_all[mod+'_fut'] = results_pres[ke]
+#     temp = 'future'
+#     mod, mem = ke.split('_')
+#     for varnam in ['tas', 'pr']:
+#         listafilo = ctl.find_file(cart_data, filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem))
+#         if len(listafilo) > 0:
+#             filo = listafilo[0]
+#         else:
+#             print('NOT FOUND: ', temp, mod, varnam)
+#             continue
+#
+#         var, coords, aux_info = ctl.read_iris_nc(filo)
+#         var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
+#
+#         for comp_moment in ['mean', 'std', 'percentile']:
+#             comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_fut[ke]['labels'], results_fut[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
+#             composites[(temp, mod, varnam, comp_moment)] = comps
+#
+# with open(cart_out + 'composites_taspr.p', 'wb') as filonz:
+#     pickle.dump(composites, filonz)
+with open(cart_out + 'composites_taspr.p', 'rb') as filonz:
+    composites = pickle.load(filonz)
+
+# plots
+okmods = ['CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'EC-Earth3P', 'EC-Earth3P-HR', 'HadGEM3-GC31-LM', 'HadGEM3-GC31-MM', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR']
+okmods_L = ['CMCC-CM2-HR4', 'EC-Earth3P', 'HadGEM3-GC31-LM', 'MPI-ESM1-2-HR']
+okmods_H = ['CMCC-CM2-VHR4', 'EC-Earth3P-HR', 'HadGEM3-GC31-MM', 'MPI-ESM1-2-XR']
+
+okmods_hist_L = okmods_L[1:] + ['ECMWF-IFS-LR']
+okmods_hist_H = okmods_H[1:] + ['ECMWF-IFS-HR']
+# Freq difference
+freqs = dict()
 
 for ke in results_pres:
-    temp = 'present'
-    mod, mem = ke.split('_')
-    for varnam in ['tas', 'pr']:
-        listafilo = ctl.find_file(cart_data, filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem))
-        if len(listafilo) > 0:
-            filo = listafilo[0]
-        else:
-            print('NOT FOUND: ', temp, mod, varnam)
-            continue
+    cose_H = []
+    for mod in okmods_H:
+        if mod == ke.split('_')[0]:
+            cose_H.append(results_pres[ke]['freq_clus'])
+    cose_L = []
+    for mod in okmods_L:
+        if mod == ke.split('_')[0]:
+            cose_L.append(results_pres[ke]['freq_clus'])
 
-        var, coords, aux_info = ctl.read_iris_nc(filo)
-        var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
-
-        for comp_moment in ['mean', 'std', 'percentile']:
-            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_pres[ke]['labels'], results_pres[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
-            composites[(temp, mod, varnam, comp_moment)] = comps
-
+freqs[('pres', 'HR')] = np.mean(cose_H, axis = 0)
+freqs[('pres', 'LR')] = np.mean(cose_L, axis = 0)
+freqs[('pres', 'HRstd')] = np.std(cose_H, axis = 0)
+freqs[('pres', 'LRstd')] = np.std(cose_L, axis = 0)
 
 for ke in results_fut:
-    temp = 'future'
-    mod, mem = ke.split('_')
-    for varnam in ['tas', 'pr']:
-        listafilo = ctl.find_file(cart_data, filtas.format(temp, mod, mem, varnam, varnam, mod, temp, mem))
-        if len(listafilo) > 0:
-            filo = listafilo[0]
-        else:
-            print('NOT FOUND: ', temp, mod, varnam)
-            continue
+    cose_H = []
+    for mod in okmods_H:
+        if mod == ke.split('_')[0]:
+            cose_H.append(results_fut[ke]['freq_clus'])
+    cose_L = []
+    for mod in okmods_L:
+        if mod == ke.split('_')[0]:
+            cose_L.append(results_fut[ke]['freq_clus'])
 
-        var, coords, aux_info = ctl.read_iris_nc(filo)
-        var_season, dates_season = ctl.sel_season(var, coords['dates'], 'DJF')
+freqs[('fut', 'HR')] = np.mean(cose_H, axis = 0)
+freqs[('fut', 'LR')] = np.mean(cose_L, axis = 0)
+freqs[('fut', 'HRstd')] = np.std(cose_H, axis = 0)
+freqs[('fut', 'LRstd')] = np.std(cose_L, axis = 0)
 
-        for comp_moment in ['mean', 'std', 'percentile']:
-            comps = ctl.composites_regimes_daily(coords['lat'], coords['lon'], var_season, dates_season, results_fut[ke]['labels'], results_fut[ke]['dates'], comp_moment = comp_moment, detrend_global = True, area_dtr = 'NML')
-            composites[(temp, mod, varnam, comp_moment)] = comps
+keall = [('pres', 'LR'), ('pres', 'HR'), ('fut', 'LR'), ('fut', 'HR')]
+laball = ['_'.join(ke) for ke in keall]
+colors = ctl.color_set(4)
+regnames = ['NAO+', 'SBL', 'AR', 'NAO-']
 
-with open(cart_out + 'composites_taspr.p', 'wb') as filonz:
-    pickle.dump(composites, filonz)
+freq_ref = results_ref['freq_clus']
+fig = plt.figure()
+axes = []
+for reg in range(4):
+    ax = plt.subplot(2,2,reg+1)
+    ax.grid(axis = 'y')
+
+    frqall = np.array([freqs[cos][reg] for cos in keall])
+    ax.bar(np.arange(4), frqall-freq_ref[reg], color = colors)
+
+    ax.set_title(regnames[reg])
+    ax.set_xticks([])
+    axes.append(ax)
+
+ctl.adjust_ax_scale(axes)
+ctl.custom_legend(fig, colors, laball, ncol = 2)
+fig.savefig(cart_out+'Regime_frequency.pdf')
+
+
+# Hist composite difference (HR, LR)
+compdiffs = dict()
+for varnam in ['tas', 'pr']:
+    comps = []
+    for mod in okmods_hist_L:
+        comps.append(composites[('pres', mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+    compdiffs[(varnam, 'LR')] = np.mean(comps, axis = 0)
+    comps = []
+    for mod in okmods_hist_H:
+        comps.append(composites[('pres', mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+    compdiffs[(varnam, 'HR')] = np.mean(comps, axis = 0)
+
+for varnam in ['tas', 'pr']:
+    compdiffs[(varnam, 'diff')] = compdiffs[(varnam, 'HR')]-compdiffs[(varnam, 'LR')]
+
+cmaps = dict()
+cmaps['tas'] = 'RdBu_r'
+cmaps['pr'] = 'BrBG'
+cbar_range = dict()
+cbar_range['tas'] = (-5, 5)
+cbar_range['pr'] = (-5, 5)
+lat = results_ref['lat']
+lon = results_ref['lon']
+
+for varnam in ['tas', 'pr']:
+    for cos in ['LR', 'HR', 'diff']:
+        fields = compdiffs[(varnam, cos)]
+        filnam = cart_out + 'comp_diff_{}_{}.pdf'.format(varnam, cos)
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'nearside', central_lat_lon = (70, -20), cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
+
+# Fut composite - Hist composite (HR, LR)
+compfut = dict()
+for varnam in ['tas', 'pr']:
+    comps = []
+    for mod in okmods_hist_L[:-1]:
+        comps.append(composites[('fut', mod, varnam, 'mean')]-composites[('pres', mod, varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+    compfut[(varnam, 'LR')] = np.mean(comps, axis = 0)
+    comps = []
+    for mod in okmods_hist_H[:-1]:
+        comps.append(composites[(fut, mod, varnam, 'mean')]-composites[('pres', 'ref', varnam, 'mean')])
+        print('CHECK', mod, np.mean(composites[('pres', mod, varnam, 'mean')]))
+    compfut[(varnam, 'HR')] = np.mean(comps, axis = 0)
+
+for varnam in ['tas', 'pr']:
+    compfut[(varnam, 'diff')] = compfut[(varnam, 'HR')]-compfut[(varnam, 'LR')]
+
+for varnam in ['tas', 'pr']:
+    for cos in ['LR', 'HR', 'diff']:
+        fields = compfut[(varnam, cos)]
+        filnam = cart_out + 'comp_futchange_{}_{}.pdf'.format(varnam, cos)
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'nearside', central_lat_lon = (70, -20), cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
