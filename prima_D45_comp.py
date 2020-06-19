@@ -94,6 +94,10 @@ filtas = 'highresSST-{}/{}/{}/day/{}/{}_day_{}_highresSST-{}_{}_*_r25_rc.nc'
 with open(cart_out + 'composites_taspr.p', 'rb') as filonz:
     composites = pickle.load(filonz)
 
+# Riporto tutto alle anomalie
+for ke in composites:
+    composites[ke] = composites[ke]-np.mean(composites[ke], axis = 0)
+
 # plots
 okmods = ['CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'EC-Earth3P', 'EC-Earth3P-HR', 'HadGEM3-GC31-LM', 'HadGEM3-GC31-MM', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR']
 okmods_L = ['CMCC-CM2-HR4', 'EC-Earth3P', 'HadGEM3-GC31-LM', 'MPI-ESM1-2-HR']
@@ -140,12 +144,10 @@ colors = ctl.color_set(4)
 regnames = ['NAO+', 'SBL', 'AR', 'NAO-']
 
 freq_ref = results_ref['freq_clus']
-fig = plt.figure()
+fig = plt.figure(figsize=(16,12))
 axes = []
 for reg in range(4):
     ax = plt.subplot(2,2,reg+1)
-    ax.grid(axis = 'y')
-
     frqall = np.array([freqs[cos][reg] for cos in keall])
     ax.bar(np.arange(4), frqall-freq_ref[reg], color = colors)
 
@@ -188,10 +190,15 @@ cblab['tas'] = 'Temperature (K)'
 cblab['pr'] = 'Daily prec (mm)'
 
 for varnam in ['tas', 'pr']:
+    fields = composites[('present', 'ref', varnam, 'mean')]
+    filnam = cart_out + 'refcomp_{}_{}.pdf'.format(varnam, cos)
+    ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = [20,80,-20,60], cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
+
+for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
         fields = compdiffs[(varnam, cos)]
         filnam = cart_out + 'comp_diff_{}_{}.pdf'.format(varnam, cos)
-        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'nearside', central_lat_lon = (70, -20), cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = [20,80,-20,60], cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
 
 # Fut composite - Hist composite (HR, LR)
 compfut = dict()
@@ -214,4 +221,4 @@ for varnam in ['tas', 'pr']:
     for cos in ['LR', 'HR', 'diff']:
         fields = compfut[(varnam, cos)]
         filnam = cart_out + 'comp_futchange_{}_{}.pdf'.format(varnam, cos)
-        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'nearside', central_lat_lon = (70, -20), cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
+        ctl.plot_multimap_contour(fields, lat, lon, filnam, visualization = 'standard', central_lat_lon = (70, -20), plot_margins = [20,80,-20,60], cmap = cmaps[varnam], title = '', subtitles = regnames, cb_label = cblab[varnam], bounding_lat = 0., draw_grid = True, n_color_levels = 10, draw_contour_lines = True, lw_contour = 0.7, cbar_range = cbar_range[varnam])
