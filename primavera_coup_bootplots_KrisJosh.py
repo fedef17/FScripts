@@ -29,6 +29,7 @@ plot_mean = True
 cart_out = cart_in + 'plots/'
 if not os.path.exists(cart_out): os.mkdir(cart_out)
 filon = open(cart_in + 'res_bootstrap_v7_KJ.p', 'rb')
+filon_ref = open(cart_in + 'res_bootstrap_v7_KJ_ref.p', 'rb')
 
 filogen = cart_in + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ.p'
 results, results_ref = ctl.load_wrtool(filogen)
@@ -92,14 +93,10 @@ for mod in model_names_all:
     print(allmems)
     if mod == 'ERA':
         allmems = ['0']
+        bootstraps_all = pickle.load(filon_ref)
+    else:
+        bootstraps_all = pickle.load(filon)
 
-    bootstraps_all = pickle.load(filon)
-    # bootstraps_all = dict()
-    # for mem in allmems:
-    #     bootstraps_all[mem] = pickle.load(filon)
-
-    #bootstraps_all = pickle.load(filon) # new version
-    #allmems = list(bootstraps_all.keys())
     allkeysss = list(bootstraps_all[allmems[0]].keys())
 
     # list of all boot means

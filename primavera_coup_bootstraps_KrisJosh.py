@@ -95,7 +95,7 @@ for ke in results_old:
 
 
 pickle.dump([results, results_ref], open(cart_out + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ.p', 'wb'))
-sys.exit()
+#sys.exit()
 
 results['ERA_0'] = results_ref
 
@@ -103,8 +103,8 @@ results['ERA_0'] = results_ref
 n_choice = 30
 n_bootstrap = 100
 
-#filo = open(cart_out + 'res_bootstrap_v7_500_relent2_nosig.p', 'wb')
-filo = open(cart_out + 'res_bootstrap_v7_KJ.p', 'wb')
+#filo = open(cart_out + 'res_bootstrap_v7_KJ.p', 'wb')
+filo = open(cart_out + 'res_bootstrap_v7_KJ_ref.p', 'wb')
 
 model_names = ['AWI-CM-1-1-LR', 'AWI-CM-1-1-HR', 'CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'CNRM-CM6-1', 'CNRM-CM6-1-HR', 'EC-Earth3P', 'EC-Earth3P-HR', 'ECMWF-IFS-LR', 'ECMWF-IFS-MR', 'ECMWF-IFS-HR', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR', 'HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM', 'HadGEM3-GC31-HH']
 
@@ -129,9 +129,10 @@ regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
 # results = restot['models']
 # results_ref = restot['reference']
 
-
-all_mods = np.array([ke.split('_')[0] for ke in results.keys()])
-all_mems = np.array([ke.split('_')[1] for ke in results.keys()])
+# all_mods = np.array([ke.split('_')[0] for ke in results.keys()])
+# all_mems = np.array([ke.split('_')[1] for ke in results.keys()])
+all_mods = np.array([ke.split('_')[0] for ke in results.keys()] + ['ERA'])
+all_mems = np.array([ke.split('_')[1] for ke in results.keys()] + ['0'])
 
 ref_cen = results['ERA_0']['centroids']
 labels = results['ERA_0']['labels']
@@ -177,7 +178,8 @@ for reg in range(4):
 allkeysss = ['significance', 'varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor']#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
 #allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
 
-for mod in model_names_all:
+#for mod in model_names_all:
+for mod in ['ERA']:
     print(mod)
     if mod not in all_mods:
         print('Skipping....')
