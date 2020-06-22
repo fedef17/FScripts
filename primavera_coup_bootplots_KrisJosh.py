@@ -182,7 +182,7 @@ if plot_sig:
         allfigs.append(fig)
 
 
-for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'relative_entropy', 'patcor', 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
+for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'relative_entropy', 'patcor']:#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
     fig = plt.figure(figsize=(16,12))
     axes = []
     for ii, reg in enumerate(regnam):
