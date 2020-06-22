@@ -57,7 +57,7 @@ model_coups = ['CMCC-CM2', 'CNRM-CM6-1', 'EC-Earth3P', 'ECMWF-IFS', 'MPI-ESM1-2'
 
 model_names_all = model_names + ['ERA']
 
-colors = ctl.color_set(len(model_coups+1)*2, sns_palette = 'Paired')
+colors = ctl.color_set((len(model_coups)+1)*2, sns_palette = 'Paired')
 colors = colors[2:]
 colorscoup = [np.mean([col1, col2], axis = 0) for col1, col2 in zip(colors[:-1:2], colors[1::2])]
 color_main = []
