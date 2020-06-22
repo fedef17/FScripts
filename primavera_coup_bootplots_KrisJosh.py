@@ -33,9 +33,10 @@ filon = open(cart_in + 'res_bootstrap_v7_KJ.p', 'rb')
 filogen = cart_in + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ.p'
 results, results_ref = ctl.load_wrtool(filogen)
 
-results.pop('HadGEM3-GC31-LL_r1i1p2f1')
-results.pop('EC-Earth3P_r1i1p1f1')
-results.pop('EC-Earth3P-HR_r1i1p1f1')
+popke = ['HadGEM3-GC31-LL_r1i1p2f1', 'EC-Earth3P_r1i1p1f1', 'EC-Earth3P-HR_r1i1p1f1']
+for ke in popke:
+    results.pop(ke)
+
 allresmembers = list(results.keys())
 
 all_mods = np.array([ke.split('_')[0] for ke in results.keys()])
