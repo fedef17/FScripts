@@ -40,8 +40,8 @@ for ke in popke:
 
 allresmembers = list(results.keys())
 
-all_mods = np.array([ke.split('_')[0] for ke in results.keys()]) + ['ERA']
-all_mems = np.array([ke.split('_')[1] for ke in results.keys()]) + ['0']
+all_mods = np.array([ke.split('_')[0] for ke in results.keys()] + ['ERA'])
+all_mems = np.array([ke.split('_')[1] for ke in results.keys()] + ['0'])
 del results
 
 ##############################################################
