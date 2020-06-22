@@ -55,7 +55,7 @@ refcen, reflab = ctl.change_clus_order(refcen, reflab, perm)
 results_old, results_ref = ctl.load_wrtool(filogen)
 
 results_ref['dates'] = refdat
-results_ref['pcs'] = refpcs
+results_ref['pcs'] = refpcs[:, :4]
 results_ref['centroids'] = refcen
 results_ref['labels'] = reflab
 
