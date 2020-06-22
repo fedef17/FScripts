@@ -35,7 +35,8 @@ results, results_ref = ctl.load_wrtool(filogen)
 
 popke = ['HadGEM3-GC31-LL_r1i1p2f1', 'EC-Earth3P_r1i1p1f1', 'EC-Earth3P-HR_r1i1p1f1']
 for ke in popke:
-    results.pop(ke)
+    if ke in results:
+        results.pop(ke)
 
 allresmembers = list(results.keys())
 
