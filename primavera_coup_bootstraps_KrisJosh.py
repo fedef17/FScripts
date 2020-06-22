@@ -93,6 +93,10 @@ for ke in results_old:
     else:
         print('{} NOT FOUND!!!! Skipping.....'.format(ke))
 
+
+pickle.dump([results, results_ref], open(cart_out + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ.p', 'wb'))
+sys.exit()
+
 results['ERA_0'] = results_ref
 
 
