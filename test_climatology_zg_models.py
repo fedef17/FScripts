@@ -34,7 +34,7 @@ model_names.append('ERA')
 nya = 30 # number of years for running mean
 clm_fullperiod = dict()
 datesall = dict()
-climat_mean_dict = dict()
+climate_mean_dict = dict()
 
 allnums = [5, 10, 20]
 
@@ -55,9 +55,9 @@ for ifile, name in zip(listafils, model_names):
     dtclmpd = pd.to_datetime(dtclm)
     datesall[name] = dtclmpd
 
-    climat_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates, window_days = 20, window_years = nya)
-    difftot, lat_area, lon_area = ctl.sel_area(lat, lon, climat_mean[-1]-climat_mean[0], 'EAT')
-    climat_mean_dict[name] = difftot
+    climate_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates, window_days = 20, window_years = nya)
+    difftot, lat_area, lon_area = ctl.sel_area(lat, lon, climate_mean[-1]-climate_mean[0], 'EAT')
+    climate_mean_dict[name] = difftot
 
 lat_sect = [(16, None), (8, 16), (0, 8)]
 lon_sect = [(0, 16), (16, 32), (32, None)]
@@ -99,7 +99,7 @@ for lla1, lla2 in lat_sect:
         ax = plt.subplot(3,3,i)
         for name, col in zip(model_names, colors):
             if name == 'ERA': lw = 2.0
-            ax.plot(datesall[name].dayofyear, np.mean(climat_mean_dict[name][:, lla1:lla2, llo1:llo2], axis = (1,2)), color = col, linewidth = lw)
+            ax.plot(datesall[name].dayofyear, np.mean(climate_mean_dict[name][:, lla1:lla2, llo1:llo2], axis = (1,2)), color = col, linewidth = lw)
 
         if lla2 is None: lla2 = -1
         if llo2 is None: llo2 = -1

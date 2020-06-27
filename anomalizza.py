@@ -34,23 +34,23 @@ mask = (dates_pdh > init) & (dates_pdh < fin)
 dates_ok = dates_pdh[mask]
 var_ok = var[mask,:,:]
 
-climat_mean = []
+climate_mean = []
 climat_std = []
 dates_clim = []
 
 for mon in range(1,13):
     mask = (dates_ok.month == mon)
-    climat_mean.append(np.mean(var_ok[mask,:,:], axis = 0))
+    climate_mean.append(np.mean(var_ok[mask,:,:], axis = 0))
     climat_std.append(np.std(var_ok[mask,:,:], axis = 0))
     dates_clim.append(pd.to_datetime('2000{:02d}01'.format(mon), format='%Y%m%d'))
 
-climat_mean = np.array(climat_mean)
+climate_mean = np.array(climate_mean)
 climat_std = np.array(climat_std)
 
 filename = 'ERAInterim_167_grid150_mean_1993-2016.nc'
 print(filename)
 filename = cart + filename
-save3Dncfield(lat,lon,climat_mean,parname,var_units,dates_clim,time_units,time_cal,filename)
+save3Dncfield(lat,lon,climate_mean,parname,var_units,dates_clim,time_units,time_cal,filename)
 
 filename = 'ERAInterim_167_grid150_std_1993-2016.nc'
 print(filename)
@@ -59,7 +59,7 @@ save3Dncfield(lat,lon,climat_std,parname,var_units,dates_clim,time_units,time_ca
 
 var_anom = []
 for el, dat in zip(var, dates_pdh):
-    anom = el - climat_mean[dat.month-1,:,:]
+    anom = el - climate_mean[dat.month-1,:,:]
     var_anom.append(anom)
 
 var_anom = np.array(var_anom)

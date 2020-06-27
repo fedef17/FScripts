@@ -69,9 +69,9 @@ def compute(ifile):
 
     var_season, dates_season = ctl.sel_season(var, dates, season)
 
-    climat_mean, dates_climat, climat_std = ctl.daily_climatology(var_season, dates_season, wnd)
+    climate_mean, dates_climat, climat_std = ctl.daily_climatology(var_season, dates_season, wnd)
 
-    var_anom = ctl.anomalies_daily(var_season, dates_season, climat_mean = climat_mean, dates_climate_mean = dates_climat)
+    var_anom = ctl.anomalies_daily(var_season, dates_season, climate_mean = climate_mean, dates_climate_mean = dates_climat)
 
     var_area, lat_area, lon_area = ctl.sel_area(lat, lon, var_anom, area)
     print(var_area.shape)

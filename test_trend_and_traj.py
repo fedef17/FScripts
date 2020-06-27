@@ -41,9 +41,9 @@ fil = cart_in + 'lcb0-1850-2100-NDJFM_zg500_NH_14473.nc'
 
 var, level, lat, lon, dates, time_units, var_units, time_cal = ctl.read4Dncfield(fil, extract_level = 50000)
 
-#climat_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates)
+#climate_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates)
 
-#var_anom = ctl.anomalies_daily_detrended(var, dates, climat_mean = climat_mean, dates_climate_mean = dates_climate_mean)
+#var_anom = ctl.anomalies_daily_detrended(var, dates, climate_mean = climate_mean, dates_climate_mean = dates_climate_mean)
 var_season, dates_season = ctl.sel_season(var, dates, 'DJF')
 
 erafile = '/data-hobbes/fabiano/OBS/ERA/ERAInterim/zg500/zg500_Aday_ERAInterim_2deg_1979-2014.nc'
@@ -219,7 +219,7 @@ for li in trans_pcs[0,1]:
     ax.plot(li3[0], li3[1], li3[2], color = 'grey')
 
 # years = [dtclm[0].year for dtclm in dates_climate_mean]
-# gigi = np.stack([np.mean(ctl.sel_season(va, dat, 'DJF', cut = False)[0], axis = 0) for va, dat in zip(climat_mean, dates_climate_mean)])
+# gigi = np.stack([np.mean(ctl.sel_season(va, dat, 'DJF', cut = False)[0], axis = 0) for va, dat in zip(climate_mean, dates_climate_mean)])
 #
 # #gigi = gigi - gigi[0]
 #

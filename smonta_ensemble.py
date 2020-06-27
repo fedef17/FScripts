@@ -90,13 +90,13 @@ for year in years:
 # Building climatology
 # faccio unica matriciona concatenando sull'asse 0, poi medio
 
-climat_mean = dict()
+climate_mean = dict()
 climat_std = dict()
 
 years_clim = list(range(1993,2017))
 
 for seas in ['may','nov']:
-    climat_mean[seas] = []
+    climate_mean[seas] = []
     climat_std[seas] = []
 
     for mon in range(nmon):
@@ -107,24 +107,24 @@ for seas in ['may','nov']:
             matric = np.concatenate([matric, all_fields[(seas, year, mon)]], axis = 0)
 
         print(matric.shape)
-        climat_mean[seas].append(np.mean(matric, axis = 0))
+        climate_mean[seas].append(np.mean(matric, axis = 0))
         climat_std[seas].append(np.std(matric, axis = 0))
 
-    climat_mean[seas] = np.array(climat_mean[seas])
+    climate_mean[seas] = np.array(climate_mean[seas])
     climat_std[seas] = np.array(climat_std[seas])
 
-#pickle.dump([all_fields, climat_mean, climat_std], open(cart+'all_fields_climat_{}.p'.format(par),'wb'), protocol = 2)
+#pickle.dump([all_fields, climate_mean, climat_std], open(cart+'all_fields_climat_{}.p'.format(par),'wb'), protocol = 2)
 
 for seas in ['may','nov']:
     filename = 'climatology_mean_{}_1993-2016.nc'.format(seas)
     print(filename)
     filename = cart2 + filename
-    save3Dncfield(lat,lon,climat_mean[seas],parname,var_units,dates_clim[seas],time_units,time_cal,filename)
+    save3Dncfield(lat,lon,climate_mean[seas],parname,var_units,dates_clim[seas],time_units,time_cal,filename)
 
     filename = 'climatology_std_{}_1993-2016.nc'.format(seas)
     print(filename)
     filename = cart2 + filename
     save3Dncfield(lat,lon,climat_std[seas],parname,var_units,dates_clim[seas],time_units,time_cal,filename)
 
-print(climat_mean['may'].shape)
-print(np.mean(climat_mean['may']))
+print(climate_mean['may'].shape)
+print(np.mean(climate_mean['may']))

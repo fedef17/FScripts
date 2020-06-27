@@ -134,15 +134,15 @@ sys.exit()
 
 nya = 30 # number of years for running mean
 
-climat_mean_dict = dict()
+climate_mean_dict = dict()
 
 for num in [1, 5, 10, 15, 20]:
-    climat_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates, window_days = num, window_years = nya)
-    climat_mean_area = []
-    for cos in climat_mean:
+    climate_mean, dates_climate_mean = ctl.trend_daily_climat(var, dates, window_days = num, window_years = nya)
+    climate_mean_area = []
+    for cos in climate_mean:
         nucos, lat_area, lon_area = ctl.sel_area(lat, lon, cos, 'EAT')
-        climat_mean_area.append(nucos)
-    climat_mean_dict[num] = climat_mean_area
+        climate_mean_area.append(nucos)
+    climate_mean_dict[num] = climate_mean_area
 
 all_years_ref = np.array([dat[0].year for dat in dates_climate_mean])
 
@@ -183,10 +183,10 @@ fig.savefig(cart_out + 'mean_climatology_zg.pdf')
 
 figs = []
 axaxes = [[], [], []]
-colors = ctl.color_set(len(climat_mean_area))
+colors = ctl.color_set(len(climate_mean_area))
 
 for num in allnums:
-    cosone = climat_mean_dict[num]
+    cosone = climate_mean_dict[num]
     ref = clm_fullperiod[num]
 
     fig = plt.figure(figsize = (16,12))
