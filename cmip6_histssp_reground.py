@@ -39,9 +39,9 @@ area = 'EAT'
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 for area in ['EAT']:#, 'PNA']:
     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
-    del results_ref['var_glob']
-    del results_ref['var_area']
-    del results_ref['solver']
+    # del results_ref['var_glob']
+    # del results_ref['var_area']
+    # del results_ref['solver']
     for mod in results_hist.keys():
         del results_hist[mod]['var_glob']
         del results_hist[mod]['var_area']
