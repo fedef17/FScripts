@@ -69,9 +69,9 @@ for area in ['EAT']:#, 'PNA']:
             # riaggiungi global mean futura e togli quella storica. Riassegna gli stati e salva tutto in res_rebase
             var_mod = results_ssp[mod]['var_glob']
             climate_rebase = results_hist[mod]['climate_mean']-results_ssp[mod]['climate_mean']
-            #var_mod_new = ctl.anomalies_daily(var_mod, results_ssp[mod]['dates'], climate_mean = climate_rebase, dates_climate_mean = results_ssp[mod]['dates_climate_mean'])
+            #var_mod_new = ctl.anomalies_daily(var_mod, results_ssp[mod]['dates'], climate_mean = climate_rebase, dates_climate_mean = results_ssp[mod]['climate_mean_dates'])
 
-            reres = cd.WRtool_core(var_mod, results_ssp[mod]['lat'], results_ssp[mod]['lon'], results_ssp[mod]['dates'], area, wnd_days = 20, numpcs = 4, numclus = 4, ref_solver = results_ref['solver'], ref_patterns_area = results_ref['cluspattern_area'], heavy_output = False, run_significance_calc = False, use_reference_eofs = True, use_reference_clusters = True, ref_clusters_centers = results_ref['centroids'], climate_mean = climate_rebase, dates_climate_mean = results_ssp[mod]['dates_climate_mean'])
+            reres = cd.WRtool_core(var_mod, results_ssp[mod]['lat'], results_ssp[mod]['lon'], results_ssp[mod]['dates'], area, wnd_days = 20, numpcs = 4, numclus = 4, ref_solver = results_ref['solver'], ref_patterns_area = results_ref['cluspattern_area'], heavy_output = False, run_significance_calc = False, use_reference_eofs = True, use_reference_clusters = True, ref_clusters_centers = results_ref['centroids'], climate_mean = climate_rebase, dates_climate_mean = results_ssp[mod]['climate_mean_dates'])
 
             res_rebase[mod] = reres
 
