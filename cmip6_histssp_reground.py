@@ -54,9 +54,11 @@ for area in ['EAT']:#, 'PNA']:
         pickle.dump(restot, fillo)
 
     for ssp in allssps:
+        print(ssp)
         results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
         res_rebase = dict()
         for mod in results_ssp.keys():
+            print(mod)
             if mod not in results_hist:
                 print('skipping '+mod)
                 continue
