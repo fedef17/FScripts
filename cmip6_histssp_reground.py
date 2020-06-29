@@ -25,8 +25,10 @@ cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_histssp_reground/'
 ctl.mkdir(cart_out_orig)
 
 file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
+file_hist_light = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
 gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
-file_rebase = cart_out_orig + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+file_rebase = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+file_light = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_light.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -36,7 +38,7 @@ reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 area = 'EAT'
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 for area in ['EAT']:#, 'PNA']:
-    results_hist, results_ref = pickle.load(open(file_hist.format(area), 'rb'))
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
     del results_ref['var_glob']
     del results_ref['var_area']
     del results_ref['solver']
@@ -45,8 +47,14 @@ for area in ['EAT']:#, 'PNA']:
         del results_hist[mod]['var_area']
         del results_hist[mod]['solver']
 
+    restot = dict()
+    restot['models'] = results_hist
+    restot['reference'] = results_ref
+    with open(file_hist_light.format(area), 'wb') as fillo:
+        pickle.dump(restot, fillo)
+
     for ssp in allssps:
-        results_ssp = pickle.load(open(gen_file_ssp.format(ssp, area), 'rb'))['models']
+        results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
         res_rebase = dict()
         for mod in results_ssp.keys():
             if mod not in results_hist:
@@ -66,4 +74,15 @@ for area in ['EAT']:#, 'PNA']:
         restot['models'] = res_rebase
         restot['reference'] = results_ref
         with open(file_rebase.format(ssp, area), 'wb') as fillo:
+            pickle.dump(restot, fillo)
+
+        for mod in results_ssp.keys():
+            del results_ssp[mod]['var_glob']
+            del results_ssp[mod]['var_area']
+            del results_ssp[mod]['solver']
+
+        restot = dict()
+        restot['models'] = results_ssp
+        restot['reference'] = results_ref
+        with open(file_light.format(ssp, area), 'wb') as fillo:
             pickle.dump(restot, fillo)
