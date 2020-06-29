@@ -78,6 +78,22 @@ for area in ['EAT']:#, 'PNA']:
         for ke in tuple(results_ssp[ssp].keys()):
             if len(results_ssp[ssp][ke]['labels']) < 12000:
                 del results_ssp[ssp][ke]
+            if len(results_ssp[ssp][ke]['labels']) > 13000:
+                # there is some duplicated year
+                labs, dats = ctl.seasonal_set(results_ssp[ssp][ke]['labels'], results_ssp[ssp][ke]['dates'], None)
+                pcs, dats = ctl.seasonal_set(results_ssp[ssp][ke]['pcs'], results_ssp[ssp][ke]['dates'], None)
+                yeas = np.array([da[0].year for da in dats])
+                labs_ok = []
+                dats_ok = []
+                pcs_ok = []
+                for ye in np.arange(2015, 2100):
+                    okse = np.where(yeas == ye)[0][0]
+                    labs_ok.append(labs[okse])
+                    dats_ok.append(dats[okse])
+                    pcs_ok.append(pcs[okse])
+                results_ssp[ssp][ke]['labels'] = np.concatenate(labs_ok)
+                results_ssp[ssp][ke]['dates'] = np.concatenate(dats_ok)
+                results_ssp[ssp][ke]['pcs'] = np.concatenate(pcs_ok)
 
     mod_hist = np.unique([cos.split('_')[0] for cos in results_hist.keys()])
     mod_ssp = dict()
