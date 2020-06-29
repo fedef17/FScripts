@@ -30,8 +30,8 @@ plt.rcParams['axes.labelsize'] = 18
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 
 yr10 = 10 # length of running mean
-dtrtyp = 'light'
-#dtrtyp = 'histrebase'
+#dtrtyp = 'light'
+dtrtyp = 'histrebase'
 
 if dtrtyp == 'light':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5/'
@@ -40,7 +40,7 @@ else:
 ctl.mkdir(cart_out_orig)
 
 file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_{}.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
 gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_{}.p'
 
 numclus = 4
@@ -62,7 +62,7 @@ for area in ['EAT']:#, 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
-    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area, dtrtyp))
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
     res_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
 
     # Erasing incomplete runs
