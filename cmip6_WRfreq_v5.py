@@ -78,7 +78,7 @@ for area in ['EAT']:#, 'PNA']:
         for ke in tuple(results_ssp[ssp].keys()):
             if len(results_ssp[ssp][ke]['labels']) < 12000:
                 del results_ssp[ssp][ke]
-            if len(results_ssp[ssp][ke]['labels']) > 13000:
+            elif len(results_ssp[ssp][ke]['labels']) > 13000:
                 # there is some duplicated year
                 labs, dats = ctl.seasonal_set(results_ssp[ssp][ke]['labels'], results_ssp[ssp][ke]['dates'], None)
                 pcs, dats = ctl.seasonal_set(results_ssp[ssp][ke]['pcs'], results_ssp[ssp][ke]['dates'], None)
