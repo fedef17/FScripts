@@ -39,7 +39,7 @@ else:
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/'
 ctl.mkdir(cart_out_orig)
 
-file_hist_refEOF = cart_in + 'out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
+file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
 file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_{}.p'
 gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_{}.p'
 
