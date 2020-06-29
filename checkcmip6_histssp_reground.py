@@ -73,7 +73,7 @@ for area in ['EAT']:#, 'PNA']:
     fig.savefig(cart_out_orig + 'baugigicheck.pdf')
 
     bau = results_hist[mod]['var_dtr']
-    bauda = np.arange(1964, 2014)
+    bauda = np.arange(1965, 2015)
     gigi = results_ssp[mod]['var_dtr']
     gigida = np.arange(2015, 2100)
     fig = plt.figure()
@@ -82,3 +82,16 @@ for area in ['EAT']:#, 'PNA']:
     plt.plot(gigida, gigi)
     plt.plot(gigida, np.polyval(results_ssp[mod]['coeffs_dtr'], gigida), linestyle = '--')
     fig.savefig(cart_out_orig + 'vardtr_check.pdf')
+
+    fig = plt.figure()
+    cols = ctl.color_set(len(results_ssp.keys()))
+    for mod, co in zip(results_ssp.keys(), cols):
+        bau = results_hist[mod]['var_dtr']
+        bauda = np.arange(1965, 2015)
+        gigi = results_ssp[mod]['var_dtr']
+        gigida = np.arange(2015, 2100)
+        plt.scatter(bauda, bau, color = co, s = 2)
+        plt.plot(bauda, np.polyval(results_hist[mod]['coeffs_dtr'], bauda), color = co, linewidth = 0.5)
+        plt.scatter(gigida, gigi, color = co, s = 2)
+        plt.plot(gigida, np.polyval(results_ssp[mod]['coeffs_dtr'], gigida), color = co, linewidth = 0.5)
+    fig.savefig(cart_out_orig + 'vardtr_check_allmods.pdf')
