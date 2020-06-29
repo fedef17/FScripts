@@ -72,7 +72,7 @@ for area in ['EAT']:#, 'PNA']:
 
     results_ssp = dict()
     for ssp in allssps:
-        results_ssp[ssp], _ = ctl.load_wrtool(gen_file_ssp.format(ssp, ssp, area, dtrtyp))
+        results_ssp[ssp], _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area, dtrtyp))
 
         # Erasing incomplete runs
         for ke in tuple(results_ssp[ssp].keys()):
