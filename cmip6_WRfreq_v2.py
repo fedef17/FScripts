@@ -192,8 +192,8 @@ for area in ['EAT', 'PNA']:
     # freqs, residtimes, eff_centroids, patterns_refEOF = pickle.load(open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'rb'))
     #
     # #### Grafico con tutti gli ssp
-    # allsims = ['hist', 'ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
-    # colsim = ctl.color_set(6)
+    allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
+    colsim = ctl.color_set(5)
     #
     # reg_names = reg_names_area[area]
     # for cos in ['last20', 'tot50']:
