@@ -20,7 +20,7 @@ from scipy import stats
 import pandas as pd
 
 #############################################################################
-cart_out_orig = cart_in + 'Results_v2_rebase/'
+cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v2_rebase/'
 ctl.mkdir(cart_out_orig)
 
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
