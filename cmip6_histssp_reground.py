@@ -39,7 +39,7 @@ reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 
 area = 'EAT'
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
-for area in ['EAT']:#, 'PNA']:
+for area in ['PNA']:#, 'PNA']:
     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
     results_ref = pickle.load(open(filref.format(area), 'rb'))
     # del results_ref['var_glob']
