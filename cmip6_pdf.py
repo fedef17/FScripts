@@ -23,15 +23,19 @@ from scipy.ndimage import gaussian_filter as gfilt
 #############################################################################
 
 cart_in = '/home/fabiano/Research/lavori/CMIP6/'
-cart_out_orig = cart_in + 'Results_v2/'
+cart_out_orig = cart_in + 'Results_v2_rebase/'
+
+cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
+file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
 
 xss3 = np.linspace(-3000., 3000., 301)
 xi_grid3, yi_grid3 = np.meshgrid(xss3, xss3)
 
 ref_pdf = dict()
 for area in ['EAT', 'PNA']:
-    file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'.format(area)
-    results_hist, results_ref = pickle.load(open(file_hist_refEOF, 'rb'))
+    results_hist, results_ref = ctl.load_wrtool(file_hist_refEOF.format(area))
 
     dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
     dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
@@ -56,8 +60,7 @@ area = 'EAT'
 
 for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
-    file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'.format(area)
-    results_hist, results_ref = pickle.load(open(file_hist_refEOF, 'rb'))
+    results_hist, results_ref = ctl.load_wrtool(file_hist_refEOF.format(area))
 
     #last20 = True
 
