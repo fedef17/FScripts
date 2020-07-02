@@ -43,8 +43,8 @@ for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
-    results_hist, results_ref = pickle.load(open(file_hist.format(area), 'rb'))
-    res_hist_refEOF, _ = pickle.load(open(file_hist_refEOF.format(area), 'rb'))
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
+    res_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
 
     # Erasing incomplete runs
     for ke in tuple(results_hist.keys()):
@@ -53,7 +53,7 @@ for area in ['EAT', 'PNA']:
 
     results_ssp = dict()
     for ssp in allssps:
-        results_ssp[ssp], _ = pickle.load(open(gen_file_ssp.format(ssp, ssp, area), 'rb'))
+        results_ssp[ssp], _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
 
         # Erasing incomplete runs
         for ke in tuple(results_ssp[ssp].keys()):
