@@ -193,7 +193,7 @@ for area in ['EAT', 'PNA']:
 
             ax2.set_title('hist vs ref')
 
-            for ssp in ['ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']:
+            for ssp in ['ssp126', 'ssp245', 'ssp370', 'ssp585']:
                 icos += 1
                 ax2 = figall.add_subplot(2, 3, icos)
 
@@ -273,7 +273,7 @@ for area in ['EAT', 'PNA']:
     ## Now for single models element-wise
     modpdf = pickle.load(open(cart_out + 'modpdfs_refCLUS_{}.p'.format(area), 'rb'))
     modall = dict()
-    for cos in ['hist', 'ssp119', 'ssp126', 'ssp245', 'ssp370', 'ssp585']:
+    for cos in ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']:
         modall[cos] = np.unique([ke[1] for ke in modpdf if ke[0] == cos])
 
     for filt in [False, True]:
