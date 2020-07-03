@@ -29,11 +29,11 @@ elif os.uname()[1] == 'ff-clevo':
 cart_out_orig = cart_in + 'Results_paper_last_rebase/'
 ctl.mkdir(cart_out_orig)
 
-cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
+cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
 
-file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
-gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+file_hist_refEOF = cart_data + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
+file_hist = cart_data + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+gen_file_ssp = cart_data + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
 
 yr10 = 10 # length of running mean
 
