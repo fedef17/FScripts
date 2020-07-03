@@ -21,31 +21,32 @@ import pandas as pd
 
 #############################################################################
 if os.uname()[1] == 'hobbes':
-    cart_in = '/home/fabiano/Research/lavori/CMIP6/'
+    cart = '/home/fabiano/Research/lavori/CMIP6/'
 elif os.uname()[1] == 'ff-clevo':
-    cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
+    cart = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
 
-cart_out_orig = cart_in + 'Results_trendssp585/'
+cart_out_orig = cart + 'Results_trendssp585/'
 ctl.mkdir(cart_out_orig)
 
-file_hist = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
-#file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF.p'
-gen_file_ssp = cart_in + 'cmip6_{}/out_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
+cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
+
+file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
 
 numclus = 4
 reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
 reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 
-
 area = 'EAT'
 ssp = 'ssp585'
 
-results_hist, results_ref = pickle.load(open(file_hist.format(area), 'rb'))
-results_ssp = pickle.load(open(gen_file_ssp.format(ssp, ssp, area), 'rb'))['models']
+results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
+results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
 
-cart_lui = cart_in + 'Results_v4/{}_NDJFM/'.format(area)
-freqs, residtimes = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+cart_lui = cart + 'Results_v5_rebase/{}_NDJFM/'.format(area)
+freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
 okmods = [ke[1] for ke in freqs if 'ssp585' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
 #['BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1\', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
@@ -83,18 +84,22 @@ for modmem in okmods:
     zg_se = zg_noglob - zg_noglob_zonme[..., np.newaxis]
     se_trend, se_errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zg_se, dates, None)
 
-    zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
-    lat = coords['lat']
-    lon = coords['lon']
-    dates = coords['dates']
-    zgmean, zgstd = ctl.seasonal_climatology(zghist, dates, season, dates_range = ctl.range_years(1964,2014))
+    try:
+        zghist, coords, _ = ctl.readxDncfield(cartmon_hist + filhist.format(mod))
+        lat = coords['lat']
+        lon = coords['lon']
+        dates = coords['dates']
+        zgmean, zgstd = ctl.seasonal_climatology(zghist, dates, season, dates_range = ctl.range_years(1964,2014))
+        cose[('hist mean', mod)] = zgmean
+        cose[('hist std', mod)] = zgstd
+    except:
+        print('passsssss ' + mod)
+        pass
 
     cose[('trend', mod)] = trend
     cose[('errtrend', mod)] = errtrend
     cose[('se_trend', mod)] = se_trend
     cose[('se_errtrend', mod)] = se_errtrend
-    cose[('hist mean', mod)] = zgmean
-    cose[('hist std', mod)] = zgstd
 
 pickle.dump(cose, open(cart_out_orig + 'zgtrends_ssp585.p', 'wb'))
 
@@ -126,7 +131,7 @@ for modmem in okmods:
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
 
-NSIG = 11 # number of models to consider response significant
+NSIG = 20 # number of models to consider response significant
 
 trendsanom.append(np.mean(trendsanom, axis = 0))
 hatchs.append(np.sum([np.sign(tre) == np.sign(trendsanom[-1]) for tre in trendsanom[:-1]], axis = 0) >= NSIG)
@@ -154,6 +159,12 @@ ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, p
 
 filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-2,2), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
+
+filename = cart_out_orig + 'trend_anom_mmm_vs_hist.pdf'
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_contour_field = meanfields[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10)
+
+filename = cart_out_orig + 'trend_anom_mmm_vs_hist_EAT.pdf'
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-2,2), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
 ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', draw_grid = True)
