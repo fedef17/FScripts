@@ -44,11 +44,16 @@ ssp = 'ssp585'
 
 results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
 results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
+print(results_hist.keys())
+print(len(results_hist.keys()))
+print(results_ssp.keys())
+print(len(results_ssp.keys()))
 
 cart_lui = cart + 'Results_v5_rebase/{}_NDJFM/'.format(area)
 freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
 okmods = [ke[1] for ke in freqs if 'ssp585' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+print(okmods)
 #['BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1\', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
 
 for nu in range(4):
@@ -131,7 +136,7 @@ for modmem in okmods:
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
 
-NSIG = 20 # number of models to consider response significant
+NSIG = int(0.8*len(okmods)) # number of models to consider response significant
 
 trendsanom.append(np.mean(trendsanom, axis = 0))
 hatchs.append(np.sum([np.sign(tre) == np.sign(trendsanom[-1]) for tre in trendsanom[:-1]], axis = 0) >= NSIG)
