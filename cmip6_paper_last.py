@@ -300,12 +300,14 @@ for area in ['EAT', 'PNA']:
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
         ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
 
-    # okmods_m1 = [mod for mod in okmods if 'INM-CM4-8' not in mod]
-    # for co in coppie:
-    #     x = [ssp585res[mod][co[0]] for mod in okmods_m1]
-    #     y = [ssp585res[mod][co[1]] for mod in okmods_m1]
-    #     filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
-    #     ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+    cart_corr = cart_corr + 'senzaINMCM4/'
+    ctl.mkdir(cart_corr)
+    okmods_m1 = [mod for mod in okmods if 'INM-CM4-8' not in mod]
+    for co in coppie:
+        x = [ssp585res[mod][co[0]] for mod in okmods_m1]
+        y = [ssp585res[mod][co[1]] for mod in okmods_m1]
+        filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
+        ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
 
     #########################################################
 
