@@ -253,7 +253,7 @@ for area in ['EAT', 'PNA']:
 
     ssp585res['ref'] = cose
 
-    print(ssp585res)
+    #print(ssp585res)
     pickle.dump(ssp585res, open(cart_out + 'resu_ssp585.p', 'wb'))
 
     #freqhistNAO  freqdiff50NAO  freqdiff20NAO  trendNAO  yearofemergence?  20-yr variab  corrwithNAM DeltaTAS  finalAA
@@ -312,7 +312,7 @@ for area in ['EAT', 'PNA']:
         pears, pval = stats.pearsonr(x, y)
         allpeas[co] = (pears, pval)
 
-    print(allpeas)
+    #print(allpeas)
 
     cart_corr = cart_corr + 'senzaINMCM4/'
     ctl.mkdir(cart_corr)
@@ -325,7 +325,7 @@ for area in ['EAT', 'PNA']:
         pears, pval = stats.pearsonr(x, y)
         allpeas[tuple(list(co)+['senzaINMCM4'])] = (pears, pval)
 
-    print(allpeas)
+    #print(allpeas)
     pickle.dump(allpeas, open(cart_corr+'allcorrs.p', 'wb'))
 
     print('SIGNIFICANT CORRS?')
