@@ -309,7 +309,8 @@ for area in ['EAT', 'PNA']:
         y = [ssp585res[mod][co[1]] for mod in okmods]
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
         pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
-        allpeas[co] = pea
+        pears, pval = stats.pearsonr(x, y)
+        allpeas[co] = (pears, pval)
 
     print(allpeas)
 
@@ -321,10 +322,29 @@ for area in ['EAT', 'PNA']:
         y = [ssp585res[mod][co[1]] for mod in okmods_m1]
         filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
         pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
-        allpeas[tuple(list(co)+['senzaINMCM4'])] = pea
+        pears, pval = stats.pearsonr(x, y)
+        allpeas[tuple(list(co)+['senzaINMCM4'])] = (pears, pval)
 
     print(allpeas)
     pickle.dump(allpeas, open(cart_corr+'allcorrs.p', 'wb'))
+
+    print('SIGNIFICANT CORRS?')
+    for co in coppie:
+        if allpeas[co][1] < 0.1:
+            print(co, allpeas[co])
+
+    for co in coppie:
+        if allpeas[tuple(list(co)+['senzaINMCM4'])][1] < 0.1:
+            print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
+
+    print('HIGH CORRS?')
+    for co in coppie:
+        if np.abs(allpeas[co][0]) > 0.4:
+            print(co, allpeas[co])
+
+    for co in coppie:
+        if np.abs(allpeas[tuple(list(co)+['senzaINMCM4'])][0]) > 0.4:
+            print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
 
     #########################################################
 
