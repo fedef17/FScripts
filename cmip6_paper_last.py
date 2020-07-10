@@ -165,6 +165,15 @@ for area in ['EAT', 'PNA']:
         cose['trendAR_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]/cose['deltaT']
         cose['trendNAOneg_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]/cose['deltaT']
 
+        cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
+        cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
+        cose['fdAR50'] = freqs[('ssp585', mod, 'tot50')][2]-freqs[('hist', mod, 'tot50')][2]
+        cose['fdNAOneg50'] = freqs[('ssp585', mod, 'tot50')][3]-freqs[('hist', mod, 'tot50')][3]
+        cose['fdNAO50_divDT'] = cose['fdNAO50']/cose['deltaT']
+        cose['fdSBL50_divDT'] = cose['fdSBL50']/cose['deltaT']
+        cose['fdAR50_divDT'] = cose['fdAR50']/cose['deltaT']
+        cose['fdNAOneg50_divDT'] = cose['fdNAOneg50']/cose['deltaT']
+
         gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)], yr10, remove_nans=True)
         pio = mk.original_test(gigi)
         cose['trendNAO_pval'] = pio.p
@@ -292,13 +301,17 @@ for area in ['EAT', 'PNA']:
     cart_corr = cart_out + 'corrplots/'
     ctl.mkdir(cart_corr)
 
-    coppie = [('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO_divDT', 'AA'), ('trendSBL_divDT', 'AA'), ('trendAR_divDT', 'AA'), ('trendNAOneg_divDT', 'AA'), ('trendNAO_divDT', 'ANAT'), ('trendSBL_divDT', 'ANAT'), ('trendAR_divDT', 'ANAT'), ('trendNAOneg_divDT', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
+    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50_divDT', 'AA'), ('fdNAO50_divDT', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50_divDT', 'AA'), ('fdSBL50_divDT', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50_divDT', 'AA'), ('fdAR50_divDT', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50_divDT', 'AA'), ('fdNAOneg50_divDT', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO_divDT', 'AA'), ('trendSBL_divDT', 'AA'), ('trendAR_divDT', 'AA'), ('trendNAOneg_divDT', 'AA'), ('trendNAO_divDT', 'ANAT'), ('trendSBL_divDT', 'ANAT'), ('trendAR_divDT', 'ANAT'), ('trendNAOneg_divDT', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
 
+    allpeas = dict()
     for co in coppie:
         x = [ssp585res[mod][co[0]] for mod in okmods]
         y = [ssp585res[mod][co[1]] for mod in okmods]
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
-        ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+        pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+        allpeas[co] = pea
+
+    print(allpeas)
 
     cart_corr = cart_corr + 'senzaINMCM4/'
     ctl.mkdir(cart_corr)
@@ -307,7 +320,11 @@ for area in ['EAT', 'PNA']:
         x = [ssp585res[mod][co[0]] for mod in okmods_m1]
         y = [ssp585res[mod][co[1]] for mod in okmods_m1]
         filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
-        ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+        pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+        allpeas[tuple(list(co)+['senzaINMCM4'])] = pea
+
+    print(allpeas)
+    pickle.dump(allpeas, open(cart_corr+'allcorrs.p', 'wb'))
 
     #########################################################
 
