@@ -75,12 +75,22 @@ for area in ['EAT', 'PNA']:
     stringa = 5*'{:10.1f}'+'\n'
 
     # da Virna
+    vmods, datatemp = ctl.read_from_txt(cart_in + 'DT_ssp585_VM.txt', n_skip = 2, sep = '\t', n_stop = 27)
+    vkeys = ['DT_Global', 'DT_High', 'DT_Mid', 'DT_Low', 'DT_NAT']
+    tempmods = dict()
+    for mod, lin in zip(vmods, datatemp):
+        tempmods[mod] = lin
+
+    okmods_mod = [ke.split('_')[0] for ke in okmods]
+    deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
+    AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
+    Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
     # namcorr = np.array([0.55, 0.73, 0.71, 0.79, 0.78, 0.56, 0.69, 0.47, 0.66, 0.80, 0.16, 0.59, 0.64, 0.77])
     # deltaT = np.array([3.5449219, 6.1132812, 4.9842224, 5.208954, 4.7590027, 4.857544, 2.9945068, 3.1509705, 3.1122742, 5.4082947, 3.7455444, 3.3199463, 3.9161987, 6.1259155])
     # AA = np.array([2.7081869, 2.4549222, 2.2232325, 2.7884138, 2.884894, 2.6862576, 2.9566925, 2.374873, 2.3171902, 2.4509392, 3.2346048, 2.6287825, 2.1749997, 2.8315532])
-    namcorr = np.nan*np.ones(len(okmods))
-    deltaT = np.nan*np.ones(len(okmods))
-    AA = np.nan*np.ones(len(okmods))
+    # namcorr = np.nan*np.ones(len(okmods))
+    # deltaT = np.nan*np.ones(len(okmods))
+    # AA = np.nan*np.ones(len(okmods))
 
     # model performance
     var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
@@ -88,14 +98,15 @@ for area in ['EAT', 'PNA']:
     effcen = [results_hist[mod]['eff_centroids'] for mod in okmods]
 
     ssp585res = dict()
-    for mod, nam, delt, aaa, vrat, cen_re, cen in zip(okmods, namcorr, deltaT, AA, var_ratio, effcen_refeof, effcen):
+    for mod, delt, aaa, ana, vrat, cen_re, cen in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen):
         ctl.printsep(resu)
         ctl.printsep(resu)
         resu.write('\n\n' + mod + '\n')
         cose = dict()
-        cose['namcorr'] = nam
+        #cose['namcorr'] = nam
         cose['deltaT'] = delt
         cose['AA'] = aaa
+        cose['ANAT'] = ana
         cose['var_ratio'] = vrat
         cose['cen_rcorr'] = np.mean([ctl.Rcorr(ce1, ce2) for ce1, ce2 in zip(cen_re, cen)])
 
@@ -147,8 +158,12 @@ for area in ['EAT', 'PNA']:
 
         cose['trendNAO'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]
         cose['trendSBL'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]
-        cose['trendNAO_divDT'] = cose['trendNAO']/cose['deltaT']
-        cose['trendSBL_divDT'] = cose['trendSBL']/cose['deltaT']
+        cose['trendAR'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]
+        cose['trendNAOneg'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]
+        cose['trendNAO_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]/cose['deltaT']
+        cose['trendSBL_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]/cose['deltaT']
+        cose['trendAR_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]/cose['deltaT']
+        cose['trendNAOneg_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]/cose['deltaT']
 
         gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)], yr10, remove_nans=True)
         pio = mk.original_test(gigi)
@@ -188,7 +203,6 @@ for area in ['EAT', 'PNA']:
             cose['trendSBL_yeme'] = 2100+ima
         else:
             cose['trendSBL_yeme'] = np.nan
-
 
         # variability
         years = np.arange(2015, 2100)
@@ -234,8 +248,8 @@ for area in ['EAT', 'PNA']:
     pickle.dump(ssp585res, open(cart_out + 'resu_ssp585.p', 'wb'))
 
     #freqhistNAO  freqdiff50NAO  freqdiff20NAO  trendNAO  yearofemergence?  20-yr variab  corrwithNAM DeltaTAS  finalAA
-    allke = ['frNAO', 'fdNAO50', 'fdNAO20', 'trendNAO', 'trendNAO_pval', 'trendNAO_yeme', 'frvar_5yr', 'frvar_20yr', 'perNAO', 'pdNAO50', 'pdNAO20', 'deltaT', 'namcorr', 'AA']
-    allnams = ['model', 'fr', 'fd50', 'fd20', 'trend', 'pval', 'yeme', 'var5', 'var20', 'pers', 'pd50', 'pd20', 'DT', 'nam', 'AA']
+    allke = ['frNAO', 'fdNAO50', 'fdNAO20', 'trendNAO', 'trendNAO_pval', 'trendNAO_yeme', 'frvar_5yr', 'frvar_20yr', 'perNAO', 'pdNAO50', 'pdNAO20', 'deltaT', 'AA', 'ANAT']
+    allnams = ['model', 'fr', 'fd50', 'fd20', 'trend', 'pval', 'yeme', 'var5', 'var20', 'pers', 'pd50', 'pd20', 'DT', 'AA', 'ANAT']
     stringa = '{:15s}'+ 4*'{:8.1f}' + '{:10.1e}' + '{:10.0f}' + 5*'{:8.1f}'+ 3*'{:6.2f}' + '\n'
     stringavirg = '{:15s},'+ 4*'{:8.1f},' + '{:10.1e},' + '{:10.0f},' + 5*'{:8.1f},' + 2*'{:6.2f},' +'{:6.2f}'
     stringatit = '{:15s}' + 4*'{:>8s}'+2*'{:>10s}'+5*'{:>8s}'+ 3*'{:>6s}'+'\n'
@@ -261,7 +275,7 @@ for area in ['EAT', 'PNA']:
     resu.write('Second regime\n')
     resu.write(stringatit.format(*allnams))
 
-    allke = ['frSBL', 'fdSBL50', 'fdSBL20', 'trendSBL', 'trendSBL_pval', 'trendSBL_yeme', 'frvar_5yr', 'frvar_20yr', 'perSBL', 'pdSBL50', 'pdSBL20', 'deltaT', 'namcorr', 'AA']
+    allke = ['frSBL', 'fdSBL50', 'fdSBL20', 'trendSBL', 'trendSBL_pval', 'trendSBL_yeme', 'frvar_5yr', 'frvar_20yr', 'perSBL', 'pdSBL50', 'pdSBL20', 'deltaT', 'AA', 'ANAT']
 
     for mod in okmods + ['MMM', 'ref']:
         bau = []
@@ -275,25 +289,23 @@ for area in ['EAT', 'PNA']:
     resu.close()
 
     # Guardiamo anche le correlazioni va là.
-    # cart_corr = cart_out + 'corrplots/'
-    # ctl.mkdir(cart_corr)
-    #
-    # coppie = [('trendNAO', 'trendSBL'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendNAO', 'AA'), ('trendNAO_divDT', 'AA'), ('trendSBL', 'AA'), ('trendSBL_divDT', 'AA'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO')]
-    #
-    # for co in coppie:
-    #     x = [ssp585res[mod][co[0]] for mod in okmods]
-    #     y = [ssp585res[mod][co[1]] for mod in okmods]
-    #     filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
-    #     ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
-    #
+    cart_corr = cart_out + 'corrplots/'
+    ctl.mkdir(cart_corr)
+
+    coppie = [('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO_divDT', 'AA'), ('trendSBL_divDT', 'AA'), ('trendAR_divDT', 'AA'), ('trendNAOneg_divDT', 'AA'), ('trendNAO_divDT', 'ANAT'), ('trendSBL_divDT', 'ANAT'), ('trendAR_divDT', 'ANAT'), ('trendNAOneg_divDT', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
+
+    for co in coppie:
+        x = [ssp585res[mod][co[0]] for mod in okmods]
+        y = [ssp585res[mod][co[1]] for mod in okmods]
+        filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
+        ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+
     # okmods_m1 = [mod for mod in okmods if 'INM-CM4-8' not in mod]
     # for co in coppie:
     #     x = [ssp585res[mod][co[0]] for mod in okmods_m1]
     #     y = [ssp585res[mod][co[1]] for mod in okmods_m1]
     #     filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
     #     ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
-
-
 
     #########################################################
 
