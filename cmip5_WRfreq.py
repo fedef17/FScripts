@@ -183,7 +183,6 @@ for area in ['EAT']:#, 'PNA']:
                 cosi.append(seas20)
             else:
                 print(mem, len(seas20), 'too short')
-            cosi.append(seas20)
         coso = np.mean(cosi, axis = 0)
         runfreq[('rcp85', reg)] = coso
         ax.plot(yr, coso, color = 'black', linewidth = 3)
@@ -203,7 +202,6 @@ for area in ['EAT']:#, 'PNA']:
                 cosi.append(seas20)
             else:
                 print(mem, 'too short')
-            cosi.append(seas20)
         coso = np.mean(cosi, axis = 0)
         runfreq[('run20', reg)] = coso
         coserr = np.std(cosi, axis = 0)
