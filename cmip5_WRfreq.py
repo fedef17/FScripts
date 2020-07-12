@@ -165,9 +165,9 @@ for area in ['EAT']:#, 'PNA']:
             results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
 
     okmods = [cos for cos in results_ssp.keys()]
-    allyr = np.arange(2005, 2100)
+    allyr = np.arange(2005, 2101)
     yr0 = 2005
-    yr1 = 2100
+    yr1 = 2101
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
@@ -180,7 +180,7 @@ for area in ['EAT']:#, 'PNA']:
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
             print(mem, len(seas20))
             if len(seas20) == len(allyr):
-                ax.plot(yr, seas20)
+                ax.plot(allyr, seas20)
                 cosi.append(seas20)
             else:
                 print(mem, len(seas20), 'too short')
