@@ -341,7 +341,7 @@ for area in ['EAT', 'PNA']:
             cosi = []
             for col, ssp in zip(colsim[1:], allssps):
                 seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
-                ax.plot(yr, ssp, color = col, linewidth = 2)
+                ax.plot(yr, seas20, color = col, linewidth = 2)
 
             ax.set_title(reg_names_area[area][reg])
             ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
