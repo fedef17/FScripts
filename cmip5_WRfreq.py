@@ -56,10 +56,26 @@ for area in ['EAT']:#, 'PNA']:
     yr = np.arange(1950, 2005)
 
     # Erasing incomplete runs
-    avlen = np.max([len(results_hist[ke]['labels']) for ke in results_hist.keys()])
+    avlen = np.median([len(results_hist[ke]['labels']) for ke in results_hist.keys()])
     for ke in tuple(results_hist.keys()):
-        if len(results_hist[ke]['labels']) < avlen-50:
+        if len(results_hist[ke]['labels']) < avlen-1000:
             del results_hist[ke]
+        elif len(results_hist[ke]['labels']) > avlen+100:
+            # there is some duplicated year
+            labs, dats = ctl.seasonal_set(results_hist[ke]['labels'], results_hist[ke]['dates'], None)
+            pcs, dats = ctl.seasonal_set(results_hist[ke]['pcs'], results_hist[ke]['dates'], None)
+            yeas = np.array([da[0].year for da in dats])
+            labs_ok = []
+            dats_ok = []
+            pcs_ok = []
+            for ye in np.arange(1950, 2005):
+                okse = np.where(yeas == ye)[0][0]
+                labs_ok.append(labs[okse])
+                dats_ok.append(dats[okse])
+                pcs_ok.append(pcs[okse])
+            results_hist[ke]['labels'] = np.concatenate(labs_ok)
+            results_hist[ke]['dates'] = np.concatenate(dats_ok)
+            results_hist[ke]['pcs'] = np.concatenate(pcs_ok)
 
     okmods = [cos for cos in results_hist.keys()]
     print(okmods)
@@ -126,6 +142,27 @@ for area in ['EAT']:#, 'PNA']:
     results = pickle.load(open(gen_file_ssp.format('rcp85', 'rcp85', area), 'rb'))
     results_ssp = results['models']
 
+    avlen = np.median([len(results_ssp[ke]['labels']) for ke in results_ssp.keys()])
+    for ke in tuple(results_ssp.keys()):
+        if len(results_ssp[ke]['labels']) < avlen-1000:
+            del results_ssp[ke]
+        elif len(results_ssp[ke]['labels']) > avlen+100:
+            # there is some duplicated year
+            labs, dats = ctl.seasonal_set(results_ssp[ke]['labels'], results_ssp[ke]['dates'], None)
+            pcs, dats = ctl.seasonal_set(results_ssp[ke]['pcs'], results_ssp[ke]['dates'], None)
+            yeas = np.array([da[0].year for da in dats])
+            labs_ok = []
+            dats_ok = []
+            pcs_ok = []
+            for ye in np.arange(2006, 2100):
+                okse = np.where(yeas == ye)[0][0]
+                labs_ok.append(labs[okse])
+                dats_ok.append(dats[okse])
+                pcs_ok.append(pcs[okse])
+            results_ssp[ke]['labels'] = np.concatenate(labs_ok)
+            results_ssp[ke]['dates'] = np.concatenate(dats_ok)
+            results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
+
     okmods = [cos for cos in results_ssp.keys()]
     yr = np.arange(2006, 2100)
     yr0 = 2006
@@ -177,3 +214,49 @@ for area in ['EAT']:#, 'PNA']:
         ax.set_title(reg_names_area[area][reg])
 
     fig.savefig(cart_out + 'long_run20_{}_rcp85.pdf'.format(area))
+
+    numclus = 4
+    freqs = dict() # tot50 e last20
+    for ke in results_hist.keys():
+        dat1 = pd.Timestamp('09-01-1964').to_pydatetime()
+        dat2 = pd.Timestamp('04-01-2005').to_pydatetime()
+        labs, dats = ctl.sel_time_range(results_hist[ke]['labels'], results_hist[ke]['dates'], (dat1, dat2))
+        freqs[('hist_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
+
+    freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in results_hist.keys()])
+
+    for ke in results_ssp.keys():
+        dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
+        dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+        labs, dats = ctl.sel_time_range(results_ssp[ke]['labels'], results_ssp[ke]['dates'], (dat1, dat2))
+        freqs[('rcp85_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
+
+    freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in results_ssp.keys()])
+
+    pickle.dump(freqs, open(cart_out + 'freqs_cmip5.p', 'wb'))
+
+    allsims = ['hist_cmip5', 'rcp85_cmip5']
+    colsim = ctl.color_set(2)
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, 'all', cos)][:, reg], nu) for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        if reg == 0: ax.set_ylabel('Regime frequency')
+
+        ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 4)
+    figall.savefig(cart_out + 'WRfreq_cmip5_{}.pdf'.format(area))
