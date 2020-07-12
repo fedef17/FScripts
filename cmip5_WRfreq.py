@@ -155,7 +155,7 @@ for area in ['EAT']:#, 'PNA']:
             labs_ok = []
             dats_ok = []
             pcs_ok = []
-            for ye in np.arange(2006, 2100):
+            for ye in np.arange(2005, 2100):
                 okse = np.where(yeas == ye)[0][0]
                 labs_ok.append(labs[okse])
                 dats_ok.append(dats[okse])
@@ -165,8 +165,8 @@ for area in ['EAT']:#, 'PNA']:
             results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
 
     okmods = [cos for cos in results_ssp.keys()]
-    allyr = np.arange(2006, 2100)
-    yr0 = 2006
+    allyr = np.arange(2005, 2100)
+    yr0 = 2005
     yr1 = 2100
 
     fig = plt.figure(figsize = (16,12))
