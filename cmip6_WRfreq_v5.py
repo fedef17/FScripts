@@ -380,23 +380,6 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
     fig.savefig(cart_out + 'allssps_freq20_{}.pdf'.format(area))
 
-    fig = plt.figure(figsize = (16,12))
-    axes = []
-    for reg in range(4):
-        ax = fig.add_subplot(2, 2, reg+1)
-        for col, ssp in zip(colsim[1:], allssps):
-            coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[(ssp, 'all', cos)][:, reg])
-            coserr = runfreq[(ssp, 'run20err', reg)]
-            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
-            ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
-        ax.set_title(reg_names_area[area][reg])
-        ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
-        axes.append(ax)
-
-    ctl.adjust_ax_scale(axes)
-    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
-    fig.savefig(cart_out + 'allssps_freq20_{}_anom.pdf'.format(area))
-
     pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_{}_v4.p'.format(area), 'wb'))
 
     cart_out_nc = cart_out + 'clus_freq_index/'
@@ -533,6 +516,23 @@ for area in ['EAT', 'PNA']:
     #### Grafico con tutti gli ssp
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
     colsim = ctl.color_set(5)
+
+    fig = plt.figure(figsize = (16,12))
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(2, 2, reg+1)
+        for col, ssp in zip(colsim[1:], allssps):
+            coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[(ssp, 'all', cos)][:, reg])
+            coserr = runfreq[(ssp, 'run20err', reg)]
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
+            ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
+        ax.set_title(reg_names_area[area][reg])
+        ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
+        axes.append(ax)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
+    fig.savefig(cart_out + 'allssps_freq20_{}_anom.pdf'.format(area))
 
     reg_names = reg_names_area[area]
     for cos in ['last20', 'tot50']:
