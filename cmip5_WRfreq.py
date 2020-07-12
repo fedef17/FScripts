@@ -53,7 +53,8 @@ for area in ['EAT']:#, 'PNA']:
 
     yr0 = 1950
     yr1 = 2005
-    yr = np.arange(1950, 2005)
+    allyr = np.arange(1950, 2005)
+    yr = allyr
 
     # Erasing incomplete runs
     avlen = np.median([len(results_hist[ke]['labels']) for ke in results_hist.keys()])
@@ -118,7 +119,7 @@ for area in ['EAT']:#, 'PNA']:
         cosi = []
         for mem in okmods:
             seas20 = np.array(ctl.running_mean(seasfreq[('hist', mem, reg)], 20))
-            if len(seas20) == len(yr):
+            if len(seas20) == len(allyr):
                 cosi.append(seas20)
             else:
                 print(mem, 'too short')
@@ -164,7 +165,7 @@ for area in ['EAT']:#, 'PNA']:
             results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
 
     okmods = [cos for cos in results_ssp.keys()]
-    yr = np.arange(2006, 2100)
+    allyr = np.arange(2006, 2100)
     yr0 = 2006
     yr1 = 2100
 
@@ -178,7 +179,7 @@ for area in ['EAT']:#, 'PNA']:
             seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
             print(mem, len(seas20))
-            if len(seas20) == len(yr):
+            if len(seas20) == len(allyr):
                 ax.plot(yr, seas20)
                 cosi.append(seas20)
             else:
@@ -198,7 +199,7 @@ for area in ['EAT']:#, 'PNA']:
         cosi = []
         for mem in okmods:
             seas20 = np.array(ctl.running_mean(seasfreq[('rcp85', mem, reg)], 20))
-            if len(seas20) == len(yr):
+            if len(seas20) == len(allyr):
                 cosi.append(seas20)
             else:
                 print(mem, 'too short')
