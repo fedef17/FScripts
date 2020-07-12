@@ -25,15 +25,17 @@ if not os.path.exists(cart_out): os.mkdir(cart_out)
 cart = '/home/fabiano/Research/lavori/WeatherRegimes/prima_coup_v7/'
 filogen = cart + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF.p'
 
+BAUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
+
 # apro il file con le pcs nuove
 with open(cart_out + 'residual_pc_clustering_as_dict.pkl', 'rb') as fil:
     nures = pickle.load(fil)
 with open(cart_out + 'raw_pc_clustering_as_dict.pkl', 'rb') as fil:
     nures_nofil = pickle.load(fil)
-with open(cart_out + 'ERA20C_r_clusters.pkl', 'rb') as fil:
-    refres = pickle.load(fil)
-with open(cart_out + 'ERA20C_u_clusters.pkl', 'rb') as fil:
-    refres_nofil = pickle.load(fil)
+# with open(cart_out + 'ERA20C_r_clusters.pkl', 'rb') as fil:
+#     refres = pickle.load(fil)
+# with open(cart_out + 'ERA20C_u_clusters.pkl', 'rb') as fil:
+#     refres_nofil = pickle.load(fil)
 
 refres['time'] = refres_nofil['time']
 

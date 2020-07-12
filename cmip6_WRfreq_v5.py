@@ -233,7 +233,7 @@ for area in ['EAT', 'PNA']:
 
             ctl.adjust_ax_scale(axes)
 
-            ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+            ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
             #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
             fig.savefig(cart_out + '{}_WRfreq_allssp_{}_{}.pdf'.format(pio, area, cos))
 
@@ -261,7 +261,7 @@ for area in ['EAT', 'PNA']:
 
         ctl.adjust_ax_scale(axes)
 
-        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         fig.savefig(cart_out + '{}_residtimes_allssp_{}_{}.pdf'.format(pio, area, cos))
 
@@ -272,7 +272,7 @@ for area in ['EAT', 'PNA']:
             ax.plot(yr, runfreq[(ssp, reg)], label = ssp, color = col)
         ax.set_title(reg_names_area[area][reg])
 
-    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
     fig.savefig(cart_out + 'allssps_freq10_{}.pdf'.format(area))
 
 
@@ -332,6 +332,25 @@ for area in ['EAT', 'PNA']:
 
         fig.savefig(cart_out + 'long_freq20_{}_{}_e_hist.pdf'.format(area, ssp))
 
+    yr = np.arange(1965, 2100)
+    allmemfig = []
+    for mem in okmods:
+        fig = plt.figure(figsize = (16,12))
+        for reg in range(4):
+            ax = fig.add_subplot(2, 2, reg+1)
+            cosi = []
+            for col, ssp in zip(colsim[1:], allssps):
+                seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist', mem, reg)], seasfreq[(ssp, mem, reg)]]), 20))
+                ax.plot(yr, ssp, color = col, linewidth = 2)
+
+            ax.set_title(reg_names_area[area][reg])
+            ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
+
+        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
+        fig.suptitle(mem)
+        allmemfig.append(fig)
+    ctl.plot_pdfpages(cart_out + 'allmods_freq20_{}.pdf'.format(area), allmemfig, save_single_figs = False)
+    plt.close('all')
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
@@ -344,7 +363,7 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names_area[area][reg])
         ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
 
-    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
     fig.savefig(cart_out + 'allssps_lanc20_{}.pdf'.format(area))
 
     fig = plt.figure(figsize = (16,12))
@@ -358,7 +377,7 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names_area[area][reg])
         ax.axvline(2015, color = 'lightslategray', linewidth = 0.2)
 
-    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+    ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
     fig.savefig(cart_out + 'allssps_freq20_{}.pdf'.format(area))
 
     pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_{}_v4.p'.format(area), 'wb'))
@@ -523,7 +542,7 @@ for area in ['EAT', 'PNA']:
 
         ctl.adjust_ax_scale(axes)
 
-        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         fig.savefig(cart_out + 'WRfreqchange_allssp_{}_{}.pdf'.format(area, cos))
 
@@ -552,7 +571,7 @@ for area in ['EAT', 'PNA']:
 
         ctl.adjust_ax_scale(axes)
 
-        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 3)
+        ctl.custom_legend(fig, colsim[1:], allsims[1:], ncol = 4)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         fig.savefig(cart_out + 'Restime_change_allssp_{}_{}.pdf'.format(area, cos))
 
@@ -603,11 +622,11 @@ for area in ['EAT', 'PNA']:
 
         #ctl.adjust_ax_scale(axes)
 
-        ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+        ctl.custom_legend(fig, colsim, allsims, ncol = 4)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         fig.savefig(cart_out + 'WRfreq_allssp_{}_{}.pdf'.format(area, cos))
 
-    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    ctl.custom_legend(figall, colsim, allsims, ncol = 4)
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box.pdf'.format(area, cos))
 
 
@@ -662,7 +681,7 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    ctl.custom_legend(figall, colsim, allsims, ncol = 4)
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box_wtrend.pdf'.format(area, cos))
 
 
@@ -700,7 +719,7 @@ for area in ['EAT', 'PNA']:
 
     #ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    ctl.custom_legend(fig, colsim, allsims, ncol = 4)
     #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
     fig.savefig(cart_out + 'WRfreq_allssp_{}_bothrefs.pdf'.format(area, cos))
 
@@ -748,11 +767,11 @@ for area in ['EAT', 'PNA']:
 
             #ctl.adjust_ax_scale(axes)
 
-            ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+            ctl.custom_legend(fig, colsim, allsims, ncol = 4)
             #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
             fig.savefig(cart_out + 'Restime_allssp_{}_{}.pdf'.format(area, cos))
 
-        ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+        ctl.custom_legend(figall, colsim, allsims, ncol = 4)
         #fig.suptitle('30yr bsp of WR freq. in 2050-2100 wrt 1964-2014')
         figall.savefig(cart_out + 'Restime_allssp_{}_{}_8box.pdf'.format(area, pio))
 
@@ -806,7 +825,7 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    ctl.custom_legend(figall, colsim, allsims, ncol = 4)
     figall.savefig(cart_out + 'Restime_allssp_{}_8box_wtrend.pdf'.format(area, cos))
 
     lat = results_ref['lat_area']
