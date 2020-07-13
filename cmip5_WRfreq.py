@@ -60,6 +60,7 @@ for area in ['EAT']:#, 'PNA']:
     okmods = [cos for cos in results_hist.keys() if cos in results_ssp.keys()]
     print(okmods)
     print(len(okmods))
+    sys.exit()
 
     yr0 = 1950
     yr1 = 2005
