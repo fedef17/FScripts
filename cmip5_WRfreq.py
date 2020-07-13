@@ -168,7 +168,6 @@ for area in ['EAT']:#, 'PNA']:
             results_ssp[ke]['dates'] = np.concatenate(dats_ok)
             results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
 
-    okmods = [cos for cos in results_ssp.keys()]
     allyr = np.arange(2005, 2101)
     yr0 = 2005
     yr1 = 2101
