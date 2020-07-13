@@ -54,6 +54,13 @@ for area in ['EAT']:#, 'PNA']:
     results_hist = results['models']
     results_ref = results['reference']
 
+    res = pickle.load(open(gen_file_ssp.format('rcp85', 'rcp85', area), 'rb'))
+    results_ssp = res['models']
+
+    okmods = [cos for cos in results_hist.keys() if cos in results_ssp.keys()]
+    print(okmods)
+    print(len(okmods))
+
     yr0 = 1950
     yr1 = 2005
     allyr = np.arange(1950, 2005)
@@ -80,10 +87,6 @@ for area in ['EAT']:#, 'PNA']:
             results_hist[ke]['labels'] = np.concatenate(labs_ok)
             results_hist[ke]['dates'] = np.concatenate(dats_ok)
             results_hist[ke]['pcs'] = np.concatenate(pcs_ok)
-
-    okmods = [cos for cos in results_hist.keys()]
-    print(okmods)
-    print(len(okmods))
 
     runfreq = dict()
     seasfreq = dict()
@@ -143,8 +146,6 @@ for area in ['EAT']:#, 'PNA']:
 
     # now for rcp85
     print('rcp85')
-    results = pickle.load(open(gen_file_ssp.format('rcp85', 'rcp85', area), 'rb'))
-    results_ssp = results['models']
 
     avlen = np.median([len(results_ssp[ke]['labels']) for ke in results_ssp.keys()])
     for ke in tuple(results_ssp.keys()):
@@ -239,7 +240,7 @@ for area in ['EAT']:#, 'PNA']:
             residtimes[('hist_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
             residtimes[('hist_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
 
-    freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in results_hist.keys()])
+    freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in okmods])
 
     for ke in results_ssp.keys():
         dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
@@ -252,7 +253,7 @@ for area in ['EAT']:#, 'PNA']:
             residtimes[('rcp85_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
             residtimes[('rcp85_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
 
-    freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in results_ssp.keys()])
+    freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in okmods])
 
     for cos in ['mean', 'p90']:
         residtimes[('hist_cmip5', 'all', cos, reg)] = np.array([residtimes[('hist_cmip5', mod, cos, reg)] for mod in okmods])
