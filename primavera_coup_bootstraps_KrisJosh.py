@@ -229,7 +229,7 @@ for numclus in [3,4,5]:
                 for reg in range(numclus):
                     okclu = labels == reg
                     okpc = pcs[okclu, :]
-                    for comp in range(numclus):
+                    for comp in range(4):
                         okpc[:, comp] = okpc[:, comp] - centroids[reg, comp] + ref_cen[reg, comp]
                     kufu = ctl.calc_pdf(okpc[:, :3].T)
                     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
