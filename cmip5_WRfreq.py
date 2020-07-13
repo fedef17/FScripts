@@ -38,12 +38,15 @@ reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
 reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 
-
 #allssps = 'ssp119 ssp126 ssp245 ssp370 ssp585'.split()
 #allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allssps = ['rcp85']
 
 for area in ['EAT']:#, 'PNA']:
+    freqs = dict() # tot50 e last20
+    trend_ssp = dict()
+    residtimes = dict()
+
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
@@ -177,6 +180,16 @@ for area in ['EAT']:#, 'PNA']:
             labok, datok = ctl.sel_time_range(results_ssp[mem]['labels'], results_ssp[mem]['dates'], ctl.range_years(yr0, yr1))
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
+
+            m, c, err_m, err_c = ctl.linear_regre_witherr(yr, seasfr[reg, :])
+            trend_ssp[('rcp85_cmip5', mem, 'trend', 'seafreq', reg)] = m
+            trend_ssp[('rcp85_cmip5', mem, 'errtrend', 'seafreq', reg)] = err_m
+
+            seas10 = ctl.running_mean(seasfr[reg, :], 10)
+            m, c, err_m, err_c = ctl.linear_regre_witherr(np.array(yr[~np.isnan(seas10)]), np.array(seas10[~np.isnan(seas10)]))
+            trend_ssp[('rcp85_cmip5', mem, 'trend', 'freq10', reg)] = m
+            trend_ssp[('rcp85_cmip5', mem, 'errtrend', 'freq10', reg)] = err_m
+
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
             print(mem, len(seas20))
             if len(seas20) == len(allyr):
@@ -215,12 +228,16 @@ for area in ['EAT']:#, 'PNA']:
     fig.savefig(cart_out + 'long_run20_{}_rcp85.pdf'.format(area))
 
     numclus = 4
-    freqs = dict() # tot50 e last20
     for ke in results_hist.keys():
         dat1 = pd.Timestamp('09-01-1964').to_pydatetime()
         dat2 = pd.Timestamp('04-01-2005').to_pydatetime()
         labs, dats = ctl.sel_time_range(results_hist[ke]['labels'], results_hist[ke]['dates'], (dat1, dat2))
         freqs[('hist_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
+
+        restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+        for reg in range(numclus):
+            residtimes[('hist_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
+            residtimes[('hist_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
 
     freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in results_hist.keys()])
 
@@ -230,9 +247,25 @@ for area in ['EAT']:#, 'PNA']:
         labs, dats = ctl.sel_time_range(results_ssp[ke]['labels'], results_ssp[ke]['dates'], (dat1, dat2))
         freqs[('rcp85_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
 
+        restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+        for reg in range(numclus):
+            residtimes[('rcp85_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
+            residtimes[('rcp85_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
+
     freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in results_ssp.keys()])
 
-    pickle.dump(freqs, open(cart_out + 'freqs_cmip5.p', 'wb'))
+    for cos in ['mean', 'p90']:
+        residtimes[('hist_cmip5', 'all', cos, reg)] = np.array([residtimes[('hist_cmip5', mod, cos, reg)] for mod in okmods])
+        residtimes[('rcp85_cmip5', 'all', cos, reg)] = np.array([residtimes[('rcp85_cmip5', mod, cos, reg)] for mod in okmods])
+
+    ssp = 'rcp85_cmip5'
+    for reg in range(4):
+        trend_ssp[(ssp, 'all', 'trend', 'seafreq', reg)] = np.array([trend_ssp[(ssp, mem, 'trend', 'seafreq', reg)] for mem in okmods])
+        trend_ssp[(ssp, 'all', 'errtrend', 'seafreq', reg)] = np.array([trend_ssp[(ssp, mem, 'errtrend', 'seafreq', reg)] for mem in okmods])
+        trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)] = np.array([trend_ssp[(ssp, mem, 'trend', 'freq10', reg)] for mem in okmods])
+        trend_ssp[(ssp, 'all', 'errtrend', 'freq10', reg)] = np.array([trend_ssp[(ssp, mem, 'errtrend', 'freq10', reg)] for mem in okmods])
+
+    pickle.dump([freqs, trend_ssp, residtimes], open(cart_out + 'freqs_cmip5_{}.p'.format(area), 'wb'))
 
     allsims = ['hist_cmip5', 'rcp85_cmip5']
     colsim = ctl.color_set(2)
