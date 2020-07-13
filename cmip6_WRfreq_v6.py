@@ -75,7 +75,7 @@ for area in ['EAT']:#, 'PNA']:
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
         for ssp in allssps:
-            col = colsim[ssp]
+            col = coldic[ssp]
             coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
             coserr = runfreq[(ssp, 'run20err', reg)]
             ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
