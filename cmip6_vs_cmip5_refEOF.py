@@ -64,7 +64,7 @@ for area in ['EAT', 'PNA']:
     resdict['cmip6'] = results_hist
     resdict['cmip5'] = results_hist_cmip5
     resdict['cmip6_refEOF'] = results_hist_refEOF
-    resdict['cmip5_refEOF'] = results_hist_cmip5_refEOF
+    resdict['cmip5_refEOF'] = results_hist_refEOF_cmip5
 
     var_ratio = dict()
     freqbias = dict()
