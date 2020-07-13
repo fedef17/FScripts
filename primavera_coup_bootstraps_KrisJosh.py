@@ -274,6 +274,8 @@ for numclus in [3,4,5]:
 
             bootstraps_all[mem] = bootstraps
 
+            sys.exit()
+
         # Calculate ensemble mean, std of:
             # - bootstrap mean, std, p10, p90 for each quantity;
 
@@ -301,6 +303,7 @@ for numclus in [3,4,5]:
                 bootstraps_all['boot_p10'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 10) for reg in range(numclus)])
                 bootstraps_all['boot_p90'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 90) for reg in range(numclus)])
             else:
+                print(ke)
                 bootstraps_all['boot_p10'][ke] = np.zeros((numclus, numclus))
                 bootstraps_all['boot_p90'][ke] = np.zeros((numclus, numclus))
                 for i in range(numclus):
