@@ -70,24 +70,24 @@ for area in ['EAT']:#, 'PNA']:
 
     yr = np.arange(1965, 2100)
 
-    fig = plt.figure(figsize = (16,12))
-    axes = []
-    for reg in range(4):
-        ax = fig.add_subplot(2, 2, reg+1)
-        for ssp in allssps:
-            col = coldic[ssp]
-            coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
-            coserr = runfreq[(ssp, 'run20err', reg)]
-            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
-            ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
-        ax.set_title(reg_names_area[area][reg])
-        ax.axvline(2015, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
-        ax.axhline(0., color = 'lightslategray', linewidth = 0.2)
-        axes.append(ax)
-
-    ctl.adjust_ax_scale(axes)
-    ctl.custom_legend(fig, colssp, allssps, ncol = 5)
-    fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
+    # fig = plt.figure(figsize = (16,12))
+    # axes = []
+    # for reg in range(4):
+    #     ax = fig.add_subplot(2, 2, reg+1)
+    #     for ssp in allssps:
+    #         col = coldic[ssp]
+    #         coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
+    #         coserr = runfreq[(ssp, 'run20err', reg)]
+    #         ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
+    #         ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
+    #     ax.set_title(reg_names_area[area][reg])
+    #     ax.axvline(2015, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+    #     ax.axhline(0., color = 'lightslategray', linewidth = 0.2)
+    #     axes.append(ax)
+    #
+    # ctl.adjust_ax_scale(axes)
+    # ctl.custom_legend(fig, colssp, allssps, ncol = 5)
+    # fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
 
 
     figall = plt.figure(figsize = (28,12))
