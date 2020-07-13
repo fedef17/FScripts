@@ -176,9 +176,11 @@ for ke in tuple(results_ssp.keys()):
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
+        print('trends!')
         ax = fig.add_subplot(2, 2, reg+1)
         cosi = []
         for mem in okmods:
+            print(mem)
             labok, datok = ctl.sel_time_range(results_ssp[mem]['labels'], results_ssp[mem]['dates'], ctl.range_years(yr0, yr1))
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
             seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
@@ -230,11 +232,13 @@ for ke in tuple(results_ssp.keys()):
     fig.savefig(cart_out + 'long_run20_{}_rcp85.pdf'.format(area))
 
     numclus = 4
-    for ke in results_hist.keys():
+    print('freqs!')
+    for mem in okmods:
+        print(mem)
         dat1 = pd.Timestamp('09-01-1964').to_pydatetime()
         dat2 = pd.Timestamp('04-01-2005').to_pydatetime()
-        labs, dats = ctl.sel_time_range(results_hist[ke]['labels'], results_hist[ke]['dates'], (dat1, dat2))
-        freqs[('hist_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
+        labs, dats = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], (dat1, dat2))
+        freqs[('hist_cmip5', mem, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
 
         restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
         for reg in range(numclus):
@@ -243,11 +247,13 @@ for ke in tuple(results_ssp.keys()):
 
     freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in okmods])
 
-    for ke in results_ssp.keys():
+    print('freqs2!')
+    for mem in okmods:
+        print(mem)
         dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
         dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-        labs, dats = ctl.sel_time_range(results_ssp[ke]['labels'], results_ssp[ke]['dates'], (dat1, dat2))
-        freqs[('rcp85_cmip5', ke, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
+        labs, dats = ctl.sel_time_range(results_ssp[mem]['labels'], results_ssp[mem]['dates'], (dat1, dat2))
+        freqs[('rcp85_cmip5', mem, 'tot50')] = ctl.calc_clus_freq(labs, numclus)
 
         restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
         for reg in range(numclus):
