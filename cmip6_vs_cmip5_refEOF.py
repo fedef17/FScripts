@@ -103,12 +103,11 @@ for area in ['EAT']:#, 'PNA']:
             ax = plt.subplot(2, 2, num+1, polar = True)
 
             obs = results_ref['cluspattern_area'][num, ...]
-
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
                 modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
-                colors = colormip[cos]*len(modpats)
+                colors = [colormip[cos]]*len(modpats)
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = None, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])#, mod_points_size = taylor_mark_dim, obs_points_size = int(1.1*taylor_mark_dim), max_val_sd = max_val_sd)
 
         fig.savefig(cart_out + 'taylor_{}{}.pdf'.format(area, tip))
