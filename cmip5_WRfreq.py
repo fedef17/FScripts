@@ -31,7 +31,7 @@ ctl.mkdir(cart_out_orig)
 #file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
 file_hist = cart_in + 'cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_allyrs_refCLUS_dtr.p'
 #file_hist_refEOF = cart_in + 'cmip6_hist/out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF.p'
-gen_file_ssp = cart_in + 'cmip5_{}/out_cmip5_{}_NDJFM_{}_4clus_4pcs_2005-2100_refCLUS_dtr_reb.p'
+gen_file_ssp = cart_in + 'cmip5_{}/out_cmip5_reb_{}_NDJFM_{}_4clus_4pcs_2005-2100_refCLUS_dtr_reb.p'
 
 numclus = 4
 reg_names_area = dict()
