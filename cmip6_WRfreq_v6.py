@@ -36,6 +36,9 @@ dtrtyp = 'histrebase'
 cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
 ctl.mkdir(cart_out_orig)
 
+cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+
 numclus = 4
 reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
@@ -53,6 +56,8 @@ for area in ['EAT']:#, 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
     reg_names = reg_names_area[area]
+
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
 
     trend_ssp, residtime_ssp = pickle.load(open(cart_v5.format(area) + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
     seasfreq, runfreq = pickle.load(open(cart_v5.format(area) + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
