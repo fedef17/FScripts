@@ -152,7 +152,7 @@ for numclus in [3,4,5]:
 
         zi_ref.append(zi)
 
-    allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor']
+    allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'relative_entropy', 'patcor']
 
     #for mod in model_names_all:
     for mod in ['ERA']:
@@ -274,8 +274,6 @@ for numclus in [3,4,5]:
 
             bootstraps_all[mem] = bootstraps
 
-            sys.exit()
-
         # Calculate ensemble mean, std of:
             # - bootstrap mean, std, p10, p90 for each quantity;
 
@@ -304,10 +302,16 @@ for numclus in [3,4,5]:
                 bootstraps_all['boot_p90'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 90) for reg in range(numclus)])
             else:
                 print(ke)
-                bootstraps_all['boot_p10'][ke] = np.zeros((numclus, numclus))
-                bootstraps_all['boot_p90'][ke] = np.zeros((numclus, numclus))
+                if ke == 'centroids':
+                    J2 = 4
+                elif ke == 'trans_matrix':
+                    J2 = numclus
+                else:
+                    raise ValueError('not specified')
+                bootstraps_all['boot_p10'][ke] = np.zeros((numclus, J2))
+                bootstraps_all['boot_p90'][ke] = np.zeros((numclus, J2))
                 for i in range(numclus):
-                    for j in range(numclus):
+                    for j in range(J2):
                         bootstraps_all['boot_p10'][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), 10)
                         bootstraps_all['boot_p90'][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), 90)
 
