@@ -88,7 +88,7 @@ for area in ['EAT']:#, 'PNA']:
             frstd = np.std(freqbias[cos+tip])
             ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[cos], ax = ax, alpha = 0.5)
 
-        ax.scatter(results_ref['var_ratio'], 0, s = 5, marker = '*', color = 'black')
+        ax.scatter(results_ref['var_ratio'], 0, s = 100, marker = '*', color = 'black')
         plt.legend()
         plt.xlabel('Variance ratio')
         plt.ylabel('Frequency bias')
