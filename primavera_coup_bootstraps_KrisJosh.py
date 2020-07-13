@@ -154,8 +154,8 @@ for numclus in [3,4,5]:
 
     allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'relative_entropy', 'patcor']
 
-    #for mod in model_names_all:
-    for mod in ['ERA']:
+    for mod in model_names_all:
+    #for mod in ['ERA']:
         print(mod)
         if mod not in all_mods:
             print('Skipping....')
