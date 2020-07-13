@@ -143,7 +143,7 @@ for numclus in [3,4,5]:
     xi_grid, yi_grid, zi_grid = np.meshgrid(*grid_i)
 
     zi_ref = []
-    for reg in range(4):
+    for reg in range(numclus):
         okclu = labels == reg
         okpc = pcs[okclu, :]
         kufu = ctl.calc_pdf(okpc[:, :3].T)
@@ -194,7 +194,7 @@ for numclus in [3,4,5]:
                 dates = np.concatenate(dates_seas_set[ok_yea])
 
                 centroids = []
-                for iclu in range(4):
+                for iclu in range(numclus):
                     okla = labels == iclu
                     centroids.append(np.mean(pcs[okla], axis = 0))
                 centroids = np.stack(centroids)
@@ -210,15 +210,15 @@ for numclus in [3,4,5]:
                 bootstraps['varopt'].append(varopt)
                 bootstraps['autocorr'].append(autocorr)
 
-                bootstraps['freq'].append(ctl.calc_clus_freq(labels, 4))
+                bootstraps['freq'].append(ctl.calc_clus_freq(labels, numclus))
 
-                centdist = np.array([ctl.distance(centroids[iclu], ref_cen[iclu]) for iclu in range(4)])
+                centdist = np.array([ctl.distance(centroids[iclu], ref_cen[iclu]) for iclu in range(numclus)])
                 bootstraps['dist_cen'].append(centdist)
                 bootstraps['centroids'].append(centroids)
 
                 resid_times = ctl.calc_regime_residtimes(labels, dates = dates)[0]
-                av_res = np.array([np.mean(resid_times[reg]) for reg in range(4)])
-                av_res_90 = np.array([np.percentile(resid_times[reg], 90) for reg in range(4)])
+                av_res = np.array([np.mean(resid_times[reg]) for reg in range(numclus)])
+                av_res_90 = np.array([np.percentile(resid_times[reg], 90) for reg in range(numclus)])
                 bootstraps['resid_times_av'].append(av_res)
                 bootstraps['resid_times_90'].append(av_res_90)
 
@@ -226,10 +226,10 @@ for numclus in [3,4,5]:
 
                 # relative entropy, RMS, patcor
                 relent_all = []
-                for reg in range(4):
+                for reg in range(numclus):
                     okclu = labels == reg
                     okpc = pcs[okclu, :]
-                    for comp in range(4):
+                    for comp in range(numclus):
                         okpc[:, comp] = okpc[:, comp] - centroids[reg, comp] + ref_cen[reg, comp]
                     kufu = ctl.calc_pdf(okpc[:, :3].T)
                     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
@@ -248,7 +248,7 @@ for numclus in [3,4,5]:
                 #
                 # relent_all = []
                 # filt_centroids = []
-                # for reg in range(4):
+                # for reg in range(numclus):
                 #     okclu = filt_labels == reg
                 #     okpc = pcs[okclu, :]
                 #     kufu = ctl.calc_pdf(okpc[:, :3].T)
@@ -263,7 +263,7 @@ for numclus in [3,4,5]:
                 #
                 # bootstraps['filt_relative_entropy'].append(relent_all)
                 #
-                # centdist = np.array([ctl.distance(filt_centroids[iclu], ref_cen_filt[iclu]) for iclu in range(4)])
+                # centdist = np.array([ctl.distance(filt_centroids[iclu], ref_cen_filt[iclu]) for iclu in range(numclus)])
                 # bootstraps['filt_dist_cen'].append(centdist)
                 #
                 # #bootstraps['filt_RMS'].append([ctl.E_rms(ce, refce) for ce, refce in zip(filt_centroids, ref_cen_filt)])
@@ -298,13 +298,13 @@ for numclus in [3,4,5]:
                 bootstraps_all['boot_p10'][ke] = np.percentile(np.concatenate([bootstraps_all[mem][ke] for mem in allmems]), 10)
                 bootstraps_all['boot_p90'][ke] = np.percentile(np.concatenate([bootstraps_all[mem][ke] for mem in allmems]), 90)
             elif bootstraps_all[allmems[0]][ke].ndim == 2:
-                bootstraps_all['boot_p10'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 10) for reg in range(4)])
-                bootstraps_all['boot_p90'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 90) for reg in range(4)])
+                bootstraps_all['boot_p10'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 10) for reg in range(numclus)])
+                bootstraps_all['boot_p90'][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), 90) for reg in range(numclus)])
             else:
-                bootstraps_all['boot_p10'][ke] = np.zeros((4,4))
-                bootstraps_all['boot_p90'][ke] = np.zeros((4,4))
-                for i in range(4):
-                    for j in range(4):
+                bootstraps_all['boot_p10'][ke] = np.zeros((numclus, numclus))
+                bootstraps_all['boot_p90'][ke] = np.zeros((numclus, numclus))
+                for i in range(numclus):
+                    for j in range(numclus):
                         bootstraps_all['boot_p10'][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), 10)
                         bootstraps_all['boot_p90'][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), 90)
 
