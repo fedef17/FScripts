@@ -57,11 +57,6 @@ for area in ['EAT']:#, 'PNA']:
     res = pickle.load(open(gen_file_ssp.format('rcp85', 'rcp85', area), 'rb'))
     results_ssp = res['models']
 
-    okmods = [cos for cos in results_hist.keys() if cos in results_ssp.keys()]
-    print(okmods)
-    print(len(okmods))
-    sys.exit()
-
     yr0 = 1950
     yr1 = 2005
     allyr = np.arange(1950, 2005)
@@ -89,6 +84,35 @@ for area in ['EAT']:#, 'PNA']:
             results_hist[ke]['dates'] = np.concatenate(dats_ok)
             results_hist[ke]['pcs'] = np.concatenate(pcs_ok)
 
+# now for rcp85
+print('rcp85')
+
+avlen = np.median([len(results_ssp[ke]['labels']) for ke in results_ssp.keys()])
+for ke in tuple(results_ssp.keys()):
+    if len(results_ssp[ke]['labels']) < avlen-1000:
+        del results_ssp[ke]
+    elif len(results_ssp[ke]['labels']) > avlen+100:
+        # there is some duplicated year
+        labs, dats = ctl.seasonal_set(results_ssp[ke]['labels'], results_ssp[ke]['dates'], None)
+        pcs, dats = ctl.seasonal_set(results_ssp[ke]['pcs'], results_ssp[ke]['dates'], None)
+        yeas = np.array([da[0].year for da in dats])
+        labs_ok = []
+        dats_ok = []
+        pcs_ok = []
+        for ye in np.arange(2005, 2100):
+            okse = np.where(yeas == ye)[0][0]
+            labs_ok.append(labs[okse])
+            dats_ok.append(dats[okse])
+            pcs_ok.append(pcs[okse])
+        results_ssp[ke]['labels'] = np.concatenate(labs_ok)
+        results_ssp[ke]['dates'] = np.concatenate(dats_ok)
+        results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
+
+    okmods = [cos for cos in results_hist.keys() if cos in results_ssp.keys()]
+    print(okmods)
+    print(len(okmods))
+
+    ## plots
     runfreq = dict()
     seasfreq = dict()
 
@@ -145,30 +169,7 @@ for area in ['EAT']:#, 'PNA']:
 
     fig.savefig(cart_out + 'long_run20_{}_hist.pdf'.format(area))
 
-    # now for rcp85
-    print('rcp85')
-
-    avlen = np.median([len(results_ssp[ke]['labels']) for ke in results_ssp.keys()])
-    for ke in tuple(results_ssp.keys()):
-        if len(results_ssp[ke]['labels']) < avlen-1000:
-            del results_ssp[ke]
-        elif len(results_ssp[ke]['labels']) > avlen+100:
-            # there is some duplicated year
-            labs, dats = ctl.seasonal_set(results_ssp[ke]['labels'], results_ssp[ke]['dates'], None)
-            pcs, dats = ctl.seasonal_set(results_ssp[ke]['pcs'], results_ssp[ke]['dates'], None)
-            yeas = np.array([da[0].year for da in dats])
-            labs_ok = []
-            dats_ok = []
-            pcs_ok = []
-            for ye in np.arange(2005, 2100):
-                okse = np.where(yeas == ye)[0][0]
-                labs_ok.append(labs[okse])
-                dats_ok.append(dats[okse])
-                pcs_ok.append(pcs[okse])
-            results_ssp[ke]['labels'] = np.concatenate(labs_ok)
-            results_ssp[ke]['dates'] = np.concatenate(dats_ok)
-            results_ssp[ke]['pcs'] = np.concatenate(pcs_ok)
-
+    # rcp85
     allyr = np.arange(2005, 2101)
     yr0 = 2005
     yr1 = 2101
