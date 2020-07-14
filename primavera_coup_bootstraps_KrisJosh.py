@@ -135,25 +135,26 @@ for numclus in [3,4,5]:
     pcs = results['ERA_0']['pcs']
     #dates = results['ERA_0']['dates']
 
-    grid_i = []
-    for i in range(3):
-        (x0, x1) = (np.percentile(pcs[:, i], 1), np.percentile(pcs[:, i], 99))
-        xss = np.linspace(x0, x1, 50)
-        grid_i.append(xss)
+    # grid_i = []
+    # for i in range(3):
+    #     (x0, x1) = (np.percentile(pcs[:, i], 1), np.percentile(pcs[:, i], 99))
+    #     xss = np.linspace(x0, x1, 50)
+    #     grid_i.append(xss)
+    #
+    # xi_grid, yi_grid, zi_grid = np.meshgrid(*grid_i)
+    #
+    # zi_ref = []
+    # for reg in range(numclus):
+    #     okclu = labels == reg
+    #     okpc = pcs[okclu, :]
+    #     kufu = ctl.calc_pdf(okpc[:, :3].T)
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #
+    #     zi_ref.append(zi)
 
-    xi_grid, yi_grid, zi_grid = np.meshgrid(*grid_i)
-
-    zi_ref = []
-    for reg in range(numclus):
-        okclu = labels == reg
-        okpc = pcs[okclu, :]
-        kufu = ctl.calc_pdf(okpc[:, :3].T)
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
-        zi = zi/np.max(zi)
-
-        zi_ref.append(zi)
-
-    allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'relative_entropy', 'patcor']
+    allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'patcor']
+    #allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'relative_entropy', 'patcor']
 
     print(model_names_all)
     #for mod in ['ERA']:
@@ -227,20 +228,20 @@ for numclus in [3,4,5]:
                 bootstraps['trans_matrix'].append(ctl.calc_regime_transmatrix(1, labels, dates))
 
                 # relative entropy, RMS, patcor
-                relent_all = []
-                for reg in range(numclus):
-                    okclu = labels == reg
-                    okpc = pcs[okclu, :]
-                    for comp in range(4):
-                        okpc[:, comp] = okpc[:, comp] - centroids[reg, comp] + ref_cen[reg, comp]
-                    kufu = ctl.calc_pdf(okpc[:, :3].T)
-                    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
-                    zi = zi/np.max(zi)
-
-                    relent = stats.entropy(zi, zi_ref[reg])
-                    relent_all.append(relent)
-
-                bootstraps['relative_entropy'].append(relent_all)
+                # relent_all = []
+                # for reg in range(numclus):
+                #     okclu = labels == reg
+                #     okpc = pcs[okclu, :]
+                #     for comp in range(4):
+                #         okpc[:, comp] = okpc[:, comp] - centroids[reg, comp] + ref_cen[reg, comp]
+                #     kufu = ctl.calc_pdf(okpc[:, :3].T)
+                #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten(), zi_grid.flatten()]))
+                #     zi = zi/np.max(zi)
+                #
+                #     relent = stats.entropy(zi, zi_ref[reg])
+                #     relent_all.append(relent)
+                #
+                # bootstraps['relative_entropy'].append(relent_all)
 
                 #bootstraps['RMS'].append([ctl.distance(ce, refce) for ce, refce in zip(centroids, ref_cen)])
                 bootstraps['patcor'].append([ctl.Rcorr(ce, refce) for ce, refce in zip(centroids, ref_cen)])
