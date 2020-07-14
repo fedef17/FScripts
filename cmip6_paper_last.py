@@ -69,6 +69,7 @@ for area in ['EAT', 'PNA']:
     trend_ssp, residtime_ssp = pickle.load(open(cart_lui + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
     seasfreq, runfreq = pickle.load(open(cart_lui + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
 
+    resssp = dict()
     for ssp in allssps:
         print('SSP '+ssp)
         results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
