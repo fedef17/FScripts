@@ -179,13 +179,13 @@ filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-2,2), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
 
 filename = cart_out_orig + 'trend_anom_mmm_vs_hist.pdf'
-ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = meanfields[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = meanfields[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = False)
 
 filename = cart_out_orig + 'trend_anom_mmm_vs_hist_EAT.pdf'
-ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = False)
 
 filename = cart_out_orig + 'trend_anom_mmm_vs_hist_polar.pdf'
-ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', bounding_lat = 10, central_lat_lon = (90, 0), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', bounding_lat = 10, central_lat_lon = (90, 0), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = False)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
 ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', draw_grid = True)
@@ -200,13 +200,13 @@ filename = cart_out_orig + 'stateddies_hist.pdf'
 ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm', draw_grid = True)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585_whist.pdf'
-ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_contour_field = stateddies, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', draw_grid = True, n_lines = 10)
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_contour_field = stateddies, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', draw_grid = True, n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = True)
 
 filename = cart_out_orig + 'stateddies_trend_mmm_vs_hist.pdf'
-ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = stateddies[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 10)
+ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = stateddies[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = True)
 
 filename = cart_out_orig + 'stateddies_trend_mmm_vs_hist_EAT.pdf'
-ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 10)
+ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = True)
 
 filename = cart_out_orig + 'stateddies_trend_mmm_vs_hist_polar.pdf'
-ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', bounding_lat = 10, central_lat_lon = (90, 0), cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 10)
+ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', bounding_lat = 10, central_lat_lon = (90, 0), cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 8, add_contour_same_levels = False, add_contour_plot_anomalies = True)
