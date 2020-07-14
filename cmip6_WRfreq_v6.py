@@ -75,7 +75,7 @@ for area in ['EAT']:#, 'PNA']:
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
     #allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'hist_cmip5', 'rcp85_cmip5']
     allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5']
-    coldic = dict(zip(allsimscol, ctl.color_set(7)))
+    coldic = dict(zip(allsimcol, ctl.color_set(7)))
     colsim = [coldic[ssp] for ssp in allsims]
     colssp = [coldic[ssp] for ssp in allssps]
 
