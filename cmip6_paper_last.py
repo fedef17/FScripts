@@ -324,9 +324,9 @@ for area in ['EAT', 'PNA']:
         y = []
         for ssp in allssps:
             okmods = [ke for ke in resssp[ssp].keys() if ke not in ['ref', 'MMM']]
-            print(ssp, np.mean(xss), np.mean(yss))
             xss = [resssp[ssp][mod][co[0]] for mod in okmods]
             yss = [resssp[ssp][mod][co[1]] for mod in okmods]
+            print(ssp, np.mean(xss), np.mean(yss))
             x.append(xss)
             y.append(yss)
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
