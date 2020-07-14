@@ -196,17 +196,17 @@ coso = np.mean(zontrend, axis = 0)[oklats]
 coserr = np.std(zontrend, axis = 0)[oklats]
 
 ax.fill_betweenx(lat[oklats], coso-coserr, coso+coserr, color = cols[0], alpha = 0.2)
-ax.plot(coso, lat[oklats], label = ssp, color = col, linewidth = 2, label = 'NML')
+ax.plot(coso, lat[oklats], color = col, linewidth = 2, label = 'NML')
 
 coso_ = np.mean(zontrend_PNA, axis = 0)
 coserr = np.std(zontrend_PNA, axis = 0)
 ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[1], alpha = 0.2)
-ax.plot(coso, lata, label = ssp, color = col, linewidth = 2, label = 'EAT')
+ax.plot(coso, lata, color = col, linewidth = 2, label = 'EAT')
 
 coso = np.mean(zontrend_EAT, axis = 0)
 coserr = np.std(zontrend_EAT, axis = 0)
 ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[2], alpha = 0.2)
-ax.plot(coso, lata, label = ssp, color = col, linewidth = 2, label = 'PNA')
+ax.plot(coso, lata, color = col, linewidth = 2, label = 'PNA')
 
 ax.axvline(0., color = 'lightslategray', linewidth = 0.2)
 ax.set_xlabel('Zonal trend anomaly (m/yr)')
