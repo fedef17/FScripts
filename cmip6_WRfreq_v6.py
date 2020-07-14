@@ -138,6 +138,7 @@ for area in ['EAT']:#, 'PNA']:
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box_wtrend_wcmip5.pdf'.format(area, cos))
 
 
+    cos = 'mean'
     fig = plt.figure(figsize = (16,12))
     axes = []
     for reg in range(4):

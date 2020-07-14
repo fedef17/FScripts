@@ -132,7 +132,7 @@ for area in ['EAT']:#, 'PNA']:
             else:
                 print(mem, len(seas20), 'too short')
         coso = np.mean(cosi, axis = 0)
-        runfreq[('hist', reg)] = coso
+        runfreq[('hist_cmip5', reg)] = coso
         ax.plot(yr, coso, color = 'black', linewidth = 3)
         ax.set_title(reg_names_area[area][reg])
 
@@ -202,7 +202,7 @@ for area in ['EAT']:#, 'PNA']:
             else:
                 print(mem, len(seas20), 'too short')
         coso = np.mean(cosi, axis = 0)
-        runfreq[('rcp85', reg)] = coso
+        runfreq[('rcp85_cmip5', reg)] = coso
         ax.plot(yr, coso, color = 'black', linewidth = 3)
         ax.set_title(reg_names_area[area][reg])
 
@@ -264,9 +264,10 @@ for area in ['EAT']:#, 'PNA']:
 
     freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in okmods])
 
-    for cos in ['mean', 'p90']:
-        residtimes[('hist_cmip5', 'all', cos, reg)] = np.array([residtimes[('hist_cmip5', mod, cos, reg)] for mod in okmods])
-        residtimes[('rcp85_cmip5', 'all', cos, reg)] = np.array([residtimes[('rcp85_cmip5', mod, cos, reg)] for mod in okmods])
+    for reg in range(4):
+        for cos in ['mean', 'p90']:
+            residtimes[('hist_cmip5', 'all', cos, reg)] = np.array([residtimes[('hist_cmip5', mod, cos, reg)] for mod in okmods])
+            residtimes[('rcp85_cmip5', 'all', cos, reg)] = np.array([residtimes[('rcp85_cmip5', mod, cos, reg)] for mod in okmods])
 
     ssp = 'rcp85_cmip5'
     for reg in range(4):
@@ -276,6 +277,7 @@ for area in ['EAT']:#, 'PNA']:
         trend_ssp[(ssp, 'all', 'errtrend', 'freq10', reg)] = np.array([trend_ssp[(ssp, mem, 'errtrend', 'freq10', reg)] for mem in okmods])
 
     pickle.dump([freqs, trend_ssp, residtimes], open(cart_out + 'freqs_cmip5_{}.p'.format(area), 'wb'))
+    pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_cmip5_{}.p'.format(area), 'wb'))
 
     allsims = ['hist_cmip5', 'rcp85_cmip5']
     colsim = ctl.color_set(2)
