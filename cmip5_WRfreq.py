@@ -209,7 +209,7 @@ for area in ['EAT']:#, 'PNA']:
     fig.savefig(cart_out + 'models_run20_{}_rcp85.pdf'.format(area))
 
     reg_names = reg_names_area[area]
-    allyr = np.arange(1964, 2101)
+    allyr = np.arange(1965, 2100)
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
@@ -217,7 +217,7 @@ for area in ['EAT']:#, 'PNA']:
         cosi = []
         for mem in okmods:
             #seas20 = np.array(ctl.running_mean(seasfreq[('rcp85_cmip5', mem, reg)], 20))
-            seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist_cmip5', mem, reg)][14:], seasfreq[('rcp85_cmip5', mem, reg)]]), 20))
+            seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist_cmip5', mem, reg)][15:], seasfreq[('rcp85_cmip5', mem, reg)][:-1]]), 20))
             if len(seas20) == len(allyr):
                 cosi.append(seas20)
             else:
