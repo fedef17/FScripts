@@ -323,7 +323,7 @@ for area in ['EAT', 'PNA']:
             y.append([resssp[ssp][mod][co[1]] for mod in okmods])
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
         pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
-        pears, pval = stats.pearsonr(x, y)
+        pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
         allpeas[co] = (pears, pval)
 
     #print(allpeas)
