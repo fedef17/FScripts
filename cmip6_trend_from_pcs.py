@@ -142,11 +142,11 @@ for modmem in okmods:
     trendsstateddy.append(stat_eddy_trend)
     zontrend.append(cose[('zontrend', mod)].squeeze())
 
-    lata, lona, var = ctl.sel_area(lat, lon, trend, 'EAT')
+    var, lata, lona = ctl.sel_area(lat, lon, trend, 'EAT')
     zeat = ctl.zonal_mean(var)
     zontrend_EAT.append(zeat)
 
-    lata, lona, var = ctl.sel_area(lat, lon, trend, 'PNA')
+    var, lata, lona = ctl.sel_area(lat, lon, trend, 'PNA')
     zpna = ctl.zonal_mean(var)
     zontrend_PNA.append(zpna)
 
