@@ -19,6 +19,13 @@ from datetime import datetime
 from scipy import stats
 import pandas as pd
 
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 18
+
 #############################################################################
 if os.uname()[1] == 'hobbes':
     cart = '/home/fabiano/Research/lavori/CMIP6/'
@@ -187,7 +194,7 @@ ax.axvline(0., color = 'lightslategray', linewidth = 0.2)
 plt.legend()
 fig.savefig(filename)
 
-cols = np.array(ctl.color_set(6))[::2]
+cols = np.array(ctl.color_set(7))[1::2]
 
 filename = cart_out_orig + 'zontrend_ssp585_MMM.pdf'
 fig = plt.figure(figsize = (16,12))

@@ -20,6 +20,12 @@ from scipy import stats
 import pandas as pd
 import pymannkendall as mk
 
+plt.rcParams['xtick.labelsize'] = 15
+plt.rcParams['ytick.labelsize'] = 15
+titlefont = 24
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 18
 #############################################################################
 if os.uname()[1] == 'hobbes':
     cart_in = '/home/fabiano/Research/lavori/CMIP6/'
@@ -51,7 +57,6 @@ for area in ['EAT', 'PNA']:
     ctl.mkdir(cart_out)
 
     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
-    results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
     results_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
 
     cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
@@ -59,202 +64,201 @@ for area in ['EAT', 'PNA']:
     trend_ssp, residtime_ssp = pickle.load(open(cart_lui + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
     seasfreq, runfreq = pickle.load(open(cart_lui + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
 
+    for ssp in allssps:
+        print('SSP '+ssp)
+        results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
 
-    okmods = [ke[1] for ke in freqs if 'ssp585' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-    print(okmods)
+        okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+        print(okmods)
 
-    #['BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1\', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
+        #['BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1\', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
 
-    # For each model write down: freq diff ssp585, trend, trend significance & year of emergence, 20-yr variability (and 50, 5, 1 yr)
-    # variability defined as std dev of N-yr means, trend removed. With bootstrap? mmm questionable.
-    resu = open(cart_out + 'results_short_{}.dat'.format(area), 'w')
+        # For each model write down: freq diff ssp585, trend, trend significance & year of emergence, 20-yr variability (and 50, 5, 1 yr)
+        # variability defined as std dev of N-yr means, trend removed. With bootstrap? mmm questionable.
+        resu = open(cart_out + 'results_short_{}_{}.dat'.format(area, ssp), 'w')
 
-    allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
-    tit = 5*'{:10s}'+'\n'
-    tit = tit.format(*allsims)
-    stringa = 5*'{:10.1f}'+'\n'
+        allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
+        tit = 5*'{:10s}'+'\n'
+        tit = tit.format(*allsims)
+        stringa = 5*'{:10.1f}'+'\n'
 
-    # da Virna
-    vmods, datatemp = ctl.read_from_txt(cart_in + 'DT_ssp585_VM.txt', n_skip = 2, sep = '\t', n_stop = 27)
-    vkeys = ['DT_Global', 'DT_High', 'DT_Mid', 'DT_Low', 'DT_NAT']
-    tempmods = dict()
-    for mod, lin in zip(vmods, datatemp):
-        tempmods[mod] = lin
+        # da Virna
+        vmods, datatemp = ctl.read_from_txt(cart_in + 'DT_{}_VM.txt'.format(ssp), n_skip = 2, sep = '\t', n_stop = 27)
+        vkeys = ['DT_Global', 'DT_High', 'DT_Mid', 'DT_Low', 'DT_NAT']
+        tempmods = dict()
+        for mod, lin in zip(vmods, datatemp):
+            tempmods[mod] = lin
 
-    okmods_mod = [ke.split('_')[0] for ke in okmods]
-    deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
-    AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
-    Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
-    # namcorr = np.array([0.55, 0.73, 0.71, 0.79, 0.78, 0.56, 0.69, 0.47, 0.66, 0.80, 0.16, 0.59, 0.64, 0.77])
-    # deltaT = np.array([3.5449219, 6.1132812, 4.9842224, 5.208954, 4.7590027, 4.857544, 2.9945068, 3.1509705, 3.1122742, 5.4082947, 3.7455444, 3.3199463, 3.9161987, 6.1259155])
-    # AA = np.array([2.7081869, 2.4549222, 2.2232325, 2.7884138, 2.884894, 2.6862576, 2.9566925, 2.374873, 2.3171902, 2.4509392, 3.2346048, 2.6287825, 2.1749997, 2.8315532])
-    # namcorr = np.nan*np.ones(len(okmods))
-    # deltaT = np.nan*np.ones(len(okmods))
-    # AA = np.nan*np.ones(len(okmods))
+        okmods_mod = [ke.split('_')[0] for ke in okmods]
+        deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
+        AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
+        Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
 
-    # model performance
-    var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
-    effcen_refeof = [results_hist_refEOF[mod]['eff_centroids'] for mod in okmods]
-    effcen = [results_hist[mod]['eff_centroids'] for mod in okmods]
+        # model performance
+        var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
+        effcen_refeof = [results_hist_refEOF[mod]['eff_centroids'] for mod in okmods]
+        effcen = [results_hist[mod]['eff_centroids'] for mod in okmods]
 
-    ssp585res = dict()
-    for mod, delt, aaa, ana, vrat, cen_re, cen in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen):
-        ctl.printsep(resu)
-        ctl.printsep(resu)
-        resu.write('\n\n' + mod + '\n')
+        ssp585res = dict()
+        for mod, delt, aaa, ana, vrat, cen_re, cen in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen):
+            ctl.printsep(resu)
+            ctl.printsep(resu)
+            resu.write('\n\n' + mod + '\n')
+            cose = dict()
+            #cose['namcorr'] = nam
+            cose['deltaT'] = delt
+            cose['AA'] = aaa
+            cose['ANAT'] = ana
+            cose['var_ratio'] = vrat
+            cose['cen_rcorr'] = np.mean([ctl.Rcorr(ce1, ce2) for ce1, ce2 in zip(cen_re, cen)])
+
+            # Frequency
+            for reg in range(4):
+                resu.write('Regime {} frequency (50 and 20-yr period minus 50-yr reference)\n'.format(reg))
+                allres50 = [freqs[(sim, mod, 'tot50')][reg] for sim in allsims]
+                allres50 = [allres50[0]] + list(np.array(allres50[1:])-allres50[0])
+                resu.write(stringa.format(*allres50))
+                allres20 = [freqs[(sim, mod, 'last20')][reg] for sim in allsims]
+                allres20 = list(np.array(allres20)-allres50[0])
+                resu.write(stringa.format(*allres20))
+
+            cose['frNAO'] = freqs[('hist', mod, 'tot50')][0]
+            cose['frSBL'] = freqs[('hist', mod, 'tot50')][1]
+            cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdNAO20'] = freqs[('ssp585', mod, 'last20')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
+            cose['fdSBL20'] = freqs[('ssp585', mod, 'last20')][1]-freqs[('hist', mod, 'tot50')][1]
+
+            for reg in range(4):
+                resu.write('Regime {} persistence (50 and 20-yr period minus 50-yr reference)\n'.format(reg))
+                allres50 = [residtimes[(sim, mod, 'mean', reg)] for sim in allsims]
+                allres50 = [allres50[0]] + list(np.array(allres50[1:])-allres50[0])
+                resu.write(stringa.format(*allres50))
+                allres20 = [residtimes[(sim, mod, 'mean_last20', reg)] for sim in allsims]
+                allres20 = list(np.array(allres20)-allres50[0])
+                resu.write(stringa.format(*allres20))
+
+            cose['perNAO'] = residtimes[('hist', mod, 'mean', 0)]
+            cose['perSBL'] = residtimes[('hist', mod, 'mean', 1)]
+            cose['pdNAO50'] = residtimes[('ssp585', mod, 'mean', 0)] - residtimes[('hist', mod, 'mean', 0)]
+            cose['pdNAO20'] = residtimes[('ssp585', mod, 'mean_last20', 0)] - residtimes[('hist', mod, 'mean', 0)]
+            cose['pdSBL50'] = residtimes[('ssp585', mod, 'mean', 1)] - residtimes[('hist', mod, 'mean', 1)]
+            cose['pdSBL20'] = residtimes[('ssp585', mod, 'mean_last20', 1)] - residtimes[('hist', mod, 'mean', 1)]
+
+            for reg in range(4):
+                resu.write('Trend Regime {} seasonal frequency (and error, second line)\n'.format(reg))
+                allres = [np.nan] + [trend_ssp[(sim, mod, 'trend', 'seafreq', reg)] for sim in allsims[1:]]
+                resu.write(stringa.format(*allres))
+                allres = [np.nan] + [trend_ssp[(sim, mod, 'errtrend', 'seafreq', reg)] for sim in allsims[1:]]
+                resu.write(stringa.format(*allres))
+                #
+                # resu.write('Trend Regime {} 10-yr running mean of seas. frequency (and error, second line)\n'.format(reg))
+                # allres = [np.nan] + [trend_ssp[(sim, mod, 'trend', 'freq10', reg)] for sim in allsims[1:]]
+                # resu.write(stringa.format(*allres))
+                # allres = [np.nan] + [trend_ssp[(sim, mod, 'errtrend', 'freq10', reg)] for sim in allsims[1:]]
+                # resu.write(stringa.format(*allres))
+
+            cose['trendNAO'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]
+            cose['trendSBL'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]
+            cose['trendAR'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]
+            cose['trendNAOneg'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]
+            cose['trendNAO_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]/cose['deltaT']
+            cose['trendSBL_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]/cose['deltaT']
+            cose['trendAR_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]/cose['deltaT']
+            cose['trendNAOneg_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]/cose['deltaT']
+
+            cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
+            cose['fdAR50'] = freqs[('ssp585', mod, 'tot50')][2]-freqs[('hist', mod, 'tot50')][2]
+            cose['fdNAOneg50'] = freqs[('ssp585', mod, 'tot50')][3]-freqs[('hist', mod, 'tot50')][3]
+            cose['fdNAO50_divDT'] = cose['fdNAO50']/cose['deltaT']
+            cose['fdSBL50_divDT'] = cose['fdSBL50']/cose['deltaT']
+            cose['fdAR50_divDT'] = cose['fdAR50']/cose['deltaT']
+            cose['fdNAOneg50_divDT'] = cose['fdNAOneg50']/cose['deltaT']
+
+            gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)], yr10, remove_nans=True)
+            pio = mk.original_test(gigi)
+            cose['trendNAO_pval'] = pio.p
+
+            if pio.h:
+                trendo = pio.trend
+                nutrend = pio.trend
+
+                ima = -1
+                while nutrend == trendo:
+                    gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)][:ima], yr10, remove_nans=True)
+                    pio = mk.original_test(gigi)
+                    nutrend = pio.trend
+                    ima = ima - 1
+
+                cose['trendNAO_yeme'] = 2100+ima
+            else:
+                cose['trendNAO_yeme'] = np.nan
+
+
+            gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)], yr10, remove_nans=True)
+            pio = mk.original_test(gigi)
+            cose['trendSBL_pval'] = pio.p
+
+            if pio.h:
+                trendo = pio.trend
+                nutrend = pio.trend
+
+                ima = -1
+                while nutrend == trendo:
+                    gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)][:ima], yr10, remove_nans=True)
+                    pio = mk.original_test(gigi)
+                    nutrend = pio.trend
+                    ima = ima - 1
+
+                cose['trendSBL_yeme'] = 2100+ima
+            else:
+                cose['trendSBL_yeme'] = np.nan
+
+            # variability
+            years = np.arange(2015, 2100)
+            seafr_dtr = seasfreq[('ssp585', mod, 0)]-trend_ssp[('ssp585', mod, 'trend', 'seafreq', 0)]*years
+            cose['frvar_1yr'] = np.std(seafr_dtr)
+
+            # for ye in [5, 10, 20, 50]:
+            #     okse = ctl.running_mean(seafr_dtr, ye, remove_nans = True)
+            #     cose['frvar_{}yr'.format(ye)] = np.std(okse)
+
+            for ye in [5, 10, 20, 50]:
+                cose['frvar_{}yr'.format(ye)] = ctl.simple_bootstrap_err(seafr_dtr, ye)
+
+            ssp585res[mod] = cose
+            ctl.printsep(resu)
+
+
+        resu.close()
+
+
+        coseall = dict()
+        for ke in cose:
+            coseall[ke] = np.mean([ssp585res[mod][ke] for mod in okmods])
+        ssp585res['MMM'] = coseall
+
         cose = dict()
-        #cose['namcorr'] = nam
-        cose['deltaT'] = delt
-        cose['AA'] = aaa
-        cose['ANAT'] = ana
-        cose['var_ratio'] = vrat
-        cose['cen_rcorr'] = np.mean([ctl.Rcorr(ce1, ce2) for ce1, ce2 in zip(cen_re, cen)])
+        cose['frNAO'] = results_ref['freq_clus'][0]
+        cose['frSBL'] = results_ref['freq_clus'][1]
+        cose['perNAO'] = np.mean(results_ref['resid_times'][0])
+        cose['perSBL'] = np.mean(results_ref['resid_times'][1])
 
-        # Frequency
-        for reg in range(4):
-            resu.write('Regime {} frequency (50 and 20-yr period minus 50-yr reference)\n'.format(reg))
-            allres50 = [freqs[(sim, mod, 'tot50')][reg] for sim in allsims]
-            allres50 = [allres50[0]] + list(np.array(allres50[1:])-allres50[0])
-            resu.write(stringa.format(*allres50))
-            allres20 = [freqs[(sim, mod, 'last20')][reg] for sim in allsims]
-            allres20 = list(np.array(allres20)-allres50[0])
-            resu.write(stringa.format(*allres20))
-
-        cose['frNAO'] = freqs[('hist', mod, 'tot50')][0]
-        cose['frSBL'] = freqs[('hist', mod, 'tot50')][1]
-        cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
-        cose['fdNAO20'] = freqs[('ssp585', mod, 'last20')][0]-freqs[('hist', mod, 'tot50')][0]
-        cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
-        cose['fdSBL20'] = freqs[('ssp585', mod, 'last20')][1]-freqs[('hist', mod, 'tot50')][1]
-
-        for reg in range(4):
-            resu.write('Regime {} persistence (50 and 20-yr period minus 50-yr reference)\n'.format(reg))
-            allres50 = [residtimes[(sim, mod, 'mean', reg)] for sim in allsims]
-            allres50 = [allres50[0]] + list(np.array(allres50[1:])-allres50[0])
-            resu.write(stringa.format(*allres50))
-            allres20 = [residtimes[(sim, mod, 'mean_last20', reg)] for sim in allsims]
-            allres20 = list(np.array(allres20)-allres50[0])
-            resu.write(stringa.format(*allres20))
-
-        cose['perNAO'] = residtimes[('hist', mod, 'mean', 0)]
-        cose['perSBL'] = residtimes[('hist', mod, 'mean', 1)]
-        cose['pdNAO50'] = residtimes[('ssp585', mod, 'mean', 0)] - residtimes[('hist', mod, 'mean', 0)]
-        cose['pdNAO20'] = residtimes[('ssp585', mod, 'mean_last20', 0)] - residtimes[('hist', mod, 'mean', 0)]
-        cose['pdSBL50'] = residtimes[('ssp585', mod, 'mean', 1)] - residtimes[('hist', mod, 'mean', 1)]
-        cose['pdSBL20'] = residtimes[('ssp585', mod, 'mean_last20', 1)] - residtimes[('hist', mod, 'mean', 1)]
-
-        for reg in range(4):
-            resu.write('Trend Regime {} seasonal frequency (and error, second line)\n'.format(reg))
-            allres = [np.nan] + [trend_ssp[(sim, mod, 'trend', 'seafreq', reg)] for sim in allsims[1:]]
-            resu.write(stringa.format(*allres))
-            allres = [np.nan] + [trend_ssp[(sim, mod, 'errtrend', 'seafreq', reg)] for sim in allsims[1:]]
-            resu.write(stringa.format(*allres))
-            #
-            # resu.write('Trend Regime {} 10-yr running mean of seas. frequency (and error, second line)\n'.format(reg))
-            # allres = [np.nan] + [trend_ssp[(sim, mod, 'trend', 'freq10', reg)] for sim in allsims[1:]]
-            # resu.write(stringa.format(*allres))
-            # allres = [np.nan] + [trend_ssp[(sim, mod, 'errtrend', 'freq10', reg)] for sim in allsims[1:]]
-            # resu.write(stringa.format(*allres))
-
-        cose['trendNAO'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]
-        cose['trendSBL'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]
-        cose['trendAR'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]
-        cose['trendNAOneg'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]
-        cose['trendNAO_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]/cose['deltaT']
-        cose['trendSBL_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]/cose['deltaT']
-        cose['trendAR_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]/cose['deltaT']
-        cose['trendNAOneg_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]/cose['deltaT']
-
-        cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
-        cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
-        cose['fdAR50'] = freqs[('ssp585', mod, 'tot50')][2]-freqs[('hist', mod, 'tot50')][2]
-        cose['fdNAOneg50'] = freqs[('ssp585', mod, 'tot50')][3]-freqs[('hist', mod, 'tot50')][3]
-        cose['fdNAO50_divDT'] = cose['fdNAO50']/cose['deltaT']
-        cose['fdSBL50_divDT'] = cose['fdSBL50']/cose['deltaT']
-        cose['fdAR50_divDT'] = cose['fdAR50']/cose['deltaT']
-        cose['fdNAOneg50_divDT'] = cose['fdNAOneg50']/cose['deltaT']
-
-        gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)], yr10, remove_nans=True)
-        pio = mk.original_test(gigi)
-        cose['trendNAO_pval'] = pio.p
-
-        if pio.h:
-            trendo = pio.trend
-            nutrend = pio.trend
-
-            ima = -1
-            while nutrend == trendo:
-                gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)][:ima], yr10, remove_nans=True)
-                pio = mk.original_test(gigi)
-                nutrend = pio.trend
-                ima = ima - 1
-
-            cose['trendNAO_yeme'] = 2100+ima
-        else:
-            cose['trendNAO_yeme'] = np.nan
-
-
-        gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)], yr10, remove_nans=True)
-        pio = mk.original_test(gigi)
-        cose['trendSBL_pval'] = pio.p
-
-        if pio.h:
-            trendo = pio.trend
-            nutrend = pio.trend
-
-            ima = -1
-            while nutrend == trendo:
-                gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)][:ima], yr10, remove_nans=True)
-                pio = mk.original_test(gigi)
-                nutrend = pio.trend
-                ima = ima - 1
-
-            cose['trendSBL_yeme'] = 2100+ima
-        else:
-            cose['trendSBL_yeme'] = np.nan
-
-        # variability
-        years = np.arange(2015, 2100)
-        seafr_dtr = seasfreq[('ssp585', mod, 0)]-trend_ssp[('ssp585', mod, 'trend', 'seafreq', 0)]*years
+        seafr_dtr = seasfreq[('hist', 'ref', 0)]
         cose['frvar_1yr'] = np.std(seafr_dtr)
-
-        # for ye in [5, 10, 20, 50]:
-        #     okse = ctl.running_mean(seafr_dtr, ye, remove_nans = True)
-        #     cose['frvar_{}yr'.format(ye)] = np.std(okse)
-
         for ye in [5, 10, 20, 50]:
             cose['frvar_{}yr'.format(ye)] = ctl.simple_bootstrap_err(seafr_dtr, ye)
 
-        ssp585res[mod] = cose
-        ctl.printsep(resu)
+        for ke in ssp585res[okmods[0]]:
+            if ke not in cose:
+                cose[ke] = np.nan
 
-    resu.close()
+        ssp585res['ref'] = cose
+        resssp[ssp] = ssp585res
 
-
-    coseall = dict()
-    for ke in cose:
-        coseall[ke] = np.mean([ssp585res[mod][ke] for mod in okmods])
-    ssp585res['MMM'] = coseall
-
-    cose = dict()
-    cose['frNAO'] = results_ref['freq_clus'][0]
-    cose['frSBL'] = results_ref['freq_clus'][1]
-    cose['perNAO'] = np.mean(results_ref['resid_times'][0])
-    cose['perSBL'] = np.mean(results_ref['resid_times'][1])
-
-    seafr_dtr = seasfreq[('hist', 'ref', 0)]
-    cose['frvar_1yr'] = np.std(seafr_dtr)
-    for ye in [5, 10, 20, 50]:
-        cose['frvar_{}yr'.format(ye)] = ctl.simple_bootstrap_err(seafr_dtr, ye)
-
-    for ke in ssp585res[okmods[0]]:
-        if ke not in cose:
-            cose[ke] = np.nan
-
-    ssp585res['ref'] = cose
-
+    pickle.dump(resssp, open(cart_out + 'resu_allssps.p', 'wb'))
     #print(ssp585res)
-    pickle.dump(ssp585res, open(cart_out + 'resu_ssp585.p', 'wb'))
 
     #freqhistNAO  freqdiff50NAO  freqdiff20NAO  trendNAO  yearofemergence?  20-yr variab  corrwithNAM DeltaTAS  finalAA
     allke = ['frNAO', 'fdNAO50', 'fdNAO20', 'trendNAO', 'trendNAO_pval', 'trendNAO_yeme', 'frvar_5yr', 'frvar_20yr', 'perNAO', 'pdNAO50', 'pdNAO20', 'deltaT', 'AA', 'ANAT']
@@ -298,32 +302,36 @@ for area in ['EAT', 'PNA']:
     resu.close()
 
     # Guardiamo anche le correlazioni va là.
-    cart_corr = cart_out + 'corrplots/'
+    cart_corr = cart_out + 'corrplots_allssps/'
     ctl.mkdir(cart_corr)
 
     coppie = [('fdNAO50', 'deltaT'), ('fdNAO50_divDT', 'AA'), ('fdNAO50_divDT', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50_divDT', 'AA'), ('fdSBL50_divDT', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50_divDT', 'AA'), ('fdAR50_divDT', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50_divDT', 'AA'), ('fdNAOneg50_divDT', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO_divDT', 'AA'), ('trendSBL_divDT', 'AA'), ('trendAR_divDT', 'AA'), ('trendNAOneg_divDT', 'AA'), ('trendNAO_divDT', 'ANAT'), ('trendSBL_divDT', 'ANAT'), ('trendAR_divDT', 'ANAT'), ('trendNAOneg_divDT', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
 
     allpeas = dict()
     for co in coppie:
-        x = [ssp585res[mod][co[0]] for mod in okmods]
-        y = [ssp585res[mod][co[1]] for mod in okmods]
+        x = []
+        y = []
+        for ssp in allssps:
+            okmods = [ke for ke in resssp[ssp].keys() if ke not in ['ref', 'MMM']]
+            x.append([resssp[ssp][mod][co[0]] for mod in okmods])
+            y.append([resssp[ssp][mod][co[1]] for mod in okmods])
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
-        pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps)
         pears, pval = stats.pearsonr(x, y)
         allpeas[co] = (pears, pval)
 
     #print(allpeas)
 
-    cart_corr = cart_corr + 'senzaINMCM4/'
-    ctl.mkdir(cart_corr)
-    okmods_m1 = [mod for mod in okmods if 'INM-CM4-8' not in mod]
-    for co in coppie:
-        x = [ssp585res[mod][co[0]] for mod in okmods_m1]
-        y = [ssp585res[mod][co[1]] for mod in okmods_m1]
-        filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
-        pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
-        pears, pval = stats.pearsonr(x, y)
-        allpeas[tuple(list(co)+['senzaINMCM4'])] = (pears, pval)
+    # cart_corr = cart_corr + 'senzaINMCM4/'
+    # ctl.mkdir(cart_corr)
+    # okmods_m1 = [mod for mod in okmods if 'INM-CM4-8' not in mod]
+    # for co in coppie:
+    #     x = [ssp585res[mod][co[0]] for mod in okmods_m1]
+    #     y = [ssp585res[mod][co[1]] for mod in okmods_m1]
+    #     filnam = cart_corr + 'corr_{}_{}_senzaINMCM4.pdf'.format(co[0], co[1])
+    #     pea = ctl.plotcorr(x, y, filename = filnam, xlabel = co[0], ylabel = co[1])
+    #     pears, pval = stats.pearsonr(x, y)
+    #     allpeas[tuple(list(co)+['senzaINMCM4'])] = (pears, pval)
 
     #print(allpeas)
     pickle.dump(allpeas, open(cart_corr+'allcorrs.p', 'wb'))
