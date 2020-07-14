@@ -100,7 +100,7 @@ for area in ['EAT', 'PNA']:
         AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
         print('AA', np.mean(AA), np.max(AA), np.min(AA))
         Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
-        print('ANAT', np.mean(ANAT), np.max(ANAT), np.min(ANAT))
+        print('Anat', np.mean(Anat), np.max(Anat), np.min(Anat))
 
         # model performance
         var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
