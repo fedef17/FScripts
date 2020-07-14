@@ -64,7 +64,7 @@ for area in ['EAT']:#, 'PNA']:
     freqs, residtimes, patterns = pickle.load(open(cart_v5.format(area) + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
     freqs_cmip5, trend_ssp_cmip5, residtimes_cmip5 = pickle.load(open(cart_cmip5.format(area) + 'freqs_cmip5_{}.p'.format(area), 'rb'))
-    seasfreq_cmip5, runfreq_cmip5 = pickle.load(open(cart_cmip5 + 'seasfreqs_cmip5_{}.p'.format(area), 'rb'))
+    seasfreq_cmip5, runfreq_cmip5 = pickle.load(open(cart_cmip5.format(area) + 'seasfreqs_cmip5_{}.p'.format(area), 'rb'))
     freqs.update(freqs_cmip5)
     trend_ssp.update(trend_ssp_cmip5)
     residtimes.update(residtimes_cmip5)
