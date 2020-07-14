@@ -166,7 +166,7 @@ stateddies.append(np.mean(stateddies, axis = 0))
 allmods_MM = allmods + ['Multi-model mean']
 
 filename = cart_out_orig + 'zontrend_ssp585.pdf'
-fig = plt.figure((16,12))
+fig = plt.figure(figsize = (16,12))
 for modmem, co in zip(okmods, zontrend):
     plt.plot(co, lat, label = modmem)
 plt.plot(np.mean(zontrend, axis = 0), lat, label = 'MMM', color = 'black', linewidth = 2)
