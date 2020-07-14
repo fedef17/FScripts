@@ -71,8 +71,9 @@ for area in ['EAT']:#, 'PNA']:
     seasfreq.update(seasfreq_cmip5)
     runfreq.update(runfreq_cmip5)
 
-    allssps = ['rcp85_cmip5', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
-    allsims = ['hist_cmip5', 'rcp85_cmip5', 'hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
+    allssps = ['ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
+    allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
+    #allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'hist_cmip5', 'rcp85_cmip5']
     coldic = dict(zip(allsims, ctl.color_set(7)))
     colsim = ctl.color_set(7)
     colssp = [coldic[ssp] for ssp in allssps]
@@ -112,12 +113,16 @@ for area in ['EAT']:#, 'PNA']:
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
 
-        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        positions = list(np.arange(len(allsims)-1)*0.7)
+        positions.append(positions[-1]+0.3+0.7)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
         if reg == 0: ax.set_ylabel('Regime frequency')
 
         ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        xli = ax.get_xlim()
 
     #ctl.adjust_ax_scale(axes)
     axes = []
@@ -128,12 +133,14 @@ for area in ['EAT']:#, 'PNA']:
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)], nu) for ssp in allssps]
 
-        ctl.boxplot_on_ax(ax, allpercs, allssps, colssp, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        ctl.boxplot_on_ax(ax, allpercs, allssps, colssp, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions[1:])
 
         ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
         if reg == 0: ax.set_ylabel('Trend in regime frequency (1/yr)')
         axes.append(ax)
+        ax.set_xlim(xli)
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
 
     ctl.adjust_ax_scale(axes)
 
@@ -154,10 +161,11 @@ for area in ['EAT']:#, 'PNA']:
             allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', cos, reg)], nu) for ssp in allsims]
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
-        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 4)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
