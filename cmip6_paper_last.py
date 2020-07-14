@@ -50,6 +50,11 @@ reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 #okmods = ['ACCESS-CM2_r1i1p1f1', 'BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1','CNRM-CM6-1-HR_r1i1p1f2', 'CNRM-CM6-1_r1i1p1f2','CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1','INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1','MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1','MPI-ESM1-2-LR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1','NorESM2-LM_r1i1p1f1', 'NorESM2-MM_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
 # mancano = ['BCC-ESM1_r1i1p1f1', 'CESM2_r1i1p1f1', 'GFDL-CM4_r1i1p1f1', 'HadGEM3-GC31-LL_r1i1p1f3', 'KACE-1-0-G_r1i1p1f1', 'MPI-ESM-1-2-HAM_r1i1p1f1']
 
+allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
+allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5']
+coldic = dict(zip(allsimcol, ctl.color_set(7)))
+colssp = [coldic[ssp] for ssp in allssps]
+
 area = 'EAT'
 ssp = 'ssp585'
 for area in ['EAT', 'PNA']:
@@ -316,7 +321,7 @@ for area in ['EAT', 'PNA']:
             x.append([resssp[ssp][mod][co[0]] for mod in okmods])
             y.append([resssp[ssp][mod][co[1]] for mod in okmods])
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
-        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps)
+        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
         pears, pval = stats.pearsonr(x, y)
         allpeas[co] = (pears, pval)
 
@@ -341,18 +346,18 @@ for area in ['EAT', 'PNA']:
         if allpeas[co][1] < 0.1:
             print(co, allpeas[co])
 
-    for co in coppie:
-        if allpeas[tuple(list(co)+['senzaINMCM4'])][1] < 0.1:
-            print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
+    # for co in coppie:
+    #     if allpeas[tuple(list(co)+['senzaINMCM4'])][1] < 0.1:
+    #         print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
 
     print('HIGH CORRS?')
     for co in coppie:
         if np.abs(allpeas[co][0]) > 0.4:
             print(co, allpeas[co])
 
-    for co in coppie:
-        if np.abs(allpeas[tuple(list(co)+['senzaINMCM4'])][0]) > 0.4:
-            print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
+    # for co in coppie:
+    #     if np.abs(allpeas[tuple(list(co)+['senzaINMCM4'])][0]) > 0.4:
+    #         print(co, 'senzaINMCM4', allpeas[tuple(list(co)+['senzaINMCM4'])])
 
     #########################################################
 
