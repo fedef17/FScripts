@@ -85,7 +85,7 @@ for area in ['EAT']:#, 'PNA']:
             results_hist[ke]['pcs'] = np.concatenate(pcs_ok)
 
     # now for rcp85
-    print('rcp85')
+    print('rcp85_cmip5')
 
     avlen = np.median([len(results_ssp[ke]['labels']) for ke in results_ssp.keys()])
     for ke in tuple(results_ssp.keys()):
@@ -123,7 +123,7 @@ for area in ['EAT']:#, 'PNA']:
         for mem in okmods:
             labok, datok = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], ctl.range_years(yr0, yr1))
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
-            seasfreq[('hist', mem, reg)] = seasfr[reg, :]
+            seasfreq[('hist_cmip5', mem, reg)] = seasfr[reg, :]
             seas20 = np.array(ctl.running_mean(seasfr[reg, :], 20))
             print(mem, len(seas20))
             if len(seas20) == len(yr):
@@ -142,14 +142,14 @@ for area in ['EAT']:#, 'PNA']:
 
     seasfr, yr_ref = ctl.calc_seasonal_clus_freq(results_ref['labels'], results_ref['dates'], numclus)
     for reg in range(4):
-        seasfreq[('hist', 'ref', reg)] = seasfr[reg, :]
+        seasfreq[('hist_cmip5', 'ref', reg)] = seasfr[reg, :]
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
         cosi = []
         for mem in okmods:
-            seas20 = np.array(ctl.running_mean(seasfreq[('hist', mem, reg)], 20))
+            seas20 = np.array(ctl.running_mean(seasfreq[('hist_cmip5', mem, reg)], 20))
             if len(seas20) == len(allyr):
                 cosi.append(seas20)
             else:
@@ -162,7 +162,7 @@ for area in ['EAT']:#, 'PNA']:
         ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
         ax.plot(yr, coso, color = 'black', linewidth = 3)
 
-        seas20ref = np.array(ctl.running_mean(seasfreq[('hist', 'ref', reg)], 20))
+        seas20ref = np.array(ctl.running_mean(seasfreq[('hist_cmip5', 'ref', reg)], 20))
         ax.plot(yr_ref, seas20ref, color = 'red', linewidth = 2, linestyle = '--')
 
         ax.set_title(reg_names_area[area][reg])
@@ -183,7 +183,7 @@ for area in ['EAT']:#, 'PNA']:
             print(mem)
             labok, datok = ctl.sel_time_range(results_ssp[mem]['labels'], results_ssp[mem]['dates'], ctl.range_years(yr0, yr1))
             seasfr, yr = ctl.calc_seasonal_clus_freq(labok, datok, numclus)
-            seasfreq[('rcp85', mem, reg)] = seasfr[reg, :]
+            seasfreq[('rcp85_cmip5', mem, reg)] = seasfr[reg, :]
 
             m, c, err_m, err_c = ctl.linear_regre_witherr(yr, seasfr[reg, :])
             trend_ssp[('rcp85_cmip5', mem, 'trend', 'seafreq', reg)] = m
@@ -209,21 +209,23 @@ for area in ['EAT']:#, 'PNA']:
     fig.savefig(cart_out + 'models_run20_{}_rcp85.pdf'.format(area))
 
     reg_names = reg_names_area[area]
+    allyr = np.arange(1964, 2101)
 
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
         cosi = []
         for mem in okmods:
-            seas20 = np.array(ctl.running_mean(seasfreq[('rcp85', mem, reg)], 20))
+            #seas20 = np.array(ctl.running_mean(seasfreq[('rcp85_cmip5', mem, reg)], 20))
+            seas20 = np.array(ctl.running_mean(np.concatenate([seasfreq[('hist_cmip5', mem, reg)][15:], seasfreq[('rcp85_cmip5', mem, reg)]]), 20))
             if len(seas20) == len(allyr):
                 cosi.append(seas20)
             else:
                 print(mem, 'too short')
         coso = np.mean(cosi, axis = 0)
-        runfreq[('run20', reg)] = coso
+        runfreq[('rcp85_cmip5', 'run20', reg)] = coso
         coserr = np.std(cosi, axis = 0)
-        runfreq[('run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
+        runfreq[('rcp85_cmip5', 'run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
         ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
         ax.plot(yr, coso, color = 'black', linewidth = 3)
 
