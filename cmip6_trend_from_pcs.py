@@ -137,7 +137,7 @@ for modmem in okmods:
     # trend_anom = trend-np.mean(trend_area)
     trendsanom.append(trend)
     trendsstateddy.append(stat_eddy_trend)
-    zontrend.append(cose['zontrend'].squeeze())
+    zontrend.append(cose[('zontrend', mod)].squeeze())
 
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
