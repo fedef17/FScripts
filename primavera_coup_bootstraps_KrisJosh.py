@@ -127,6 +127,7 @@ for numclus in [3,4,5]:
 
     ################################################################################
     all_mods = np.array([ke.split('_')[0] for ke in results.keys()] + ['ERA'])
+    print(all_mods)
     all_mems = np.array([ke.split('_')[1] for ke in results.keys()] + ['0'])
 
     ref_cen = results['ERA_0']['centroids']
@@ -154,8 +155,9 @@ for numclus in [3,4,5]:
 
     allkeysss = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'centroids', 'trans_matrix', 'relative_entropy', 'patcor']
 
-    for mod in model_names_all:
+    print(model_names_all)
     #for mod in ['ERA']:
+    for mod in model_names_all:
         print(mod)
         if mod not in all_mods:
             print('Skipping....')
