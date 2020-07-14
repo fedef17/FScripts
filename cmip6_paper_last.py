@@ -98,7 +98,9 @@ for area in ['EAT', 'PNA']:
         okmods_mod = [ke.split('_')[0] for ke in okmods]
         deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
         AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
+        print('AA', np.mean(AA), np.max(AA), np.min(AA))
         Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
+        print('ANAT', np.mean(ANAT), np.max(ANAT), np.min(ANAT))
 
         # model performance
         var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
@@ -239,6 +241,7 @@ for area in ['EAT', 'PNA']:
 
         resu.close()
 
+        resssp[ssp] = ssp585res
 
         coseall = dict()
         for ke in cose:
@@ -261,7 +264,6 @@ for area in ['EAT', 'PNA']:
                 cose[ke] = np.nan
 
         ssp585res['ref'] = cose
-        resssp[ssp] = ssp585res
 
     pickle.dump(resssp, open(cart_out + 'resu_allssps.p', 'wb'))
     #print(ssp585res)
@@ -319,8 +321,11 @@ for area in ['EAT', 'PNA']:
         y = []
         for ssp in allssps:
             okmods = [ke for ke in resssp[ssp].keys() if ke not in ['ref', 'MMM']]
-            x.append([resssp[ssp][mod][co[0]] for mod in okmods])
-            y.append([resssp[ssp][mod][co[1]] for mod in okmods])
+            print(ssp, np.mean(xss), np.mean(yss))
+            xss = [resssp[ssp][mod][co[0]] for mod in okmods]
+            yss = [resssp[ssp][mod][co[1]] for mod in okmods]
+            x.append(xss)
+            y.append(yss)
         filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
         pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
         pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
