@@ -187,24 +187,24 @@ ax.axvline(0., color = 'lightslategray', linewidth = 0.2)
 plt.legend()
 fig.savefig(filename)
 
-cols = ctl.color_set(3)
+cols = np.array(ctl.color_set(6))[::2]
 
 filename = cart_out_orig + 'zontrend_ssp585_MMM.pdf'
 fig = plt.figure(figsize = (16,12))
 ax = fig.add_subplot(111)
 coso = np.mean(zontrend, axis = 0)[oklats]
-coserr = np.std(zontrend, axis = 0)[oklats]
+coserr = np.std(zontrend, axis = 0)[oklats]/np.sqrt(len(zontrend)-1)
 
 ax.fill_betweenx(lat[oklats], coso-coserr, coso+coserr, color = cols[0], alpha = 0.2)
 ax.plot(coso, lat[oklats], color = cols[0], linewidth = 2, label = 'NML')
 
 coso = np.mean(zontrend_PNA, axis = 0)
-coserr = np.std(zontrend_PNA, axis = 0)
+coserr = np.std(zontrend_PNA, axis = 0)/np.sqrt(len(zontrend)-1)
 ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[1], alpha = 0.2)
 ax.plot(coso, lata, color = cols[1], linewidth = 2, label = 'PNA')
 
 coso = np.mean(zontrend_EAT, axis = 0)
-coserr = np.std(zontrend_EAT, axis = 0)
+coserr = np.std(zontrend_EAT, axis = 0)/np.sqrt(len(zontrend)-1)
 ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[2], alpha = 0.2)
 ax.plot(coso, lata, color = cols[2], linewidth = 2, label = 'EAT')
 
