@@ -118,6 +118,9 @@ area = (-180, 180, 20, 90)
 trendsanom = []
 trendsstateddy = []
 zontrend = []
+zontrend_EAT = []
+zontrend_PNA = []
+
 hatchs = []
 hatchs_se = []
 for modmem in okmods:
@@ -138,6 +141,14 @@ for modmem in okmods:
     trendsanom.append(trend)
     trendsstateddy.append(stat_eddy_trend)
     zontrend.append(cose[('zontrend', mod)].squeeze())
+
+    lata, lona, var = ctl.sel_area(lat, lon, trend, 'EAT')
+    zeat = ctl.zonal_mean(var)
+    zontrend_EAT.append(zeat)
+
+    lata, lona, var = ctl.sel_area(lat, lon, trend, 'PNA')
+    zpna = ctl.zonal_mean(var)
+    zontrend_PNA.append(zpna)
 
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
@@ -176,17 +187,31 @@ ax.axvline(0., color = 'lightslategray', linewidth = 0.2)
 plt.legend()
 fig.savefig(filename)
 
+cols = ctl.color_set(3)
+
 filename = cart_out_orig + 'zontrend_ssp585_MMM.pdf'
 fig = plt.figure(figsize = (16,12))
 ax = fig.add_subplot(111)
 coso = np.mean(zontrend, axis = 0)[oklats]
 coserr = np.std(zontrend, axis = 0)[oklats]
-col = 'red'
-ax.fill_betweenx(coso-coserr, coso+coserr, lat[oklats], color = col, alpha = 0.2)
-ax.plot(coso, lat[oklats], label = ssp, color = col, linewidth = 2)
+
+ax.fill_betweenx(lat[oklats], coso-coserr, coso+coserr, color = cols[0], alpha = 0.2)
+ax.plot(coso, lat[oklats], label = ssp, color = col, linewidth = 2, label = 'NML')
+
+coso_ = np.mean(zontrend_PNA, axis = 0)
+coserr = np.std(zontrend_PNA, axis = 0)
+ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[1], alpha = 0.2)
+ax.plot(coso, lata, label = ssp, color = col, linewidth = 2, label = 'EAT')
+
+coso = np.mean(zontrend_EAT, axis = 0)
+coserr = np.std(zontrend_EAT, axis = 0)
+ax.fill_betweenx(lata, coso-coserr, coso+coserr, color = cols[2], alpha = 0.2)
+ax.plot(coso, lata, label = ssp, color = col, linewidth = 2, label = 'PNA')
+
 ax.axvline(0., color = 'lightslategray', linewidth = 0.2)
 ax.set_xlabel('Zonal trend anomaly (m/yr)')
 ax.set_ylabel('Latitude')
+plt.legend()
 fig.savefig(filename)
 
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
