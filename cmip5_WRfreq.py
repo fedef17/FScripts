@@ -226,8 +226,8 @@ for area in ['EAT']:#, 'PNA']:
         runfreq[('rcp85_cmip5', 'run20', reg)] = coso
         coserr = np.std(cosi, axis = 0)
         runfreq[('rcp85_cmip5', 'run20err', reg)] = coserr/np.sqrt(len(okmods)-1)
-        ax.fill_between(yr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
-        ax.plot(yr, coso, color = 'black', linewidth = 3)
+        ax.fill_between(allyr, coso-coserr, coso+coserr, color = 'steelblue', alpha = 0.3)
+        ax.plot(allyr, coso, color = 'black', linewidth = 3)
 
         ax.set_title(reg_names_area[area][reg])
 
