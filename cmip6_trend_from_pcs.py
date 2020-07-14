@@ -84,6 +84,8 @@ for modmem in okmods:
     zg_noglob, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, zgssp, dates, season, deg = 3, area = 'NML')
 
     trend, errtrend, _, _ = ctl.local_lineartrend_climate(lat, lon, zg_noglob, dates, None)
+    zontrend = ctl.zonal_mean(trend)
+    zonerrtrend = ctl.zonal_mean(errtrend)
 
     zg_noglob_zonme = ctl.zonal_mean(zg_noglob)
     zg_se = zg_noglob - zg_noglob_zonme[..., np.newaxis]
@@ -105,6 +107,8 @@ for modmem in okmods:
     cose[('errtrend', mod)] = errtrend
     cose[('se_trend', mod)] = se_trend
     cose[('se_errtrend', mod)] = se_errtrend
+    cose[('zontrend', mod)] = zontrend
+    cose[('zonerrtrend', mod)] = zonerrtrend
 
 pickle.dump(cose, open(cart_out_orig + 'zgtrends_ssp585.p', 'wb'))
 
@@ -113,6 +117,7 @@ area = (-180, 180, 20, 90)
 
 trendsanom = []
 trendsstateddy = []
+zontrend = []
 hatchs = []
 hatchs_se = []
 for modmem in okmods:
@@ -132,6 +137,7 @@ for modmem in okmods:
     # trend_anom = trend-np.mean(trend_area)
     trendsanom.append(trend)
     trendsstateddy.append(stat_eddy_trend)
+    zontrend.append(cose['zontrend'].squeeze())
 
     hatchs.append(np.abs(trend) > 2*errtrend)
     hatchs_se.append(np.abs(stat_eddy_trend) > 2*se_errtrend)
@@ -159,6 +165,13 @@ for mod in allmods:
 stateddies.append(np.mean(stateddies, axis = 0))
 allmods_MM = allmods + ['Multi-model mean']
 
+filename = cart_out_orig + 'zontrend_ssp585.pdf'
+fig = plt.figure((16,12))
+for modmem, co in zip(okmods, zontrend):
+    plt.plot(co, lat, label = modmem)
+plt.plot(np.mean(zontrend, axis = 0), lat, label = 'MMM', color = 'black', linewidth = 2)
+fig.savefig(filename)
+
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_hatching = hatchs, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
 
@@ -166,16 +179,22 @@ filename = cart_out_orig + 'trend_anom_ssp585_EAT.pdf'
 ctl.plot_multimap_contour(trendsanom, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-2,2), add_hatching = hatchs, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
 
 filename = cart_out_orig + 'trend_anom_mmm_vs_hist.pdf'
-ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = meanfields[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10)
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-1,1), add_contour_field = meanfields[-1], figsize = (24,12), cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
 
 filename = cart_out_orig + 'trend_anom_mmm_vs_hist_EAT.pdf'
-ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10)
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
+
+filename = cart_out_orig + 'trend_anom_mmm_vs_hist_polar.pdf'
+ctl.plot_map_contour(trendsanom[-1], lat, lon, filename, plot_anomalies=True, visualization = 'polar', cbar_range=(-1,1), add_contour_field = meanfields[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs[-1], n_lines = 10, add_contour_same_levels = False, add_contour_plot_anomalies = False)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585.pdf'
 ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-2,2), add_hatching = hatchs_se, fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm/year', draw_grid = True)
 
 filename = cart_out_orig + 'trend_stateddy_ssp585_EAT.pdf'
 ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-2,2), add_hatching = hatchs_se, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
+
+filename = cart_out_orig + 'trend_stateddy_ssp585_polar.pdf'
+ctl.plot_multimap_contour(trendsstateddy, lat, lon, filename, plot_anomalies=True, visualization = 'polar', cbar_range=(-2,2), add_hatching = hatchs_se, fix_subplots_shape = (3, 5), figsize = (18,12), subtitles = allmods_MM, cb_label = 'm/year', verbose = True, draw_grid = True)
 
 filename = cart_out_orig + 'stateddies_hist.pdf'
 ctl.plot_multimap_contour(stateddies, lat, lon, filename, plot_anomalies=True, plot_margins=(-180, 180, 20, 90), cbar_range=(-200,200), fix_subplots_shape = (7, 2), figsize = (15,20), subtitles = allmods_MM, cb_label = 'm', draw_grid = True)
@@ -188,3 +207,6 @@ ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True
 
 filename = cart_out_orig + 'stateddies_trend_mmm_vs_hist_EAT.pdf'
 ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'nearside', central_lat_lon = (65, -30), cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 10)
+
+filename = cart_out_orig + 'stateddies_trend_mmm_vs_hist_polar.pdf'
+ctl.plot_map_contour(trendsstateddy[-1], lat, lon, filename, plot_anomalies=True, visualization = 'polar', cbar_range=(-1,1), add_contour_field = stateddies[-1], cb_label = 'm/year', draw_grid = True, add_hatching = hatchs_se[-1], n_lines = 10)
