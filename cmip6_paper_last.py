@@ -88,7 +88,7 @@ for area in ['EAT', 'PNA']:
         stringa = 5*'{:10.1f}'+'\n'
 
         # da Virna
-        vmods, datatemp = ctl.read_from_txt(cart_in + 'DT_{}_VM.txt'.format(ssp), n_skip = 2, sep = '\t', n_stop = 27)
+        vmods, datatemp = ctl.read_from_txt(cart_in + 'virnas_tas/DT_{}_VM.txt'.format(ssp), n_skip = 2, sep = '\t', n_stop = 27)
         vkeys = ['DT_Global', 'DT_High', 'DT_Mid', 'DT_Low', 'DT_NAT']
         tempmods = dict()
         for mod, lin in zip(vmods, datatemp):
