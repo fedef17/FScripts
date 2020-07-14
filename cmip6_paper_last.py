@@ -75,6 +75,8 @@ for area in ['EAT', 'PNA']:
         results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
 
         okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+        if ssp == 'ssp126':
+            okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
         print(okmods)
 
         #['BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1\', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
@@ -96,6 +98,7 @@ for area in ['EAT', 'PNA']:
             tempmods[mod] = lin
 
         okmods_mod = [ke.split('_')[0] for ke in okmods]
+
         deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
         AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
         print('AA', np.mean(AA), np.max(AA), np.min(AA))
