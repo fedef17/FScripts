@@ -170,6 +170,19 @@ fig = plt.figure(figsize = (16,12))
 for modmem, co in zip(okmods, zontrend):
     plt.plot(co, lat, label = modmem)
 plt.plot(np.mean(zontrend, axis = 0), lat, label = 'MMM', color = 'black', linewidth = 2)
+plt.legend()
+fig.savefig(filename)
+
+filename = cart_out_orig + 'zontrend_ssp585_MMM.pdf'
+fig = plt.figure(figsize = (16,12))
+ax = fig.add_subplot(111)
+coso = np.mean(zontrend, axis = 0)
+coserr = np.std(zontrend, axis = 0)
+col = 'red'
+ax.fill_betweenx(coso-coserr, coso+coserr, color = col, alpha = 0.2)
+ax.plot(coso, lat, label = ssp, color = col, linewidth = 2)
+ax.set_xlabel('Zonal trend anomaly (m/yr)')
+ax.set_ylabel('Latitude')
 fig.savefig(filename)
 
 filename = cart_out_orig + 'trend_anom_ssp585.pdf'
