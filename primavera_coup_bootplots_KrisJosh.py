@@ -179,7 +179,7 @@ for numclus in [3,4,5]:
     allfigs = []
     if plot_sig:
         for nam in ['varopt', 'autocorr']:
-            fig, ax = plt.subplots(figsize=(16,12))
+            fig, ax = plt.subplots(figsize=(20,12))
 
             allpercs = dict()
             for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
@@ -198,7 +198,7 @@ for numclus in [3,4,5]:
 
 
     for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'patcor']:#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
-        fig = plt.figure(figsize=(16,12))
+        fig = plt.figure(figsize=(20,12))
         axes = []
         for ii, reg in enumerate(regnam):
             ax = plt.subplot(2, 3, ii+1)
@@ -226,7 +226,7 @@ for numclus in [3,4,5]:
 
 
     ax_pers_2 = []
-    fig_pers = plt.figure(figsize=(16,12))
+    fig_pers = plt.figure(figsize=(20,12))
     for i in range(numclus):
         ax_pers_2.append(plt.subplot(2,3,i+1))
 
@@ -235,7 +235,7 @@ for numclus in [3,4,5]:
     axes_diff = []
     axes_pers = []
     for ireg, reg in enumerate(regnam):
-        fig = plt.figure(figsize=(16,12))
+        fig = plt.figure(figsize=(20,12))
         for ii in range(numclus):
             ax = plt.subplot(2, 3, ii+1)
 
