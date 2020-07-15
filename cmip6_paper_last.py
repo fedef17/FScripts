@@ -317,7 +317,7 @@ for area in ['EAT', 'PNA']:
     cart_corr = cart_out + 'corrplots_allssps/'
     ctl.mkdir(cart_corr)
 
-    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50_divDT', 'AA'), ('fdNAO50_divDT', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50_divDT', 'AA'), ('fdSBL50_divDT', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50_divDT', 'AA'), ('fdAR50_divDT', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50_divDT', 'AA'), ('fdNAOneg50_divDT', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO_divDT', 'AA'), ('trendSBL_divDT', 'AA'), ('trendAR_divDT', 'AA'), ('trendNAOneg_divDT', 'AA'), ('trendNAO_divDT', 'ANAT'), ('trendSBL_divDT', 'ANAT'), ('trendAR_divDT', 'ANAT'), ('trendNAOneg_divDT', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
+    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
 
     allpeas = dict()
     for co in coppie:
