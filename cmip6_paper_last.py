@@ -105,6 +105,9 @@ for area in ['EAT', 'PNA']:
         print('AA', np.mean(AA), np.max(AA), np.min(AA))
         Anat = np.array([tempmods[mod][4] for mod in okmods_mod])
         print('Anat', np.mean(Anat), np.max(Anat), np.min(Anat))
+        PE_grad = np.array([tempmods[mod][1]-tempmods[mod][3] for mod in okmods_mod])
+        Pole_NA_grad = np.array([tempmods[mod][1]-tempmods[mod][4] for mod in okmods_mod])
+        NA_EQ_grad = np.array([tempmods[mod][4]-tempmods[mod][3] for mod in okmods_mod])
 
         # model performance
         var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
@@ -112,7 +115,7 @@ for area in ['EAT', 'PNA']:
         effcen = [results_hist[mod]['eff_centroids'] for mod in okmods]
 
         ssp585res = dict()
-        for mod, delt, aaa, ana, vrat, cen_re, cen in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen):
+        for mod, delt, aaa, ana, vrat, cen_re, cen, peg, png, neg in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen, PE_grad, Pole_NA_grad, NA_EQ_grad):
             ctl.printsep(resu)
             ctl.printsep(resu)
             resu.write('\n\n' + mod + '\n')
@@ -121,6 +124,10 @@ for area in ['EAT', 'PNA']:
             cose['deltaT'] = delt
             cose['AA'] = aaa
             cose['ANAT'] = ana
+            cose['PE_grad'] = peg
+            cose['Pole_NA_grad'] = png
+            cose['NA_EQ_grad'] = neg
+
             cose['var_ratio'] = vrat
             cose['cen_rcorr'] = np.mean([ctl.Rcorr(ce1, ce2) for ce1, ce2 in zip(cen_re, cen)])
 
@@ -314,10 +321,10 @@ for area in ['EAT', 'PNA']:
     resu.close()
 
     # Guardiamo anche le correlazioni va là.
-    cart_corr = cart_out + 'corrplots_allssps/'
+    cart_corr = cart_out + 'corrplots_allssps_v2/'
     ctl.mkdir(cart_corr)
 
-    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT')]
+    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT'), ('PE_grad', 'trendNAO'), ('PE_grad', 'trendNAOneg'), ('Pole_NA_grad', 'trendNAO'), ('Pole_NA_grad', 'trendNAOneg'), ('NA_EQ_grad', 'trendNAO'), ('NA_EQ_grad', 'trendNAOneg'), ('PE_grad', 'trendSBL'), ('PE_grad', 'trendAR'), ('Pole_NA_grad', 'trendSBL'), ('Pole_NA_grad', 'trendAR'), ('NA_EQ_grad', 'trendSBL'), ('NA_EQ_grad', 'trendAR'), ('fdNAO50', 'trendNAO'), ('fdNAOneg50', 'trendNAOneg'), ('fdSBL50', 'trendSBL'), ('fdAR50', 'trendAR')]
 
     allpeas = dict()
     for co in coppie:
