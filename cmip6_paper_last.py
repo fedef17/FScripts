@@ -100,9 +100,10 @@ for area in ['EAT', 'PNA']:
         okmods_mod = [ke.split('_')[0] for ke in okmods]
 
         deltaT = np.array([tempmods[mod][0] for mod in okmods_mod])
-        AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
+        #AA = np.array([tempmods[mod][1]/tempmods[mod][0] for mod in okmods_mod])
+        AA = np.array([tempmods[mod][1] for mod in okmods_mod])
         print('AA', np.mean(AA), np.max(AA), np.min(AA))
-        Anat = np.array([tempmods[mod][4]/tempmods[mod][0] for mod in okmods_mod])
+        Anat = np.array([tempmods[mod][4] for mod in okmods_mod])
         print('Anat', np.mean(Anat), np.max(Anat), np.min(Anat))
 
         # model performance
