@@ -165,7 +165,8 @@ for numclus in [3,4,5]:
 
     # colors = ctl.color_set(len(model_names), sns_palette = 'Paired') + [cm.colors.ColorConverter.to_rgb('black')]
     nam = 'significance'
-    regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
+    regnam = ['clus_{}'.format(i) for i in range(numclus)]
+    #regnam = ['NAO +', 'Sc. BL', 'AR', 'NAO -']
 
     #plt.style.use('seaborn-whitegrid')
     #plt.style.use('default')
