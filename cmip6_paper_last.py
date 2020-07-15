@@ -324,6 +324,9 @@ for area in ['EAT', 'PNA']:
     cart_corr = cart_out + 'corrplots_allssps_v2/'
     ctl.mkdir(cart_corr)
 
+    cart_corr_sig = cart_out + 'corrplots_allssps_v2_sigcorrs/'
+    ctl.mkdir(cart_corr_sig)
+
     coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT'), ('PE_grad', 'trendNAO'), ('PE_grad', 'trendNAOneg'), ('Pole_NA_grad', 'trendNAO'), ('Pole_NA_grad', 'trendNAOneg'), ('NA_EQ_grad', 'trendNAO'), ('NA_EQ_grad', 'trendNAOneg'), ('PE_grad', 'trendSBL'), ('PE_grad', 'trendAR'), ('Pole_NA_grad', 'trendSBL'), ('Pole_NA_grad', 'trendAR'), ('NA_EQ_grad', 'trendSBL'), ('NA_EQ_grad', 'trendAR'), ('fdNAO50', 'trendNAO'), ('fdNAOneg50', 'trendNAOneg'), ('fdSBL50', 'trendSBL'), ('fdAR50', 'trendAR')]
 
     allpeas = dict()
@@ -337,9 +340,12 @@ for area in ['EAT', 'PNA']:
             #print(ssp, np.mean(xss), np.mean(yss))
             x.append(xss)
             y.append(yss)
-        filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
-        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
         pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
+        if pval < 0.1:
+            filnam = cart_corr_sig + 'corr_{}_{}.pdf'.format(co[0], co[1])
+        else:
+            filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
+        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
         allpeas[co] = (pears, pval)
 
     #print(allpeas)
