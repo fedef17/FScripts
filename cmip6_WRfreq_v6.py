@@ -97,7 +97,7 @@ for area in ['EAT', 'PNA']:
         axes.append(ax)
 
     ctl.adjust_ax_scale(axes)
-    ctl.custom_legend(fig, colssp, allssps, ncol = 5)
+    ctl.custom_legend(fig, colssp, allssps, ncol = 3)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
 
 
@@ -145,7 +145,7 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(figall, colsim, allsims, ncol = 4)
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box_wtrend_wcmip5.pdf'.format(area, cos))
 
 
@@ -168,5 +168,5 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names[reg])
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
 
-    ctl.custom_legend(fig, colsim, allsims, ncol = 4)
+    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
