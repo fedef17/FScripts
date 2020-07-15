@@ -79,11 +79,11 @@ for numclus in [3,4,5]:
     nmods = len(model_names_all)
 
     #allnams = ['significance',
-    allnams = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'relative_entropy', 'patcor']#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
+    allnams = ['varopt', 'autocorr', 'freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'trans_matrix', 'centroids', 'patcor']#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']
     #alltits = ['Sharpness of regime structure',
-    alltits = ['Optimal variance ratio', 'lag-1 autocorrelation', 'Regime frequency', 'Centroid distance to reference in phase space', 'Average residence time', '90th percentile of residence time', 'Transition matrix', 'Regime centroid', 'Relative entropy of cluster cloud in phase space', 'Pattern correlation of cluster centroid in phase space']#, 'Centroid distance to reference in phase space (5-day filter)', 'Relative entropy of cluster cloud in phase space (5-day filter)', 'Pattern correlation of cluster centroid in phase space (5-day filter)']
+    alltits = ['Optimal variance ratio', 'lag-1 autocorrelation', 'Regime frequency', 'Centroid distance to reference in phase space', 'Average residence time', '90th percentile of residence time', 'Transition matrix', 'Regime centroid', 'Pattern correlation of cluster centroid in phase space']#, 'Centroid distance to reference in phase space (5-day filter)', 'Relative entropy of cluster cloud in phase space (5-day filter)', 'Pattern correlation of cluster centroid in phase space (5-day filter)']
     #allylabels = ['sharpness',
-    allylabels = ['optimal ratio', 'lag-1 autocorrelation', 'frequency', 'centroid distance (m)', 'resid. time (days)', 'resid. time (days)', 'trans. probability', 'centroid (m)', 'rel. entropy', 'patt. corr.']#, 'centroid distance (m)', 'rel. entropy', 'patt. corr.']
+    allylabels = ['optimal ratio', 'lag-1 autocorrelation', 'frequency', 'centroid distance (m)', 'resid. time (days)', 'resid. time (days)', 'trans. probability', 'centroid (m)', 'patt. corr.']#, 'centroid distance (m)', 'rel. entropy', 'patt. corr.']
 
     alltits = dict(zip(allnams, alltits))
     allylabels = dict(zip(allnams, allylabels))
@@ -138,15 +138,21 @@ for numclus in [3,4,5]:
                 #print(ndim, type(bootstraps_all['ens_min'][ke]))
             elif ndim == 2:
                 for cos, num in zip(['p10', 'p25', 'p50', 'p75', 'p90'], [10, 25, 50, 75, 90]):
-                    bootstraps_all['boot_'+cos][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), num) for reg in range(4)])
-                # bootstraps_all['ens_min'][ke] = np.array([np.min([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(4)])
-                # bootstraps_all['ens_max'][ke] = np.array([np.max([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(4)])
+                    bootstraps_all['boot_'+cos][ke] = np.array([np.percentile(np.concatenate([bootstraps_all[mem][ke][:, reg] for mem in allmems]), num) for reg in range(numclus)])
+                # bootstraps_all['ens_min'][ke] = np.array([np.min([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(numclus)])
+                # bootstraps_all['ens_max'][ke] = np.array([np.max([np.percentile(bootstraps_all[mem][ke][:,reg], 50) for mem in allmems]) for reg in range(numclus)])
                 #print(ndim, type(bootstraps_all['ens_min'][ke]))
             else:
+                if ke == 'centroids':
+                    J2 = 4
+                elif ke == 'trans_matrix':
+                    J2 = numclus
+                else:
+                    raise ValueError('not specified')
                 for cos, num in zip(['p10', 'p25', 'p50', 'p75', 'p90'], [10, 25, 50, 75, 90]):
-                    bootstraps_all['boot_'+cos][ke] = np.zeros((4,4))
-                    for i in range(4):
-                        for j in range(4):
+                    bootstraps_all['boot_'+cos][ke] = np.zeros((numclus,J2))
+                    for i in range(numclus):
+                        for j in range(J2):
                             bootstraps_all['boot_'+cos][ke][i, j] = np.percentile(np.concatenate([bootstraps_all[mem][ke][:, i, j] for mem in allmems]), num)
 
                             # if cos == 'p50':
@@ -190,11 +196,11 @@ for numclus in [3,4,5]:
             allfigs.append(fig)
 
 
-    for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'relative_entropy', 'patcor']:#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
+    for nam in ['freq', 'dist_cen', 'resid_times_av', 'resid_times_90', 'patcor']:#, 'filt_dist_cen', 'filt_relative_entropy', 'filt_patcor']:
         fig = plt.figure(figsize=(16,12))
         axes = []
         for ii, reg in enumerate(regnam):
-            ax = plt.subplot(2, 2, ii+1)
+            ax = plt.subplot(2, 3, ii+1)
 
             allpercs = dict()
             for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
@@ -220,8 +226,8 @@ for numclus in [3,4,5]:
 
     ax_pers_2 = []
     fig_pers = plt.figure(figsize=(16,12))
-    for i in range(4):
-        ax_pers_2.append(plt.subplot(2,2,i+1))
+    for i in range(numclus):
+        ax_pers_2.append(plt.subplot(2,3,i+1))
 
     nam = 'trans_matrix'
     figs = []
@@ -229,8 +235,8 @@ for numclus in [3,4,5]:
     axes_pers = []
     for ireg, reg in enumerate(regnam):
         fig = plt.figure(figsize=(16,12))
-        for ii in range(4):
-            ax = plt.subplot(2, 2, ii+1)
+        for ii in range(numclus):
+            ax = plt.subplot(2, 3, ii+1)
 
             allpercs = dict()
             for cos in ['mean', 'std', 'p10', 'p25', 'p50', 'p75', 'p90']:
@@ -260,7 +266,7 @@ for numclus in [3,4,5]:
     ctl.adjust_ax_scale(axes_diff)
     ctl.adjust_ax_scale(axes_pers)
 
-    for fig, ireg in zip(figs, range(4)):
+    for fig, ireg in zip(figs, range(numclus)):
         fig.savefig(cart_out + '{}_reg{}_bootstraps_v7_k{}.pdf'.format(nam, ireg, numclus))
 
 
@@ -282,7 +288,7 @@ for numclus in [3,4,5]:
     #     ind = 0
     #     normpers = [np.array([(1-cos[ireg, ireg]) for cos in bootstri[mod][nam]]) for mod in model_names_all]
     #     normpers = dict(zip(model_names_all, normpers))
-    #     for ii in range(4):
+    #     for ii in range(numclus):
     #         if ii == ireg: continue
     #         ind += 1
     #         ax = plt.subplot(1, 3, ind)
@@ -309,7 +315,7 @@ for numclus in [3,4,5]:
     #
     # ctl.adjust_ax_scale(axes_diff)
     #
-    # for fig, ireg in zip(figs, range(4)):
+    # for fig, ireg in zip(figs, range(numclus)):
     #     fig.savefig(cart_out + 'transonly_reg{}_bootstraps_v7.pdf'.format(ireg))
 
 
