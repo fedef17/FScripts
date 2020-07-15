@@ -42,7 +42,7 @@ reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 #allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allssps = ['rcp85']
 
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
     freqs = dict() # tot50 e last20
     trend_ssp = dict()
     residtimes = dict()

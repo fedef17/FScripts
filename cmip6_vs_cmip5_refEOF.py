@@ -55,7 +55,7 @@ colormip['cmip5'] = ctl.color_set(6)[4]
 colormip['cmip6'] = ctl.color_set(6)[0]
 
 area = 'EAT'
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 

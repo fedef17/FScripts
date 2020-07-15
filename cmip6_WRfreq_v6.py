@@ -52,7 +52,7 @@ clatlo['PNA'] = (70., -120.)
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 
 area = 'EAT'
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
     reg_names = reg_names_area[area]
