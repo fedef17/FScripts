@@ -143,10 +143,10 @@ for area in ['EAT', 'PNA']:
 
             cose['frNAO'] = freqs[('hist', mod, 'tot50')][0]
             cose['frSBL'] = freqs[('hist', mod, 'tot50')][1]
-            cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
-            cose['fdNAO20'] = freqs[('ssp585', mod, 'last20')][0]-freqs[('hist', mod, 'tot50')][0]
-            cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
-            cose['fdSBL20'] = freqs[('ssp585', mod, 'last20')][1]-freqs[('hist', mod, 'tot50')][1]
+            cose['fdNAO50'] = freqs[(ssp, mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdNAO20'] = freqs[(ssp, mod, 'last20')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdSBL50'] = freqs[(ssp, mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
+            cose['fdSBL20'] = freqs[(ssp, mod, 'last20')][1]-freqs[('hist', mod, 'tot50')][1]
 
             for reg in range(4):
                 resu.write('Regime {} persistence (50 and 20-yr period minus 50-yr reference)\n'.format(reg))
@@ -159,10 +159,10 @@ for area in ['EAT', 'PNA']:
 
             cose['perNAO'] = residtimes[('hist', mod, 'mean', 0)]
             cose['perSBL'] = residtimes[('hist', mod, 'mean', 1)]
-            cose['pdNAO50'] = residtimes[('ssp585', mod, 'mean', 0)] - residtimes[('hist', mod, 'mean', 0)]
-            cose['pdNAO20'] = residtimes[('ssp585', mod, 'mean_last20', 0)] - residtimes[('hist', mod, 'mean', 0)]
-            cose['pdSBL50'] = residtimes[('ssp585', mod, 'mean', 1)] - residtimes[('hist', mod, 'mean', 1)]
-            cose['pdSBL20'] = residtimes[('ssp585', mod, 'mean_last20', 1)] - residtimes[('hist', mod, 'mean', 1)]
+            cose['pdNAO50'] = residtimes[(ssp, mod, 'mean', 0)] - residtimes[('hist', mod, 'mean', 0)]
+            cose['pdNAO20'] = residtimes[(ssp, mod, 'mean_last20', 0)] - residtimes[('hist', mod, 'mean', 0)]
+            cose['pdSBL50'] = residtimes[(ssp, mod, 'mean', 1)] - residtimes[('hist', mod, 'mean', 1)]
+            cose['pdSBL20'] = residtimes[(ssp, mod, 'mean_last20', 1)] - residtimes[('hist', mod, 'mean', 1)]
 
             for reg in range(4):
                 resu.write('Trend Regime {} seasonal frequency (and error, second line)\n'.format(reg))
@@ -177,25 +177,25 @@ for area in ['EAT', 'PNA']:
                 # allres = [np.nan] + [trend_ssp[(sim, mod, 'errtrend', 'freq10', reg)] for sim in allsims[1:]]
                 # resu.write(stringa.format(*allres))
 
-            cose['trendNAO'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]
-            cose['trendSBL'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]
-            cose['trendAR'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]
-            cose['trendNAOneg'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]
-            cose['trendNAO_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 0)]/cose['deltaT']
-            cose['trendSBL_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 1)]/cose['deltaT']
-            cose['trendAR_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 2)]/cose['deltaT']
-            cose['trendNAOneg_divDT'] = 10*trend_ssp[('ssp585', mod, 'trend', 'freq10', 3)]/cose['deltaT']
+            cose['trendNAO'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 0)]
+            cose['trendSBL'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 1)]
+            cose['trendAR'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 2)]
+            cose['trendNAOneg'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 3)]
+            cose['trendNAO_divDT'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 0)]/cose['deltaT']
+            cose['trendSBL_divDT'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 1)]/cose['deltaT']
+            cose['trendAR_divDT'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 2)]/cose['deltaT']
+            cose['trendNAOneg_divDT'] = 10*trend_ssp[(ssp, mod, 'trend', 'freq10', 3)]/cose['deltaT']
 
-            cose['fdNAO50'] = freqs[('ssp585', mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
-            cose['fdSBL50'] = freqs[('ssp585', mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
-            cose['fdAR50'] = freqs[('ssp585', mod, 'tot50')][2]-freqs[('hist', mod, 'tot50')][2]
-            cose['fdNAOneg50'] = freqs[('ssp585', mod, 'tot50')][3]-freqs[('hist', mod, 'tot50')][3]
+            cose['fdNAO50'] = freqs[(ssp, mod, 'tot50')][0]-freqs[('hist', mod, 'tot50')][0]
+            cose['fdSBL50'] = freqs[(ssp, mod, 'tot50')][1]-freqs[('hist', mod, 'tot50')][1]
+            cose['fdAR50'] = freqs[(ssp, mod, 'tot50')][2]-freqs[('hist', mod, 'tot50')][2]
+            cose['fdNAOneg50'] = freqs[(ssp, mod, 'tot50')][3]-freqs[('hist', mod, 'tot50')][3]
             cose['fdNAO50_divDT'] = cose['fdNAO50']/cose['deltaT']
             cose['fdSBL50_divDT'] = cose['fdSBL50']/cose['deltaT']
             cose['fdAR50_divDT'] = cose['fdAR50']/cose['deltaT']
             cose['fdNAOneg50_divDT'] = cose['fdNAOneg50']/cose['deltaT']
 
-            gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)], yr10, remove_nans=True)
+            gigi = ctl.running_mean(seasfreq[(ssp, mod, 0)], yr10, remove_nans=True)
             pio = mk.original_test(gigi)
             cose['trendNAO_pval'] = pio.p
 
@@ -205,7 +205,7 @@ for area in ['EAT', 'PNA']:
 
                 ima = -1
                 while nutrend == trendo:
-                    gigi = ctl.running_mean(seasfreq[('ssp585', mod, 0)][:ima], yr10, remove_nans=True)
+                    gigi = ctl.running_mean(seasfreq[(ssp, mod, 0)][:ima], yr10, remove_nans=True)
                     pio = mk.original_test(gigi)
                     nutrend = pio.trend
                     ima = ima - 1
@@ -215,7 +215,7 @@ for area in ['EAT', 'PNA']:
                 cose['trendNAO_yeme'] = np.nan
 
 
-            gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)], yr10, remove_nans=True)
+            gigi = ctl.running_mean(seasfreq[(ssp, mod, 1)], yr10, remove_nans=True)
             pio = mk.original_test(gigi)
             cose['trendSBL_pval'] = pio.p
 
@@ -225,7 +225,7 @@ for area in ['EAT', 'PNA']:
 
                 ima = -1
                 while nutrend == trendo:
-                    gigi = ctl.running_mean(seasfreq[('ssp585', mod, 1)][:ima], yr10, remove_nans=True)
+                    gigi = ctl.running_mean(seasfreq[(ssp, mod, 1)][:ima], yr10, remove_nans=True)
                     pio = mk.original_test(gigi)
                     nutrend = pio.trend
                     ima = ima - 1
@@ -236,7 +236,7 @@ for area in ['EAT', 'PNA']:
 
             # variability
             years = np.arange(2015, 2100)
-            seafr_dtr = seasfreq[('ssp585', mod, 0)]-trend_ssp[('ssp585', mod, 'trend', 'seafreq', 0)]*years
+            seafr_dtr = seasfreq[(ssp, mod, 0)]-trend_ssp[(ssp, mod, 'trend', 'seafreq', 0)]*years
             cose['frvar_1yr'] = np.std(seafr_dtr)
 
             # for ye in [5, 10, 20, 50]:
