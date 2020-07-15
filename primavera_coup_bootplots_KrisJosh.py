@@ -29,7 +29,7 @@ plot_mean = True
 for numclus in [3,4,5]:
     cart_out = cart_in + 'plots_k{}/'.format(numclus)
     if not os.path.exists(cart_out): os.mkdir(cart_out)
-    filon = open(cart_in + 'res_bootstrap_v7_KJ_k{}.p'.format(numclus), 'rb')
+    #filon = open(cart_in + 'res_bootstrap_v7_KJ_k{}.p'.format(numclus), 'rb')
     filon_ref = open(cart_in + 'res_bootstrap_v7_KJ_ref_k{}.p'.format(numclus), 'rb')
 
     filogen = cart_in + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ_k{}.p'.format(numclus)
@@ -98,11 +98,12 @@ for numclus in [3,4,5]:
         allmems = np.sort(all_mems[whos_mod])
 
         print(allmems)
-        if mod == 'ERA':
-            allmems = ['0']
-            bootstraps_all = pickle.load(filon_ref)
-        else:
-            bootstraps_all = pickle.load(filon)
+        # if mod == 'ERA':
+        #     allmems = ['0']
+        #     bootstraps_all = pickle.load(filon_ref)
+        # else:
+        #     bootstraps_all = pickle.load(filon)
+        bootstraps_all = pickle.load(filon_ref)
 
         allkeysss = list(bootstraps_all[allmems[0]].keys())
 
