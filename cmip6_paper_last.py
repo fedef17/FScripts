@@ -343,9 +343,13 @@ for area in ['EAT', 'PNA']:
         pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
         if pval < 0.1:
             filnam = cart_corr_sig + 'corr_{}_{}.pdf'.format(co[0], co[1])
+            filnam_sg = cart_corr_sig + 'corr_{}_{}_sg.pdf'.format(co[0], co[1])
         else:
             filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
+            filnam_sg = cart_corr + 'corr_{}_{}_sg.pdf'.format(co[0], co[1])
+            
         pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
+        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp, single_group_corr = True)
         allpeas[co] = (pears, pval)
 
     #print(allpeas)
