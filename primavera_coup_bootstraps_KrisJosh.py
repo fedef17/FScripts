@@ -31,7 +31,7 @@ with open(cart_out + 'residual_pc_clustering_as_dict_v2.pkl', 'rb') as fil:
 with open(cart_out + 'raw_pc_clustering_as_dict_v2.pkl', 'rb') as fil:
     nures_nofil = pickle.load(fil)
 
-for numclus in [3,4,5]:
+for numclus in [3,4,5,6]:
     refres = nures['reference']
     refres_nofil = nures_nofil['reference']
     refcen = refres[numclus]['centroids'][:,:4]#/9.81 # these should be the counterparts of the original regimes in the residual phase space
@@ -218,7 +218,7 @@ for numclus in [3,4,5]:
                 bootstraps['dist_cen'].append(centdist)
                 bootstraps['centroids'].append(centroids)
 
-                et, patcor = calc_RMS_and_patcor(ref_cen, centroids)
+                et, patcor = ctl.calc_RMS_and_patcor(ref_cen, centroids)
                 bootstraps['RMS'].append(et)
                 bootstraps['patcor'].append(patcor)
 
