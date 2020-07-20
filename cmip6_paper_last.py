@@ -111,11 +111,14 @@ for area in ['EAT', 'PNA']:
 
         # model performance
         var_ratio = [results_hist_refEOF[mod]['var_ratio'] for mod in okmods]
+        patc = [np.mean(results_hist_refEOF[mod]['patcor']) for mod in okmods]
+        freqbias = np.array([np.mean(np.abs(results_hist_refEOF[mod]['freq_clus']-results_ref['freq_clus'])) for mod in okmods])
+
         effcen_refeof = [results_hist_refEOF[mod]['eff_centroids'] for mod in okmods]
         effcen = [results_hist[mod]['eff_centroids'] for mod in okmods]
 
         ssp585res = dict()
-        for mod, delt, aaa, ana, vrat, cen_re, cen, peg, png, neg in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen, PE_grad, Pole_NA_grad, NA_EQ_grad):
+        for mod, delt, aaa, ana, vrat, cen_re, cen, pa, fb, peg, png, neg in zip(okmods, deltaT, AA, Anat, var_ratio, effcen_refeof, effcen, patc, freqbias, PE_grad, Pole_NA_grad, NA_EQ_grad):
             ctl.printsep(resu)
             ctl.printsep(resu)
             resu.write('\n\n' + mod + '\n')
@@ -130,6 +133,8 @@ for area in ['EAT', 'PNA']:
 
             cose['var_ratio'] = vrat
             cose['cen_rcorr'] = np.mean([ctl.Rcorr(ce1, ce2) for ce1, ce2 in zip(cen_re, cen)])
+            cose['patcor'] = pa
+            cose['freq_bias'] = fb
 
             # Frequency
             for reg in range(4):
@@ -327,7 +332,7 @@ for area in ['EAT', 'PNA']:
     cart_corr_sig = cart_out + 'corrplots_allssps_v2_sigcorrs/'
     ctl.mkdir(cart_corr_sig)
 
-    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT'), ('PE_grad', 'trendNAO'), ('PE_grad', 'trendNAOneg'), ('Pole_NA_grad', 'trendNAO'), ('Pole_NA_grad', 'trendNAOneg'), ('NA_EQ_grad', 'trendNAO'), ('NA_EQ_grad', 'trendNAOneg'), ('PE_grad', 'trendSBL'), ('PE_grad', 'trendAR'), ('Pole_NA_grad', 'trendSBL'), ('Pole_NA_grad', 'trendAR'), ('NA_EQ_grad', 'trendSBL'), ('NA_EQ_grad', 'trendAR'), ('fdNAO50', 'trendNAO'), ('fdNAOneg50', 'trendNAOneg'), ('fdSBL50', 'trendSBL'), ('fdAR50', 'trendAR')]
+    coppie = [('fdNAO50', 'deltaT'), ('fdNAO50', 'AA'), ('fdNAO50', 'ANAT'), ('fdSBL50', 'deltaT'), ('fdSBL50', 'AA'), ('fdSBL50', 'ANAT'), ('fdAR50', 'deltaT'), ('fdAR50', 'AA'), ('fdAR50', 'ANAT'), ('fdNAOneg50', 'deltaT'), ('fdNAOneg50', 'AA'), ('fdNAOneg50', 'ANAT'), ('trendNAO', 'deltaT'), ('trendSBL', 'deltaT'), ('trendAR', 'deltaT'), ('trendNAOneg', 'deltaT'), ('trendNAO', 'AA'), ('trendSBL', 'AA'), ('trendAR', 'AA'), ('trendNAOneg', 'AA'), ('trendNAO', 'ANAT'), ('trendSBL', 'ANAT'), ('trendAR', 'ANAT'), ('trendNAOneg', 'ANAT'), ('trendNAO', 'var_ratio'), ('deltaT', 'var_ratio'), ('trendNAO', 'cen_rcorr'), ('var_ratio', 'cen_rcorr'), ('frNAO', 'trendNAO'), ('AA', 'ANAT'), ('PE_grad', 'trendNAO'), ('PE_grad', 'trendNAOneg'), ('Pole_NA_grad', 'trendNAO'), ('Pole_NA_grad', 'trendNAOneg'), ('NA_EQ_grad', 'trendNAO'), ('NA_EQ_grad', 'trendNAOneg'), ('PE_grad', 'trendSBL'), ('PE_grad', 'trendAR'), ('Pole_NA_grad', 'trendSBL'), ('Pole_NA_grad', 'trendAR'), ('NA_EQ_grad', 'trendSBL'), ('NA_EQ_grad', 'trendAR'), ('fdNAO50', 'trendNAO'), ('fdNAOneg50', 'trendNAOneg'), ('fdSBL50', 'trendSBL'), ('fdAR50', 'trendAR'), ('patcor', 'trendNAO'), ('freq_bias', 'trendNAO'), ('patcor', 'trendNAOneg'), ('freq_bias', 'trendNAOneg')]
 
     allpeas = dict()
     for co in coppie:
@@ -347,7 +352,7 @@ for area in ['EAT', 'PNA']:
         else:
             filnam = cart_corr + 'corr_{}_{}.pdf'.format(co[0], co[1])
             filnam_sg = cart_corr + 'corr_{}_{}_sg.pdf'.format(co[0], co[1])
-            
+
         pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp)
         pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = co[0], ylabel = co[1], groups = allssps, colors = colssp, single_group_corr = True)
         allpeas[co] = (pears, pval)
