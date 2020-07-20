@@ -20,8 +20,8 @@ from scipy import stats
 import seaborn as sns
 
 #######################################
-colo = '#d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4'
-#colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
+#colo = '#d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4'
+colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
 colo = colo.split()
 colo = colo[::-1]
 # sns.palplot(colo)
@@ -29,8 +29,12 @@ cmappa = colors.ListedColormap(colo)
 cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
 
-cart = '/home/fabiano/Research/lavori/CMIP6/cmip6_hist/'
-cart_out = '/home/fabiano/Research/lavori/CMIP6/Results_v2/'
+if os.uname()[1] == 'hobbes':
+    cart_in = '/home/fabiano/Research/lavori/CMIP6/'
+elif os.uname()[1] == 'ff-clevo':
+    cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
+cart = cart_in + 'cmip6_hist/'
+cart_out = cart_in + 'Results_v2/'
 # cart = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/'
 # fil = 'out_ERA_DJF_EAT_4clus_4pcs_1957-2014.p'
 fil_EAT = 'out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF_dtr.p'
@@ -49,7 +53,8 @@ clatlo = dict()
 clatlo['EAT'] = (70, -20)
 clatlo['PNA'] = (70, 210)
 
-clevels = np.arange(-135., 136., 30.)
+#clevels = np.arange(-135., 136., 30.)
+clevels = np.arange(-165., 166., 30.)
 
 plt.rcParams['lines.dashed_pattern'] = [5, 5]
 # for proj, blat in zip(['nearside', 'Npolar', 'Nstereo'], [0, 5, 25]):
@@ -66,7 +71,7 @@ for area in ['EAT', 'PNA']:
     subtits = [pat+' ({:4.1f}%)'.format(fre) for pat, fre in zip(patnames[area], freq_ref)]
 
     filename = cart_out + 'Allclus_OBSERVED_{}.pdf'.format(area)
-    figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo[area], cmap = cmappa, title = '', subtitles = subtits, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7)
+    figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo[area], cmap = cmappa, title = '', subtitles = subtits, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, n_lines = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7)
 
 
 sys.exit()

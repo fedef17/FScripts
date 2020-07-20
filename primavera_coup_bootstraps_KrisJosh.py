@@ -102,7 +102,6 @@ for numclus in [3,4,5]:
 
     results['ERA_0'] = results_ref
 
-
     n_choice = 30
     n_bootstrap = 100
 
@@ -219,6 +218,10 @@ for numclus in [3,4,5]:
                 bootstraps['dist_cen'].append(centdist)
                 bootstraps['centroids'].append(centroids)
 
+                et, patcor = calc_RMS_and_patcor(ref_cen, centroids)
+                bootstraps['RMS'].append(et)
+                bootstraps['patcor'].append(patcor)
+
                 resid_times = ctl.calc_regime_residtimes(labels, dates = dates)[0]
                 av_res = np.array([np.mean(resid_times[reg]) for reg in range(numclus)])
                 av_res_90 = np.array([np.percentile(resid_times[reg], 90) for reg in range(numclus)])
@@ -244,7 +247,7 @@ for numclus in [3,4,5]:
                 # bootstraps['relative_entropy'].append(relent_all)
 
                 #bootstraps['RMS'].append([ctl.distance(ce, refce) for ce, refce in zip(centroids, ref_cen)])
-                bootstraps['patcor'].append([ctl.Rcorr(ce, refce) for ce, refce in zip(centroids, ref_cen)])
+                #bootstraps['patcor'].append([ctl.Rcorr(ce, refce) for ce, refce in zip(centroids, ref_cen)])
 
                 # redo the same for filtered regimes
                 # filt_labels = ctl.regime_filter_long(labels, dates, days_thres = 5)
