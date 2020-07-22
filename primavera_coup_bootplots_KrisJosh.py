@@ -26,7 +26,7 @@ cart_in = '/home/fabiano/Research/lavori/prima_regimes_KS/'
 plot_sig = True
 plot_mean = True
 
-for numclus in [3,4,5]:
+for numclus in [3,4,5,6]:
     cart_out = cart_in + 'plots_k{}/'.format(numclus)
     if not os.path.exists(cart_out): os.mkdir(cart_out)
     #filon = open(cart_in + 'res_bootstrap_v7_KJ_k{}.p'.format(numclus), 'rb')
