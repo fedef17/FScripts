@@ -28,6 +28,8 @@ cart_g_ut = '/nas/archive_CMIP6/CMIP6_jasmin/UTmean/'
 cart_g_lt = '/nas/archive_CMIP6/CMIP6_jasmin/LTmean/'
 cart_g_s = '/nas/archive_CMIP6/CMIP6_jasmin/Smean/'
 
+ssp = 'ssp585'
+
 for cart in listacarts:
     mod = cart.split('/')[5]
     mem = cart.split('/')[7]
@@ -35,11 +37,15 @@ for cart in listacarts:
     print(mod, mem)
     print('----------------------------\n')
 
-    cartut = '/'.join(cart.split('/')[:-2]) + '/UTmean/'
+    print('----------------------------\n')
+    print(mod, mem)
+    print('----------------------------\n')
+
+    cartut = cart_g_ut + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartut)
-    cartstrat = '/'.join(cart.split('/')[:-2]) + '/Smean/'
+    cartstrat = cart_g_s + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartstrat)
-    cartlt = '/'.join(cart.split('/')[:-2]) + '/LTmean/'
+    cartlt = cart_g_lt + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartlt)
 
     file_list = [co.split('/')[-1] for co in glob.glob(cart+'ta*nc')]
@@ -85,11 +91,11 @@ for cart in listacarts:
         os.system(command)
 
     # regrid
-    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_UTmean.nc {}ta_{}_{}_2015-2100_UTmean_r1.nc'.format(cartut, mod, mem, cart_g_ut, mod, mem)
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_UTmean.nc {}ta_{}_{}_{}_2015-2100_UTmean_r1.nc'.format(cartut, mod, mem, cart_g_ut, mod, mem, ssp)
     os.system(command)
 
-    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_Smean.nc {}ta_{}_{}_2015-2100_Smean_r1.nc'.format(cartstrat, mod, mem, cart_g_s, mod, mem)
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_Smean.nc {}ta_{}_{}_{}_2015-2100_Smean_r1.nc'.format(cartstrat, mod, mem, cart_g_s, mod, mem, ssp)
     os.system(command)
 
-    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_LTmean.nc {}ta_{}_{}_2015-2100_LTmean_r1.nc'.format(cartlt, mod, mem, cart_g_lt, mod, mem)
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_LTmean.nc {}ta_{}_{}_{}_2015-2100_LTmean_r1.nc'.format(cartlt, mod, mem, cart_g_lt, mod, mem, ssp)
     os.system(command)
