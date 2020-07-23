@@ -82,7 +82,7 @@ for area in ['EAT', 'PNA']:
         fig = plt.figure(figsize = (16,12))
         ax = fig.add_subplot(111)
         for cos in ['cmip5', 'cmip6']:
-            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[(cos, area)], s = 5)
+            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[(cos, area)], s = 50)
 
             varme = np.mean(var_ratio[cos+tip])
             varstd = np.std(var_ratio[cos+tip])
@@ -90,8 +90,8 @@ for area in ['EAT', 'PNA']:
             frstd = np.std(freqbias[cos+tip])
             ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[(cos, area)], ax = ax, alpha = 0.5)
 
-        ax.scatter(results_ref['var_ratio'], 0, s = 250, marker = '*', color = 'black')
-        plt.legend()
+        ax.scatter(results_ref['var_ratio'], 0, s = 250, marker = '*', color = 'black', label = 'ERA')
+        plt.legend(fontsize = 20)
         plt.xlabel('Variance ratio')
         plt.ylabel('Frequency bias')
         plt.title('cmip6 vs cmip6 var_fr '+tip)
