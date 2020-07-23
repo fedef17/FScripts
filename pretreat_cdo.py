@@ -24,9 +24,16 @@ import pandas as pd
 cart_orig = '/nas/archive_CMIP6/CMIP6_jasmin/'
 listacarts = glob.glob(cart_orig + '*/*/*/*/*/*/*/*/')
 
+cart_g_ut = '/nas/archive_CMIP6/CMIP6_jasmin/UTmean/'
+cart_g_lt = '/nas/archive_CMIP6/CMIP6_jasmin/LTmean/'
+cart_g_s = '/nas/archive_CMIP6/CMIP6_jasmin/Smean/'
+
 for cart in listacarts:
     mod = cart.split('/')[5]
     mem = cart.split('/')[7]
+    print('----------------------------\n')
+    print(mod, mem)
+    print('----------------------------\n')
 
     cartut = '/'.join(cart.split('/')[:-2]) + '/UTmean/'
     os.mkdir(cartut)
@@ -69,3 +76,20 @@ for cart in listacarts:
         os.system(command)
         command = 'cdo cat {}*LTmean.nc {}ta_{}_{}_2015-2100_LTmean.nc'.format(cartlt, cartlt, mod, mem)
         os.system(command)
+    else:
+        command = 'cp {}*UTmean.nc {}ta_{}_{}_2015-2100_UTmean.nc'.format(cartut, cartut, mod, mem)
+        os.system(command)
+        command = 'cp {}*Smean.nc {}ta_{}_{}_2015-2100_Smean.nc'.format(cartstrat, cartstrat, mod, mem)
+        os.system(command)
+        command = 'cp {}*LTmean.nc {}ta_{}_{}_2015-2100_LTmean.nc'.format(cartlt, cartlt, mod, mem)
+        os.system(command)
+
+    # regrid
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_UTmean.nc {}ta_{}_{}_2015-2100_UTmean_r1.nc'.format(cartut, mod, mem, cart_g_ut, mod, mem)
+    os.system(command)
+
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_Smean.nc {}ta_{}_{}_2015-2100_Smean_r1.nc'.format(cartstrat, mod, mem, cart_g_s, mod, mem)
+    os.system(command)
+
+    command = 'cdo remapbil,r360x180 {}ta_{}_{}_2015-2100_LTmean.nc {}ta_{}_{}_2015-2100_LTmean_r1.nc'.format(cartlt, mod, mem, cart_g_lt, mod, mem)
+    os.system(command)
