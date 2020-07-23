@@ -34,7 +34,7 @@ ctl.mkdir(cart_g_s)
 
 for cart in listacarts:
     mod = cart.split('/')[7]
-    mem = cart.split('/')[9]
+    mem = cart.split('/')[12]
     print('----------------------------\n')
     print(mod, mem)
     print('----------------------------\n')
