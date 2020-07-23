@@ -21,8 +21,12 @@ import pandas as pd
 
 #################################
 
-cart_orig = '/archive/paolo/cmip5/CMIP5/output1/'
-listacarts = glob.glob(cart_orig + '*/*/rcp85/mon/atmos/Amon/r1i1*/ta/')
+# cart_orig = '/archive/paolo/cmip5/CMIP5/output1/'
+# listacarts = glob.glob(cart_orig + '*/*/rcp85/mon/atmos/Amon/r1i1*/ta/')
+# ssp = 'rcp85'
+cart_orig = '/archive/paolo/cmip6/CMIP6/model-output/'
+listacarts = glob.glob(cart_orig + '*/*/ssp585/atmos/Amon/r1i1*/ta/')
+ssp = 'ssp585'
 
 cartou = '/home/federico/work/CMIP6/data_mon_ta/'
 cart_g_ut = cartou + 'UTmean/'
@@ -34,16 +38,17 @@ ctl.mkdir(cart_g_s)
 
 for cart in listacarts:
     mod = cart.split('/')[7]
-    mem = cart.split('/')[12]
+    # mem = cart.split('/')[12]
+    mem = cart.split('/')[11]
     print('----------------------------\n')
     print(mod, mem)
     print('----------------------------\n')
 
-    cartut = cart_g_ut + '{}_{}_rcp85/'.format(mod, mem)
+    cartut = cart_g_ut + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartut)
-    cartstrat = cart_g_s + '{}_{}_rcp85/'.format(mod, mem)
+    cartstrat = cart_g_s + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartstrat)
-    cartlt = cart_g_lt + '{}_{}_rcp85/'.format(mod, mem)
+    cartlt = cart_g_lt + '{}_{}_{}/'.format(mod, mem, ssp)
     ctl.mkdir(cartlt)
 
     file_list = [co.split('/')[-1] for co in glob.glob(cart+'ta*nc')]

@@ -21,8 +21,11 @@ import pandas as pd
 
 #################################
 
-cart_orig = '/archive/paolo/cmip5/CMIP5/output1/'
-listacarts = glob.glob(cart_orig + '*/*/rcp85/mon/atmos/Amon/r1i1*/ua/')
+# cart_orig = '/archive/paolo/cmip5/CMIP5/output1/'
+# listacarts = glob.glob(cart_orig + '*/*/rcp85/mon/atmos/Amon/r1i1*/ua/')
+cart_orig = '/archive/paolo/cmip6/CMIP6/model-output/'
+listacarts = glob.glob(cart_orig + '*/*/ssp585/atmos/Amon/r1i1*/ua/')
+ssp = 'ssp585'
 
 cartou = '/home/federico/work/CMIP6/data_mon_ua/'
 cart_g_s = cartou + 'Smean/'
@@ -30,12 +33,13 @@ ctl.mkdir(cart_g_s)
 
 for cart in listacarts:
     mod = cart.split('/')[7]
-    mem = cart.split('/')[12]
+    # mem = cart.split('/')[12]
+    mem = cart.split('/')[11]
     print('----------------------------\n')
     print(mod, mem)
     print('----------------------------\n')
 
-    cartstrat = cart_g_s + '{}_{}_rcp85/'.format(mod, mem)
+    cartstrat = cart_g_s + '{}_{}_ssp585/'.format(mod, mem)
     ctl.mkdir(cartstrat)
 
     file_list = [co.split('/')[-1] for co in glob.glob(cart+'ua*nc')]
