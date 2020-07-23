@@ -51,8 +51,10 @@ clatlo['EAT'] = (70., -20.)
 clatlo['PNA'] = (70., -120.)
 
 colormip = dict()
-colormip['cmip5'] = ctl.color_set(6)[4]
-colormip['cmip6'] = ctl.color_set(6)[0]
+colormip[('cmip5', 'EAT')] = ctl.color_set(6)[4]
+colormip[('cmip6', 'EAT')] = ctl.color_set(6)[0]
+colormip[('cmip5', 'PNA')] = ctl.color_set(6)[3]
+colormip[('cmip6', 'PNA')] = ctl.color_set(6)[5]
 
 area = 'EAT'
 for area in ['EAT', 'PNA']:
@@ -80,13 +82,13 @@ for area in ['EAT', 'PNA']:
         fig = plt.figure(figsize = (16,12))
         ax = fig.add_subplot(111)
         for cos in ['cmip5', 'cmip6']:
-            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[cos])
+            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[(cos, area)])
 
             varme = np.mean(var_ratio[cos+tip])
             varstd = np.std(var_ratio[cos+tip])
             frme = np.mean(freqbias[cos+tip])
             frstd = np.std(freqbias[cos+tip])
-            ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[cos], ax = ax, alpha = 0.5)
+            ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[(cos, area)], ax = ax, alpha = 0.5)
 
         ax.scatter(results_ref['var_ratio'], 0, s = 250, marker = '*', color = 'black')
         plt.legend()
@@ -108,7 +110,7 @@ for area in ['EAT', 'PNA']:
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
                 modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
-                colors = [colormip[cos]]*len(modpats)
-                ctl.Taylor_plot(modpats, obs, ax = ax, title = None, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])#, mod_points_size = taylor_mark_dim, obs_points_size = int(1.1*taylor_mark_dim), max_val_sd = max_val_sd)
+                colors = [colormip[(cos, area)]]*len(modpats)
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])#, mod_points_size = taylor_mark_dim, obs_points_size = int(1.1*taylor_mark_dim), max_val_sd = max_val_sd)
 
         fig.savefig(cart_out + 'taylor_{}{}.pdf'.format(area, tip))
