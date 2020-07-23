@@ -26,8 +26,8 @@ listacarts = glob.glob(cart_orig + '*/*/ssp585/r1i1*/Amon/ua/*/latest/')
 cartou = '/work/scratch-nopw/fedef17/prima_outgoing/cmip6/ua_mean_strat/'
 
 for cart in listacarts:
-    mod = cart.split('/')[5]
-    mem = cart.split('/')[7]
+    mod = cart.split('/')[7]
+    mem = cart.split('/')[9]
     print('----------------------------\n')
     print(mod, mem)
     print('----------------------------\n')
