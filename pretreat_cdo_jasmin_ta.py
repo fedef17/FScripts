@@ -55,7 +55,7 @@ for cart in listacarts:
 
         filepart = filenam[:indpo] + '_UTmean.nc'
         file_out = cartut + filepart
-        command = 'cdo sellevel, {} {}prov.nc'.format(file_in, cartou)
+        command = 'cdo sellevel,40000,30000,25000,20000,15000 {} {}prov.nc'.format(file_in, cartou)
         os.system(command)
         command = 'cdo vertmean {}prov.nc {}'.format(cartou, file_out)
         os.system(command)
@@ -69,7 +69,7 @@ for cart in listacarts:
 
         filepart = filenam[:indpo] + '_LTmean.nc'
         file_out = cartlt + filepart
-        command = 'cdo sellevel, {} {}prov.nc'.format(file_in, cartou)
+        command = 'cdo sellevel,100000,92500,85000,70000 {} {}prov.nc'.format(file_in, cartou)
         os.system(command)
         command = 'cdo vertmean {}prov.nc {}'.format(cartou, file_out)
         os.system(command)
