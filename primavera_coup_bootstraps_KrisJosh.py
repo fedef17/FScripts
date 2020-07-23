@@ -31,6 +31,14 @@ with open(cart_out + 'residual_pc_clustering_as_dict_v2.pkl', 'rb') as fil:
 with open(cart_out + 'raw_pc_clustering_as_dict_v2.pkl', 'rb') as fil:
     nures_nofil = pickle.load(fil)
 
+tip = 'RAW' # 'RAW'
+if tip == 'RAW':
+    nures = nures_nofil
+elif tip == 'FILTERED':
+    pass
+else:
+    raise ValueError
+
 for numclus in [3,4,5,6]:
     refres = nures['reference']
     refres_nofil = nures_nofil['reference']
@@ -97,7 +105,7 @@ for numclus in [3,4,5,6]:
     results_ref['freq_clus'] = ctl.calc_clus_freq(results_ref['labels'], numclus)
     results_ref['resid_times'] = ctl.calc_regime_residtimes(results_ref['labels'], dates = results_ref['dates'])[0]
 
-    pickle.dump([results, results_ref], open(cart_out + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_FILTEREDKJ_k{}.p'.format(numclus), 'wb'))
+    pickle.dump([results, results_ref], open(cart_out + 'out_prima_coup_v7_DJF_EAT_4clus_4pcs_1957-2014_refEOF_{}KJ_k{}.p'.format(tip, numclus), 'wb'))
     #sys.exit()
 
     results['ERA_0'] = results_ref
@@ -105,7 +113,7 @@ for numclus in [3,4,5,6]:
     n_choice = 30
     n_bootstrap = 100
 
-    filo = open(cart_out + 'res_bootstrap_v7_KJ_ref_k{}.p'.format(numclus), 'wb')
+    filo = open(cart_out + 'res_bootstrap_v7_KJ_k{}_{}.p'.format(numclus, tip), 'wb')
 
     model_names = ['AWI-CM-1-1-LR', 'AWI-CM-1-1-HR', 'CMCC-CM2-HR4', 'CMCC-CM2-VHR4', 'CNRM-CM6-1', 'CNRM-CM6-1-HR', 'EC-Earth3P', 'EC-Earth3P-HR', 'ECMWF-IFS-LR', 'ECMWF-IFS-MR', 'ECMWF-IFS-HR', 'MPI-ESM1-2-HR', 'MPI-ESM1-2-XR', 'HadGEM3-GC31-LL', 'HadGEM3-GC31-MM', 'HadGEM3-GC31-HM', 'HadGEM3-GC31-HH']
 
