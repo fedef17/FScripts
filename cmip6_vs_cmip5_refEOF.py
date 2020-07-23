@@ -82,7 +82,7 @@ for area in ['EAT', 'PNA']:
         fig = plt.figure(figsize = (16,12))
         ax = fig.add_subplot(111)
         for cos in ['cmip5', 'cmip6']:
-            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[(cos, area)])
+            ax.scatter(var_ratio[cos+tip], freqbias[cos+tip], label = cos, color = colormip[(cos, area)], s = 5)
 
             varme = np.mean(var_ratio[cos+tip])
             varstd = np.std(var_ratio[cos+tip])
