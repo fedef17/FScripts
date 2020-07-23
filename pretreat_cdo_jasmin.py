@@ -5,25 +5,30 @@ import numpy as np
 import sys
 import os
 import glob
-from matplotlib import pyplot as plt
-from matplotlib import cm
+#from matplotlib import pyplot as plt
+#from matplotlib import cm
 
-import pickle
-import netCDF4 as nc
-import climtools_lib as ctl
-import climdiags as cd
+#import pickle
+#import netCDF4 as nc
+#import climtools_lib as ctl
+#import climdiags as cd
 
-from matplotlib.colors import LogNorm
-from datetime import datetime
+#from matplotlib.colors import LogNorm
+#from datetime import datetime
 
-from scipy import stats
-import pandas as pd
+#from scipy import stats
+#import pandas as pd
 
 #################################
 
 cart_orig = '/badc/cmip6/data/CMIP6/ScenarioMIP/'
 listacarts = glob.glob(cart_orig + '*/*/ssp585/r1i1*/Amon/ua/*/latest/')
 cartou = '/work/scratch-nopw/fedef17/prima_outgoing/cmip6/ua_mean_strat/'
+
+def mkdirif(cart):
+    if not os.path.exists(cart):
+        os.mkdir(cart)
+    return
 
 for cart in listacarts:
     mod = cart.split('/')[7]
@@ -32,7 +37,7 @@ for cart in listacarts:
     print(mod, mem)
     print('----------------------------\n')
     cartut = cartou + '{}_{}_ssp585/'.format(mod, mem)
-    ctl.mkdir(cartut)
+    mkdirif(cartut)
 
     file_list = [co.split('/')[-1] for co in glob.glob(cart+'ua*nc')]
 
