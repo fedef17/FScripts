@@ -29,8 +29,11 @@ for cart in listacarts:
     mem = cart.split('/')[7]
 
     cartut = '/'.join(cart.split('/')[:-2]) + '/UTmean/'
+    os.mkdir(cartut)
     cartstrat = '/'.join(cart.split('/')[:-2]) + '/Smean/'
+    os.mkdir(cartstrat)
     cartlt = '/'.join(cart.split('/')[:-2]) + '/LTmean/'
+    os.mkdir(cartlt)
 
     file_list = [co.split('/')[-1] for co in glob.glob(cart+'ta*nc')]
 
