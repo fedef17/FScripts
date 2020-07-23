@@ -51,7 +51,7 @@ for cart in listacarts:
     for filenam in file_list:
         if float(filenam.split('_')[-1][:-3].split('-')[1][:4]) <= 2100:
             pass
-        else
+        else:
             continue
 
         file_in = cart + filenam
