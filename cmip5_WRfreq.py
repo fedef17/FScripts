@@ -111,7 +111,8 @@ for area in ['EAT', 'PNA']:
     okmods = [cos for cos in results_hist.keys() if cos in results_ssp.keys()]
     print(okmods)
     print(len(okmods))
-
+    print('BAUUUUUUUUUUUUUUUUUUUUUUUUU')
+    sys.exit()
     ## plots
     runfreq = dict()
     seasfreq = dict()
