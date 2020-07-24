@@ -115,6 +115,7 @@ for area in ['EAT', 'PNA']:
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
+                print(cos, models)
                 #modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
                 modpats = [resdict[cos+tip][mod]['eff_centroids'][num, ...] for mod in models]
                 plocos[('eff_cen', cos+tip, area, num)] = modpats
