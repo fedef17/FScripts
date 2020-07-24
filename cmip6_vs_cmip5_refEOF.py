@@ -23,7 +23,7 @@ plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 18
 
 #############################################################################
@@ -57,6 +57,7 @@ colormip[('cmip5', 'PNA')] = ctl.color_set(6)[3]
 colormip[('cmip6', 'PNA')] = ctl.color_set(6)[5]
 
 area = 'EAT'
+plocos = dict()
 for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
@@ -76,7 +77,9 @@ for area in ['EAT', 'PNA']:
     freqbias = dict()
     for ke in resdict:
         var_ratio[ke] = np.array([resdict[ke][mod]['var_ratio'] for mod in resdict[ke].keys()])
+        plocos[('var_ratio', ke, area)] = var_ratio[ke]
         freqbias[ke] = np.array([np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus'])) for mod in resdict[ke].keys()])
+        plocos[('freq_bias', ke, area)] = freqbias[ke]
 
     for tip in ['', '_refEOF']:
         fig = plt.figure(figsize = (16,12))
@@ -90,6 +93,7 @@ for area in ['EAT', 'PNA']:
             frstd = np.std(freqbias[cos+tip])
             ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[(cos, area)], ax = ax, alpha = 0.5)
 
+        plocos[('var_ratio', 'ref', area)] = results_ref['var_ratio']
         ax.scatter(results_ref['var_ratio'], 0, s = 250, marker = '*', color = 'black', label = 'ERA')
         plt.legend(fontsize = 20)
         plt.xlabel('Variance ratio')
@@ -105,12 +109,63 @@ for area in ['EAT', 'PNA']:
         for num, patt in enumerate(patnames):
             ax = plt.subplot(2, 2, num+1, polar = True)
 
-            obs = results_ref['cluspattern_area'][num, ...]
+            #obs = results_ref['cluspattern_area'][num, ...]
+            obs = results_ref['centroids'][num, ...]
+            plocos[('centroids', 'ref', area, num)] = obs
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
-                modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
+                #modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
+                modpats = [resdict[cos+tip][mod]['eff_centroids'][num, ...] for mod in models]
+                plocos[('eff_cen', cos+tip, area, num)] = modpats
                 colors = [colormip[(cos, area)]]*len(modpats)
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])#, mod_points_size = taylor_mark_dim, obs_points_size = int(1.1*taylor_mark_dim), max_val_sd = max_val_sd)
 
         fig.savefig(cart_out + 'taylor_{}{}.pdf'.format(area, tip))
+
+
+cart_out = cart_out_orig + 'EAT_and_PNA/'
+ctl.mkdir(cart_out)
+
+for tip in ['', '_refEOF']:
+    fig = plt.figure(figsize = (24,12))
+    for i, area in enumerate(['EAT', 'PNA']):
+        ax = plt.subplot(1, 2, i+1)
+        for cos in ['cmip5', 'cmip6']:
+            var_ratio = plocos[('var_ratio', cos+tip, area)]
+            freqbias = plocos[('freqbias', cos+tip, area)]
+            ax.scatter(var_ratio, freqbias, label = cos, color = colormip[(cos, area)], s = 50)
+
+            varme = np.mean(var_ratio)
+            varstd = np.std(var_ratio)
+            frme = np.mean(freqbias)
+            frstd = np.std(freqbias)
+            ctl.ellipse_plot(varme, frme, varstd, frstd, colors = colormip[(cos, area)], ax = ax, alpha = 0.5)
+
+        ax.scatter(plocos[('var_ratio', 'ref', area)], 0, s = 250, marker = '*', color = 'black', label = 'ERA')
+        ax.legend(fontsize = 20)
+        ax.set_xlabel('Variance ratio')
+        ax.set_ylabel('Frequency bias')
+        ax.set_title(area)
+    fig.savefig(cart_out + 'var_fr_plot_{}.pdf'.format(tip))
+
+
+# taylor with clouds
+patnames = reg_names_area[area]
+for tip in ['', '_refEOF']:
+    fig = plt.figure(figsize=(24,12))
+    for i, area in enumerate(['EAT', 'PNA']):
+        for num, patt in enumerate(patnames):
+            ax = plt.subplot(2, 4, num+1+4*i, polar = True)
+
+            obs = plocos[('centroids', 'ref', area, num)]
+            meapats = dict()
+            for cos in ['cmip5', 'cmip6']:
+                modpats = plocos[('eff_cen', cos+tip, area, num)]
+
+                colors = [colormip[(cos, area)]]*len(modpats)
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])
+
+    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 30)
+    ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 30)
+    fig.savefig(cart_out + 'taylor_{}.pdf'.format(tip))
