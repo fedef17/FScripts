@@ -152,10 +152,10 @@ for tip in ['', '_refEOF']:
 
 
 # taylor with clouds
-patnames = reg_names_area[area]
 for tip in ['', '_refEOF']:
     fig = plt.figure(figsize=(24,12))
     for i, area in enumerate(['EAT', 'PNA']):
+        patnames = reg_names_area[area]
         for num, patt in enumerate(patnames):
             ax = plt.subplot(2, 4, num+1+4*i, polar = True)
 
@@ -167,6 +167,6 @@ for tip in ['', '_refEOF']:
                 colors = [colormip[(cos, area)]]*len(modpats)
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])
 
-    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 30)
-    ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 30)
+    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     fig.savefig(cart_out + 'taylor_{}.pdf'.format(tip))
