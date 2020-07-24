@@ -97,15 +97,20 @@ for area in ['EAT', 'PNA']:
     mod_ssp = dict()
     for ssp in allssps:
         mod_ssp[ssp] = np.unique([cos.split('_')[0] for cos in results_ssp[ssp].keys()])
+        print(ssp, mod_ssp[ssp])
 
     print('keeping only models used in ssps')
-    print(mod_hist)
+    #print(mod_hist)
     mod_hist = [mod for mod in mod_hist if np.any([mod in mod_ssp[ssp] for ssp in allssps])]
     print(mod_hist)
 
     okmods = [mod for mod in results_hist.keys() if np.all([mod in results_ssp[ssp].keys() for ssp in allssps[1:]])]
     #okmods.remove('EC-Earth3_r4i1p1f1')
+    print('okmods')
     print(okmods)
+    print(len(okmods))
+
+    sys.exit()
 
     runfreq = dict()
     seasfreq = dict()
