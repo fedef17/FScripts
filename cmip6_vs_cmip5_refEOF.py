@@ -165,7 +165,7 @@ for tip in ['', '_refEOF']:
                 modpats = plocos[('eff_cen', cos+tip, area, num)]
 
                 colors = [colormip[(cos, area)]]*len(modpats)
-                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0], max_val_sd = 2.5)
 
     ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
