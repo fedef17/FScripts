@@ -79,7 +79,7 @@ for area in ['EAT', 'PNA']:
         var_ratio[ke] = np.array([resdict[ke][mod]['var_ratio'] for mod in resdict[ke].keys()])
         plocos[('var_ratio', ke, area)] = var_ratio[ke]
         freqbias[ke] = np.array([np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus'])) for mod in resdict[ke].keys()])
-        plocos[('freq_bias', ke, area)] = freqbias[ke]
+        plocos[('freqbias', ke, area)] = freqbias[ke]
 
     for tip in ['', '_refEOF']:
         fig = plt.figure(figsize = (16,12))
