@@ -124,6 +124,8 @@ for area in ['EAT', 'PNA']:
 
         fig.savefig(cart_out + 'taylor_{}{}.pdf'.format(area, tip))
 
+with open(cart_out_orig + 'histbiases.p', 'wb') as filo:
+    pickle.dump(plocos, filo)
 
 cart_out = cart_out_orig + 'EAT_and_PNA/'
 ctl.mkdir(cart_out)
