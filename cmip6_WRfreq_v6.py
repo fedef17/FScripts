@@ -23,7 +23,7 @@ plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 18
 
 #############################################################################
@@ -42,7 +42,7 @@ file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_
 numclus = 4
 reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
-reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
+reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'BR']
 
 clatlo = dict()
 clatlo['EAT'] = (70., -20.)
