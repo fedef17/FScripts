@@ -109,16 +109,16 @@ for area in ['EAT', 'PNA']:
         for num, patt in enumerate(patnames):
             ax = plt.subplot(2, 2, num+1, polar = True)
 
-            #obs = results_ref['cluspattern_area'][num, ...]
-            obs = results_ref['centroids'][num, ...]
-            plocos[('centroids', 'ref', area, num)] = obs
+            obs = results_ref['cluspattern_area'][num, ...]
+            #obs = results_ref['centroids'][num, ...]
+            plocos[('patterns', 'ref', area, num)] = obs
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
                 print(cos, models)
-                #modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
-                modpats = [resdict[cos+tip][mod]['eff_centroids'][num, ...] for mod in models]
-                plocos[('eff_cen', cos+tip, area, num)] = modpats
+                modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
+                #modpats = [resdict[cos+tip][mod]['eff_centroids'][num, ...] for mod in models]
+                plocos[('patterns', cos+tip, area, num)] = modpats
                 colors = [colormip[(cos, area)]]*len(modpats)
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0])#, mod_points_size = taylor_mark_dim, obs_points_size = int(1.1*taylor_mark_dim), max_val_sd = max_val_sd)
 
@@ -159,13 +159,13 @@ for tip in ['', '_refEOF']:
         for num, patt in enumerate(patnames):
             ax = plt.subplot(2, 4, num+1+4*i, polar = True)
 
-            obs = plocos[('centroids', 'ref', area, num)]
+            obs = plocos[('patterns', 'ref', area, num)]
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
-                modpats = plocos[('eff_cen', cos+tip, area, num)]
+                modpats = plocos[('patterns', cos+tip, area, num)]
 
                 colors = [colormip[(cos, area)]]*len(modpats)
-                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0], max_val_sd = 2.5)
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0], max_val_sd = 1.6)
 
     ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
