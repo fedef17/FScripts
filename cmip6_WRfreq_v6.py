@@ -19,12 +19,12 @@ from datetime import datetime
 from scipy import stats
 import pandas as pd
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
 titlefont = 24
 plt.rcParams['figure.titlesize'] = titlefont
 plt.rcParams['axes.titlesize'] = 28
-plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
 cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
@@ -114,6 +114,8 @@ for area in ['EAT', 'PNA']:
         ax.axvline(2015, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         ax.axhline(0., color = 'lightslategray', linewidth = 0.2)
         axes.append(ax)
+        if reg == 0:
+            ax.set_ylabel('Frequency anomaly')
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colssp, allssps, ncol = 3)
@@ -207,6 +209,8 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        if reg == 0:
+            ax.set_ylabel('Av. persistence (days)')
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
