@@ -100,6 +100,24 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colssp, allssps, ncol = 3)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
 
+    fig = plt.figure(figsize = (24,8))
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(1, 4, reg+1)
+        for ssp in allssps:
+            col = coldic[ssp]
+            coso = runfreq[(ssp, 'run20', reg)]-np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
+            coserr = runfreq[(ssp, 'run20err', reg)]
+            ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.15)
+            ax.plot(yr, coso, label = ssp, color = col, linewidth = 2)
+        ax.set_title(reg_names_area[area][reg])
+        ax.axvline(2015, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        ax.axhline(0., color = 'lightslategray', linewidth = 0.2)
+        axes.append(ax)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colssp, allssps, ncol = 3)
+    fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5_line.pdf'.format(area))
 
     figall = plt.figure(figsize = (28,12))
     axes = []
@@ -170,3 +188,25 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
+
+
+    fig = plt.figure(figsize = (24,8))
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(1, 4, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', cos, reg)], nu) for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        # ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+
+    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
