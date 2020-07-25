@@ -58,6 +58,7 @@ colormip[('cmip6', 'PNA')] = ctl.color_set(7)[6]
 
 area = 'EAT'
 plocos = dict()
+res_short = dict()
 for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
@@ -80,6 +81,11 @@ for area in ['EAT', 'PNA']:
         plocos[('var_ratio', ke, area)] = var_ratio[ke]
         freqbias[ke] = np.array([np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus'])) for mod in resdict[ke].keys()])
         plocos[('freqbias', ke, area)] = freqbias[ke]
+
+        for mod in resdict[ke]:
+            res_short[(ke, mod, area, 'var_ratio')] = resdict[ke][mod]['var_ratio']
+            res_short[(ke, mod, area, 'freqbias')] = np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus']))
+            res_short[(ke, mod, area, 'patcor')] = resdict[ke][mod]['patcor']
 
     for tip in ['', '_refEOF']:
         fig = plt.figure(figsize = (16,12))
@@ -125,7 +131,7 @@ for area in ['EAT', 'PNA']:
         fig.savefig(cart_out + 'taylor_{}{}.pdf'.format(area, tip))
 
 with open(cart_out_orig + 'histbiases.p', 'wb') as filo:
-    pickle.dump(plocos, filo)
+    pickle.dump(res_short, filo)
 
 cart_out = cart_out_orig + 'EAT_and_PNA/'
 ctl.mkdir(cart_out)

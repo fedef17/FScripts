@@ -89,6 +89,8 @@ for area in ['EAT', 'PNA']:
     print(okmods)
 
     ### model performance
+    # cose[(area, 'var_ratio')] = plocos[('var_ratio', ke, area)]
+    # plocos[('freqbias', ke, area)]
     # var_ratio = [results_hist_refEOF[cos][mod]['var_ratio'] for mod in okmods[cos]]
     # cose[(area, 'var_ratio')] = dict(zip(okmods[cos], var_ratio))
     # patc = [np.mean(results_hist_refEOF[cos][mod]['patcor']) for mod in okmods[cos]]
@@ -156,9 +158,89 @@ for area in ['EAT', 'PNA']:
 
             pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
             filnam = cart_corr_sig + 'corr_{}_{}_{}.pdf'.format(*co)
-            pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = ke, ylabel = livar, groups = ['ssp585'], colors = ['red'], single_group_corr = True)#['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
+            pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = ke, ylabel = livar, groups = ['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
             allpeas[co] = (pears, pval)
             if abs(pears) > 0.3:
-                print('-------->', co, '{:5.2f}'.format(pears))
+                print('-------->', co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
             else:
-                print(co, '{:5.2f}'.format(pears))
+                print(co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
+
+
+
+from sklearn.linear_model import LinearRegression
+
+#model1: AA UTW PVu
+varfit1 = ['AA', 'UTW', 'PVu']
+#model2: RUTAW PVt
+varfit2 = ['RUTAW', 'PVt']
+#model3: best of quellisopra + weights da var_ratio
+
+# partiamo con model1
+print('MODEL 1!')
+
+na = 'slope'
+varok = 'trend'
+
+X = []
+X2 = []
+Y = []
+Yeat = []
+Ypna = []
+Yfirst = []
+weights = []
+for ssp in ['rcp85', 'ssp585']:
+    for mod in okmods[ssp]:
+        if (ssp, mod, na, 'AA') in resvi:
+            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in varfit1])
+            X.append(Xmod)
+            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in varfit2])
+            X2.append(Xmod)
+            Ymod = np.concatenate([varli[(ssp, mod, 'EAT', varok)][:-1], varli[(ssp, mod, 'PNA', varok)][:-1]])
+            Y.append(Ymod)
+            Yeat.append(varli[(ssp, mod, 'EAT', varok)][:-1])
+            Ypna.append(varli[(ssp, mod, 'PNA', varok)][:-1])
+            Yfirst.append(np.array([varli[(ssp, mod, 'EAT', varok)][0], varli[(ssp, mod, 'PNA', varok)][0]]))
+
+            weights.append(wei)
+
+X = np.stack(X)
+X2 = np.stack(X2)
+Y = np.stack(Y)
+Yeat = np.stack(Yeat)
+Ypna = np.stack(Ypna)
+Yfirst = np.stack(Yfirst)
+
+model1 = LinearRegression().fit(X, Y)
+print(model1.score(X, Y))
+print(model1.coef_)
+#>>> reg.predict(np.array([[3, 5]]))
+
+model1_eat = LinearRegression().fit(X, Yeat)
+print(model1_eat.score(X, Yeat))
+print(model1_eat.coef_)
+
+model1_pna = LinearRegression().fit(X, Ypna)
+print(model1_pna.score(X, Ypna))
+print(model1_pna.coef_)
+
+model1_first = LinearRegression().fit(X, Yfirst)
+print(model1_first.score(X, Yfirst))
+print(model1_first.coef_)
+
+#model2
+print('MODEL 2!')
+model2 = LinearRegression().fit(X2, Y)
+print(model2.score(X2, Y))
+print(model2.coef_)
+
+model2_eat = LinearRegression().fit(X2, Yeat)
+print(model2_eat.score(X2, Yeat))
+print(model2_eat.coef_)
+
+model2_pna = LinearRegression().fit(X2, Ypna)
+print(model2_pna.score(X2, Ypna))
+print(model2_pna.coef_)
+
+model2_first = LinearRegression().fit(X2, Yfirst)
+print(model2_first.score(X2, Yfirst))
+print(model2_first.coef_)
