@@ -63,7 +63,7 @@ colssp = [coldic[ssp] for ssp in allssps]
 area = 'EAT'
 ssp = 'ssp585'
 cose = dict()
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
     #results_hist_refEOF, results_ref = ctl.load_wrtool(file_hist_refEOF.format(area))
     trend_ssp, residtime_ssp = pickle.load(open(cart_v5.format(area) + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
     seasfreq, runfreq = pickle.load(open(cart_v5.format(area) + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
@@ -85,7 +85,7 @@ for area in ['EAT']:#, 'PNA']:
 
     okmods = dict()
     okmods['ssp585'] = [ke[1] for ke in freqs if 'ssp585' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-    okmods['rcp85'] = [ke[1] for ke in freqs if 'rcp85' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+    okmods['rcp85'] = [ke[1] for ke in freqs if 'rcp85_cmip5' in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
     print(okmods)
 
     ### model performance
@@ -128,23 +128,23 @@ for ssp in ['rcp85', 'ssp585']:
     if ssp == 'rcp85':
         cos = '_cmip5'
     for mod in okmods[ssp]:
-        for area in ['EAT']:#, 'PNA']:
+        for area in ['EAT', 'PNA']:
             trend_ssp = cose[(area, 'trend')]
             freqs = cose[(area, 'freq')]
             varli[(ssp, mod, area, 'trend')] = np.array([trend_ssp[(ssp+cos, mod, 'trend', 'freq10', reg)] for reg in range(4)])
-            varli[(ssp, mod, area, 'fr_fin')] = np.array(freqs[(ssp+cos, mod, 'last20')])
+            varli[(ssp, mod, area, 'fr_fin')] = np.array(freqs[(ssp+cos, mod, 'tot50')])
             varli[(ssp, mod, area, 'fr_diff')] = np.array(freqs[(ssp+cos, mod, 'tot50')])-np.array(freqs[('hist'+cos, mod, 'tot50')])
 
 
 allpeas = dict()
 
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
     for ke in vkeys:
         for livar in ['trend', 'fr_fin', 'fr_diff']:
             co = (livar, ke, area)
             x = []
             y = []
-            for ssp in ['ssp585']:#'rcp85',
+            for ssp in ['ssp585', 'rcp85']:
                 xss = []
                 yss = []
                 for mod in okmods[ssp]:
@@ -159,4 +159,6 @@ for area in ['EAT']:#, 'PNA']:
             pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = ke, ylabel = livar, groups = ['ssp585'], colors = ['red'], single_group_corr = True)#['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
             allpeas[co] = (pears, pval)
             if abs(pears) > 0.3:
+                print('-------->', co, '{:5.2f}'.format(pears))
+            else:
                 print(co, '{:5.2f}'.format(pears))

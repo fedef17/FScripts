@@ -35,11 +35,11 @@ dtrtyp = 'histrebase'
 cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/cmip6_vs_cmip5_refEOF/'
 ctl.mkdir(cart_out_orig)
 
-file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2005_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2005_refCLUS_dtr_light.p'
+file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refCLUS_dtr.p'
 
-file_hist_refEOF_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1964-2005_refEOF_dtr.p'
-file_hist_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1964-2005_refCLUS_dtr.p'
+file_hist_refEOF_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
+file_hist_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1957-2005_refCLUS_dtr.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -51,10 +51,10 @@ clatlo['EAT'] = (70., -20.)
 clatlo['PNA'] = (70., -120.)
 
 colormip = dict()
-colormip[('cmip5', 'EAT')] = ctl.color_set(6)[4]
-colormip[('cmip6', 'EAT')] = ctl.color_set(6)[0]
-colormip[('cmip5', 'PNA')] = ctl.color_set(6)[3]
-colormip[('cmip6', 'PNA')] = ctl.color_set(6)[5]
+colormip[('cmip5', 'EAT')] = ctl.color_set(7)[4]
+colormip[('cmip6', 'EAT')] = ctl.color_set(7)[0]
+colormip[('cmip5', 'PNA')] = ctl.color_set(7)[2]
+colormip[('cmip6', 'PNA')] = ctl.color_set(7)[6]
 
 area = 'EAT'
 plocos = dict()
