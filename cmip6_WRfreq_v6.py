@@ -100,7 +100,7 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colssp, allssps, ncol = 3)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
 
-    fig = plt.figure(figsize = (24,6))
+    fig = plt.figure(figsize = (27,6))
     axes = []
     for reg in range(4):
         ax = fig.add_subplot(1, 4, reg+1)
@@ -192,7 +192,7 @@ for area in ['EAT', 'PNA']:
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
 
-    fig = plt.figure(figsize = (24,6))
+    fig = plt.figure(figsize = (27,6))
     axes = []
     for reg in range(4):
         ax = fig.add_subplot(1, 4, reg + 1)
@@ -212,5 +212,6 @@ for area in ['EAT', 'PNA']:
         if reg == 0:
             ax.set_ylabel('Av. persistence (days)')
 
+    ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))

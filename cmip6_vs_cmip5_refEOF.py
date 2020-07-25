@@ -84,6 +84,7 @@ for area in ['EAT', 'PNA']:
 
         for mod in resdict[ke]:
             res_short[(ke, mod, area, 'var_ratio')] = resdict[ke][mod]['var_ratio']
+            # res_short[(ke, mod, area, 'var_ratio_bias')] = np.abs(resdict[ke][mod]['var_ratio']-results_ref['var_ratio'])
             res_short[(ke, mod, area, 'freqbias')] = np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus']))
             res_short[(ke, mod, area, 'patcor')] = resdict[ke][mod]['patcor']
 

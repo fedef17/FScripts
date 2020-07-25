@@ -98,6 +98,16 @@ for area in ['EAT', 'PNA']:
     # freqbias = np.array([np.mean(np.abs(results_hist_refEOF[cos][mod]['freq_clus']-results_ref['freq_clus'])) for mod in okmods[cos]])
     # cose[(area, 'freqbias')] = dict(zip(okmods[cos], freqbias))
 
+filbi = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/Results_cmip6_vs_cmip5_refEOF/histbiases.p'
+with open(filbi, 'rb') as pino:
+    res_short = pickle.load(pino)
+kesal = list(res_short.keys())
+for ke in kesal:
+    if 'cmip5_refEOF' in ke:
+        res_short[tuple(['rcp85'] + list(ke[1:]))] = res_short[ke]
+    if 'cmip6_refEOF' in ke:
+        res_short[tuple(['ssp585'] + list(ke[1:]))] = res_short[ke]
+
 # da Virna
 vicar = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/virnas_tas/new/'
 fils = ['Indices_{}.txt', 'Slopes_{}.txt']
@@ -184,10 +194,14 @@ varok = 'trend'
 X = []
 X2 = []
 Y = []
+Yall = []
 Yeat = []
 Ypna = []
 Yfirst = []
 weights = []
+weights2 = []
+#for ssp in ['ssp585']:
+#for ssp in ['rcp85']:
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
         if (ssp, mod, na, 'AA') in resvi:
@@ -195,52 +209,197 @@ for ssp in ['rcp85', 'ssp585']:
             X.append(Xmod)
             Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in varfit2])
             X2.append(Xmod)
-            Ymod = np.concatenate([varli[(ssp, mod, 'EAT', varok)][:-1], varli[(ssp, mod, 'PNA', varok)][:-1]])
+            Ymod = np.concatenate([varli[(ssp, mod, 'EAT', varok)][:-1], varli[(ssp, mod, 'PNA', varok)][np.array([0,2,3])]])
             Y.append(Ymod)
-            Yeat.append(varli[(ssp, mod, 'EAT', varok)][:-1])
-            Ypna.append(varli[(ssp, mod, 'PNA', varok)][:-1])
+            Ymod = np.concatenate([varli[(ssp, mod, 'EAT', varok)], varli[(ssp, mod, 'PNA', varok)]])
+            Yall.append(Ymod)
+            Yeat.append(varli[(ssp, mod, 'EAT', varok)][:2])
+            Ypna.append(varli[(ssp, mod, 'PNA', varok)][np.array([0, -1])])
             Yfirst.append(np.array([varli[(ssp, mod, 'EAT', varok)][0], varli[(ssp, mod, 'PNA', varok)][0]]))
 
+            wei = np.mean(res_short[(ssp, mod, 'EAT', 'patcor')])
             weights.append(wei)
 
+            wei = res_short[(ssp, mod, 'EAT', 'var_ratio')]
+            weights2.append(wei)
+
+
+from sklearn.preprocessing import StandardScaler
+
+# STANDARDIZZO LE FEATURES
 X = np.stack(X)
 X2 = np.stack(X2)
+
+standardize_features = True
+# if standardize_features:
+#     Xok = []
+#     for xli in X.T:
+#         print('pio', xli)
+#         scaler = StandardScaler().fit(xli)
+#         xliok = scaler.transform(xli)
+#         Xok.append(xliok)
+#     X = np.stack(Xok).T
+#
+#     Xok = []
+#     for xli in X2.T:
+#         print('pio', xli)
+#         scaler = StandardScaler().fit(xli)
+#         xliok = scaler.transform(xli)
+#         Xok.append(xliok)
+#     X2 = np.stack(Xok).T
+if standardize_features:
+    scaler = StandardScaler().fit(X)
+    X = scaler.transform(X)
+    print('pio', X)
+
+    scaler2 = StandardScaler().fit(X2)
+    X2 = scaler2.transform(X2)
+    print('pio', X2)
+
 Y = np.stack(Y)
+Yall = np.stack(Yall)
 Yeat = np.stack(Yeat)
 Ypna = np.stack(Ypna)
 Yfirst = np.stack(Yfirst)
+weights = np.array(weights)
+weights2 = np.array(weights2)
 
+print('6 regimes')
 model1 = LinearRegression().fit(X, Y)
 print(model1.score(X, Y))
 print(model1.coef_)
 #>>> reg.predict(np.array([[3, 5]]))
+print('8 regimes')
+model1 = LinearRegression().fit(X, Yall)
+print(model1.score(X, Yall))
+print(model1.coef_)
 
+
+
+
+print('only 2 eat')
 model1_eat = LinearRegression().fit(X, Yeat)
 print(model1_eat.score(X, Yeat))
 print(model1_eat.coef_)
 
+print('only 2 pna')
 model1_pna = LinearRegression().fit(X, Ypna)
 print(model1_pna.score(X, Ypna))
 print(model1_pna.coef_)
 
+print('only NAO+ and PT')
 model1_first = LinearRegression().fit(X, Yfirst)
 print(model1_first.score(X, Yfirst))
 print(model1_first.coef_)
 
+print('only NAO+ and PT, weighted for patcor')
+model1_first_wpatcor = LinearRegression().fit(X, Yfirst, sample_weight = weights)
+print(model1_first_wpatcor.score(X, Yfirst, sample_weight = weights))
+print(model1_first_wpatcor.coef_)
+
+print('only NAO+ and PT, weighted for var_ratio')
+model1_first_wvarrat = LinearRegression().fit(X, Yfirst, sample_weight = weights2)
+print(model1_first_wvarrat.score(X, Yfirst, sample_weight = weights2))
+print(model1_first_wvarrat.coef_)
+
 #model2
 print('MODEL 2!')
+print('6 regimes')
 model2 = LinearRegression().fit(X2, Y)
 print(model2.score(X2, Y))
 print(model2.coef_)
 
+print('8 regimes')
+model2 = LinearRegression().fit(X2, Yall)
+print(model2.score(X2, Yall))
+print(model2.coef_)
+
+print('only 2 eat')
 model2_eat = LinearRegression().fit(X2, Yeat)
 print(model2_eat.score(X2, Yeat))
 print(model2_eat.coef_)
 
+print('only 2 pna')
 model2_pna = LinearRegression().fit(X2, Ypna)
 print(model2_pna.score(X2, Ypna))
 print(model2_pna.coef_)
 
+print('only NAO+ and PT')
 model2_first = LinearRegression().fit(X2, Yfirst)
 print(model2_first.score(X2, Yfirst))
 print(model2_first.coef_)
+
+print('only NAO+ and PT, weighted for patcor')
+model2_first_wpatcor = LinearRegression().fit(X2, Yfirst, sample_weight = weights)
+print(model2_first_wpatcor.score(X2, Yfirst, sample_weight = weights))
+print(model2_first_wpatcor.coef_)
+
+print('only NAO+ and PT, weighted for var_ratio')
+model2_first_wvarrat = LinearRegression().fit(X2, Yfirst, sample_weight = weights2)
+print(model2_first_wvarrat.score(X2, Yfirst, sample_weight = weights2))
+print(model2_first_wvarrat.coef_)
+
+from matplotlib import colors
+import matplotlib.gridspec as gridspec
+
+# FIGURA
+colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
+colo = colo.split()
+colo = colo[::-1]
+cmappa = colors.ListedColormap(colo)
+cmappa.set_over('#800026') #662506
+cmappa.set_under('#023858') #542788
+
+fig = plt.figure(figsize=(12,8))
+gs = gridspec.GridSpec(7, 9)
+axes = []
+axes.append(fig.add_subplot(gs[:3, 1:5]))
+axes.append(fig.add_subplot(gs[:3, 5:]))
+axes.append(fig.add_subplot(gs[4:6, 1:5]))
+axes.append(fig.add_subplot(gs[4:6, 5:]))
+
+bau = -1
+for j, mod, varf in zip([0,1], [model1, model2], [varfit1, varfit2]):
+    if j == 0:
+        ext = [0, 4, 0, 3]
+    else:
+        ext = [0, 4, 0, 2]
+    i=1
+    bau += 1
+    ax = axes[bau]
+    area = 'EAT'
+    #ax = fig.add_subplot(2, 2, i + 2*j)
+    gigi = ax.imshow(mod.coef_[:4, :].T, vmin = -0.05, vmax = 0.05, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+    ax.xaxis.tick_top()
+    ax.set_xticks(0.5+np.arange(4), minor = False)
+    #if j == 0:
+    ax.set_xticklabels(reg_names_area[area], ha='center')
+    ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
+    ax.set_yticklabels(varf, va='center')
+    if j == 0: ax.set_title(area)
+
+    bau += 1
+    ax = axes[bau]
+    i=2
+    area = 'PNA'
+    #ax = fig.add_subplot(2, 2, i + 2*j)
+    gigi = ax.imshow(mod.coef_[4:, :].T, vmin = -0.05, vmax = 0.05, cmap = cmappa, origin = 'lower', extent = ext, aspect = 1)
+    ax.xaxis.tick_top()
+    ax.set_xticks(0.5+np.arange(4), minor = False)
+    #if j == 0:
+    ax.set_xticklabels(reg_names_area[area], ha='center')
+    ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
+    ax.set_yticklabels(varf, va='center')
+    if j == 0: ax.set_title(area)
+
+#cax = fig.add_subplot(gs[6, :])
+cax = plt.axes([0.1, 0.08, 0.8, 0.03])
+cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
+cb.ax.tick_params(labelsize=18)
+cb.set_label('Regression coefficient', fontsize=20)
+plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+
+ax.text(0.05, 0.8, 'Regr. 1', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+ax.text(0.05, 0.4, 'Regr. 2', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+
+fig.savefig(cart_out_orig + 'Regr_model.pdf')
