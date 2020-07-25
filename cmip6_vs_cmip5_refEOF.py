@@ -53,7 +53,7 @@ clatlo['PNA'] = (70., -120.)
 colormip = dict()
 colormip[('cmip5', 'EAT')] = ctl.color_set(7)[4]
 colormip[('cmip6', 'EAT')] = ctl.color_set(7)[0]
-colormip[('cmip5', 'PNA')] = ctl.color_set(7)[2]
+colormip[('cmip5', 'PNA')] = ctl.color_set(7)[3]
 colormip[('cmip6', 'PNA')] = ctl.color_set(7)[6]
 
 area = 'EAT'
