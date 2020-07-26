@@ -37,17 +37,18 @@ cart = cart_in + 'cmip6_hist/'
 cart_out = cart_in + 'Results_v2/'
 # cart = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/'
 # fil = 'out_ERA_DJF_EAT_4clus_4pcs_1957-2014.p'
-fil_EAT = 'out_cmip6_hist_NDJFM_EAT_4clus_4pcs_1964-2014_refEOF_dtr.p'
-fil_PNA = 'out_cmip6_hist_NDJFM_PNA_4clus_4pcs_1964-2014_refEOF_dtr.p'
+cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
+#file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
 
 results = dict()
-_, results['EAT'] = pickle.load(open(cart+fil_EAT, 'rb'))
-_, results['PNA'] = pickle.load(open(cart+fil_PNA, 'rb'))
+_, results['EAT'] = pickle.load(open(cart+fil_hist.format('EAT'), 'rb'))
+_, results['PNA'] = pickle.load(open(cart+fil_hist.format('PNA'), 'rb'))
 del _
 
 patnames = dict()
 patnames['EAT'] = ['NAO +', 'Scand. Blocking', 'Atlantic Ridge', 'NAO -']
-patnames['PNA'] = ['Pacific Trough', 'PNA +', 'PNA -', 'Alaskan Ridge']
+patnames['PNA'] = ['Pacific Trough', 'PNA +', 'PNA -', 'Bering Ridge']
 
 clatlo = dict()
 clatlo['EAT'] = (70, -20)
@@ -62,6 +63,9 @@ plt.rcParams['lines.dashed_pattern'] = [5, 5]
 proj = 'nearside'
 blat = 0
 
+
+patts = []
+nams = []
 for area in ['EAT', 'PNA']:
     result_obs = results[area]
     patt_ref = result_obs['cluspattern']
@@ -70,9 +74,14 @@ for area in ['EAT', 'PNA']:
     lon = result_obs['lon']
     subtits = [pat+' ({:4.1f}%)'.format(fre) for pat, fre in zip(patnames[area], freq_ref)]
 
+    nams += subtits
+    patts += patt_ref
+
     filename = cart_out + 'Allclus_OBSERVED_{}.pdf'.format(area)
     figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo[area], cmap = cmappa, title = '', subtitles = subtits, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, n_lines = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7)
 
+    filename = cart_out + 'Allclus_OBSERVED_{}_line.pdf'.format(area)
+    figs = ctl.plot_multimap_contour(patt_ref, lat, lon, filename, visualization = proj, central_lat_lon = clatlo[area], cmap = cmappa, title = '', subtitles = subtits, cb_label = 'Geopotential height anomaly (m)', color_percentiles = (0.5,99.5), number_subplots = False, bounding_lat = blat, draw_grid = True, n_color_levels = 10, n_lines = 10, draw_contour_lines = True, clevels = clevels, lw_contour = 0.7, fix_subplots_shape = (1,4), figsize = (10, 24))
 
 sys.exit()
 

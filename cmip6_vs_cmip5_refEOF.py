@@ -35,11 +35,17 @@ dtrtyp = 'histrebase'
 cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/cmip6_vs_cmip5_refEOF/'
 ctl.mkdir(cart_out_orig)
 
-file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refCLUS_dtr.p'
+ye1 = 1964
+ye2 = 2005
 
-file_hist_refEOF_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
-file_hist_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_1957-2005_refCLUS_dtr.p'
+cart_out_orig = cart_out_orig + 'ref_{}_{}/'.format(ye1, ye2)
+ctl.mkdir(cart_out_orig)
+
+file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_{}-{}_refEOF_dtr.p'
+file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_{}-{}_refCLUS_dtr.p'
+
+file_hist_refEOF_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_{}-{}_refEOF_dtr.p'
+file_hist_cmip5 = '/home/fabiano/Research/lavori/CMIP6/cmip5_hist_reb/out_cmip5_hist_reb_NDJFM_{}_4clus_4pcs_{}-{}_refCLUS_dtr.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -63,10 +69,10 @@ for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
-    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
-    results_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
-    results_hist_cmip5, _ = ctl.load_wrtool(file_hist_cmip5.format(area))
-    results_hist_refEOF_cmip5, _ = ctl.load_wrtool(file_hist_refEOF_cmip5.format(area))
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area, ye1, ye2))
+    results_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area, ye1, ye2))
+    results_hist_cmip5, _ = ctl.load_wrtool(file_hist_cmip5.format(area, ye1, ye2))
+    results_hist_refEOF_cmip5, _ = ctl.load_wrtool(file_hist_refEOF_cmip5.format(area, ye1, ye2))
 
     resdict = dict()
     resdict['cmip6'] = results_hist
