@@ -173,8 +173,11 @@ for area in ['EAT', 'PNA']:
     print('T-TEST for {}'.format(area))
     for reg in range(4):
         print('REGIME',reg)
-        a = freqs[('hist', 'all', cos)][:, reg]
         for ssp in allssps:
+            if ssp == 'rcp85_cmip5':
+                a = freqs[('hist_cmip5', 'all', cos)][:, reg]
+            else:
+                a = freqs[('hist', 'all', cos)][:, reg]
             print(ssp)
             b = freqs[(ssp, 'all', cos)][:, reg]
             ttests[('freq', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
@@ -242,8 +245,11 @@ for area in ['EAT', 'PNA']:
     print('T-TEST for {}'.format(area))
     for reg in range(4):
         print('REGIME',reg)
-        a = residtimes[('hist', 'all', cos, reg)]
         for ssp in allssps:
+            if ssp == 'rcp85_cmip5':
+                a = residtimes[('hist_cmip5', 'all', cos, reg)]
+            else:
+                a = residtimes[('hist', 'all', cos, reg)]
             print(ssp)
             b = residtimes[(ssp, 'all', cos, reg)]
             ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
