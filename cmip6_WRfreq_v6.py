@@ -238,6 +238,7 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'Trends_{}_FINAL.pdf'.format(area))
 
+    cos = 'mean'
     print('T-TEST for {}'.format(area))
     for reg in range(4):
         print('REGIME',reg)
@@ -248,7 +249,6 @@ for area in ['EAT', 'PNA']:
             ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
             print(ttests[('residtimes', area, reg, ssp)])
 
-    cos = 'mean'
     fig = plt.figure(figsize = (16,12))
     axes = []
     for reg in range(4):
