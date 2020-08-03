@@ -279,6 +279,7 @@ for area in ['EAT', 'PNA']:
         if reg == 0 or reg == 2:
             ax.set_ylabel('Av. persistence (days)')
 
+    ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
