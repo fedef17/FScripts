@@ -202,7 +202,11 @@ for area in ['EAT', 'PNA']:
         #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
         if reg == 0: ax.set_ylabel('Regime frequency')
 
-        ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        #ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, -10, color = 'black', marker = '*', s = 10)
+
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         xli = ax.get_xlim()
 
@@ -234,6 +238,15 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'Trends_{}_FINAL.pdf'.format(area))
 
+    print('T-TEST for {}'.format(area))
+    for reg in range(4):
+        print('REGIME',reg)
+        a = residtimes[('hist', 'all', cos, reg)]
+        for ssp in allssps:
+            print(ssp)
+            b = residtimes[(ssp, 'all', cos, reg)]
+            ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
+            print(ttests[('residtimes', area, reg, ssp)])
 
     cos = 'mean'
     fig = plt.figure(figsize = (16,12))
@@ -253,19 +266,13 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 10)
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
-    print('T-TEST for {}'.format(area))
-    for reg in range(4):
-        print('REGIME',reg)
-        a = residtimes[('hist', 'all', cos, reg)]
-        for ssp in allssps:
-            print(ssp)
-            b = residtimes[(ssp, 'all', cos, reg)]
-            ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
-            print(ttests[('residtimes', area, reg, ssp)])
 
     fig = plt.figure(figsize = (27,6))
     axes = []
@@ -286,6 +293,9 @@ for area in ['EAT', 'PNA']:
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         if reg == 0:
             ax.set_ylabel('Av. persistence (days)')
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 10)
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
