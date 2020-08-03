@@ -51,6 +51,8 @@ clatlo['PNA'] = (70., -120.)
 #allssps = 'ssp119 ssp126 ssp245 ssp370 ssp585'.split()
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 
+ttests = dict()
+
 area = 'EAT'
 for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
@@ -168,6 +170,69 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_allssp_{}_8box_wtrend_wcmip5.pdf'.format(area, cos))
 
+    print('T-TEST for {}'.format(area))
+    for reg in range(4):
+        a = freqs[(ssp, 'all', 'hist')][:, reg]
+        for ssp in allssps:
+            b = freqs[(ssp, 'all', cos)][:, reg]
+            ttests[('freq', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
+            print(ttests[('freq', area, reg, ssp)])
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        histmean = np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, 'all', cos)][:, reg], nu) - histmean for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+
+        positions = list(np.arange(len(allsims)-1)*0.7)
+        positions.append(positions[-1]+0.3+0.7)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+        if reg == 0: ax.set_ylabel('Regime frequency')
+
+        ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        xli = ax.get_xlim()
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL.pdf'.format(area, cos))
+
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 4, 4 + reg + 1)
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)], nu) for ssp in allssps]
+
+        ctl.boxplot_on_ax(ax, allpercs, allssps, colssp, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions[1:])
+
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        if reg == 0: ax.set_ylabel('Trend in regime frequency (1/yr)')
+        axes.append(ax)
+        ax.set_xlim(xli)
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'Trends_{}_FINAL.pdf'.format(area))
+
 
     cos = 'mean'
     fig = plt.figure(figsize = (16,12))
@@ -191,6 +256,13 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
+    print('T-TEST for {}'.format(area))
+    for reg in range(4):
+        a = residtimes[(ssp, 'all', 'hist')][:, reg]
+        for ssp in allssps:
+            b = residtimes[(ssp, 'all', cos)][:, reg]
+            ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
+            print(ttests[('residtimes', area, reg, ssp)])
 
     fig = plt.figure(figsize = (27,6))
     axes = []
@@ -215,3 +287,6 @@ for area in ['EAT', 'PNA']:
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
+
+with open(cart_out + 'ttests.p', 'wb') as fillo:
+    pickle.dump(ttests, fillo)

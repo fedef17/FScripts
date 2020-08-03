@@ -176,98 +176,189 @@ from sklearn.preprocessing import StandardScaler
 na = 'slope'
 varok = 'trend'
 
-varall = ['GW', 'RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+import itertools as itt
 
 # best 3 drivers for EAT
-import itertools as itt
-pio3 = list(itt.combinations(varall, 3))
+varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
+#varall = ['GW', 'PVS', 'RUTAW', 'NAWrGW', 'PST']
 pio2 = list(itt.combinations(varall, 2))
+pio4 = list(itt.combinations(varall, 4))
+pio3 = list(itt.combinations(varall, 3))
 
 print('\n\n\n With GW \n')
 # partiamo con model1
 print('BEST 3 DRIVERS!')
 allscores = dict()
-for num, pio in zip([2,3], [pio2, pio3]):
-    for area in ['EAT', 'PNA']:
-        allscores[(num, area)] = []
-        for pi in pio:
-            X = []
-            Y = []
-            for ssp in ['rcp85', 'ssp585']:
-                for mod in okmods[ssp]:
-                    if (ssp, mod, na, 'AA') in resvi:
-                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
-                        X.append(Xmod)
-
-                        Y.append(varli[(ssp, mod, area, varok)])
-
-            Y = np.stack(Y)
-            # STANDARDIZZO LE FEATURES
-            X = np.stack(X)
-            scaler = StandardScaler().fit(X)
-            X = scaler.transform(X)
-
-            model = LinearRegression().fit(X, Y)
-            allscores[(num, area)].append(model.score(X, Y))
-            print(pi, model.score(X, Y))
-
-        argma = np.argmax(allscores[(num, area)])
-        print(num, area, list(pio)[argma], allscores[(num, area)][argma], '\n')
-
-
-# RESCALING THE FREQ TRENDS TO GW
-varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-pio2 = list(itt.combinations(varall, 2))
-varall = ['PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-pio3 = list(itt.combinations(varall, 3))
-
-# partiamo con model1
-print('\n\n\n Without GW!\n')
-allscores = dict()
-for num, pio in zip([2,3], [pio2, pio3]):
-    for area in ['EAT', 'PNA']:
-        allscores[(num, area)] = []
-        for pi in pio:
-            X = []
-            Y = []
-            for ssp in ['rcp85', 'ssp585']:
-                for mod in okmods[ssp]:
-                    if (ssp, mod, na, 'AA') in resvi:
-                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
-                        X.append(Xmod)
-
-                        Y.append(varli[(ssp, mod, area, varok)])
-
-            Y = np.stack(Y)
-            # STANDARDIZZO LE FEATURES
-            X = np.stack(X)
-            scaler = StandardScaler().fit(X)
-            X = scaler.transform(X)
-
-            model = LinearRegression().fit(X, Y)
-            allscores[(num, area)].append(model.score(X, Y))
-            print(pi, model.score(X, Y))
-
-        argma = np.argmax(allscores[(num, area)])
-        print(num, area, list(pio)[argma], allscores[(num, area)][argma], '\n')
-
-
-# RESCALING THE FREQ TRENDS TO GW
-varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-pio2 = list(itt.combinations(varall, 2))
-varall = ['PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-pio3 = list(itt.combinations(varall, 3))
-
-# partiamo con model1
-print('\n\n\n SCALING FREQ trends for GW!\n')
-allscores = dict()
 bestxs = dict()
 bestys = dict()
 bestset = dict()
-for num, pio in zip([2,3], [pio2, pio3]):
+tip = 'conGW'
+for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
     for area in ['EAT', 'PNA']:
-        allscores[(num, area)] = []
+        allscores[(tip, num, area)] = []
         for pi in pio:
+            # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
+            X = []
+            Y = []
+            for ssp in ['rcp85', 'ssp585']:
+                for mod in okmods[ssp]:
+                    if (ssp, mod, na, 'AA') in resvi:
+                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
+                        X.append(Xmod)
+
+                        Y.append(varli[(ssp, mod, area, varok)])
+
+            Y = np.stack(Y)
+            # STANDARDIZZO LE FEATURES
+            X = np.stack(X)
+            scaler = StandardScaler().fit(X)
+            X = scaler.transform(X)
+
+            model = LinearRegression().fit(X, Y)
+            allscores[(tip, num, area)].append(model.score(X, Y))
+            print(pi, model.score(X, Y))
+
+        argma = np.argmax(allscores[(tip, num, area)])
+        bestset[(tip, num, area)] = list(pio)[argma]
+
+        X = []
+        for ssp in ['rcp85', 'ssp585']:
+            for mod in okmods[ssp]:
+                if (ssp, mod, na, 'AA') in resvi:
+                    Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in bestset[(tip, num, area)]])
+                    X.append(Xmod)
+        X = np.stack(X)
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        bestxs[(tip, num, area)] = X
+        bestys[(tip, num, area)] = Y
+        print(tip, num, area, list(pio)[argma], allscores[(tip, num, area)][argma], '\n')
+        print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
+
+
+print('\n\n\n With NO GW scaling of drivers \n')
+# best 3 drivers for EAT
+varall = ['PVS', 'UTW', 'AArGW', 'NAWrGW', 'PST']
+pio2 = list(itt.combinations(varall, 2))
+pio4 = list(itt.combinations(varall, 4))
+pio3 = list(itt.combinations(varall, 3))
+
+# partiamo con model1
+print('BEST 3 DRIVERS!')
+tip = 'unscal'
+for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
+    for area in ['EAT', 'PNA']:
+        allscores[(tip, num, area)] = []
+        for pi in pio:
+            # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
+            X = []
+            Y = []
+            for ssp in ['rcp85', 'ssp585']:
+                for mod in okmods[ssp]:
+                    if (ssp, mod, na, 'AA') in resvi:
+                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
+                        X.append(Xmod)
+
+                        Y.append(varli[(ssp, mod, area, varok)])
+
+            Y = np.stack(Y)
+            # STANDARDIZZO LE FEATURES
+            X = np.stack(X)
+            scaler = StandardScaler().fit(X)
+            X = scaler.transform(X)
+
+            model = LinearRegression().fit(X, Y)
+            allscores[(tip, num, area)].append(model.score(X, Y))
+            print(pi, model.score(X, Y))
+
+        argma = np.argmax(allscores[(tip, num, area)])
+        bestset[(tip, num, area)] = list(pio)[argma]
+
+        X = []
+        for ssp in ['rcp85', 'ssp585']:
+            for mod in okmods[ssp]:
+                if (ssp, mod, na, 'AA') in resvi:
+                    Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in bestset[(tip, num, area)]])
+                    X.append(Xmod)
+        X = np.stack(X)
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        bestxs[(tip, num, area)] = X
+        bestys[(tip, num, area)] = Y
+        print(tip, num, area, list(pio)[argma], allscores[(tip, num, area)][argma], '\n')
+        print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
+
+
+# RESCALING THE FREQ TRENDS TO GW
+varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+pio2 = list(itt.combinations(varall, 2))
+varall = ['PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+pio3 = list(itt.combinations(varall, 3))
+pio4 = list(itt.combinations(varall, 4))
+
+tip = 'senzaGW'
+# partiamo con model1
+print('\n\n\n Without GW!\n')
+for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
+    for area in ['EAT', 'PNA']:
+        allscores[(tip, num, area)] = []
+        for pi in pio:
+            # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
+            X = []
+            Y = []
+            for ssp in ['rcp85', 'ssp585']:
+                for mod in okmods[ssp]:
+                    if (ssp, mod, na, 'AA') in resvi:
+                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
+                        X.append(Xmod)
+
+                        Y.append(varli[(ssp, mod, area, varok)])
+
+            Y = np.stack(Y)
+            # STANDARDIZZO LE FEATURES
+            X = np.stack(X)
+            scaler = StandardScaler().fit(X)
+            X = scaler.transform(X)
+
+            model = LinearRegression().fit(X, Y)
+            allscores[(tip, num, area)].append(model.score(X, Y))
+            print(pi, model.score(X, Y))
+
+        argma = np.argmax(allscores[(tip, num, area)])
+        bestset[(tip, num, area)] = list(pio)[argma]
+        X = []
+        for ssp in ['rcp85', 'ssp585']:
+            for mod in okmods[ssp]:
+                if (ssp, mod, na, 'AA') in resvi:
+                    Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in bestset[(tip, num, area)]])
+                    X.append(Xmod)
+        X = np.stack(X)
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        bestxs[(tip, num, area)] = X
+        bestys[(tip, num, area)] = Y
+        print(tip, num, area, list(pio)[argma], allscores[(tip, num, area)][argma], '\n')
+        print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
+
+
+# RESCALING THE FREQ TRENDS TO GW
+varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+varall = ['PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+pio2 = list(itt.combinations(varall, 2))
+pio3 = list(itt.combinations(varall, 3))
+pio4 = list(itt.combinations(varall, 4))
+
+tip = 'GWscaling'
+# partiamo con model1
+print('\n\n\n SCALING FREQ trends for GW!\n')
+for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
+    for area in ['EAT', 'PNA']:
+        allscores[(tip, num, area)] = []
+        for pi in pio:
+            # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
             X = []
             Y = []
             for ssp in ['rcp85', 'ssp585']:
@@ -285,14 +376,25 @@ for num, pio in zip([2,3], [pio2, pio3]):
             X = scaler.transform(X)
 
             model = LinearRegression().fit(X, Y)
-            allscores[(num, area)].append(model.score(X, Y))
+            allscores[(tip, num, area)].append(model.score(X, Y))
             print(pi, model.score(X, Y))
 
-        argma = np.argmax(allscores[(num, area)])
-        bestxs[(num, area)] = X
-        bestys[(num, area)] = Y
-        bestset[(num, area)] = list(pio)[argma]
-        print(num, area, list(pio)[argma], allscores[(num, area)][argma], '\n')
+        argma = np.argmax(allscores[(tip, num, area)])
+        bestset[(tip, num, area)] = list(pio)[argma]
+        X = []
+        for ssp in ['rcp85', 'ssp585']:
+            for mod in okmods[ssp]:
+                if (ssp, mod, na, 'AA') in resvi:
+                    Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in bestset[(tip, num, area)]])
+                    X.append(Xmod)
+        X = np.stack(X)
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        bestxs[(tip, num, area)] = X
+        bestys[(tip, num, area)] = Y
+        print(tip, num, area, list(pio)[argma], allscores[(tip, num, area)][argma], '\n')
+        print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
 
 
 import statsmodels.api as sm
@@ -302,31 +404,32 @@ from scipy import stats
 # 3 EAT ('UTWrGW', 'AArGW', 'PSTrGW') 0.3278009127949955
 # 3 PNA ('PVSrGW', 'AArGW', 'NAWrGW') 0.26665645026370693
 resall = dict()
-for num, pio in zip([2,3], [pio2, pio3]):
-    for area in ['EAT', 'PNA']:
-        xii = bestxs[(num, area)]
-        varfii = bestset[(num, area)]
-        y = bestys[(num, area)]
+for tip in ['conGW', 'unscal', 'senzaGW', 'GWscaling']:
+    for num in [2,3,4]:
+        for area in ['EAT', 'PNA']:
+            xii = bestxs[(tip, num, area)]
+            varfii = bestset[(tip, num, area)]
+            y = bestys[(tip, num, area)]
 
-        Xgi = sm.add_constant(xii)
-        pvals = []
-        params = []
-        rsq = []
-        for ko, nam in zip(y.T, reg_names_area[area]):
-            print('\n')
-            print(nam)
-            est = sm.OLS(ko, Xgi)
-            est2 = est.fit()
-            pvals.append(est2.pvalues)
-            params.append(est2.params)
-            rsq.append(est2.rsquared)
+            Xgi = sm.add_constant(xii)
+            pvals = []
+            params = []
+            rsq = []
+            for ko, nam in zip(y.T, reg_names_area[area]):
+                print('\n')
+                print(nam)
+                est = sm.OLS(ko, Xgi)
+                est2 = est.fit()
+                pvals.append(est2.pvalues)
+                params.append(est2.params)
+                rsq.append(est2.rsquared)
 
-        pvals = np.stack(pvals)
-        params = np.stack(params)
-        rsq = np.stack(rsq)
-        resall[(num, area, 'pvals')] = pvals[:, 1:]
-        resall[(num, area, 'params')] = params[:, 1:]
-        resall[(num, area, 'rsq')] = rsq
+            pvals = np.stack(pvals)
+            params = np.stack(params)
+            rsq = np.stack(rsq)
+            resall[(tip, num, area, 'pvals')] = pvals[:, 1:]
+            resall[(tip, num, area, 'params')] = params[:, 1:]
+            resall[(tip, num, area, 'rsq')] = rsq
 
 
 #############################################################################
@@ -341,28 +444,74 @@ cmappa = colors.ListedColormap(colo)
 cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
 
+for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05), (-0.05, 0.05), (-0.05, 0.05), (-1.2, 1.2)]):
+    fig = plt.figure(figsize=(12,8))
+    gs = gridspec.GridSpec(7, 9)
+    axes = []
+    axes.append(fig.add_subplot(gs[:3, 1:5]))
+    axes.append(fig.add_subplot(gs[:3, 5:]))
+    axes.append(fig.add_subplot(gs[4:6, 1:5]))
+    axes.append(fig.add_subplot(gs[4:6, 5:]))
 
-fig = plt.figure(figsize=(12,8))
-gs = gridspec.GridSpec(7, 9)
-axes = []
-axes.append(fig.add_subplot(gs[:3, 1:5]))
-axes.append(fig.add_subplot(gs[:3, 5:]))
-axes.append(fig.add_subplot(gs[4:6, 1:5]))
-axes.append(fig.add_subplot(gs[4:6, 5:]))
+    bau = -1
+    for num in [3,2]:
+        for area in ['EAT', 'PNA']:
+            varf = bestset[(tip, num, area)]
+            varf = [va if 'rGW' not in va else va[:-3] for va in varf]
+            nvars = len(varf)
+            ext = [0, 4, 0, nvars]
 
-bau = -1
-for num, pio in zip([3,2], [pio2, pio3]):
+            bau += 1
+            ax = axes[bau]
+            gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = vlim[0], vmax = vlim[1], cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+
+            pvaok = resall[(tip, num, area, 'pvals')].T
+            for ix in range(4):
+                for iy in range(nvars):
+                    if pvaok[iy, ix] < 0.05:
+                        ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
+                    elif pvaok[iy, ix] < 0.1:
+                        ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
+
+            ax.xaxis.tick_top()
+            ax.set_xticks(0.5+np.arange(4), minor = False)
+            ax.set_xticklabels(reg_names_area[area], ha='center')
+            ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
+            ax.set_yticklabels(varf, va='center')
+            if num == 3: ax.set_title(area)
+
+    #cax = fig.add_subplot(gs[6, :])
+    cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+    cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
+    cb.ax.tick_params(labelsize=18)
+    cb.set_label(r'Regression coefficient ($yr^{-1}$)', fontsize=20)
+    plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+
+    ax.text(0.05, 0.75, '3 drivers', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+    ax.text(0.05, 0.35, '2 drivers', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+
+    fig.savefig(cart_out_orig + 'Regr_model_optimal_{}.pdf'.format(tip))
+
+# 4 drivers
+    fig = plt.figure(figsize=(16,8))
+    gs = gridspec.GridSpec(5, 2)
+    axes = []
+    axes.append(fig.add_subplot(gs[:4, 0]))
+    axes.append(fig.add_subplot(gs[:4, 1]))
+
+    bau = -1
+    num = 4
     for area in ['EAT', 'PNA']:
-        varf = bestset[(num, area)]
+        varf = bestset[(tip, num, area)]
         varf = [va if 'rGW' not in va else va[:-3] for va in varf]
         nvars = len(varf)
         ext = [0, 4, 0, nvars]
 
         bau += 1
         ax = axes[bau]
-        gigi = ax.imshow(resall[(num, area, 'params')].T, vmin = -1.2, vmax = 1.2, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+        gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = vlim[0], vmax = vlim[1], cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
-        pvaok = resall[(num, area, 'pvals')].T
+        pvaok = resall[(tip, num, area, 'pvals')].T
         for ix in range(4):
             for iy in range(nvars):
                 if pvaok[iy, ix] < 0.05:
@@ -375,29 +524,43 @@ for num, pio in zip([3,2], [pio2, pio3]):
         ax.set_xticklabels(reg_names_area[area], ha='center')
         ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
         ax.set_yticklabels(varf, va='center')
-        if num == 3: ax.set_title(area)
+        ax.set_title(area)
 
-#cax = fig.add_subplot(gs[6, :])
-cax = plt.axes([0.1, 0.08, 0.8, 0.03])
-cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
-cb.ax.tick_params(labelsize=18)
-cb.set_label('Regression coefficient', fontsize=20)
-plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+    #cax = fig.add_subplot(gs[6, :])
+    cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+    cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
+    cb.ax.tick_params(labelsize=18)
+    cb.set_label(r'Regression coefficient ($yr^{-1}$)', fontsize=20)
+    plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
 
-ax.text(0.05, 0.8, '3 drivers', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
-ax.text(0.05, 0.4, '2 drivers', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+    fig.savefig(cart_out_orig + 'Regr_model_optimal_{}_4drivers.pdf'.format(tip))
 
-fig.savefig(cart_out_orig + 'Regr_model_optimal.pdf')
+    fig = plt.figure(figsize=(12,8))
+    ax = fig.add_subplot(111)
+    for num, col in zip([2,3,4], ['indianred', 'steelblue', 'forestgreen']):
+        vals = np.concatenate([resall[(tip, num, 'EAT', 'rsq')], resall[(tip, num, 'PNA', 'rsq')]])
+        ax.plot(np.arange(8), vals, label = '{} drivers'.format(num), color = col)
+        ax.scatter(np.arange(8), vals, color = col)
 
-fig = plt.figure(figsize=(12,8))
-ax = fig.add_subplot(111)
-for num, col in zip([2,3], ['indianred', 'steelblue']):
-    vals = np.concatenate([resall[(num, 'EAT', 'rsq')], resall[(num, 'PNA', 'rsq')]])
-    ax.plot(np.arange(8), vals, label = '{} drivers'.format(num), color = col)
-    ax.scatter(np.arange(8), vals, color = col)
+        ax.set_xticks(np.arange(8), minor = False)
+        ax.set_xticklabels(reg_names_area['EAT']+reg_names_area['PNA'], ha='center')
+        ax.legend()
+        ax.set_ylabel('R squared')
+    fig.savefig(cart_out_orig + 'Rsquared_optimal_{}.pdf'.format(tip))
 
-    ax.set_xticks(np.arange(8), minor = False)
-    ax.set_xticklabels(reg_names_area['EAT']+reg_names_area['PNA'], ha='center')
-    ax.legend()
-    ax.set_ylabel('R squared')
-fig.savefig(cart_out_orig + 'Rsquared_optimal.pdf'.format(pio))
+
+
+X = []
+for ssp in ['rcp85', 'ssp585']:
+    for mod in okmods[ssp]:
+        if (ssp, mod, na, 'AA') in resvi:
+            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in vkeys])
+            X.append(Xmod)
+X = np.stack(X)
+np.set_printoptions(precision=3)
+print(vkeys)
+print(np.std(X, axis = 0))
+
+scaler = StandardScaler().fit(X)
+X = scaler.transform(X)
+print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
