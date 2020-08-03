@@ -200,7 +200,7 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
         #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
-        if reg == 0: ax.set_ylabel('Regime frequency')
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
 
         #ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
         for pos, ssp in zip(positions[1:], allsims[1:]):
@@ -228,7 +228,7 @@ for area in ['EAT', 'PNA']:
 
         ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
-        if reg == 0: ax.set_ylabel('Trend in regime frequency (1/yr)')
+        if reg == 0 or reg == 2: ax.set_ylabel('Trend in regime frequency (1/yr)')
         axes.append(ax)
         ax.set_xlim(xli)
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
@@ -270,6 +270,9 @@ for area in ['EAT', 'PNA']:
             if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
                 ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
 
+        if reg == 0 or reg == 2:
+            ax.set_ylabel('Av. persistence (days)')
+
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
@@ -291,7 +294,7 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
-        if reg == 0:
+        if reg == 0 or reg == 2:
             ax.set_ylabel('Av. persistence (days)')
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:

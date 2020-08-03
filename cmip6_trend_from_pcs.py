@@ -19,12 +19,12 @@ from datetime import datetime
 from scipy import stats
 import pandas as pd
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
 titlefont = 24
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['axes.titlesize'] = 28
+plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
 if os.uname()[1] == 'hobbes':
