@@ -172,8 +172,10 @@ for area in ['EAT', 'PNA']:
 
     print('T-TEST for {}'.format(area))
     for reg in range(4):
+        print('REGIME',reg)
         a = freqs[('hist', 'all', cos)][:, reg]
         for ssp in allssps:
+            print(ssp)
             b = freqs[(ssp, 'all', cos)][:, reg]
             ttests[('freq', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
             print(ttests[('freq', area, reg, ssp)])
@@ -257,9 +259,11 @@ for area in ['EAT', 'PNA']:
 
     print('T-TEST for {}'.format(area))
     for reg in range(4):
-        a = residtimes[('hist', 'all', cos)][:, reg]
+        print('REGIME',reg)
+        a = residtimes[('hist', 'all', cos, reg)]
         for ssp in allssps:
-            b = residtimes[(ssp, 'all', cos)][:, reg]
+            print(ssp)
+            b = residtimes[(ssp, 'all', cos, reg)]
             ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
             print(ttests[('residtimes', area, reg, ssp)])
 
