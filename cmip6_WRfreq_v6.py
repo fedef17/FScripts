@@ -212,9 +212,8 @@ for area in ['EAT', 'PNA']:
 
     figall = plt.figure(figsize = (16,12))
     axes = []
-    cos = 'tot50'
     for reg in range(4):
-        ax = figall.add_subplot(2, 4, 4 + reg + 1)
+        ax = figall.add_subplot(2, 2, reg + 1)
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)], nu) for ssp in allssps]
