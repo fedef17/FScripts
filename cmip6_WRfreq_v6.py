@@ -205,7 +205,7 @@ for area in ['EAT', 'PNA']:
         #ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, -10, color = 'black', marker = '*', s = 10)
+                ax.scatter(pos, -10, color = 'black', marker = '*', s = 30)
 
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         xli = ax.get_xlim()
@@ -268,7 +268,7 @@ for area in ['EAT', 'PNA']:
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 10)
+                ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
 
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
@@ -295,7 +295,7 @@ for area in ['EAT', 'PNA']:
             ax.set_ylabel('Av. persistence (days)')
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 10)
+                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 30)
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
