@@ -75,11 +75,12 @@ for area in ['EAT', 'PNA']:
 
     allssps = ['ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
-    #allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'hist_cmip5', 'rcp85_cmip5']
-    allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5']
+    allsims_wcmip5 = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'hist_cmip5', 'rcp85_cmip5']
+    allsimcol = ['hist', 'ssp126', 'ssp245', 'hist_cmip5', 'ssp370', 'ssp585', 'rcp85_cmip5']
     coldic = dict(zip(allsimcol, ctl.color_set(7)))
     colsim = [coldic[ssp] for ssp in allsims]
     colssp = [coldic[ssp] for ssp in allssps]
+    colsim_wcmip5 = [coldic[ssp] for ssp in allsims_wcmip5]
 
     yr = np.arange(1965, 2100)
 
@@ -217,6 +218,38 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL.pdf'.format(area, cos))
+
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        histmean = np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, 'all', cos)][:, reg], nu) - histmean for ssp in allsims_wcmip5]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+
+        positions = list(np.arange(len(allsims)-1)*0.7)
+        positions.append(positions[-1]+0.3+0.7)
+        positions.append(positions[-1]+0.7)
+        ctl.boxplot_on_ax(ax, allpercs, allsims_wcmip5, colsim_wcmip5, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
+
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        xli = ax.get_xlim()
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL_whistcmip5.pdf'.format(area, cos))
 
 
     figall = plt.figure(figsize = (16,12))
