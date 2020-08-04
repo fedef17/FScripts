@@ -549,12 +549,29 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
     fig.savefig(cart_out_orig + 'Rsquared_optimal_{}.pdf'.format(tip))
 
 
-
+varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
         if (ssp, mod, na, 'AA') in resvi:
-            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in vkeys])
+            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in varall])
+            X.append(Xmod)
+X = np.stack(X)
+np.set_printoptions(precision=3)
+print(vkeys)
+print(np.std(X, axis = 0))
+
+scaler = StandardScaler().fit(X)
+X = scaler.transform(X)
+print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
+
+
+varall = ['GW', 'PVS', 'UTW', 'AA', 'NAW', 'PST']
+X = []
+for ssp in ['rcp85', 'ssp585']:
+    for mod in okmods[ssp]:
+        if (ssp, mod, na, 'AA') in resvi:
+            Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in varall])
             X.append(Xmod)
 X = np.stack(X)
 np.set_printoptions(precision=3)
