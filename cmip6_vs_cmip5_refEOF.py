@@ -145,6 +145,7 @@ ctl.mkdir(cart_out)
 
 for tip in ['', '_refEOF']:
     fig = plt.figure(figsize = (24,12))
+    axes = []
     for i, area in enumerate(['EAT', 'PNA']):
         ax = plt.subplot(1, 2, i+1)
         for cos in ['cmip5', 'cmip6']:
@@ -163,6 +164,7 @@ for tip in ['', '_refEOF']:
         ax.set_xlabel('Variance ratio')
         ax.set_ylabel('Frequency bias')
         ax.set_title(area)
+    ctl.adjust_ax_scale(axes)
     fig.savefig(cart_out + 'var_fr_plot_{}.pdf'.format(tip))
 
 
