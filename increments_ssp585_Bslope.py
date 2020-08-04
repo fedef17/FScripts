@@ -36,10 +36,10 @@ ENSEMBLES=['r1i1p1f1', 'r1i1p1f1', 'r1i1p1f1', 'r1i1p1f2', 'r1i1p1f2', 'r1i1p1f2
 
 for mod, ens in zip(MODELS, ENSEMBLES):
     print(mod, ens)
-    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,60,90 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_LTmean_r1.nc {}AA_{}.nc'.format(INDIR_AA, mod, ens, tmpDIR, mod)
-    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,-30,30 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_UTmean_r1.nc {}TA_{}.nc'.format(INDIR_TA, mod, ens, tmpDIR, mod)
-    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,70,90 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_Smean_r1.nc {}PVt_{}.nc'.format(INDIR_PVt, mod, ens, tmpDIR, mod)
-    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,70,90  -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_Smean_r1.nc {}PVu_{}.nc'.format(INDIR_PVu, mod, ens, tmpDIR, mod)
+    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,60,90 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_LTmean_r1.nc {}AA_{}.nc'.format(INDIR_AA, mod, ens, tmpDIR, mod))
+    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,-30,30 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_UTmean_r1.nc {}TA_{}.nc'.format(INDIR_TA, mod, ens, tmpDIR, mod))
+    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,70,90 -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_Smean_r1.nc {}PVt_{}.nc'.format(INDIR_PVt, mod, ens, tmpDIR, mod))
+    os.system('cdo -s -selyear,2015/2100 -fldmean -sellonlatbox,-180,180,70,90  -yearmean -selmonth,11,12,1,2,3 {}/ta_{}_{}_ssp585_2015-2100_Smean_r1.nc {}PVu_{}.nc'.format(INDIR_PVu, mod, ens, tmpDIR, mod))
 
 Nens=len(MODELS)
 Yrs='2015/2100'
