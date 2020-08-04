@@ -243,7 +243,7 @@ for area in ['EAT', 'PNA']:
         #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
         if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
 
-        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        ax.axvline(np.mean([positions[-3], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         xli = ax.get_xlim()
 
     ctl.adjust_ax_scale(axes)
