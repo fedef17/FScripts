@@ -148,7 +148,6 @@ for tip in ['', '_refEOF']:
     axes = []
     for i, area in enumerate(['EAT', 'PNA']):
         ax = plt.subplot(1, 2, i+1)
-        axes.append(ax)
         for cos in ['cmip5', 'cmip6']:
             var_ratio = plocos[('var_ratio', cos+tip, area)]
             freqbias = plocos[('freqbias', cos+tip, area)]
@@ -165,6 +164,7 @@ for tip in ['', '_refEOF']:
         ax.set_xlabel('Variance ratio')
         ax.set_ylabel('Frequency bias')
         ax.set_title(area)
+        axes.append(ax)
     ctl.adjust_ax_scale(axes)
     fig.savefig(cart_out + 'var_fr_plot_{}.pdf'.format(tip))
 
