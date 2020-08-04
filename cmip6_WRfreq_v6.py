@@ -242,6 +242,11 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names[reg])
         #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
         if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
+        okpos = [pos for pos, ssp in zip(positions, allsims_wcmip5) if 'hist' not in ssp]
+        okssps = [ssp for ssp in allsims_wcmip5 if 'hist' not in ssp]
+        for pos, ssp in zip(okpos, okssps):
+            if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, -10, color = 'black', marker = '*', s = 30)
 
         ax.axvline(np.mean([positions[-3], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         xli = ax.get_xlim()
