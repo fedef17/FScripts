@@ -248,7 +248,7 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    ctl.custom_legend(figall, colsim_wcmip5, allsims_wcmip5, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL_whistcmip5.pdf'.format(area, cos))
 
 
