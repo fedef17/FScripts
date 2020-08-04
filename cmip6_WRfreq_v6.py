@@ -305,7 +305,7 @@ for area in ['EAT', 'PNA']:
             ax.set_ylabel('Av. persistence (days)')
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, 3.8, color = 'black', marker = '*', s = 30)
+                ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
