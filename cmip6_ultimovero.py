@@ -110,7 +110,7 @@ for ke in kesal:
 
 # da Virna
 vicar = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/virnas_tas/new/'
-fils = ['Indices_{}.txt', 'Slopes_{}.txt', 'Slopes_{}_temp.txt']
+fils = ['Indices_{}.txt', 'Slopes_{}_ndjfm.txt', 'Slopes_{}_temp.txt']
 nams = ['temp', 'slope', 'slope']
 tip = [0,0,1]
 
@@ -346,7 +346,7 @@ for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
 
 # RESCALING THE FREQ TRENDS TO GW
 varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-varall = ['PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+varall = ['UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
 pio2 = list(itt.combinations(varall, 2))
 pio3 = list(itt.combinations(varall, 3))
 pio4 = list(itt.combinations(varall, 4))
@@ -445,6 +445,12 @@ cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
 
 for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05), (-0.05, 0.05), (-0.05, 0.05), (-1.2, 1.2)]):
+
+    piolo = np.concatenate([np.concatenate([resall[(tip, num, area, 'params')].flatten() for area in ['EAT', 'PNA']]) for num in [2,3]])
+    vmin = np.min(piolo)
+    vmax = np.max(piolo)
+    vmi = np.round(np.max(np.abs([vmin, vmax])), decimals=2)
+
     fig = plt.figure(figsize=(12,8))
     gs = gridspec.GridSpec(7, 9)
     axes = []
@@ -463,14 +469,14 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
 
             bau += 1
             ax = axes[bau]
-            gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = vlim[0], vmax = vlim[1], cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+            gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
             pvaok = resall[(tip, num, area, 'pvals')].T
             for ix in range(4):
                 for iy in range(nvars):
-                    if pvaok[iy, ix] < 0.05:
+                    if pvaok[iy, ix] < 0.01:
                         ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
-                    elif pvaok[iy, ix] < 0.1:
+                    elif pvaok[iy, ix] < 0.05:
                         ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
 
             ax.xaxis.tick_top()
@@ -484,7 +490,7 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
     cax = plt.axes([0.1, 0.1, 0.8, 0.05])
     cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
     cb.ax.tick_params(labelsize=18)
-    cb.set_label(r'Regression coefficient ($yr^{-1}$)', fontsize=20)
+    cb.set_label(r'Regression coefficient ($K^{-1}$)', fontsize=20)
     plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
 
     ax.text(0.05, 0.75, '3 drivers', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
@@ -509,14 +515,14 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
 
         bau += 1
         ax = axes[bau]
-        gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = vlim[0], vmax = vlim[1], cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+        gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
         pvaok = resall[(tip, num, area, 'pvals')].T
         for ix in range(4):
             for iy in range(nvars):
-                if pvaok[iy, ix] < 0.05:
+                if pvaok[iy, ix] < 0.01:
                     ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
-                elif pvaok[iy, ix] < 0.1:
+                elif pvaok[iy, ix] < 0.05:
                     ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
 
         ax.xaxis.tick_top()
@@ -538,6 +544,9 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
     fig = plt.figure(figsize=(12,8))
     ax = fig.add_subplot(111)
     for num, col in zip([2,3,4], ['indianred', 'steelblue', 'forestgreen']):
+        print(tip, num)
+        print(np.mean(resall[(tip, num, 'EAT', 'rsq')]))
+        print(np.mean(resall[(tip, num, 'PNA', 'rsq')]))
         vals = np.concatenate([resall[(tip, num, 'EAT', 'rsq')], resall[(tip, num, 'PNA', 'rsq')]])
         ax.plot(np.arange(8), vals, label = '{} drivers'.format(num), color = col)
         ax.scatter(np.arange(8), vals, color = col)
@@ -549,7 +558,8 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
     fig.savefig(cart_out_orig + 'Rsquared_optimal_{}.pdf'.format(tip))
 
 
-varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
+#varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
+varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'NAWrGW']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
@@ -558,7 +568,7 @@ for ssp in ['rcp85', 'ssp585']:
             X.append(Xmod)
 X = np.stack(X)
 np.set_printoptions(precision=3)
-print(vkeys)
+print(varall)
 print(np.std(X, axis = 0))
 
 scaler = StandardScaler().fit(X)
@@ -566,7 +576,8 @@ X = scaler.transform(X)
 print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
 
 
-varall = ['GW', 'PVS', 'UTW', 'AA', 'NAW', 'PST']
+#varall = ['GW', 'PVS', 'UTW', 'AA', 'NAW', 'PST']
+varall = ['GW', 'UTW', 'AA', 'NAW', 'PST']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
@@ -575,7 +586,7 @@ for ssp in ['rcp85', 'ssp585']:
             X.append(Xmod)
 X = np.stack(X)
 np.set_printoptions(precision=3)
-print(vkeys)
+print(varall)
 print(np.std(X, axis = 0))
 
 scaler = StandardScaler().fit(X)

@@ -60,6 +60,171 @@ patnames = ['NAO+', 'SBL', 'AR', 'NAO-']
 figs = []
 
 fig = plt.figure(figsize = (16,12))
+#ax = fig.add_subplot(111)
+
+allye = results['ERA']['freq_clus_seasonal_years']
+obsfr = results['ERA']['freq_clus_seasonal'].T
+
+axes = []
+for reg in range(4):
+    ax = fig.add_subplot(2, 2, reg+1)
+
+    modskill = []
+    modskill_p50 = []
+    obserie = np.array([ob[reg] for ob in obsfr])
+    for mod in exps:
+        modserie = []
+        modserie_p50 = []
+        for ye in allye:
+            cose = [results[mod]['freq_clus_seasonal']['{:02d}_{}1101'.format(nu, ye)][reg] for nu in range(25)]
+            modserie.append(np.mean(cose))
+            modserie_p50.append(np.median(cose))
+
+        modskill.append(ctl.Rcorr(obserie, modserie))
+        modskill_p50.append(ctl.Rcorr(obserie, modserie_p50))
+
+    xs = np.arange(len(modskill))
+    ax.scatter(xs, modskill, c = colors, s = 100)
+    ax.scatter(xs, modskill_p50, c = colors, s = 100, marker = 'x')
+    ax.grid()
+
+    ax.set_xticks([])
+    ax.set_title(patnames[reg])
+    axes.append(ax)
+
+ctl.adjust_ax_scale(axes)
+
+fig.suptitle('Seasonal skill')
+ctl.custom_legend(fig, colors, exps)
+fig.savefig(cart_out + 'seas_skill.pdf')
+figs.append(fig)
+
+
+fig = plt.figure(figsize = (16,12))
+ax = fig.add_subplot(111)
+
+allye = results['ERA']['freq_clus_seasonal_years']
+obsfr = results['ERA']['freq_clus_seasonal'].T
+
+modskill = []
+modskill_p50 = []
+modskill_p75 = []
+modskill_p25 = []
+for mod in exps:
+    modserie = []
+    modserie_p50 = []
+    modserie_p25 = []
+    modserie_p75 = []
+    for ye, obf in zip(allye, obsfr):
+        cose = [ctl.Rcorr(results[mod]['freq_clus_seasonal']['{:02d}_{}1101'.format(nu, ye)], obf) for nu in range(25)]
+        modserie.append(np.mean(cose))
+        modserie_p50.append(np.median(cose))
+        modserie_p25.append(np.percentile(cose, 25))
+        modserie_p75.append(np.percentile(cose, 75))
+
+    modskill.append(np.mean(modserie))
+    modskill_p50.append(np.mean(modserie_p50))
+    modskill_p25.append(np.mean(modserie_p25))
+    modskill_p75.append(np.mean(modserie_p75))
+
+xs = np.arange(len(modskill))
+ax.scatter(xs, modskill, c = colors, s = 100)
+ax.scatter(xs, modskill_p50, c = colors, s = 100, marker = 'x')
+ax.scatter(xs, modskill_p25, c = colors, s = 100, marker = '<')
+ax.scatter(xs, modskill_p75, c = colors, s = 100, marker = '>')
+ax.grid()
+
+fig.suptitle('Seasonal skill allregs')
+ctl.custom_legend(fig, colors, exps)
+fig.savefig(cart_out + 'seas_skill_allregs.pdf')
+figs.append(fig)
+
+
+for month in range(3):
+    fig = plt.figure(figsize = (16,12))
+    #ax = fig.add_subplot(111)
+
+    allye = results['ERA']['freq_clus_seasonal_years']
+    obsfr = results['ERA']['freq_clus_monthly'].T[month::3]
+
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(2, 2, reg+1)
+
+        modskill = []
+        modskill_p50 = []
+        obserie = np.array([ob[reg] for ob in obsfr])
+        for mod in exps:
+            modserie = []
+            modserie_p50 = []
+            for ye in allye:
+                cose = [results[mod]['freq_clus_monthly']['{:02d}_{}1101'.format(nu, ye)][reg, month] for nu in range(25)]
+                modserie.append(np.mean(cose))
+                modserie_p50.append(np.median(cose))
+
+            modskill.append(ctl.Rcorr(obserie, modserie))
+            modskill_p50.append(ctl.Rcorr(obserie, modserie_p50))
+
+        xs = np.arange(len(modskill))
+        ax.scatter(xs, modskill, c = colors, s = 100)
+        ax.scatter(xs, modskill_p50, c = colors, s = 100, marker = 'x')
+        ax.grid()
+
+        ax.set_xticks([])
+        ax.set_title(patnames[reg])
+        axes.append(ax)
+
+    ctl.adjust_ax_scale(axes)
+
+    fig.suptitle('Month {} skill'.format(month))
+    ctl.custom_legend(fig, colors, exps)
+    fig.savefig(cart_out + 'month{}_skill.pdf'.format(month))
+    figs.append(fig)
+
+
+    fig = plt.figure(figsize = (16,12))
+    ax = fig.add_subplot(111)
+
+    allye = results['ERA']['freq_clus_seasonal_years']
+    obsfr = results['ERA']['freq_clus_monthly'].T[month::3]
+
+    modskill = []
+    modskill_p50 = []
+    modskill_p75 = []
+    modskill_p25 = []
+    for mod in exps:
+        modserie = []
+        modserie_p50 = []
+        modserie_p25 = []
+        modserie_p75 = []
+        for ye, obf in zip(allye, obsfr):
+            cose = [ctl.Rcorr(results[mod]['freq_clus_seasonal']['{:02d}_{}1101'.format(nu, ye)], obf) for nu in range(25)]
+            cose = [ctl.Rcorr(results[mod]['freq_clus_monthly']['{:02d}_{}1101'.format(nu, ye)][:, month], obf) for nu in range(25)]
+            modserie.append(np.mean(cose))
+            modserie_p50.append(np.median(cose))
+            modserie_p25.append(np.percentile(cose, 25))
+            modserie_p75.append(np.percentile(cose, 75))
+
+        modskill.append(np.mean(modserie))
+        modskill_p50.append(np.mean(modserie_p50))
+        modskill_p25.append(np.mean(modserie_p25))
+        modskill_p75.append(np.mean(modserie_p75))
+
+    xs = np.arange(len(modskill))
+    ax.scatter(xs, modskill, c = colors, s = 100)
+    ax.scatter(xs, modskill_p50, c = colors, s = 100, marker = 'x')
+    ax.scatter(xs, modskill_p25, c = colors, s = 100, marker = '<')
+    ax.scatter(xs, modskill_p75, c = colors, s = 100, marker = '>')
+    ax.grid()
+
+    fig.suptitle('Month {} skill allregs'.format(month))
+    ctl.custom_legend(fig, colors, exps)
+    fig.savefig(cart_out + 'month{}_skill_allregs.pdf'.format(month))
+    figs.append(fig)
+
+sys.exit()
+
+fig = plt.figure(figsize = (16,12))
 ax = fig.add_subplot(111)
 
 varrats = np.array([results[ex]['var_ratio'] for ex in exps_all])

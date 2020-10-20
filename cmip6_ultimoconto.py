@@ -110,7 +110,7 @@ for ke in kesal:
 
 # da Virna
 vicar = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/virnas_tas/new/'
-fils = ['Indices_{}.txt', 'Slopes_{}.txt', 'Slopes_{}_temp.txt']
+fils = ['Indices_{}.txt', 'Slopes_{}_ndjfm.txt', 'Slopes_{}_temp.txt']
 nams = ['temp', 'slope', 'slope']
 tip = [0,0,1]
 
@@ -168,32 +168,32 @@ for ssp in ['rcp85', 'ssp585']:
             varli[(ssp, mod, area, 'fr_diff')] = np.array(freqs[(ssp+cos, mod, 'tot50')])-np.array(freqs[('hist'+cos, mod, 'tot50')])
 
 
-# allpeas = dict()
-#
-# for area in ['EAT', 'PNA']:
-#     for ke in vkeys:
-#         for livar in ['trend', 'fr_fin', 'fr_diff']:
-#             co = (livar, ke, area)
-#             x = []
-#             y = []
-#             for ssp in ['ssp585', 'rcp85']:
-#                 xss = []
-#                 yss = []
-#                 for mod in okmods[ssp]:
-#                     if (ssp, mod, 'slope', ke) in resvi.keys() and (ssp, mod, area, livar) in varli.keys():
-#                         xss.append(resvi[(ssp, mod, 'slope', ke)])
-#                         yss.append(varli[(ssp, mod, area, livar)][0])
-#                 x.append(xss)
-#                 y.append(yss)
-#
-#             pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
-#             filnam = cart_corr_sig + 'corr_{}_{}_{}.pdf'.format(*co)
-#             pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = ke, ylabel = livar, groups = ['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
-#             allpeas[co] = (pears, pval)
-#             if abs(pears) > 0.3:
-#                 print('-------->', co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
-#             else:
-#                 print(co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
+allpeas = dict()
+
+for area in ['EAT', 'PNA']:
+    for ke in vkeys:
+        for livar in ['trend', 'fr_fin', 'fr_diff']:
+            co = (livar, ke, area)
+            x = []
+            y = []
+            for ssp in ['ssp585', 'rcp85']:
+                xss = []
+                yss = []
+                for mod in okmods[ssp]:
+                    if (ssp, mod, 'slope', ke) in resvi.keys() and (ssp, mod, area, livar) in varli.keys():
+                        xss.append(resvi[(ssp, mod, 'slope', ke)])
+                        yss.append(varli[(ssp, mod, area, livar)][0])
+                x.append(xss)
+                y.append(yss)
+
+            pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
+            filnam = cart_corr_sig + 'corr_{}_{}_{}.pdf'.format(*co)
+            pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = ke, ylabel = livar, groups = ['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
+            allpeas[co] = (pears, pval)
+            if abs(pears) > 0.3:
+                print('-------->', co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
+            else:
+                print(co, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
 
 
 
