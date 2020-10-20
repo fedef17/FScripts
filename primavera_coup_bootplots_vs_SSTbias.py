@@ -299,10 +299,15 @@ pearsall = dict()
 pears_nocmcc = dict()
 pears_nooutli = dict()
 
+biasdict = dict()
+biasdict['model_names'] = model_names
+
 for biasnam, bias in zip(allbiasnam, allbias):
     print(biasnam)
     allfigs = []
     bias = np.array(bias)
+    biasdict[biasnam] = bias
+
     for nam in ['significance', 'varopt', 'autocorr', 'mean_dist_cen', 'mean_patcor', 'mean_freq_bias']:
         fig, ax = plt.subplots(figsize=(16,12))
 
@@ -465,6 +470,8 @@ for biasnam, bias in zip(allbiasnam, allbias):
 
     ctl.plot_pdfpages(cart_out + 'all_bootplots{}.pdf'.format(biasnam), allfigs, save_single_figs = False)
 
+
+pickle.dump(biasdict, open(cart_out + 'allbiases.p', 'wb'))
 
 print('Higher correlations:\n')
 for ke in rcorrsall:

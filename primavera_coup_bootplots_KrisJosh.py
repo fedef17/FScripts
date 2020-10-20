@@ -163,6 +163,8 @@ for numclus in [3,4,5,6]:
         bootstri[mod] = bootstraps_all
 
 
+    #pickle.dump(bootstri, open(cart_out + 'res_bootstr_k'{}'.p', 'wb'))
+
     # colors = ctl.color_set(len(model_names), sns_palette = 'Paired') + [cm.colors.ColorConverter.to_rgb('black')]
     nam = 'significance'
     regnam = ['clus_{}'.format(i) for i in range(numclus)]
