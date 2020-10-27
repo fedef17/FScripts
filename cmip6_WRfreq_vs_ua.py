@@ -73,12 +73,19 @@ for fieldnam in ['ua', 'pr']:
         print('SSP '+ssp)
 
         for modmem in okmods:
+            print(modmem)
             if modmem not in all_modmem:
                 print('NO data for {}'.format(modmem))
                 continue
 
             mod, mem = modmem.split('_')
-            var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file)
+            try:
+                var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file)
+            except Exception as exp:
+                print('Unable to read data for {}, going on with next model..'.format(modmem))
+                print(exp)
+                continue
+
             lat = coords['lat']
             lon = coords['lon']
             dates = coords['dates']
