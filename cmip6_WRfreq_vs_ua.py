@@ -18,7 +18,6 @@ from datetime import datetime
 
 from scipy import stats
 import pandas as pd
-import pymannkendall as mk
 import glob
 
 plt.rcParams['xtick.labelsize'] = 15
