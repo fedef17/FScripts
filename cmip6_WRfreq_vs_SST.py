@@ -49,7 +49,7 @@ yr10 = 10 # length of running mean
 numclus = 4
 reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
-reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
+reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'BR']
 #okmods = ['ACCESS-CM2_r1i1p1f1', 'BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1','CNRM-CM6-1-HR_r1i1p1f2', 'CNRM-CM6-1_r1i1p1f2','CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1','INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1','MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1','MPI-ESM1-2-LR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1','NorESM2-LM_r1i1p1f1', 'NorESM2-MM_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
 # mancano = ['BCC-ESM1_r1i1p1f1', 'CESM2_r1i1p1f1', 'GFDL-CM4_r1i1p1f1', 'HadGEM3-GC31-LL_r1i1p1f3', 'KACE-1-0-G_r1i1p1f1', 'MPI-ESM-1-2-HAM_r1i1p1f1']
 
@@ -119,6 +119,7 @@ for area in ['EAT', 'PNA']:
         if ssp == 'ssp126':
             okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
         print(okmods)
+        sys.exit()
 
         for mod in okmods:
             for reg in range(4):
@@ -129,7 +130,49 @@ for area in ['EAT', 'PNA']:
 #### ok.
 ### ORA ho tas_anom e cose
 # provo
+
 # NO
 # alur. io voglio per ogni punto vedere come correlano i trend delle frequenze con i trend delle SST
 # e sarebbe bello capire chi viene prima ma non so se funziona
 # però ecco vedere se i modelli con WR trend maggiore si scaldano anche di più in qualche zona sarebbe carino
+
+# per ogni punto devo fare corr tra freq trend e sst trend
+# però.. entrambi detrendati per il global warming?
+# sennò non ha molto senso, cioè beccherò le zone che si scaldano di più
+
+# devo dividere sst_trend e freq_trend per il global tas trend di ogni modello
+corrmaps = dict()
+ssp = 'ssp585'
+for area in ['EAT', 'PNA']:
+    for reg in range(4):
+        trendmat = tas_trends[(ssp, okmods[0])]
+        corr_map = np.empty_like(trendmat)
+        pval_map = np.empty_like(trendmat)
+        nlat, nlon = trendmat.shape
+        lat, lon = ctl.genlatlon(nlat, nlon)
+
+        gw = np.array([ctl.global_mean(tas_trends[(ssp, mod)], lat) for mod in okmods])
+        frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+
+        for la in range(nlat):
+            for lo in range(nlon):
+                tastr = np.array([tas_trends[(ssp, mod)][la, lo] for mod in okmods])
+                pears, pval = stats.pearsonr(frok/gw, tastr/gw)
+
+                corr_map[la, lo] = pears
+                pval_map[la, lo] = pval
+
+        corrmaps[('corr', area, reg)] = corr_map
+        corrmaps[('pval', area, reg)] = pval_map
+
+        fnam = cart_out + 'corrmap_{}_{}.pdf'.format(area, reg)
+        ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]), draw_grid = True)
+
+        fnam = cart_out + 'pvalmap_{}_{}.pdf'.format(area, reg)
+        ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]))
+
+    cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
+    pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
+
+    fnam = cart_out + 'corrmap_{}_allregs.pdf'.format(area)
+    ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}'.format(area), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))
