@@ -129,3 +129,7 @@ for area in ['EAT', 'PNA']:
 #### ok.
 ### ORA ho tas_anom e cose
 # provo
+# NO
+# alur. io voglio per ogni punto vedere come correlano i trend delle frequenze con i trend delle SST
+# e sarebbe bello capire chi viene prima ma non so se funziona
+# però ecco vedere se i modelli con WR trend maggiore si scaldano anche di più in qualche zona sarebbe carino

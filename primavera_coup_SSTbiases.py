@@ -84,55 +84,57 @@ area_box = (-80, 10, 20, 80)
 sstera_mean_area, latsel, lonsel = ctl.sel_area(lat, lon, sstera_mean, area_box)
 okpoera = (sstera_mean_area < -100) | (sstera_mean_area > 500)
 
-# allrms = dict()
-# allpatcor = dict()
-# #for mod, mem in zip(model_names, ens_mems):
-# for mod in model_names:
-#     print(mod)
-#     filmod_part = 'tos-{}-1950-2014-'.format(mod)
-#     if 'AWI' in mod:
-#         filmod_part = 'tos-{}-1950-2010-'.format(mod)
-#     allfimod = [fi for fi in os.listdir(cart_sst) if filmod_part in fi and 'remap.nc' in fi]
-#     print(allfimod)
-#
-#     for fi in allfimod:
-#         filmod = cart_sst + fi
-#         i0 = len(filmod_part)
-#         mem = fi[i0:i0+8]
-#         print(mem)
-#         if 'EC-Earth' in mod and mem == 'r1i1p1f1':
-#             continue
-#         if 'HadGEM' in mod and mem == 'r1i1p2f1':
-#             continue
-#         sstmod, datacoords, _ = ctl.readxDncfield(filmod)
-#         datesmod = datacoords['dates']
-#         lat = datacoords['lat']
-#         lon = datacoords['lon']
-#
-#         if sstmod.min() > 200:
-#             sstmod = sstmod - 273.15
-#
-#         sstmod_mean, sstmod_sd = ctl.seasonal_climatology(sstmod, datesmod, 'DJF', dates_range = ctl.range_years(1957, 2014))
-#
-#         # compare
-#         sstmod_mean_area, latsel, lonsel = ctl.sel_area(lat, lon, sstmod_mean, area_box)
-#
-#         okpomod = (sstmod_mean_area < -100) | (sstmod_mean_area > 500)
-#         oktot = (okpomod) | (okpoera)
-#
-#         sstmod_x = np.ma.masked_array(sstmod_mean_area, mask = oktot)
-#         sstera_x = np.ma.masked_array(sstera_mean_area, mask = oktot)
-#
-#         ctl.plot_triple_sidebyside(sstmod_x, sstera_x, latsel, lonsel, plot_type = 'pcolormesh', filename = cart_out_maps + 'map_EAT_{}_{}.pdf'.format(mod, mem), plot_margins = area_box, title = 'DJF SST bias - {} - {}'.format(mod, mem), stitle_1 = mod, stitle_2 = 'ERA', cb_label = 'SST bias (K)')
-#
-#         rms = ctl.E_rms(sstmod_x, sstera_x, latitude = latsel, masked = True)
-#         patcor = ctl.Rcorr(sstmod_x, sstera_x, latitude = latsel, masked = True)
-#         print(rms, patcor)
-#         allrms[(mod, mem)] = rms
-#         allpatcor[(mod, mem)] = patcor
-#
-#
-# pickle.dump([allrms, allpatcor], open(cart_out + 'sst_bias_rms_djf_eat.p', 'wb'))
+allcose = dict()
+allrms = dict()
+allpatcor = dict()
+#for mod, mem in zip(model_names, ens_mems):
+for mod in model_names:
+    print(mod)
+    filmod_part = 'tos-{}-1950-2014-'.format(mod)
+    if 'AWI' in mod:
+        filmod_part = 'tos-{}-1950-2010-'.format(mod)
+    allfimod = [fi for fi in os.listdir(cart_sst) if filmod_part in fi and 'remap.nc' in fi]
+    print(allfimod)
+
+    for fi in allfimod:
+        filmod = cart_sst + fi
+        i0 = len(filmod_part)
+        mem = fi[i0:i0+8]
+        print(mem)
+        if 'EC-Earth' in mod and mem == 'r1i1p1f1':
+            continue
+        if 'HadGEM' in mod and mem == 'r1i1p2f1':
+            continue
+        sstmod, datacoords, _ = ctl.readxDncfield(filmod)
+        datesmod = datacoords['dates']
+        lat = datacoords['lat']
+        lon = datacoords['lon']
+
+        if sstmod.min() > 200:
+            sstmod = sstmod - 273.15
+
+        sstmod_mean, sstmod_sd = ctl.seasonal_climatology(sstmod, datesmod, 'DJF', dates_range = ctl.range_years(1957, 2014))
+
+        # compare
+        for area in ['EAT', 'PNA']AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        sstmod_mean_area, latsel, lonsel = ctl.sel_area(lat, lon, sstmod_mean, area_box)
+
+        okpomod = (sstmod_mean_area < -100) | (sstmod_mean_area > 500)
+        oktot = (okpomod) | (okpoera)
+
+        sstmod_x = np.ma.masked_array(sstmod_mean_area, mask = oktot)
+        sstera_x = np.ma.masked_array(sstera_mean_area, mask = oktot)
+
+        ctl.plot_triple_sidebyside(sstmod_x, sstera_x, latsel, lonsel, plot_type = 'pcolormesh', filename = cart_out_maps + 'map_EAT_{}_{}.pdf'.format(mod, mem), plot_margins = area_box, title = 'DJF SST bias - {} - {}'.format(mod, mem), stitle_1 = mod, stitle_2 = 'ERA', cb_label = 'SST bias (K)')
+
+        rms = ctl.E_rms(sstmod_x, sstera_x, latitude = latsel, masked = True)
+        patcor = ctl.Rcorr(sstmod_x, sstera_x, latitude = latsel, masked = True)
+        print(rms, patcor)
+        allrms[(mod, mem)] = rms
+        allpatcor[(mod, mem)] = patcor
+
+
+pickle.dump([allrms, allpatcor], open(cart_out + 'sst_bias_rms_djf_eat.p', 'wb'))
 allrms, allpatcor = pickle.load(open(cart_out + 'sst_bias_rms_djf_eat.p', 'rb'))
 
 fig = plt.figure(figsize = (16, 12))
