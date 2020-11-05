@@ -80,7 +80,7 @@ for fieldnam in ['ua', 'pr']:
 
             mod, mem = modmem.split('_')
             try:
-                var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file)
+                var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (2015, 2100))
             except Exception as exp:
                 print('Unable to read data for {}, going on with next model..'.format(modmem))
                 print(exp)
