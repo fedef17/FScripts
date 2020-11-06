@@ -29,11 +29,14 @@ plt.rcParams['axes.labelsize'] = 18
 #############################################################################
 if os.uname()[1] == 'hobbes':
     cart_in = '/home/fabiano/Research/lavori/CMIP6/'
+    cart_out = cart_in + 'Results_uaprec_corrmap/'
+    ctl.mkdir(cart_out)
 elif os.uname()[1] == 'ff-clevo':
     cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
-
-cart_out = '/home/federico/work/CMIP6/Results_ua_corrmap/'
-ctl.mkdir(cart_out)
+elif os.uname()[1] == 'wilma':
+    cart_in = 'baugigi'
+    cart_out = '/home/federico/work/CMIP6/Results_ua_corrmap/'
+    ctl.mkdir(cart_out)
 
 cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
 file_hist_refEOF = cart_data + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
@@ -54,55 +57,58 @@ allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5
 coldic = dict(zip(allsimcol, ctl.color_set(7)))
 colssp = [coldic[ssp] for ssp in allssps]
 
-ref_file = '/home/federico/work/CMIP6/ERA/ERA40+Int_daily_1957-2018_zg500_remap25_meters.nc'
+# ref_file = '/home/federico/work/CMIP6/ERA/ERA40+Int_daily_1957-2018_zg500_remap25_meters.nc'
+#
+# for fieldnam in ['ua', 'pr']:
+#     print(fieldnam)
+#
+#     field_anom = dict()
+#     field_trends = dict()
+#     if fieldnam == 'ua':
+#         levok = 300
+#     else:
+#         levok = None
+#
+#     all_data = ctl.check_available_cmip6_data(fieldnam, 'Amon', 'ssp585')
+#     all_modmem = [co[1]+'_'+co[2] for co in all_data]
+#
+#     for ssp in ['ssp585']:
+#         print('SSP '+ssp)
+#
+#         for modmem in okmods:
+#             print(modmem)
+#             if modmem not in all_modmem:
+#                 print('NO data for {}'.format(modmem))
+#                 continue
+#
+#             mod, mem = modmem.split('_')
+#             try:
+#                 var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (2015, 2100))
+#             except Exception as exp:
+#                 print('Unable to read data for {}, going on with next model..'.format(modmem))
+#                 print(exp)
+#                 continue
+#
+#             lat = coords['lat']
+#             lon = coords['lon']
+#             dates = coords['dates']
+#
+#             tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
+#             field_anom[(ssp, mod, 'NDJFM')] = tas
+#
+#             trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+#             field_trends[(ssp, mod, 'NDJFM')] = trendmat
+#
+#             tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, None, deg = 3, area = 'global', print_trend = True)
+#             field_anom[(ssp, mod, 'year')] = tas
+#
+#             trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, None, print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+#             field_trends[(ssp, mod, 'year')] = trendmat
+#
+#     pickle.dump([field_anom, field_trends], open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'wb'))
 
-for fieldnam in ['ua', 'pr']:
-    print(fieldnam)
-
-    field_anom = dict()
-    field_trends = dict()
-    if fieldnam == 'ua':
-        levok = 300
-    else:
-        levok = None
-
-    all_data = ctl.check_available_cmip6_data(fieldnam, 'Amon', 'ssp585')
-    all_modmem = [co[1]+'_'+co[2] for co in all_data]
-
-    for ssp in ['ssp585']:
-        print('SSP '+ssp)
-
-        for modmem in okmods:
-            print(modmem)
-            if modmem not in all_modmem:
-                print('NO data for {}'.format(modmem))
-                continue
-
-            mod, mem = modmem.split('_')
-            try:
-                var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'Amon', 'ssp585', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (2015, 2100))
-            except Exception as exp:
-                print('Unable to read data for {}, going on with next model..'.format(modmem))
-                print(exp)
-                continue
-
-            lat = coords['lat']
-            lon = coords['lon']
-            dates = coords['dates']
-
-            tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
-            field_anom[(ssp, mod, 'NDJFM')] = tas
-
-            trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-            field_trends[(ssp, mod, 'NDJFM')] = trendmat
-
-            tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, None, deg = 3, area = 'global', print_trend = True)
-            field_anom[(ssp, mod, 'year')] = tas
-
-            trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, None, print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-            field_trends[(ssp, mod, 'year')] = trendmat
-
-    pickle.dump([field_anom, field_trends], open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'wb'))
+for fieldnam in ['ua', 'prec']:
+    field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
 
 # tas_anom, tas_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p', 'rb'))
 #
