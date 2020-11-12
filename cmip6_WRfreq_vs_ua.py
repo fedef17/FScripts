@@ -51,6 +51,7 @@ reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
 reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'BR']
 
 okmods = ['ACCESS-CM2_r1i1p1f1', 'BCC-CSM2-MR_r1i1p1f1', 'CanESM5_r1i1p1f1', 'CESM2-WACCM_r1i1p1f1', 'CNRM-CM6-1-HR_r1i1p1f2', 'CNRM-CM6-1_r1i1p1f2', 'CNRM-ESM2-1_r1i1p1f2', 'EC-Earth3_r1i1p1f1', 'FGOALS-g3_r1i1p1f1', 'INM-CM4-8_r1i1p1f1', 'INM-CM5-0_r1i1p1f1', 'IPSL-CM6A-LR_r1i1p1f1', 'MIROC6_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1', 'MRI-ESM2-0_r1i1p1f1', 'NorESM2-LM_r1i1p1f1', 'NorESM2-MM_r1i1p1f1', 'UKESM1-0-LL_r1i1p1f2']
+okmods_mo = [co.split('_')[0] for co in okmods]
 
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5']
@@ -143,7 +144,7 @@ for area in ['EAT', 'PNA']:
 for fieldnam in ['ua', 'prec']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
     print(field_trends.keys())
-    for mod in okmods:
+    for mod in okmods_mo:
         print(mod, ('ssp585', mod, 'year') in field_trends)
     # provo
     # per ogni punto devo fare corr tra freq trend e sst trend
@@ -163,12 +164,12 @@ for fieldnam in ['ua', 'prec']:
                 nlat, nlon = trendmat.shape
                 lat, lon = ctl.genlatlon(nlat, nlon)
 
-                gw = np.array([ctl.global_mean(field_trends[(ssp, mod, seas)], lat) for mod in okmods])
+                gw = np.array([ctl.global_mean(field_trends[(ssp, mod, seas)], lat) for mod in okmods_mo])
                 frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
 
                 for la in range(nlat):
                     for lo in range(nlon):
-                        tastr = np.array([field_trends[(ssp, mod, seas)][la, lo] for mod in okmods])
+                        tastr = np.array([field_trends[(ssp, mod, seas)][la, lo] for mod in okmods_mo])
                         pears, pval = stats.pearsonr(frok/gw, tastr/gw)
 
                         corr_map[la, lo] = pears
