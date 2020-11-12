@@ -170,8 +170,8 @@ for fieldnam in ['ua', 'pr']:
                 nlat, nlon = trendmat.shape
                 lat, lon = ctl.genlatlon(nlat, nlon)
 
-                #gw = np.array([ctl.global_mean(tas_trends[(ssp, mod.split('_')[0], seas)], lat) for mod in okmok])
-                gw = np.array([ctl.global_mean(tas_trends[(ssp, mod.split('_')[0])], lat) for mod in okmok])
+                gw = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmok])
+                #gw = np.array([ctl.global_mean(tas_trends[(ssp, mod.split('_')[0])], lat) for mod in okmok])
                 frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmok])
 
                 for la in range(nlat):
