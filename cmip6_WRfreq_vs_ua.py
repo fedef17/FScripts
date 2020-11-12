@@ -144,8 +144,13 @@ for area in ['EAT', 'PNA']:
 for fieldnam in ['ua', 'prec']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
     print(field_trends.keys())
-    for mod in okmods_mo:
-        print(mod, ('ssp585', mod, 'year') in field_trends)
+    okmok = []
+    for mod in okmods:
+        if ('ssp585', mod.split('_')[0], 'year') in field_trends:
+            okmok.append(mod)
+
+    print('Available models:', okmok)
+
     # provo
     # per ogni punto devo fare corr tra freq trend e sst trend
     # però.. entrambi detrendati per il global warming?
@@ -158,18 +163,18 @@ for fieldnam in ['ua', 'prec']:
         for area in ['EAT', 'PNA']:
             for reg in range(4):
                 # trendmat = tas_trends[(ssp, okmods[0])]
-                trendmat = field_trends[(ssp, okmods[0], seas)]
+                trendmat = field_trends[(ssp, okmok[0], seas)]
                 corr_map = np.empty_like(trendmat)
                 pval_map = np.empty_like(trendmat)
                 nlat, nlon = trendmat.shape
                 lat, lon = ctl.genlatlon(nlat, nlon)
 
-                gw = np.array([ctl.global_mean(field_trends[(ssp, mod, seas)], lat) for mod in okmods_mo])
-                frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+                gw = np.array([ctl.global_mean(field_trends[(ssp, mod.split('_')[0], seas)], lat) for mod in okmok])
+                frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmok])
 
                 for la in range(nlat):
                     for lo in range(nlon):
-                        tastr = np.array([field_trends[(ssp, mod, seas)][la, lo] for mod in okmods_mo])
+                        tastr = np.array([field_trends[(ssp, mod.split('_')[0], seas)][la, lo] for mod in okmok])
                         pears, pval = stats.pearsonr(frok/gw, tastr/gw)
 
                         corr_map[la, lo] = pears
