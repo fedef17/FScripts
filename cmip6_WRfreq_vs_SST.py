@@ -125,8 +125,7 @@ for area in ['EAT', 'PNA']:
         if ssp == 'ssp126':
             okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
         print(okmods)
-        sys.exit()
-
+        
         for mod in okmods:
             for reg in range(4):
                 cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
