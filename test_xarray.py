@@ -19,7 +19,7 @@ from datetime import datetime
 import pickle
 
 import climtools_lib as ctl
-import climdiags as cd
+#import climdiags as cd
 
 from importlib import reload
 
