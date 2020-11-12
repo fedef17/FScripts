@@ -163,7 +163,7 @@ for fieldnam in ['ua', 'prec']:
         for area in ['EAT', 'PNA']:
             for reg in range(4):
                 # trendmat = tas_trends[(ssp, okmods[0])]
-                trendmat = field_trends[(ssp, okmok[0], seas)]
+                trendmat = field_trends[(ssp, okmok[0].split('_')[0], seas)]
                 corr_map = np.empty_like(trendmat)
                 pval_map = np.empty_like(trendmat)
                 nlat, nlon = trendmat.shape
