@@ -58,49 +58,49 @@ allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5
 coldic = dict(zip(allsimcol, ctl.color_set(7)))
 colssp = [coldic[ssp] for ssp in allssps]
 
-tas_anom = dict()
-tas_trends = dict()
-for ssp in ['ssp585']:
-    print('SSP '+ssp)
-
-    area = 'EAT'
-    cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
-    freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
-
-    okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-    if ssp == 'ssp126':
-        okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
-    print(okmods)
-
-    for mod in okmods:
-        # lisf = glob.glob(fil_tas.format(mod, '*'))
-        # if len(lisf) > 1:
-        #     raise ValueError('too many models matching: {}'.format(lisf))
-        # elif len(lisf) == 1:
-        #     okfil = lisf[0]
-        # else:
-        #     print('Model {} not found!'.format(mod))
-        #     continue
-        okfil = fil_tas.format(*(mod.split('_')))
-        # leggo tas, faccio detrend, calcolo anom e ok.
-        var, coords, aux_info = ctl.readxDncfield(okfil)
-        lat = coords['lat']
-        lon = coords['lon']
-        dates = coords['dates']
-
-        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
-        tas_anom[(ssp, mod, 'NDJFM')] = tas
-
-        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-        tas_trends[(ssp, mod, 'NDJFM')] = trendmat
-
-        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, None, deg = 3, area = 'global', print_trend = True)
-        tas_anom[(ssp, mod, 'year')] = tas
-
-        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, None, print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-        tas_trends[(ssp, mod, 'year')] = trendmat
-
-pickle.dump([tas_anom, tas_trends], open(cart_out + 'tas_anom_ssp585.p', 'wb'))
+# tas_anom = dict()
+# tas_trends = dict()
+# for ssp in ['ssp585']:
+#     print('SSP '+ssp)
+#
+#     area = 'EAT'
+#     cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
+#     freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+#
+#     okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+#     if ssp == 'ssp126':
+#         okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
+#     print(okmods)
+#
+#     for mod in okmods:
+#         # lisf = glob.glob(fil_tas.format(mod, '*'))
+#         # if len(lisf) > 1:
+#         #     raise ValueError('too many models matching: {}'.format(lisf))
+#         # elif len(lisf) == 1:
+#         #     okfil = lisf[0]
+#         # else:
+#         #     print('Model {} not found!'.format(mod))
+#         #     continue
+#         okfil = fil_tas.format(*(mod.split('_')))
+#         # leggo tas, faccio detrend, calcolo anom e ok.
+#         var, coords, aux_info = ctl.readxDncfield(okfil)
+#         lat = coords['lat']
+#         lon = coords['lon']
+#         dates = coords['dates']
+#
+#         tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
+#         tas_anom[(ssp, mod, 'NDJFM')] = tas
+#
+#         trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+#         tas_trends[(ssp, mod, 'NDJFM')] = trendmat
+#
+#         tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, None, deg = 3, area = 'global', print_trend = True)
+#         tas_anom[(ssp, mod, 'year')] = tas
+#
+#         trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, None, print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+#         tas_trends[(ssp, mod, 'year')] = trendmat
+#
+# pickle.dump([tas_anom, tas_trends], open(cart_out + 'tas_anom_ssp585.p', 'wb'))
 tas_anom, tas_trends = pickle.load(open(cart_out + 'tas_anom_ssp585.p', 'rb'))
 
 area = 'EAT'
