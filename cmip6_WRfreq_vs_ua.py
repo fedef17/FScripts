@@ -142,6 +142,8 @@ for area in ['EAT', 'PNA']:
 tas_anom, tas_trends = pickle.load(open(cart_out + '../Results_SST_corrmap/tas_anom_ssp585.p', 'rb'))
 #### ok.
 ### ORA ho tas_anom e cose
+lat_180, lon_360 = ctl.genlatlon(180, 360)
+
 for fieldnam in ['ua', 'pr']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
     print(field_trends.keys())
@@ -170,7 +172,7 @@ for fieldnam in ['ua', 'pr']:
                 nlat, nlon = trendmat.shape
                 lat, lon = ctl.genlatlon(nlat, nlon)
 
-                gw = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmok])
+                gw = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat_180) for mod in okmok])
                 #gw = np.array([ctl.global_mean(tas_trends[(ssp, mod.split('_')[0])], lat) for mod in okmok])
                 frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmok])
 
