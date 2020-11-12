@@ -107,80 +107,81 @@ colssp = [coldic[ssp] for ssp in allssps]
 #
 #     pickle.dump([field_anom, field_trends], open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'wb'))
 
+
+
+area = 'EAT'
+ssp = 'ssp585'
+cose = dict()
+
+for area in ['EAT', 'PNA']:
+    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
+    results_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
+
+    cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
+    freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+    trend_ssp, residtime_ssp = pickle.load(open(cart_lui + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
+    seasfreq, runfreq = pickle.load(open(cart_lui + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
+
+    #for ssp in allssps:
+    for ssp in ['ssp585']:
+        print('SSP '+ssp)
+        results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
+
+        okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+        if ssp == 'ssp126':
+            okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
+        print(okmods)
+
+        for mod in okmods:
+            for reg in range(4):
+                cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
+                cose[(ssp, area, mod, 'trend', reg)]= trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
+
+
+#### ok.
+### ORA ho tas_anom e cose
 for fieldnam in ['ua', 'prec']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
+    # provo
+    # per ogni punto devo fare corr tra freq trend e sst trend
+    # però.. entrambi detrendati per il global warming?
+    # sennò non ha molto senso, cioè beccherò le zone che si scaldano di più
 
-# tas_anom, tas_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p', 'rb'))
-#
-# area = 'EAT'
-# ssp = 'ssp585'
-# cose = dict()
-#
-# for area in ['EAT', 'PNA']:
-#     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
-#     results_hist_refEOF, _ = ctl.load_wrtool(file_hist_refEOF.format(area))
-#
-#     cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
-#     freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
-#     trend_ssp, residtime_ssp = pickle.load(open(cart_lui + 'trends_wrfreq_e_restime_{}.p'.format(area), 'rb'))
-#     seasfreq, runfreq = pickle.load(open(cart_lui + 'seasfreqs_{}_v4.p'.format(area), 'rb'))
-#
-#     #for ssp in allssps:
-#     for ssp in ['ssp585']:
-#         print('SSP '+ssp)
-#         results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
-#
-#         okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-#         if ssp == 'ssp126':
-#             okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
-#         print(okmods)
-#
-#         for mod in okmods:
-#             for reg in range(4):
-#                 cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
-#                 cose[(ssp, area, mod, 'trend', reg)]= trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
-#
-#
-# #### ok.
-# ### ORA ho tas_anom e cose
-# # provo
-# # per ogni punto devo fare corr tra freq trend e sst trend
-# # però.. entrambi detrendati per il global warming?
-# # sennò non ha molto senso, cioè beccherò le zone che si scaldano di più
-#
-# # devo dividere sst_trend e freq_trend per il global tas trend di ogni modello
-# corrmaps = dict()
-# ssp = 'ssp585'
-# for area in ['EAT', 'PNA']:
-#     for reg in range(4):
-#         trendmat = tas_trends[(ssp, okmods[0])]
-#         corr_map = np.empty_like(trendmat)
-#         pval_map = np.empty_like(trendmat)
-#         nlat, nlon = trendmat.shape
-#         lat, lon = ctl.genlatlon(nlat, nlon)
-#
-#         gw = np.array([ctl.global_mean(tas_trends[(ssp, mod)], lat) for mod in okmods])
-#         frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
-#
-#         for la in range(nlat):
-#             for lo in range(nlon):
-#                 tastr = np.array([tas_trends[(ssp, mod)][la, lo] for mod in okmods])
-#                 pears, pval = stats.pearsonr(frok/gw, tastr/gw)
-#
-#                 corr_map[la, lo] = pears
-#                 pval_map[la, lo] = pval
-#
-#         corrmaps[('corr', area, reg)] = corr_map
-#         corrmaps[('pval', area, reg)] = pval_map
-#
-#         fnam = cart_out + 'corrmap_{}_{}.pdf'.format(area, reg)
-#         ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]), draw_grid = True)
-#
-#         fnam = cart_out + 'pvalmap_{}_{}.pdf'.format(area, reg)
-#         ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]))
-#
-#     cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
-#     pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
-#
-#     fnam = cart_out + 'corrmap_{}_allregs.pdf'.format(area)
-#     ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}'.format(area), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))
+    # devo dividere sst_trend e freq_trend per il global tas trend di ogni modello
+    corrmaps = dict()
+    ssp = 'ssp585'
+    for seas in ['NDJFM', 'year']:
+        for area in ['EAT', 'PNA']:
+            for reg in range(4):
+                # trendmat = tas_trends[(ssp, okmods[0])]
+                trendmat = field_trends[(ssp, okmods[0], seas)]
+                corr_map = np.empty_like(trendmat)
+                pval_map = np.empty_like(trendmat)
+                nlat, nlon = trendmat.shape
+                lat, lon = ctl.genlatlon(nlat, nlon)
+
+                gw = np.array([ctl.global_mean(field_trends[(ssp, mod, seas)], lat) for mod in okmods])
+                frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+
+                for la in range(nlat):
+                    for lo in range(nlon):
+                        tastr = np.array([field_trends[(ssp, mod, seas)][la, lo] for mod in okmods])
+                        pears, pval = stats.pearsonr(frok/gw, tastr/gw)
+
+                        corr_map[la, lo] = pears
+                        pval_map[la, lo] = pval
+
+                corrmaps[('corr', area, reg)] = corr_map
+                corrmaps[('pval', area, reg)] = pval_map
+
+                fnam = cart_out + '{}_corrmap_{}_{}_{}.pdf'.format(fieldnam, area, reg, seas)
+                ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas), draw_grid = True)
+
+                fnam = cart_out + '{}_pvalmap_{}_{}_{}.pdf'.format(fieldnam, area, reg, seas)
+                ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas))
+
+            cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
+            pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
+
+            fnam = cart_out + '{}_corrmap_{}_allregs_{}.pdf'.format(fieldnam, area, seas)
+            ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, seas: {}'.format(area, seas), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))

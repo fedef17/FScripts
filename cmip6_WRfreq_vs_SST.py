@@ -58,43 +58,49 @@ allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5
 coldic = dict(zip(allsimcol, ctl.color_set(7)))
 colssp = [coldic[ssp] for ssp in allssps]
 
-# tas_anom = dict()
-# tas_trends = dict()
-# for ssp in ['ssp585']:
-#     print('SSP '+ssp)
-#
-#     area = 'EAT'
-#     cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
-#     freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
-#
-#     okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-#     if ssp == 'ssp126':
-#         okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
-#     print(okmods)
-#
-#     for mod in okmods:
-#         # lisf = glob.glob(fil_tas.format(mod, '*'))
-#         # if len(lisf) > 1:
-#         #     raise ValueError('too many models matching: {}'.format(lisf))
-#         # elif len(lisf) == 1:
-#         #     okfil = lisf[0]
-#         # else:
-#         #     print('Model {} not found!'.format(mod))
-#         #     continue
-#         okfil = fil_tas.format(*(mod.split('_')))
-#         # leggo tas, faccio detrend, calcolo anom e ok.
-#         var, coords, aux_info = ctl.readxDncfield(okfil)
-#         lat = coords['lat']
-#         lon = coords['lon']
-#         dates = coords['dates']
-#
-#         tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
-#         tas_anom[(ssp, mod)] = tas
-#
-#         trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-#         tas_trends[(ssp, mod)] = trendmat
-#
-# pickle.dump([tas_anom, tas_trends], open(cart_out + 'tas_anom_ssp585.p', 'wb'))
+tas_anom = dict()
+tas_trends = dict()
+for ssp in ['ssp585']:
+    print('SSP '+ssp)
+
+    area = 'EAT'
+    cart_lui = cart_in + 'Results_v5_rebase/{}_NDJFM/'.format(area)
+    freqs, residtimes, patterns = pickle.load(open(cart_lui + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+
+    okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+    if ssp == 'ssp126':
+        okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
+    print(okmods)
+
+    for mod in okmods:
+        # lisf = glob.glob(fil_tas.format(mod, '*'))
+        # if len(lisf) > 1:
+        #     raise ValueError('too many models matching: {}'.format(lisf))
+        # elif len(lisf) == 1:
+        #     okfil = lisf[0]
+        # else:
+        #     print('Model {} not found!'.format(mod))
+        #     continue
+        okfil = fil_tas.format(*(mod.split('_')))
+        # leggo tas, faccio detrend, calcolo anom e ok.
+        var, coords, aux_info = ctl.readxDncfield(okfil)
+        lat = coords['lat']
+        lon = coords['lon']
+        dates = coords['dates']
+
+        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 3, area = 'global', print_trend = True)
+        tas_anom[(ssp, mod, 'NDJFM')] = tas
+
+        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+        tas_trends[(ssp, mod, 'NDJFM')] = trendmat
+
+        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'year', deg = 3, area = 'global', print_trend = True)
+        tas_anom[(ssp, mod, year)] = tas
+
+        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'year', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+        tas_trends[(ssp, mod, year)] = trendmat
+
+pickle.dump([tas_anom, tas_trends], open(cart_out + 'tas_anom_ssp585.p', 'wb'))
 tas_anom, tas_trends = pickle.load(open(cart_out + 'tas_anom_ssp585.p', 'rb'))
 
 area = 'EAT'
@@ -143,36 +149,37 @@ for area in ['EAT', 'PNA']:
 # devo dividere sst_trend e freq_trend per il global tas trend di ogni modello
 corrmaps = dict()
 ssp = 'ssp585'
-for area in ['EAT', 'PNA']:
-    for reg in range(4):
-        trendmat = tas_trends[(ssp, okmods[0])]
-        corr_map = np.empty_like(trendmat)
-        pval_map = np.empty_like(trendmat)
-        nlat, nlon = trendmat.shape
-        lat, lon = ctl.genlatlon(nlat, nlon)
+for seas in ['NDJFM', 'year']:
+    for area in ['EAT', 'PNA']:
+        for reg in range(4):
+            trendmat = tas_trends[(ssp, okmods[0], seas)]
+            corr_map = np.empty_like(trendmat)
+            pval_map = np.empty_like(trendmat)
+            nlat, nlon = trendmat.shape
+            lat, lon = ctl.genlatlon(nlat, nlon)
 
-        gw = np.array([ctl.global_mean(tas_trends[(ssp, mod)], lat) for mod in okmods])
-        frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+            gw = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods])
+            frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
 
-        for la in range(nlat):
-            for lo in range(nlon):
-                tastr = np.array([tas_trends[(ssp, mod)][la, lo] for mod in okmods])
-                pears, pval = stats.pearsonr(frok/gw, tastr/gw)
+            for la in range(nlat):
+                for lo in range(nlon):
+                    tastr = np.array([tas_trends[(ssp, mod, seas)][la, lo] for mod in okmods])
+                    pears, pval = stats.pearsonr(frok/gw, tastr/gw)
 
-                corr_map[la, lo] = pears
-                pval_map[la, lo] = pval
+                    corr_map[la, lo] = pears
+                    pval_map[la, lo] = pval
 
-        corrmaps[('corr', area, reg)] = corr_map
-        corrmaps[('pval', area, reg)] = pval_map
+            corrmaps[('corr', area, reg)] = corr_map
+            corrmaps[('pval', area, reg)] = pval_map
 
-        fnam = cart_out + 'corrmap_{}_{}.pdf'.format(area, reg)
-        ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]), draw_grid = True)
+            fnam = cart_out + 'tas_corrmap_{}_{}_{}.pdf'.format(area, reg, seas)
+            ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas), draw_grid = True)
 
-        fnam = cart_out + 'pvalmap_{}_{}.pdf'.format(area, reg)
-        ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}'.format(area, reg_names_area[area][reg]))
+            fnam = cart_out + 'tas_pvalmap_{}_{}_{}.pdf'.format(area, reg, seas)
+            ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas))
 
-    cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
-    pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
+        cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
+        pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
 
-    fnam = cart_out + 'corrmap_{}_allregs.pdf'.format(area)
-    ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}'.format(area), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))
+        fnam = cart_out + 'tas_corrmap_{}_allregs_{}.pdf'.format(area, seas)
+        ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, seas: {}'.format(area, seas), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))
