@@ -141,7 +141,7 @@ for area in ['EAT', 'PNA']:
 
 #### ok.
 ### ORA ho tas_anom e cose
-for fieldnam in ['ua', 'prec']:
+for fieldnam in ['ua', 'pr']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
     print(field_trends.keys())
     okmok = []
