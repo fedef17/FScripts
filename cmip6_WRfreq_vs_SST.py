@@ -94,10 +94,10 @@ for ssp in ['ssp585']:
         trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
         tas_trends[(ssp, mod, 'NDJFM')] = trendmat
 
-        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'year', deg = 3, area = 'global', print_trend = True)
+        tas, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, None, deg = 3, area = 'global', print_trend = True)
         tas_anom[(ssp, mod, year)] = tas
 
-        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'year', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+        trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, None, print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
         tas_trends[(ssp, mod, year)] = trendmat
 
 pickle.dump([tas_anom, tas_trends], open(cart_out + 'tas_anom_ssp585.p', 'wb'))
