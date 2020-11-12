@@ -142,6 +142,9 @@ for area in ['EAT', 'PNA']:
 ### ORA ho tas_anom e cose
 for fieldnam in ['ua', 'prec']:
     field_anom, field_trends = pickle.load(open(cart_out + '{}_anom_ssp585.p'.format(fieldnam), 'rb'))
+    print(field_trends.keys())
+    for mod in okmods:
+        print(mod, ('ssp585', mod, 'year') in field_trends)
     # provo
     # per ogni punto devo fare corr tra freq trend e sst trend
     # però.. entrambi detrendati per il global warming?
