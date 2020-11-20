@@ -126,6 +126,7 @@ for varnam in allvars:
                 resdic[(forc, 0, 0, varnam, band)] = np.mean(varm[laok])
                 resdic_err[(forc, 0, 0, varnam, band)] = np.mean(varstd[laok])
 
+allforc = ['pi', 'c4']
 
 derdic = dict()
 derdic_err = dict()
