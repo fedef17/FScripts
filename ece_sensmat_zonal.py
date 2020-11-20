@@ -106,7 +106,12 @@ for varnam in allvars:
                         resdic_err[(forc, change, let, varnam, band)] = np.mean(varstd[laok])
 
         # Loading the control
-        mok = mname.format(forc, 0, 0)
+        if forc == 'pi':
+            mok = 'tpa1'
+        elif forc == 'c4':
+            mok = 't4a1'
+        else:
+            mok = 'bau'
         print(mok)
 
         listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1855)] # skipping the first year
