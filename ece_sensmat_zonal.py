@@ -152,6 +152,7 @@ derdic_err = dict()
 ## Derivata con parametro normalizzato
 for var in allvars:
     figs = []
+    axes = []
     for band in bands:
         fig, ax = plt.subplots(figsize=(16,12))
 
@@ -197,12 +198,14 @@ for var in allvars:
         ax.grid()
         ax.axhline(0., color = 'black')
         ax.set_ylabel('uff_param * derivative of '+ var + ' (W/m2)')
+        axes.append(ax)
 
         fig.suptitle('Derivative of {} in lat band ({}, {})'.format(var, band[0], band[1]))
         figs.append(fig)
 
         #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
 
+    ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal.pdf'.format(var), figs)
 
 with open(cart_out + 'der_sensmat_zonal.p', 'wb') as filox:
