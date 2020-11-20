@@ -80,7 +80,7 @@ valchange['RLCRIT_UPHYS'] = np.array([1.02, 0.95, 0.8, 0.73, 0.91, 0.84])*1e-5
 lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 
-allvars = ['ttr', 'tsr', 'tnr', 'tcc', 'cp', 'lsp']
+allvars = ['ttr', 'tsr', 'tcc', 'cp', 'lsp']
 
 resdic = dict()
 resdic_err = dict()
