@@ -95,7 +95,7 @@ for varnam in allvars:
                 listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1855)] # skipping the first year
 
                 if tl.check_file(listafil[0]):
-                    var, coords, aux_info = ctl.read_ensemble_iris(listafil)
+                    var, coords, aux_info = ctl.read_ensemble_iris(listafil, netcdf4_read = True)
                     varm, varstd = ctl.seasonal_climatology(var, coords['dates'], 'year')
                     varm = ctl.zonal_mean(varm)
                     varstd = ctl.zonal_mean(varstd)
