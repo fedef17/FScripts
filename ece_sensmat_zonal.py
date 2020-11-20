@@ -72,6 +72,25 @@ valchange['RSNOWLIN2'] = np.array([0.079, 0.057, 0.013, 0.001, 0.046, 0.024])
 valchange['RCLDIFF'] = np.array([5, 4, 2, 1, 3.5, 2.5])*1e-6
 valchange['RLCRIT_UPHYS'] = np.array([1.02, 0.95, 0.8, 0.73, 0.91, 0.84])*1e-5
 
+allforc = ['pi', 'c4']
+allchan = 'm n p q l r'.split()
+
+forcsym = dict()
+forcsym['pi'] = 'o'
+forcsym['c4'] = 'x'
+
+forccol = dict()
+forccol['pi'] = 'lightseagreen'
+forccol['c4'] = 'indianred'
+
+changecol = dict()
+changecol['m'] = 'darkblue'
+changecol['n'] = 'steelblue'
+changecol['p'] = 'darkorange'
+changecol['q'] = 'indianred'
+changecol['l'] = 'pink'
+changecol['r'] = 'violet'
+
 # cosa voglio fare: per ogni membro, faccio la media del toa_long e del toa_short annuale. e metto a punto una funzione che dato il cambio dei parametri, mi da l'effetto atteso sulla toa_net. Quindi forse voglio anche qui le derivate. yes, derivate normalizzate per ogni parametro.
 # prima leggo, poi faccio la media zonale?, meglio in bande? SI. [-90, -65, -40, -20, 20, 40, 65, 90]
 # Salvo la media nelle bande per ogni exp
