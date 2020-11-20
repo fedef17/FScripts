@@ -20,6 +20,8 @@ from scipy import stats
 import pandas as pd
 import glob
 
+import tunlib as tl
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
@@ -83,6 +85,7 @@ allvars = ['ttr', 'tsr', 'tnr', 'tcc', 'cp', 'lsp']
 resdic = dict()
 resdic_err = dict()
 for varnam in allvars:
+    print(var)
     for forc in ['pi', 'c4']:
         for nu, let, param in zip(nums, letts, testparams):
             for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
