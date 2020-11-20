@@ -33,7 +33,7 @@ cart_in = '/data-hobbes/fabiano/TunECS/AMIP_exps/'
 cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
 mname = '{:2s}{:1s}{:1s}'
-fil = cart_in + '{:4s}/post/mon/Post_{:4d}/{:4d}_{:4d}_{}.nc'
+fil = cart_in + '{:4s}/post/mon/Post_{:4d}/{:4s}_{:4d}_{}.nc'
 
 testparams = ['ENTRORG', 'RPRCON', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
 nums = np.arange(8)
