@@ -145,12 +145,15 @@ for varnam in allvars:
 
 
 for forc in ['pi', 'c4']:
-    for nu, let, param in zip(nums, letts, testparams):
-        for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
-            for band in bands:
+    for band in bands:
+        for nu, let, param in zip(nums, letts, testparams):
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
                 if (forc, change, let, 'ttr', band) in resdic.keys():
                     resdic[(forc, change, let, 'toa_net', band)] = resdic[(forc, change, let, 'ttr', band)]+resdic[(forc, change, let, 'tsr', band)]
                     resdic_err[(forc, change, let, 'toa_net', band)] = np.mean(resdic_err[(forc, change, let, 'ttr', band)]+resdic_err[(forc, change, let, 'tsr', band)])
+
+        resdic[(forc, 0, 0, 'toa_net', band)] = resdic[(forc, 0, 0, 'ttr', band)]+resdic[(forc, 0, 0, 'tsr', band)]
+        resdic_err[(forc, 0, 0, 'toa_net', band)] = np.mean(resdic_err[(forc, 0, 0, 'ttr', band)]+resdic_err[(forc, 0, 0, 'tsr', band)])
 
 allvars.append('toa_net')
 
