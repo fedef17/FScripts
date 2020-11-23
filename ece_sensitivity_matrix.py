@@ -220,6 +220,8 @@ for var in ['toa_net', 'srf_net']:
     fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('delta'))
 
 ## Derivata con parametro normalizzato
+derdic = dict()
+derdic_err = dict()
 for var in ['toa_net', 'srf_net']:
     fig, ax = plt.subplots(figsize=(16,12))
 
@@ -256,10 +258,12 @@ for var in ['toa_net', 'srf_net']:
             deriv = np.gradient(np.array(cose), np.array(xval))
             print(param, deriv)
             ders.append(uff_params[param]*deriv[1])
+            derdic[(forc, param, var)] = deriv[1]
             errs[1] = -errs[1]
             errs.insert(1, 0.)
             deriv_err = np.gradient(np.array(errs), np.array(xval))
             err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
+            derdic_err[(forc, param, var)] = np.abs(deriv_err[1])
 
         ax.errorbar(nums+shift, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
         ax.scatter(nums+shift, ders, color = forccol[forc], marker = forcsym[forc], s = 100, label = forc)
@@ -275,3 +279,6 @@ for var in ['toa_net', 'srf_net']:
     fig.suptitle('Derivative of {} with respect to params'.format(var))
 
     fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
+
+with open(cart_out + 'der_sensmat_global.p', 'wb') as filox:
+    pickle.dump([resdic, derdic, derdic_err], filox)
