@@ -242,7 +242,7 @@ for var in ['toa_net', 'srf_net']:
             cose = []
             errs = []
             xval = []
-            for ii, change in zip([0, 1, -1, 2, 3], ['m', 'n', '0', 'p', 'q']):
+            for ii, change in zip([1, -1, 2], ['n', '0', 'p']):
                 if change == '0':
                     cose.append(ctrl[forc])
                 else:
@@ -257,17 +257,13 @@ for var in ['toa_net', 'srf_net']:
 
             deriv = np.gradient(np.array(cose), np.array(xval))
             print(param, deriv)
-            ders.append(uff_params[param]*deriv[2])
-            derdic[(forc, param, var)] = deriv[2]
-            derdic[(forc, param, var, 'left')] = deriv[0]
-            derdic[(forc, param, var, 'right')] = deriv[-1]
-
-            errs.insert(2, 0.)
-            errs[3] = -errs[3]
-            errs[4] = -errs[4]
+            ders.append(uff_params[param]*deriv[1])
+            derdic[(forc, param, var)] = deriv[1]
+            errs[1] = -errs[1]
+            errs.insert(1, 0.)
             deriv_err = np.gradient(np.array(errs), np.array(xval))
-            err_ders.append(uff_params[param]*np.abs(deriv_err[2]))
-            derdic_err[(forc, param, var)] = np.abs(deriv_err[2])
+            err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
+            derdic_err[(forc, param, var)] = np.abs(deriv_err[1])
 
         ax.errorbar(nums+shift, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
         ax.scatter(nums+shift, ders, color = forccol[forc], marker = forcsym[forc], s = 100, label = forc)
