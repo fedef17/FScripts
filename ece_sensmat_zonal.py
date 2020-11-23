@@ -228,8 +228,8 @@ for var in allvars:
             ders = []
             err_ders = []
             for band in bands:
-                ders.append(derdic[(forc, change, let, varnam, band)])
-                err_ders.append(derdic_err[(forc, change, let, varnam, band)])
+                ders.append(uff_params[param]*derdic[(forc, change, let, varnam, band)])
+                err_ders.append(uff_params[param]*derdic_err[(forc, change, let, varnam, band)])
 
             ders = np.array(ders)
             err_ders = np.array(err_ders)
