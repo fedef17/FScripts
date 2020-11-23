@@ -182,14 +182,14 @@ for var in allvars:
                         xval.append(uff_params[param])
 
                 deriv = np.gradient(np.array(cose), np.array(xval))
-                derdic[(forc, param, varnam, band)] = deriv[1]
+                derdic[(forc, param, var, band)] = deriv[1]
                 print(param, deriv)
                 ders.append(uff_params[param]*deriv[1])
                 errs[1] = -errs[1]
                 errs.insert(1, 0.)
                 deriv_err = np.gradient(np.array(errs), np.array(xval))
                 err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
-                derdic_err[(forc, param, varnam, band)] = np.abs(deriv_err[1])
+                derdic_err[(forc, param, var, band)] = np.abs(deriv_err[1])
 
             ax.errorbar(nums+shift, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
             ax.scatter(nums+shift, ders, color = forccol[forc], marker = forcsym[forc], s = 100, label = forc)
@@ -229,8 +229,8 @@ for var in allvars:
             ders = []
             err_ders = []
             for band in bands:
-                ders.append(uff_params[param]*derdic[(forc, param, varnam, band)])
-                err_ders.append(uff_params[param]*derdic_err[(forc, param, varnam, band)])
+                ders.append(uff_params[param]*derdic[(forc, param, var, band)])
+                err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band)])
 
             ders = np.array(ders)
             err_ders = np.array(err_ders)
