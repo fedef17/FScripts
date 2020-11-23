@@ -122,7 +122,7 @@ for varnam in allvars:
 
                     for band in bands:
                         laok = (coords['lat'] > band[0]) & (coords['lat'] <= band[1])
-                        print(laok)
+                        #print(laok)
                         resdic[(forc, change, let, varnam, band)] = np.mean(varm[laok])
                         resdic_err[(forc, change, let, varnam, band)] = np.mean(varstd[laok])
 
