@@ -98,6 +98,7 @@ changecol['r'] = 'violet'
 
 lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
+lacen = np.array([np.mean(laol) for laol in bands])
 
 allvars = ['ttr', 'tsr', 'tcc', 'cp', 'lsp']
 
@@ -210,3 +211,43 @@ for var in allvars:
 
 with open(cart_out + 'der_sensmat_zonal.p', 'wb') as filox:
     pickle.dump([resdic, resdic_err, derdic, derdic_err], filox)
+
+
+## Derivata con parametro normalizzato
+for var in allvars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+        fig, ax = plt.subplots(figsize=(16,12))
+
+        ctrl = dict()
+        ctrl['pi'] = resdic[('pi', 0, 0, var, band)]
+        ctrl['c4'] = resdic[('c4', 0, 0, var, band)]
+
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            ders = []
+            err_ders = []
+            for band in bands:
+                ders.append(derdic[(forc, change, let, varnam, band)])
+                err_ders.append(derdic_err[(forc, change, let, varnam, band)])
+
+            ders = np.array(ders)
+            err_ders = np.array(err_ders)
+            ax.fill_between(lacen, ders-err_ders, ders+err_ders, color = forccol[forc], alpha = 0.3)
+            ax.plot(lacen, ders, color = forccol[forc], label = forc)
+            ax.scatter(lacen, ders, color = forccol[forc], marker = forcsym[forc], s = 100)
+            #ax.errorbar(lacen, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
+
+        ax.legend()
+        ax.grid()
+        ax.axhline(0., color = 'black')
+        ax.set_ylabel('uff_param * derivative of '+ var + ' (W/m2)')
+        ax.set_xlabel('Latitude')
+        axes.append(ax)
+
+        fig.suptitle('Zonal derivative of {} wrt {}'.format(var, param))
+        figs.append(fig)
+        #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
+
+    ctl.adjust_ax_scale(axes)
+    ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam.pdf'.format(var), figs)
