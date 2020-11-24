@@ -75,6 +75,10 @@ valchange['RLCRIT_UPHYS'] = np.array([1.02, 0.95, 0.8, 0.73, 0.91, 0.84])*1e-5
 allforc = ['pi', 'c4']
 allchan = 'm n p q l r'.split()
 
+def val_ok(param, change):
+    iok = allchan.index(change)
+    return valchange[param][iok]
+
 forcsym = dict()
 forcsym['pi'] = 'o'
 forcsym['c4'] = 'x'
@@ -112,7 +116,10 @@ for varnam in allvars:
                 mok = mname.format(forc, change, let)
                 print(mok)
 
-                listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1855)] # skipping the first year
+                if forc == 'pi' and let == 'h' and change in ['p', 'n']:
+                    listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1860)] # ten years for these, instead of 5
+                else:
+                    listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1855)] # skipping the first year
 
                 if tl.check_file(listafil[0]):
                     var, coords, aux_info = ctl.read_ensemble_iris(listafil, netcdf4_read = True)
@@ -179,31 +186,56 @@ for var in allvars:
                 cose = []
                 errs = []
                 xval = []
-                for ii, change in zip([1, -1, 2], ['n', '0', 'p']):
-                    if change == '0':
-                        cose.append(ctrl[forc])
-                    else:
-                        cose.append(resdic[(forc, change, let, var, band)])
-                        errs.append(resdic_err[(forc, change, let, var, band)])
+                if (forc, 'l', let, var, band) not in resdic:
+                    for ii, change in zip([1, -1, 2], ['n', '0', 'p']):
+                        if change == '0':
+                            cose.append(ctrl[forc])
+                        else:
+                            cose.append(resdic[(forc, change, let, var, band)])
+                            errs.append(resdic_err[(forc, change, let, var, band)])
 
-                    if ii >= 0:
-                        xval.append(valchange[param][ii])
-                    else:
-                        xval.append(uff_params[param])
+                        if ii >= 0:
+                            xval.append(valchange[param][ii])
+                        else:
+                            xval.append(uff_params[param])
 
-                deriv = np.gradient(np.array(cose), np.array(xval))
-                derdic[(forc, param, var, band)] = deriv[1]
-                derdic[(forc, param, var, band, 'left')] = deriv[0]
-                derdic[(forc, param, var, band, 'right')] = deriv[-1]
+                    deriv = np.gradient(np.array(cose), np.array(xval))
+                    derdic[(forc, param, var, band)] = deriv[1]
+                    derdic[(forc, param, var, band, 'left')] = deriv[0]
+                    derdic[(forc, param, var, band, 'right')] = deriv[-1]
 
-                print(param, deriv)
-                ders.append(uff_params[param]*deriv[1])
+                    print(param, deriv)
+                    ders.append(uff_params[param]*deriv[1])
 
-                errs.insert(1, 0.)
-                errs[2] = -errs[2]
-                deriv_err = np.gradient(np.array(errs), np.array(xval))
-                err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
-                derdic_err[(forc, param, var, band)] = np.abs(deriv_err[1])
+                    errs.insert(1, 0.)
+                    errs[2] = -errs[2]
+                    deriv_err = np.gradient(np.array(errs), np.array(xval))
+                    err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
+                    derdic_err[(forc, param, var, band)] = np.abs(deriv_err[1])
+                else:
+                    for change in ['n', 'l', '0', 'r', 'p']:
+                        if change == '0':
+                            cose.append(ctrl[forc])
+                            errs.append(0)
+                            xval.append(uff_params[param])
+                        else:
+                            cose.append(resdic[(forc, change, let, var, band)])
+                            errs.append(resdic_err[(forc, change, let, var, band)])
+                            xval.append(val_ok(param, change))
+
+                    deriv = np.gradient(np.array(cose), np.array(xval))
+                    derdic[(forc, param, var, band)] = deriv[2]
+                    derdic[(forc, param, var, band, 'left')] = deriv[0]
+                    derdic[(forc, param, var, band, 'right')] = deriv[-1]
+
+                    print(param, deriv)
+                    ders.append(uff_params[param]*deriv[2])
+
+                    errs[3] = -errs[3]
+                    errs[4] = -errs[4]
+                    deriv_err = np.gradient(np.array(errs), np.array(xval))
+                    err_ders.append(uff_params[param]*np.abs(deriv_err[2]))
+                    derdic_err[(forc, param, var, band)] = np.abs(deriv_err[2])
 
             ax.errorbar(nums+shift, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
             ax.scatter(nums+shift, ders, color = forccol[forc], marker = forcsym[forc], s = 100, label = forc)
@@ -235,10 +267,6 @@ for var in allvars:
     for nu, let, param in zip(nums, letts, testparams):
         fig, ax = plt.subplots(figsize=(16,12))
 
-        ctrl = dict()
-        ctrl['pi'] = resdic[('pi', 0, 0, var, band)]
-        ctrl['c4'] = resdic[('c4', 0, 0, var, band)]
-
         for forc, shift in zip(allforc, [-0.05, 0.05]):
             ders = []
             err_ders = []
@@ -266,3 +294,38 @@ for var in allvars:
 
     ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam.pdf'.format(var), figs)
+
+
+############# Plot toa_net diffs for each param
+for var in all_vars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            fig, ax = plt.subplots(figsize=(16,12))
+            ctrl = np.array([resdic[(forc, 0, 0, var, band)] for band in bands])
+
+            for change in ['n', 'l', 'r', 'p']:
+                if (forc, param, change, var, band) not in resdic:
+                    continue
+                vals = np.array([resdic[(forc, param, change, var, band)] for band in bands])
+                err_vals = np.array([resdic_err[(forc, param, change, var, band)] for band in bands])
+
+                ax.fill_between(lacen, vals-err_vals, vals+err_vals, color = changecol[change], alpha = 0.3)
+                ax.plot(lacen, vals, color = changecol[change], label = change, linestyle = forcsty[forc])
+                ax.scatter(lacen, vals, color = changecol[change], marker = forcsym[forc], s = 100)
+
+        ax.legend()
+        ax.grid()
+        ax.axhline(0., color = 'black')
+        ax.set_ylabel('change of '+ var + ' (W/m2)')
+        ax.set_xlabel('Latitude')
+        axes.append(ax)
+
+        fig.suptitle('{} run: change of {} wrt {}'.format(forc, var, param))
+        figs.append(fig)
+        #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
+
+    ctl.adjust_ax_scale(axes)
+    ctl.plot_pdfpages(cart_out + '{}_changemat_zonal.pdf'.format(var), figs)
