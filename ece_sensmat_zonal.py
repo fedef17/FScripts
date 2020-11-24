@@ -305,12 +305,15 @@ for var in allvars:
         for forc, shift in zip(allforc, [-0.05, 0.05]):
             fig, ax = plt.subplots(figsize=(16,12))
             ctrl = np.array([resdic[(forc, 0, 0, var, band)] for band in bands])
+            print('ctrl', ctrl)
 
             for change in ['n', 'l', 'r', 'p']:
                 if (forc, param, change, var, band) not in resdic:
                     continue
                 vals = np.array([resdic[(forc, param, change, var, band)] for band in bands])
+                print(vals)
                 err_vals = np.array([resdic_err[(forc, param, change, var, band)] for band in bands])
+                vals = vals-ctrl
 
                 ax.fill_between(lacen, vals-err_vals, vals+err_vals, color = changecol[change], alpha = 0.3)
                 ax.plot(lacen, vals, color = changecol[change], label = change, linestyle = forcsty[forc])
