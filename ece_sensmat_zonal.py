@@ -299,6 +299,10 @@ for var in allvars:
 
 
 ############# Plot toa_net diffs for each param
+forcsty = dict()
+forcsty['pi'] = '-'
+forcsty['c4'] = '--'
+
 for var in allvars:
     figs = []
     axes = []
