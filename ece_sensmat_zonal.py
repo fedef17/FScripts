@@ -124,6 +124,7 @@ for varnam in allvars:
                 if tl.check_file(listafil[0]):
                     var, coords, aux_info = ctl.read_ensemble_iris(listafil, netcdf4_read = True)
                     varm, varstd = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
+                    varstd = varstd/np.sqrt(len(listafil)-1)
 
                     for band in bands:
                         laok = (coords['lat'] > band[0]) & (coords['lat'] <= band[1])
@@ -144,6 +145,7 @@ for varnam in allvars:
         if tl.check_file(listafil[0]):
             var, coords, aux_info = ctl.read_ensemble_iris(listafil, netcdf4_read = True)
             varm, varstd = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
+            varstd = varstd/np.sqrt(len(listafil)-1)
 
             for band in bands:
                 laok = (coords['lat'] > band[0]) & (coords['lat'] <= band[1])
@@ -308,7 +310,7 @@ for var in allvars:
             print('ctrl', ctrl)
 
             for change in ['n', 'l', 'r', 'p']:
-                if (forc, param, change, var, band) not in resdic:
+                if (forc, change, let, var, bands[0]) not in resdic:
                     continue
                 vals = np.array([resdic[(forc, param, change, var, band)] for band in bands])
                 print(vals)
