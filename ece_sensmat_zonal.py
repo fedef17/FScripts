@@ -297,7 +297,7 @@ for var in allvars:
 
 
 ############# Plot toa_net diffs for each param
-for var in all_vars:
+for var in allvars:
     figs = []
     axes = []
     for nu, let, param in zip(nums, letts, testparams):
