@@ -312,9 +312,9 @@ for var in allvars:
             for change in ['n', 'l', 'r', 'p']:
                 if (forc, change, let, var, bands[0]) not in resdic:
                     continue
-                vals = np.array([resdic[(forc, param, change, var, band)] for band in bands])
+                vals = np.array([resdic[(forc, change, let, var, band)] for band in bands])
                 print(vals)
-                err_vals = np.array([resdic_err[(forc, param, change, var, band)] for band in bands])
+                err_vals = np.array([resdic_err[(forc, change, let, var, band)] for band in bands])
                 vals = vals-ctrl
 
                 ax.fill_between(lacen, vals-err_vals, vals+err_vals, color = changecol[change], alpha = 0.3)
