@@ -286,6 +286,8 @@ for var in allvars:
 
         for forc, shift in zip(allforc, [-0.05, 0.05]):
             ders = []
+            ders_left = []
+            ders_right = []
             err_ders = []
             for band in bands:
                 ders.append(uff_params[param]*derdic[(forc, param, var, band)])
