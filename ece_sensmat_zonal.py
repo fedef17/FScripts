@@ -291,10 +291,9 @@ for dertip in ['', 'left', 'right']:
                 for band in bands:
                     if dertip == '':
                         ders.append(uff_params[param]*derdic[(forc, param, var, band)])
-                        err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band)])
                     else:
                         ders.append(uff_params[param]*derdic[(forc, param, var, band, dertip)])
-                        err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band, dertip)])
+                    err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band)])
 
                 ders = np.array(ders)
                 err_ders = np.array(err_ders)
