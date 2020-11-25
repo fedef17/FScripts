@@ -202,9 +202,6 @@ for var in allvars:
                             xval.append(uff_params[param])
 
                     deriv = np.gradient(np.array(cose), np.array(xval))
-                    if not tl.check_increasing(xval):
-                        print('Reverse order for xval! changing deriv sign')
-                        deriv = -1.0*deriv # I want deriv to be defined unambiguosly
 
                     derdic[(forc, param, var, band)] = deriv[1]
                     derdic[(forc, param, var, band, 'left')] = deriv[0]

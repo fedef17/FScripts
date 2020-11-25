@@ -256,9 +256,6 @@ for var in ['toa_net', 'srf_net']:
                     xval.append(uff_params[param])
 
             deriv = np.gradient(np.array(cose), np.array(xval))
-            if not tl.check_increasing(xval):
-                print('Reverse order for xval! changing deriv sign')
-                deriv = -1.0*deriv # I want deriv to be defined unambiguosly
 
             print(param, deriv)
             ders.append(uff_params[param]*deriv[1])
