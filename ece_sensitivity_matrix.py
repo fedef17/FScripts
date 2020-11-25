@@ -260,6 +260,16 @@ for var in ['toa_net', 'srf_net']:
             print(param, deriv)
             ders.append(uff_params[param]*deriv[1])
             derdic[(forc, param, var)] = deriv[1]
+            if tl.check_increasing(xval):
+                derdic[(forc, param, var, 'left')] = deriv[0]
+                derdic[(forc, param, var, 'right')] = deriv[-1]
+            elif tl.check_decreasing(xval):
+                derdic[(forc, param, var, 'left')] = deriv[-1]
+                derdic[(forc, param, var, 'right')] = deriv[0]
+            else:
+                print(xval)
+                raise ValueError('problema tenemos')
+
             errs[1] = -errs[1]
             errs.insert(1, 0.)
             deriv_err = np.gradient(np.array(errs), np.array(xval))

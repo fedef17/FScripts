@@ -203,11 +203,18 @@ for var in allvars:
 
                     deriv = np.gradient(np.array(cose), np.array(xval))
 
-                    derdic[(forc, param, var, band)] = deriv[1]
-                    derdic[(forc, param, var, band, 'left')] = deriv[0]
-                    derdic[(forc, param, var, band, 'right')] = deriv[-1]
-
                     print(param, deriv)
+                    derdic[(forc, param, var, band)] = deriv[1]
+                    if tl.check_increasing(xval):
+                        derdic[(forc, param, var, band, 'left')] = deriv[0]
+                        derdic[(forc, param, var, band, 'right')] = deriv[-1]
+                    elif tl.check_decreasing(xval):
+                        derdic[(forc, param, var, band, 'left')] = deriv[-1]
+                        derdic[(forc, param, var, band, 'right')] = deriv[0]
+                    else:
+                        print(xval)
+                        raise ValueError('problema tenemos')
+
                     ders.append(uff_params[param]*deriv[1])
 
                     errs.insert(1, 0.)
@@ -228,10 +235,17 @@ for var in allvars:
 
                     deriv = np.gradient(np.array(cose), np.array(xval))
                     derdic[(forc, param, var, band)] = deriv[2]
-                    derdic[(forc, param, var, band, 'left')] = deriv[0]
-                    derdic[(forc, param, var, band, 'right')] = deriv[-1]
-
                     print(param, deriv)
+                    if tl.check_increasing(xval):
+                        derdic[(forc, param, var, band, 'left')] = deriv[0]
+                        derdic[(forc, param, var, band, 'right')] = deriv[-1]
+                    elif tl.check_decreasing(xval):
+                        derdic[(forc, param, var, band, 'left')] = deriv[-1]
+                        derdic[(forc, param, var, band, 'right')] = deriv[0]
+                    else:
+                        print(xval)
+                        raise ValueError('problema tenemos')
+
                     ders.append(uff_params[param]*deriv[2])
 
                     errs[3] = -errs[3]
