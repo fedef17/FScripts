@@ -237,6 +237,9 @@ for var in ['toa_net', 'srf_net']:
 
     for forc, shift in zip(allforc, [-0.05, 0.05]):
         ders = []
+        ders_left = []
+        ders_right = []
+
         err_ders = []
         for nu, let, param in zip(nums, letts, testparams):
             cose = []
@@ -270,6 +273,9 @@ for var in ['toa_net', 'srf_net']:
                 print(xval)
                 raise ValueError('problema tenemos')
 
+            ders_left.append(uff_params[param]*derdic[(forc, param, var, 'left')])
+            ders_right.append(uff_params[param]*derdic[(forc, param, var, 'right')])
+
             errs[1] = -errs[1]
             errs.insert(1, 0.)
             deriv_err = np.gradient(np.array(errs), np.array(xval))
@@ -278,6 +284,8 @@ for var in ['toa_net', 'srf_net']:
 
         ax.errorbar(nums+shift, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
         ax.scatter(nums+shift, ders, color = forccol[forc], marker = forcsym[forc], s = 100, label = forc)
+        ax.scatter(nums+shift, ders_left, color = forccol[forc], marker = '<', s = 70, label = forc)
+        ax.scatter(nums+shift, ders_right, color = forccol[forc], marker = '>', s = 70, label = forc)
 
 
     ax.legend()

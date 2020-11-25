@@ -278,39 +278,44 @@ with open(cart_out + 'der_sensmat_zonal.p', 'wb') as filox:
 
 
 ## Derivata con parametro normalizzato
-for var in allvars:
-    figs = []
-    axes = []
-    for nu, let, param in zip(nums, letts, testparams):
-        fig, ax = plt.subplots(figsize=(16,12))
+for dertip in ['', 'left', 'right']:
+    for var in allvars:
+        figs = []
+        axes = []
+        for nu, let, param in zip(nums, letts, testparams):
+            fig, ax = plt.subplots(figsize=(16,12))
 
-        for forc, shift in zip(allforc, [-0.05, 0.05]):
-            ders = []
-            err_ders = []
-            for band in bands:
-                ders.append(uff_params[param]*derdic[(forc, param, var, band)])
-                err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band)])
+            for forc, shift in zip(allforc, [-0.05, 0.05]):
+                ders = []
+                err_ders = []
+                for band in bands:
+                    if dertip == '':
+                        ders.append(uff_params[param]*derdic[(forc, param, var, band)])
+                        err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band)])
+                    else:
+                        ders.append(uff_params[param]*derdic[(forc, param, var, band, dertip)])
+                        err_ders.append(uff_params[param]*derdic_err[(forc, param, var, band, dertip)])
 
-            ders = np.array(ders)
-            err_ders = np.array(err_ders)
-            ax.fill_between(lacen, ders-err_ders, ders+err_ders, color = forccol[forc], alpha = 0.3)
-            ax.plot(lacen, ders, color = forccol[forc], label = forc)
-            ax.scatter(lacen, ders, color = forccol[forc], marker = forcsym[forc], s = 100)
-            #ax.errorbar(lacen, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
+                ders = np.array(ders)
+                err_ders = np.array(err_ders)
+                ax.fill_between(lacen, ders-err_ders, ders+err_ders, color = forccol[forc], alpha = 0.3)
+                ax.plot(lacen, ders, color = forccol[forc], label = forc)
+                ax.scatter(lacen, ders, color = forccol[forc], marker = forcsym[forc], s = 100)
+                #ax.errorbar(lacen, ders, yerr = err_ders, fmt = 'none', color = forccol[forc], capsize = 2, elinewidth = 1)
 
-        ax.legend()
-        ax.grid()
-        ax.axhline(0., color = 'black')
-        ax.set_ylabel('uff_param * derivative of '+ var + ' (W/m2)')
-        ax.set_xlabel('Latitude')
-        axes.append(ax)
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            ax.set_ylabel('uff_param * derivative of '+ var + ' (W/m2)')
+            ax.set_xlabel('Latitude')
+            axes.append(ax)
 
-        fig.suptitle('Zonal derivative of {} wrt {}'.format(var, param))
-        figs.append(fig)
-        #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
+            fig.suptitle('Zonal derivative of {} wrt {}'.format(var, param))
+            figs.append(fig)
+            #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
 
-    ctl.adjust_ax_scale(axes)
-    ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam.pdf'.format(var), figs)
+        ctl.adjust_ax_scale(axes)
+        ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam{}.pdf'.format(var, dertip), figs)
 
 
 ############# Plot toa_net diffs for each param
