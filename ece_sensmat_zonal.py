@@ -314,7 +314,7 @@ for var in allvars:
         #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
 
     ctl.adjust_ax_scale(axes)
-    ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam{}.pdf'.format(var, dertip), figs)
+    ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal_wparam.pdf'.format(var), figs)
 
 
 ############# Plot toa_net diffs for each param
