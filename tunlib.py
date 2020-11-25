@@ -53,3 +53,7 @@ def check_file(filnam):
         return True
     else:
         return False
+
+
+def check_increasing(arr):
+    return np.all(np.diff(arr) > 0)
