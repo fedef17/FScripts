@@ -59,7 +59,7 @@ lacen = np.array([np.mean(laol) for laol in bands])
 
 ##################################################################################
 
-def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
+def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
     """
     Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
 
@@ -90,7 +90,7 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = der
     return var_change_glob, var_change_zonal
 
 
-def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv'):
+def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge'):
     """
     Simply sums the change for each param.
     """
@@ -101,6 +101,36 @@ def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv'):
         cglob, czon = calc_change_var(forc, param, var, newpar_set[param], method = method)
         var_change_glob += cglob
         var_change_zonal += czon
+
+    return var_change_glob, var_change_zonal
+
+
+def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge'):
+    """
+    Gives the change in var in the c4 run wrt pi.
+    """
+
+    var_change_glob = 0.
+    var_change_zonal = np.zeros(len(bands))
+
+    for param in newpar_set:
+        cglob, czon = calc_change_c4pi(param, var, newpar_set[param], method = method)
+        var_change_glob += cglob
+        var_change_zonal += czon
+
+    return var_change_glob, var_change_zonal
+
+
+def calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge'):
+    """
+    Gives the change in var in the c4 run wrt pi.
+    """
+
+    cglob_c4, czon_c4 = calc_change_var('c4', param, var, newpar_val, method = method)
+    cglob_pi, czon_pi = calc_change_var('pi', param, var, newpar_val, method = method)
+
+    var_change_glob = cglob_c4 - cglob_pi
+    var_change_zonal = czon_c4 - czon_pi
 
     return var_change_glob, var_change_zonal
 
