@@ -168,7 +168,7 @@ for varnam in allvars:
             varm, varstd = ctl.global_seas_climatology(var, coords['dates'], 'year')
             varstd = varstd/np.sqrt(len(listafil)-1)
             resdic[(forc, change, let, varnam, 'glob')] = varm
-            resdic_err[(forc, change, let, varnam, 'glob')] = varstd)
+            resdic_err[(forc, change, let, varnam, 'glob')] = varstd
 
 
 for var in ['toa_net', 'srf_net']:
