@@ -33,11 +33,10 @@ cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
     _, _, derdic, _ = pickle.load(filox)
 
-with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
-    gigi = pickle.load(filox)
-    derdic_glo = gigi[-2]
-
-derdic.update(derdic_glo)
+# with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
+#     gigi = pickle.load(filox)
+#     derdic_glo = gigi[-2]
+# derdic.update(derdic_glo)
 
 spldic = None
 
@@ -68,7 +67,7 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = der
     """
 
     if method == 'deriv':
-        der_g = derdic[(forc, param, var)]
+        der_g = derdic[(forc, param, var, 'glob')]
         var_change_glob = (newpar_val-uff_params[param])*der_g
 
         der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
@@ -78,7 +77,7 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = der
             edge = 'left'
         else:
             edge = 'right'
-        der_g = derdic[(forc, param, var, edge)]
+        der_g = derdic[(forc, param, var, 'glob', edge)]
         var_change_glob = (newpar_val-uff_params[param])*der_g
 
         der_z = np.array([derdic[(forc, param, var, band, edge)] for band in bands])

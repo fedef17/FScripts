@@ -104,7 +104,16 @@ lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
-allvars = ['ttr', 'tsr', 'tcc', 'cp', 'lsp']
+allvars = ['ttr', 'tsr', 'str', 'ssr', 'tcc', 'cp', 'lsp']
+
+# tsr: This parameter is the incoming solar radiation (also known as shortwave radiation) minus the outgoing solar radiation at the top of the atmosphere. It is the amount of radiation passing through a horizontal plane. The incoming solar radiation is the amount received from the Sun. The outgoing solar radiation is the amount reflected and scattered by the Earth's atmosphere and surface.
+# ttr: The thermal (also known as terrestrial or longwave) radiation emitted to space at the top of the atmosphere is commonly known as the Outgoing Longwave Radiation (OLR). The top net thermal radiation (this parameter) is equal to the negative of OLR.
+# tsr + ttr = tnr. Positive -> incoming! (downward)
+# ssr: This parameter is the amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth (both direct and diffuse) minus the amount reflected by the Earth's surface (which is governed by the albedo).
+# str: This parameter is the difference between downward and upward thermal radiation at the surface of the Earth. It the amount passing through a horizontal plane.
+# ssr + str = snr. Positive -> downward
+
+# energia assorbita da atm: tnr-snr
 
 resdic = dict()
 resdic_err = dict()
@@ -127,10 +136,13 @@ for varnam in allvars:
                     varstd = varstd/np.sqrt(len(listafil)-1)
 
                     for band in bands:
-                        laok = (coords['lat'] > band[0]) & (coords['lat'] <= band[1])
-                        #print(laok)
-                        resdic[(forc, change, let, varnam, band)] = np.mean(varm[laok])
-                        resdic_err[(forc, change, let, varnam, band)] = np.mean(varstd[laok])
+                        resdic[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varm, coords['lat'], band[0], band[1])
+                        resdic_err[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varstd, coords['lat'], band[0], band[1])
+
+                    varm, varstd = ctl.global_seas_climatology(var, coords['dates'], 'year')
+                    varstd = varstd/np.sqrt(len(listafil)-1)
+                    resdic[(forc, change, let, varnam, 'glob')] = varm
+                    resdic_err[(forc, change, let, varnam, 'glob')] = varstd
 
         # Loading the control
         if forc == 'pi':
@@ -147,24 +159,33 @@ for varnam in allvars:
             varm, varstd = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
             varstd = varstd/np.sqrt(len(listafil)-1)
 
+            change = 0
+            let = 0
             for band in bands:
-                laok = (coords['lat'] > band[0]) & (coords['lat'] <= band[1])
-                resdic[(forc, 0, 0, varnam, band)] = np.mean(varm[laok])
-                resdic_err[(forc, 0, 0, varnam, band)] = np.mean(varstd[laok])
+                resdic[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varm, coords['lat'], band[0], band[1])
+                resdic_err[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varstd, coords['lat'], band[0], band[1])
+
+            varm, varstd = ctl.global_seas_climatology(var, coords['dates'], 'year')
+            varstd = varstd/np.sqrt(len(listafil)-1)
+            resdic[(forc, change, let, varnam, 'glob')] = varm
+            resdic_err[(forc, change, let, varnam, 'glob')] = varstd)
 
 
-for forc in ['pi', 'c4']:
-    for band in bands:
-        for nu, let, param in zip(nums, letts, testparams):
-            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
-                if (forc, change, let, 'ttr', band) in resdic.keys():
-                    resdic[(forc, change, let, 'toa_net', band)] = resdic[(forc, change, let, 'ttr', band)]+resdic[(forc, change, let, 'tsr', band)]
-                    resdic_err[(forc, change, let, 'toa_net', band)] = np.mean(resdic_err[(forc, change, let, 'ttr', band)]+resdic_err[(forc, change, let, 'tsr', band)])
+for var in ['toa_net', 'srf_net']:
+    firl = var[0]
+    for forc in ['pi', 'c4']:
+        for band in bands+['glob']:
+            for nu, let, param in zip(nums, letts, testparams):
+                for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                    if (forc, change, let, firl+'tr', band) in resdic.keys():
+                        resdic[(forc, change, let, var, band)] = resdic[(forc, change, let, firl+'tr', band)]+resdic[(forc, change, let, firl+'sr', band)]
+                        resdic_err[(forc, change, let, var, band)] = np.mean(resdic_err[(forc, change, let, firl+'tr', band)]+resdic_err[(forc, change, let, firl+'sr', band)])
 
-        resdic[(forc, 0, 0, 'toa_net', band)] = resdic[(forc, 0, 0, 'ttr', band)]+resdic[(forc, 0, 0, 'tsr', band)]
-        resdic_err[(forc, 0, 0, 'toa_net', band)] = np.mean(resdic_err[(forc, 0, 0, 'ttr', band)]+resdic_err[(forc, 0, 0, 'tsr', band)])
+            resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, firl+'tr', band)]+resdic[(forc, 0, 0, firl+'sr', band)]
+            resdic_err[(forc, 0, 0, var, band)] = np.mean(resdic_err[(forc, 0, 0, firl+'tr', band)]+resdic_err[(forc, 0, 0, firl+'sr', band)])
 
 allvars.append('toa_net')
+allvars.append('srf_net')
 
 allforc = ['pi', 'c4']
 
@@ -174,7 +195,7 @@ derdic_err = dict()
 for var in allvars:
     figs = []
     axes = []
-    for band in bands:
+    for band in bands + ['glob']:
         fig, ax = plt.subplots(figsize=(16,12))
 
         ctrl = dict()
