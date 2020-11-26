@@ -139,7 +139,7 @@ for varnam in allvars:
                         resdic[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varm, coords['lat'], band[0], band[1])
                         resdic_err[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varstd, coords['lat'], band[0], band[1])
 
-                    varm, varstd = ctl.global_seas_climatology(var, coords['dates'], 'year')
+                    varm, varstd = ctl.global_seas_climatology(var, coords['lat'], coords['dates'], 'year')
                     varstd = varstd/np.sqrt(len(listafil)-1)
                     resdic[(forc, change, let, varnam, 'glob')] = varm
                     resdic_err[(forc, change, let, varnam, 'glob')] = varstd
@@ -165,7 +165,7 @@ for varnam in allvars:
                 resdic[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varm, coords['lat'], band[0], band[1])
                 resdic_err[(forc, change, let, varnam, band)] = ctl.band_mean_from_zonal(varstd, coords['lat'], band[0], band[1])
 
-            varm, varstd = ctl.global_seas_climatology(var, coords['dates'], 'year')
+            varm, varstd = ctl.global_seas_climatology(var, coords['lat'], coords['dates'], 'year')
             varstd = varstd/np.sqrt(len(listafil)-1)
             resdic[(forc, change, let, varnam, 'glob')] = varm
             resdic_err[(forc, change, let, varnam, 'glob')] = varstd
