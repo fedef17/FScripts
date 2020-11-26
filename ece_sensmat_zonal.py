@@ -454,8 +454,8 @@ for var in allvars:
     for nu, let, param in zip(nums, letts, testparams):
         fig, ax = plt.subplots(figsize=(16,12))
         for forc, shift in zip(allforc, [-0.05, 0.05]):
-            ctrl = resdic_mean[(forc, 0, 0, var)]
-            ctrl_err = resdic_err[(forc, 0, 0, var)]
+            ctrl = resdic[(forc, 0, 0, var, 'glob')]
+            ctrl_err = resdic_err[(forc, 0, 0, var, 'glob')]
 
             vals = []
             err_vals = []
