@@ -308,7 +308,7 @@ forcsty = dict()
 forcsty['pi'] = '-'
 forcsty['c4'] = '--'
 
-for var in allvars:
+for var in ['toa_net', 'srf_net']:
     figs = []
     axes = []
     for nu, let, param in zip(nums, letts, testparams):
@@ -353,7 +353,7 @@ for var in allvars:
     ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)
 
 
-for var in allvars:
+for var in ['toa_net', 'srf_net']:
     figs = []
     axes = []
     for nu, let, param in zip(nums, letts, testparams):
