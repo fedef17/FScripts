@@ -130,6 +130,74 @@ for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
         cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
 
+    print('\n PARSET: \n')
+    print(parset)
+
+print('\n\n ------------------------------ \n\n')
+
+for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
+    print('\n\n\n--------  param set: {}     ----------\n'.format(nam))
+    print('\nChange in pi\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nChange in sensitivity\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nFirst, equilibrating prec with DETRPEN and RMFDEPS\n')
+    okparams = ['DETRPEN', 'RMFDEPS']
+    start = [uff_params[par] for par in okparams]
+    okbounds_lo = np.array([bo for bo, par in zip(bounds[0], testparams) if par in okparams])
+    okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
+    okbounds = (okbounds_lo, okbounds_hi)
+
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'psl', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
+    nuvals = result.x
+    nudic = dict(zip(okparams, nuvals))
+    parset.update(nudic)
+
+    print('\n PARSET: \n')
+    print(parset)
+
+    print('\nChange in pi\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nChange in sensitivity\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nSecond, equilibrating toa_net with RCLDIFF and RLCRIT_UPHYS\n')
+
+    okparams = ['RCLDIFF', 'RLCRIT_UPHYS']
+    start = [uff_params[par] for par in okparams]
+    okbounds_lo = np.array([bo for bo, par in zip(bounds[0], testparams) if par in okparams])
+    okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
+    okbounds = (okbounds_lo, okbounds_hi)
+
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'toa_net', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
+    nuvals = result.x
+    nudic = dict(zip(okparams, nuvals))
+    parset.update(nudic)
+
+    print('\nChange in pi\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nChange in sensitivity\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\n PARSET: \n')
+    print(parset)
+
 # Warming: RPRCON- : 0.0010, RSNOWLIN2+ : 0.05, ENTRORG- : 0.00014 (or less),
 # Cooling: RPRCON+ : 0.0018, RSNOWLIN2+ : 0.02,  ENTRORG+ : 0.00020, DETRPEN+/-, RMFDEPS +/-, RVICE +,  RCLDIFF-, RLCRIT_UPHYS +/-
 # More prec:
