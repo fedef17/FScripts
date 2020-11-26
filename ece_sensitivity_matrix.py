@@ -78,7 +78,7 @@ valchange['RLCRIT_UPHYS'] = np.array([1.02, 0.95, 0.8, 0.73, 0.91, 0.84])*1e-5
 
 resdic = dict()
 resdic_mean = dict()
-resdic_errr = dict()
+resdic_err = dict()
 
 for forc in ['pi', 'c4']:
     for nu, let, param in zip(nums, letts, testparams):
