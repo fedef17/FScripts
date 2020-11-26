@@ -94,12 +94,13 @@ parset_w = {'ENTRORG' : 0.00014, 'RPRCON' : 0.001, 'RSNOWLIN2' : 0.05}
 parset_c = {'ENTRORG' : 0.0002, 'RPRCON' : 0.0018, 'RSNOWLIN2' : 0.02}
 
 for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
-    print('Change in pi\n')
+    print('\n--------  param set: {}     ----------\n'.format(nam))
+    print('\nChange in pi\n')
     for var in allvars:
         cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
 
-    print('Change in sensitivity\n')
+    print('\nChange in sensitivity\n')
     for var in allvars:
         cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
