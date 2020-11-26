@@ -153,11 +153,12 @@ def delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deri
     var_change_glob, var_change_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
     return var_change_glob
 
+
 def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
     newpar_set = dict(zip(okparams, newpars))
     jac = []
     for param in newpar_set:
-        der = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
+        der, _ = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
         jac.append(der)
 
     return np.array(jac)
