@@ -294,8 +294,33 @@ for var in allvars:
     ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_sensmat_zonal.pdf'.format(var), figs)
 
+
+### Adding simple linear deriv
+linder = dict()
+linder_err = dict()
+for var in allvars:
+    for band in bands + ['glob']:
+        ctrl = dict()
+        ctrl['pi'] = resdic[('pi', 0, 0, var, band)]
+        ctrl['c4'] = resdic[('c4', 0, 0, var, band)]
+
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            for nu, let, param in zip(nums, letts, testparams):
+                for iic, change in zip([1, 2], ['n', 'p']):
+                    if valchange[param][iic] < uff_params[param]:
+                        diff = ctrl[forc] - resdic[(forc, change, let, var, band)]
+                        xdi = uff_params[param] - valchange[param][iic]
+                        linder[(forc, param, var, band, 'left')] = diff/xdi
+                        linder_err[(forc, param, var, band, 'left')] = resdic_err[(forc, change, let, var, band)]/xdi
+                    else:
+                        diff = resdic[(forc, change, let, var, band)] - ctrl[forc]
+                        xdi = valchange[param][iic] - uff_params[param]
+                        linder[(forc, param, var, band, 'right')] = diff/xdi
+                        linder_err[(forc, param, var, band, 'right')] = resdic_err[(forc, change, let, var, band)]/xdi
+
+
 with open(cart_out + 'der_sensmat_zonal.p', 'wb') as filox:
-    pickle.dump([resdic, resdic_err, derdic, derdic_err], filox)
+    pickle.dump([resdic, resdic_err, derdic, derdic_err, linder, linder_err], filox)
 
 
 ## Derivata con parametro normalizzato

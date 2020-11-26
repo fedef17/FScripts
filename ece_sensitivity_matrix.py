@@ -395,6 +395,7 @@ for var in ['toa_net', 'srf_net']:
 
             ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
             ax.plot(xval, vals, color = forccol[forc], label = forc)
+            ax.scatter(xval, vals, color = forccol[forc], marker = forcsym[forc], s = 100)
 
             ax.legend()
             ax.grid()
