@@ -27,6 +27,7 @@ plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
+cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
 # Loading the derivatives of the vars wrt params
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:

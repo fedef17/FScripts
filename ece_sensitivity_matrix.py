@@ -351,3 +351,58 @@ for var in allvars:
 
     ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)
+
+
+for var in allvars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+        fig, ax = plt.subplots(figsize=(16,12))
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            ctrl = resdic[(forc, 0, 0, var)]
+            ctrl_err = resdic_err[(forc, 0, 0, var)]
+
+            vals = []
+            vals_check = []
+            vals_check_2 = []
+            err_vals = []
+            xval = []
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, var) not in resdic:
+                    continue
+                vals.append(resdic[(forc, change, let, var)])
+
+                cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv')
+                vals_check.append(cglob)
+                cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv_edge')
+                vals_check_2.append(cglob)
+
+                err_vals.append(resdic_err[(forc, change, let, var)])
+                xval.append(valchange[param][iic])
+
+            ax.scatter(xval, vals_check, color = forccol[forc], marker = '*', s = 70)
+            ax.scatter(xval, vals_check_2, color = forccol[forc], marker = '<', s = 70)
+
+            if tl.check_increasing(xval):
+                ii = np.where(xval > uff_params[param])[0][0]
+            elif tl.check_decreasing(xval):
+                ii = np.where(xval < uff_params[param])[0][0]
+            xval.insert(ii, uff_params[param])
+            vals.insert(ii, ctrl)
+            err_vals.insert(ii, ctrl_err)
+
+            ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
+            ax.plot(xval, vals, color = forccol[forc], label = forc)
+
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            ax.set_ylabel('change of '+ var + ' (W/m2)')
+            ax.set_xlabel(param)
+
+        axes.append(ax)
+        fig.suptitle('change of {} wrt {}'.format(var, param))
+        figs.append(fig)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.plot_pdfpages(cart_out + '{}_changemat_global_wcheck.pdf'.format(var), figs)
