@@ -59,12 +59,12 @@ lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
-climvars = dict()
-for var in allvars:
-    glo, zon = clim_var('pi', var)
-    climvars[var] = glo
-    climvars[(var, 'zonal')] = zon
-    print(var, glo)
+# climvars = dict()
+# for var in allvars:
+#     glo, zon = clim_var('pi', var)
+#     climvars[var] = glo
+#     climvars[(var, 'zonal')] = zon
+#     print(var, glo)
 
 ##################################################################################
 def clim_var(forc, var):
