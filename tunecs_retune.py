@@ -109,7 +109,7 @@ for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
         cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
 
-    okparams = [par in testparams if par not in parset.keys()]
+    okparams = [par for par in testparams if par not in parset.keys()]
     start = [uff_params[par] for par in okparams]
     result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'net_toa', 'deriv_edge', ), verbose=1, method = 'trf', bounds = bounds)
     nuvals = result.x
