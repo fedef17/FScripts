@@ -446,3 +446,45 @@ for var in allvars:
 
     ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_changemat_zonal_wcheck.pdf'.format(var), figs)
+
+
+for var in allvars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+        fig, ax = plt.subplots(figsize=(16,12))
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            ctrl = resdic_mean[(forc, 0, 0, var)]
+            ctrl_err = resdic_err[(forc, 0, 0, var)]
+
+            vals = []
+            err_vals = []
+            xval = []
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, var, 'glob') not in resdic:
+                    continue
+                vals.append(resdic[(forc, change, let, var, 'glob')])
+                err_vals.append(resdic_err[(forc, change, let, var, 'glob')])
+                xval.append(valchange[param][iic])
+
+            xval.append(uff_params[param])
+            vals.append(ctrl)
+            err_vals.append(ctrl_err)
+            xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
+
+            ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
+            ax.plot(xval, vals, color = forccol[forc], label = forc)
+            ax.scatter(xval, vals, color = forccol[forc], marker = forcsym[forc], s = 100)
+
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            ax.set_ylabel('change of '+ var)
+            ax.set_xlabel(param)
+
+        axes.append(ax)
+        fig.suptitle('change of {} wrt {}'.format(var, param))
+        figs.append(fig)
+
+    ctl.adjust_ax_scale(axes, sel_axis = 'y')
+    ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)
