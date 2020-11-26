@@ -22,6 +22,8 @@ import glob
 
 import tunlib as tl
 
+from scipy.optimize import Bounds, minimize, least_squares
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
@@ -53,6 +55,8 @@ uff_params['RMFDEPS'] = 0.3
 uff_params['RCLDIFF'] = 3.E-6
 uff_params['RCLDIFFC'] = 5.0
 uff_params['RLCRIT_UPHYS'] = 0.875e-5
+
+bounds = (np.array([1e-4, 9e-4, 0.4e-4, 0.1, 0.08, 0.015, 1.e-6, 0.7e-5]), np.array([2.4e-4, 2.e-3, 1.3e-4, 0.5, 0.2, 0.055, 5.e-6, 1.1e-5]))
 
 diseqs = dict()
 diseqs['m'] = -2
@@ -95,6 +99,23 @@ parset_c = {'ENTRORG' : 0.0002, 'RPRCON' : 0.0018, 'RSNOWLIN2' : 0.02}
 
 for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
     print('\n--------  param set: {}     ----------\n'.format(nam))
+    print('\nChange in pi\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('\nChange in sensitivity\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    okparams = [par in testparams if par not in parset.keys()]
+    start = [uff_params[par] for par in okparams]
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'net_toa', 'deriv_edge', ), verbose=1, method = 'trf', bounds = bounds)
+    nuvals = result.x
+    nudic = dict(zip(okparams, nuvals))
+    parset.update(nudic)
+
     print('\nChange in pi\n')
     for var in allvars:
         cglob, czon = tl.calc_change_var_allparams('pi', var, parset)

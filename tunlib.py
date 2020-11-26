@@ -38,6 +38,8 @@ with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
 #     derdic_glo = gigi[-2]
 # derdic.update(derdic_glo)
 
+testparams = ['ENTRORG', 'RPRCON', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
+
 spldic = None
 
 uff_params = dict()
@@ -99,6 +101,37 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic 
     return var_change_glob, var_change_zonal
 
 
+def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
+    """
+    Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
+
+    Available methods: deriv, deriv_edge, spline
+    """
+
+    if method == 'deriv':
+        der_g = derdic[(forc, param, var, 'glob')]
+        var_change_glob = der_g
+
+        der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
+        var_change_zonal = der_z
+    elif method == 'deriv_edge':
+        if newpar_val < uff_params[param]:
+            edge = 'left'
+        else:
+            edge = 'right'
+        der_g = linder[(forc, param, var, 'glob', edge)]
+        var_change_glob = der_g
+
+        der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
+        var_change_zonal = der_z
+    elif method == 'spline':
+        pass
+    else:
+        raise ValueError('method {} not available'.format(method))
+
+    return var_change_glob, var_change_zonal
+
+
 def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge'):
     """
     Simply sums the change for each param.
@@ -112,6 +145,22 @@ def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge'):
         var_change_zonal += czon
 
     return var_change_glob, var_change_zonal
+
+
+def delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+    newpar_set = dict(zip(okparams, newpars))
+    newpar_set.update(fix_parset)
+    var_change_glob, var_change_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
+    return var_change_glob
+
+def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+    newpar_set = dict(zip(okparams, newpars))
+    jac = []
+    for param in newpar_set:
+        der = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
+        jac.append(der)
+
+    return np.array(jac)
 
 
 def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge'):
