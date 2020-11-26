@@ -394,9 +394,9 @@ for var in ['toa_net', 'srf_net']:
             ax.scatter(xval, vals_check_2, color = forccol[forc], marker = '<', s = 70)
 
             if tl.check_increasing(xval):
-                ii = np.where(xval > uff_params[param])[0][0]
+                ii = np.where(np.array(xval) > uff_params[param])[0][0]
             elif tl.check_decreasing(xval):
-                ii = np.where(xval < uff_params[param])[0][0]
+                ii = np.where(np.array(xval) < uff_params[param])[0][0]
             xval.insert(ii, uff_params[param])
             vals.insert(ii, ctrl)
             err_vals.insert(ii, ctrl_err)
