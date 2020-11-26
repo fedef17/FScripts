@@ -31,7 +31,7 @@ cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
 # Loading the derivatives of the vars wrt params
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
-    _, _, derdic, _ = pickle.load(filox)
+    _, _, derdic, _, linder, _ = pickle.load(filox)
 
 # with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
 #     gigi = pickle.load(filox)
@@ -59,7 +59,7 @@ lacen = np.array([np.mean(laol) for laol in bands])
 
 ##################################################################################
 
-def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = derdic, spldic = spldic, uff_params = uff_params):
+def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
     """
     Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
 
@@ -77,10 +77,10 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv', derdic = der
             edge = 'left'
         else:
             edge = 'right'
-        der_g = derdic[(forc, param, var, 'glob', edge)]
+        der_g = linder[(forc, param, var, 'glob', edge)]
         var_change_glob = (newpar_val-uff_params[param])*der_g
 
-        der_z = np.array([derdic[(forc, param, var, band, edge)] for band in bands])
+        der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
         var_change_zonal = (newpar_val-uff_params[param])*der_z
     elif method == 'spline':
         pass
