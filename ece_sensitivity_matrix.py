@@ -301,3 +301,53 @@ for var in ['toa_net', 'srf_net']:
 
 with open(cart_out + 'der_sensmat_global.p', 'wb') as filox:
     pickle.dump([resdic, derdic, derdic_err], filox)
+
+
+############# Plot toa_net diffs for each param
+forcsty = dict()
+forcsty['pi'] = '-'
+forcsty['c4'] = '--'
+
+for var in allvars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+        fig, ax = plt.subplots(figsize=(16,12))
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            ctrl = resdic[(forc, 0, 0, var)]
+            ctrl_err = resdic_err[(forc, 0, 0, var)]
+
+            vals = []
+            err_vals = []
+            xval = []
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, var) not in resdic:
+                    continue
+                vals.append(resdic[(forc, change, let, var)])
+                err_vals.append(resdic_err[(forc, change, let, var)])
+                xval.append(valchange[param][iic])
+
+            if tl.check_increasing(xval):
+                ii = np.where(xval > uff_params[param])[0][0]
+            elif tl.check_decreasing(xval):
+                ii = np.where(xval < uff_params[param])[0][0]
+            xval.insert(ii, uff_params[param])
+            vals.insert(ii, ctrl)
+            err_vals.insert(ii, ctrl_err)
+
+            ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
+            ax.plot(xval, vals, color = forccol[forc], label = forc)
+            ax.scatter(xval, vals, color = forccol[forc], marker = forcsym[forc], s = 100)
+
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            ax.set_ylabel('change of '+ var + ' (W/m2)')
+            ax.set_xlabel(param)
+
+        axes.append(ax)
+        fig.suptitle('change of {} wrt {}'.format(var, param))
+        figs.append(fig)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)

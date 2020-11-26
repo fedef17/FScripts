@@ -359,3 +359,44 @@ for var in allvars:
 
     ctl.adjust_ax_scale(axes)
     ctl.plot_pdfpages(cart_out + '{}_changemat_zonal.pdf'.format(var), figs)
+
+
+for var in allvars:
+    figs = []
+    axes = []
+    for nu, let, param in zip(nums, letts, testparams):
+
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            fig, ax = plt.subplots(figsize=(16,12))
+            ctrl = np.array([resdic[(forc, 0, 0, var, band)] for band in bands])
+            print('ctrl', ctrl)
+
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, var, bands[0]) not in resdic:
+                    continue
+                vals = np.array([resdic[(forc, change, let, var, band)] for band in bands])
+                print(vals)
+                err_vals = np.array([resdic_err[(forc, change, let, var, band)] for band in bands])
+                vals = vals-ctrl
+
+                ax.fill_between(lacen, vals-err_vals, vals+err_vals, color = changecol[change], alpha = 0.3)
+                ax.plot(lacen, vals, color = changecol[change], label = change, linestyle = forcsty[forc])
+
+                cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv')
+                ax.scatter(lacen, czon, color = changecol[change], marker = '*', s = 70)
+                cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv_edge')
+                ax.scatter(lacen, czon, color = changecol[change], marker = '<', s = 70)
+
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            ax.set_ylabel('change of '+ var + ' (W/m2)')
+            ax.set_xlabel('Latitude')
+            axes.append(ax)
+
+            fig.suptitle('{} run: change of {} wrt {}'.format(forc, var, param))
+            figs.append(fig)
+            #fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
+
+    ctl.adjust_ax_scale(axes)
+    ctl.plot_pdfpages(cart_out + '{}_changemat_zonal_wcheck.pdf'.format(var), figs)
