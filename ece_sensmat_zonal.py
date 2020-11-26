@@ -189,8 +189,8 @@ for var in allvars:
                 errs = []
                 xval = []
                 if (forc, 'l', let, var, band) not in resdic:
-                    for ii, change in zip([1, -1, 2], ['n', '0', 'p']):
-                        if change == '0':
+                    for ii, change in zip([1, -1, 2], ['n', 0, 'p']):
+                        if change == 0:
                             cose.append(ctrl[forc])
                         else:
                             cose.append(resdic[(forc, change, let, var, band)])
@@ -223,8 +223,8 @@ for var in allvars:
                     err_ders.append(uff_params[param]*np.abs(deriv_err[1]))
                     derdic_err[(forc, param, var, band)] = np.abs(deriv_err[1])
                 else:
-                    for change in ['n', 'l', '0', 'r', 'p']:
-                        if change == '0':
+                    for change in ['n', 'l', 0, 'r', 'p']:
+                        if change == 0:
                             cose.append(ctrl[forc])
                             errs.append(0)
                             xval.append(uff_params[param])

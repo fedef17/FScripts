@@ -34,7 +34,7 @@ with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
     _, _, derdic, _ = pickle.load(filox)
 
 with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
-    _, derdic_glo, _ = pickle.load(filox)
+    _, _, derdic_glo, _ = pickle.load(filox)
 
 derdic.update(derdic_glo)
 

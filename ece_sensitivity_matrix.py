@@ -77,6 +77,9 @@ valchange['RCLDIFF'] = np.array([5, 4, 2, 1, 3.5, 2.5])*1e-6
 valchange['RLCRIT_UPHYS'] = np.array([1.02, 0.95, 0.8, 0.73, 0.91, 0.84])*1e-5
 
 resdic = dict()
+resdic_mean = dict()
+resdic_errr = dict()
+
 for forc in ['pi', 'c4']:
     for nu, let, param in zip(nums, letts, testparams):
         for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
@@ -97,8 +100,8 @@ if tl.check_file(filnam):
     print('ok!', filnam)
     anni, toa_net, srf_net, tas = tl.read_gregory(filnam)
     forc = 'pi'
-    change = '0'
-    let = '0'
+    change = 0
+    let = 0
     resdic[(forc, change, let, 'toa_net')] = toa_net
     resdic[(forc, change, let, 'srf_net')] = srf_net
     resdic[(forc, change, let, 'years')] = anni
@@ -110,8 +113,8 @@ if tl.check_file(filnam):
     print('ok!', filnam)
     anni, toa_net, srf_net, tas = tl.read_gregory(filnam)
     forc = 'c4'
-    change = '0'
-    let = '0'
+    change = 0
+    let = 0
     resdic[(forc, change, let, 'toa_net')] = toa_net
     resdic[(forc, change, let, 'srf_net')] = srf_net
     resdic[(forc, change, let, 'years')] = anni
@@ -142,8 +145,8 @@ for tip in ['diff', 'abs']:
         fig, ax = plt.subplots(figsize=(16,12))
         for forc, shift in zip(allforc, [-0.05, 0.05]):
 
-            change = '0'
-            let = '0'
+            change = 0
+            let = 0
             scatt = []
             errs = []
             vals = resdic[(forc, change, let, var)]
@@ -188,8 +191,8 @@ for tip in ['diff', 'abs']:
 for var in ['toa_net', 'srf_net']:
     fig, ax = plt.subplots(figsize=(16,12))
 
-    change = '0'
-    let = '0'
+    change = 0
+    let = 0
     forc = 'pi'
     vals = resdic[(forc, change, let, var)]
     ctrl_pi = np.mean(vals[1:])
@@ -226,8 +229,8 @@ for var in ['toa_net', 'srf_net']:
     fig, ax = plt.subplots(figsize=(16,12))
 
     ctrl = dict()
-    change = '0'
-    let = '0'
+    change = 0
+    let = 0
     forc = 'pi'
     vals = resdic[(forc, change, let, var)]
     ctrl['pi'] = np.mean(vals[1:])
@@ -245,8 +248,8 @@ for var in ['toa_net', 'srf_net']:
             cose = []
             errs = []
             xval = []
-            for ii, change in zip([1, -1, 2], ['n', '0', 'p']):
-                if change == '0':
+            for ii, change in zip([1, -1, 2], ['n', 0, 'p']):
+                if change == 0:
                     cose.append(ctrl[forc])
                 else:
                     vals = resdic[(forc, change, let, var)]
@@ -299,8 +302,13 @@ for var in ['toa_net', 'srf_net']:
 
     fig.savefig(cart_out + var+'_scattplot_{}.pdf'.format('deriv'))
 
+for ke in resdic:
+    if ke[-1] in ['toa_net', 'srf_net']:
+        resdic_mean[ke] = np.mean(resdic[ke][1:])
+        resdic_err[ke] = np.std(resdic[ke][1:])
+
 with open(cart_out + 'der_sensmat_global.p', 'wb') as filox:
-    pickle.dump([resdic, derdic, derdic_err], filox)
+    pickle.dump([resdic_mean, resdic_err, derdic, derdic_err], filox)
 
 
 ############# Plot toa_net diffs for each param
@@ -314,8 +322,8 @@ for var in ['toa_net', 'srf_net']:
     for nu, let, param in zip(nums, letts, testparams):
         fig, ax = plt.subplots(figsize=(16,12))
         for forc, shift in zip(allforc, [-0.05, 0.05]):
-            ctrl = resdic[(forc, '0', '0', var)]
-            ctrl_err = resdic_err[(forc, '0', '0', var)]
+            ctrl = resdic_mean[(forc, 0, 0, var)]
+            ctrl_err = resdic_err[(forc, 0, 0, var)]
 
             vals = []
             err_vals = []
@@ -323,7 +331,7 @@ for var in ['toa_net', 'srf_net']:
             for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
                 if (forc, change, let, var) not in resdic:
                     continue
-                vals.append(resdic[(forc, change, let, var)])
+                vals.append(resdic_mean[(forc, change, let, var)])
                 err_vals.append(resdic_err[(forc, change, let, var)])
                 xval.append(valchange[param][iic])
 
@@ -359,8 +367,8 @@ for var in ['toa_net', 'srf_net']:
     for nu, let, param in zip(nums, letts, testparams):
         fig, ax = plt.subplots(figsize=(16,12))
         for forc, shift in zip(allforc, [-0.05, 0.05]):
-            ctrl = resdic[(forc, '0', '0', var)]
-            ctrl_err = resdic_err[(forc, '0', '0', var)]
+            ctrl = resdic_mean[(forc, 0, 0, var)]
+            ctrl_err = resdic_err[(forc, 0, 0, var)]
 
             vals = []
             vals_check = []
@@ -370,7 +378,7 @@ for var in ['toa_net', 'srf_net']:
             for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
                 if (forc, change, let, var) not in resdic:
                     continue
-                vals.append(resdic[(forc, change, let, var)])
+                vals.append(resdic_mean[(forc, change, let, var)])
 
                 cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv')
                 vals_check.append(cglob)
