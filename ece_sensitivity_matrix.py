@@ -342,6 +342,8 @@ for var in ['toa_net', 'srf_net']:
             xval.insert(ii, uff_params[param])
             vals.insert(ii, ctrl)
             err_vals.insert(ii, ctrl_err)
+            vals = np.array(vals)
+            err_vals = np.array(err_vals)
 
             ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
             ax.plot(xval, vals, color = forccol[forc], label = forc)
@@ -399,6 +401,8 @@ for var in ['toa_net', 'srf_net']:
             vals.insert(ii, ctrl)
             err_vals.insert(ii, ctrl_err)
 
+            vals = np.array(vals)
+            err_vals = np.array(err_vals)
             ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
             ax.plot(xval, vals, color = forccol[forc], label = forc)
 
