@@ -59,6 +59,13 @@ lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
+climvars = dict()
+for var in allvars:
+    glo, zon = clim_var('pi', var)
+    climvars[var] = glo
+    climvars[(var, 'zonal')] = zon
+    print(var, glo)
+
 ##################################################################################
 def clim_var(forc, var):
     """
@@ -151,7 +158,7 @@ def delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deri
     newpar_set = dict(zip(okparams, newpars))
     newpar_set.update(fix_parset)
     var_change_glob, var_change_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
-    return var_change_glob
+    return var_change_glob/np.abs(climvars[var])
 
 
 def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
@@ -161,7 +168,7 @@ def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = '
         der, _ = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
         jac.append(der)
 
-    return np.array(jac)
+    return np.array(jac)/np.abs(climvars[var])
 
 
 def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge'):
