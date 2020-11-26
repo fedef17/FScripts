@@ -375,7 +375,7 @@ for var in ['toa_net', 'srf_net']:
             for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
                 if (forc, change, let, var) not in resdic:
                     continue
-                vals.append(resdic_mean[(forc, change, let, var)])
+                vals.append(resdic_mean[(forc, change, let, var)]-ctrl)
 
                 cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv')
                 vals_check.append(cglob)
@@ -389,7 +389,7 @@ for var in ['toa_net', 'srf_net']:
             ax.scatter(xval, vals_check_2, color = forccol[forc], marker = '<', s = 70)
 
             xval.append(uff_params[param])
-            vals.append(ctrl)
+            vals.append(0.) #ctrl) # I measure the change here, so 0 for the control
             err_vals.append(ctrl_err)
             xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
 
