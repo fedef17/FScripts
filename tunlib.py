@@ -31,7 +31,7 @@ cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
 # Loading the derivatives of the vars wrt params
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
-    _, _, derdic, _, linder, _ = pickle.load(filox)
+    resdic, _, derdic, _, linder, _ = pickle.load(filox)
 
 # with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
 #     gigi = pickle.load(filox)
@@ -58,6 +58,15 @@ bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
 ##################################################################################
+def clim_var(forc, var):
+    """
+    Gives the climatological values of var with the official param.
+    """
+    global_var = resdic[(forc, 0, 0, var, 'glob')]
+    zonal_var = np.array([resdic[(forc, 0, 0, var, band)] for band in bands])
+
+    return global_var, zonal_var
+
 
 def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
     """

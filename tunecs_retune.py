@@ -81,8 +81,28 @@ def val_ok(param, change):
 ##########################################
 
 ##### OK. This scripts estimates the best values for all parameters, once one or more of them are set.
+allvars = ['toa_net', 'srf_net', 'cp', 'lsp', 'tcc']
 
+climvars = dict()
+for var in allvars:
+    glo, zon = tl.clim_var('pi', var)
+    climvars[var] = glo
+    climvars[(var, 'zonal')] = zon
+    print(var, glo)
 
+parset_w = {'ENTRORG' : 0.00014, 'RPRCON' : 0.001, 'RSNOWLIN2' : 0.05}
+parset_c = {'ENTRORG' : 0.0002, 'RPRCON' : 0.0018, 'RSNOWLIN2' : 0.02}
+
+for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
+    print('Change in pi\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
+
+    print('Change in sensitivity\n')
+    for var in allvars:
+        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
+        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
 
 # Warming: RPRCON- : 0.0010, RSNOWLIN2+ : 0.05, ENTRORG- : 0.00014 (or less),
 # Cooling: RPRCON+ : 0.0018, RSNOWLIN2+ : 0.02,  ENTRORG+ : 0.00020, DETRPEN+/-, RMFDEPS +/-, RVICE +,  RCLDIFF-, RLCRIT_UPHYS +/-
@@ -90,6 +110,6 @@ def val_ok(param, change):
 
 # DETRPEN and RMFDEPS may be used to balance precipitation, in response to RPRCON/ENTRORG changes. Also, this might produce extreme wetting/drying in the future
 
-
 #cglob, czon = tl.calc_change_var_allparams(forc, var, new_set, method = 'deriv_edge')
+
 #cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv_edge')
