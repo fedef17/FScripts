@@ -85,6 +85,9 @@ def val_ok(param, change):
 ##########################################
 
 ##### OK. This scripts estimates the best values for all parameters, once one or more of them are set.
+xtol = 1.e-12
+gtol = 1.e-12
+
 allvars = ['toa_net', 'srf_net', 'cp', 'lsp', 'tcc']
 
 climvars = dict()
@@ -154,7 +157,7 @@ for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
     okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
     okbounds = (okbounds_lo, okbounds_hi)
 
-    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'lsp', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'lsp', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
     nuvals = result.x
     nudic = dict(zip(okparams, nuvals))
     parset.update(nudic)
@@ -180,7 +183,7 @@ for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
     okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
     okbounds = (okbounds_lo, okbounds_hi)
 
-    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'toa_net', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'toa_net', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
     nuvals = result.x
     nudic = dict(zip(okparams, nuvals))
     parset.update(nudic)
