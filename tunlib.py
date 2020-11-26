@@ -35,7 +35,7 @@ with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
 
 with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
     gigi = pickle.load(filox)
-    derdic = gigi[-2]
+    derdic_glo = gigi[-2]
 
 derdic.update(derdic_glo)
 
