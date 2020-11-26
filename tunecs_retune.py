@@ -115,7 +115,7 @@ for parset, nam in zip([parset_w, parset_c], ['high ECS', 'low ECS']):
     okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
     okbounds = (okbounds_lo, okbounds_hi)
 
-    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'net_toa', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
+    result = least_squares(tl.delta_pi_glob, start, jac = tl.jac_delta_pi_glob, args = (okparams, parset, 'toa_net', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds)
     nuvals = result.x
     nudic = dict(zip(okparams, nuvals))
     parset.update(nudic)
