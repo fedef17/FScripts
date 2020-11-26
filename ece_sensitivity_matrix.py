@@ -335,15 +335,10 @@ for var in ['toa_net', 'srf_net']:
                 err_vals.append(resdic_err[(forc, change, let, var)])
                 xval.append(valchange[param][iic])
 
-            if tl.check_increasing(xval):
-                ii = np.where(np.array(xval) > uff_params[param])[0][0]
-            elif tl.check_decreasing(xval):
-                ii = np.where(np.array(xval) < uff_params[param])[0][0]
-            xval.insert(ii, uff_params[param])
-            vals.insert(ii, ctrl)
-            err_vals.insert(ii, ctrl_err)
-            vals = np.array(vals)
-            err_vals = np.array(err_vals)
+            xval.append(uff_params[param])
+            vals.append(ctrl)
+            err_vals.append(ctrl_err)
+            xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
 
             ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
             ax.plot(xval, vals, color = forccol[forc], label = forc)
@@ -393,16 +388,11 @@ for var in ['toa_net', 'srf_net']:
             ax.scatter(xval, vals_check, color = forccol[forc], marker = '*', s = 70)
             ax.scatter(xval, vals_check_2, color = forccol[forc], marker = '<', s = 70)
 
-            if tl.check_increasing(xval):
-                ii = np.where(np.array(xval) > uff_params[param])[0][0]
-            elif tl.check_decreasing(xval):
-                ii = np.where(np.array(xval) < uff_params[param])[0][0]
-            xval.insert(ii, uff_params[param])
-            vals.insert(ii, ctrl)
-            err_vals.insert(ii, ctrl_err)
+            xval.append(uff_params[param])
+            vals.append(ctrl)
+            err_vals.append(ctrl_err)
+            xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
 
-            vals = np.array(vals)
-            err_vals = np.array(err_vals)
             ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
             ax.plot(xval, vals, color = forccol[forc], label = forc)
 

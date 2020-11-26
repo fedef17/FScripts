@@ -131,6 +131,21 @@ def check_file(filnam):
     else:
         return False
 
+def order_increasing(arr, *args):
+    """
+    Orders all args (and arr) according to the increasing order of arr.
+    """
+    nuord = np.argsort(arr)
+    nuarr = np.array(arr)[nuord]
+
+    nulist = []
+    nulist.append(nuarr)
+
+    for co in args:
+        nulist.append(np.array(co)[nuord])
+
+    return nulist
+
 def check_increasing(arr):
     return np.all(np.diff(arr) > 0)
 
