@@ -296,8 +296,8 @@ for var in allvars:
 
 
 ### Adding simple linear deriv
-linder = dict()
-linder_err = dict()
+linder = dict()
+linder_err = dict()
 for var in allvars:
     for band in bands + ['glob']:
         ctrl = dict()
