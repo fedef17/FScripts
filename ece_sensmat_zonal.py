@@ -514,13 +514,14 @@ for var in allvars:
             err_vals.append(ctrl_err)
             xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
 
-            cose[forc] = (vals, err_vals)
+            cose[forc] = (vals-ctrl, err_vals)
 
         err_vals = np.mean([cose[forc][1] for forc in allforc], axis = 0)
         vals = cose['c4'][0] - cose['pi'][0]
-        ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
-        ax.plot(xval, vals, color = forccol[forc], label = forc)
-        ax.scatter(xval, vals, color = forccol[forc], marker = forcsym[forc], s = 100)
+        col = 'mediumaquamarine'
+        ax.fill_between(xval, vals-err_vals, vals+err_vals, color = col, alpha = 0.3)
+        ax.plot(xval, vals, color = col, label = forc)
+        ax.scatter(xval, vals, color = col, marker = forcsym[forc], s = 100)
 
         ax.legend()
         ax.grid()
