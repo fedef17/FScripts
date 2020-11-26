@@ -357,7 +357,7 @@ for var in ['toa_net', 'srf_net']:
         fig.suptitle('change of {} wrt {}'.format(var, param))
         figs.append(fig)
 
-    ctl.adjust_ax_scale(axes)
+    ctl.adjust_ax_scale(axes, sel_axis = 'y')
     ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)
 
 
@@ -412,5 +412,5 @@ for var in ['toa_net', 'srf_net']:
         fig.suptitle('change of {} wrt {}'.format(var, param))
         figs.append(fig)
 
-    ctl.adjust_ax_scale(axes)
+    ctl.adjust_ax_scale(axes, sel_axis = 'y')
     ctl.plot_pdfpages(cart_out + '{}_changemat_global_wcheck.pdf'.format(var), figs)
