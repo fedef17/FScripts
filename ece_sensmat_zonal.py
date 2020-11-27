@@ -104,7 +104,7 @@ lats = [-90, -65, -40, -20, 20, 40, 65, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
-allvars = ['ttr', 'tsr', 'str', 'ssr', 'tcc', 'cp', 'lsp']
+allvars = ['ttr', 'tsr', 'str', 'ssr', 'sshf', 'slhf', 'tcc', 'cp', 'lsp']
 
 # tsr: This parameter is the incoming solar radiation (also known as shortwave radiation) minus the outgoing solar radiation at the top of the atmosphere. It is the amount of radiation passing through a horizontal plane. The incoming solar radiation is the amount received from the Sun. The outgoing solar radiation is the amount reflected and scattered by the Earth's atmosphere and surface.
 # ttr: The thermal (also known as terrestrial or longwave) radiation emitted to space at the top of the atmosphere is commonly known as the Outgoing Longwave Radiation (OLR). The top net thermal radiation (this parameter) is equal to the negative of OLR.
@@ -112,6 +112,8 @@ allvars = ['ttr', 'tsr', 'str', 'ssr', 'tcc', 'cp', 'lsp']
 # ssr: This parameter is the amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth (both direct and diffuse) minus the amount reflected by the Earth's surface (which is governed by the albedo).
 # str: This parameter is the difference between downward and upward thermal radiation at the surface of the Earth. It the amount passing through a horizontal plane.
 # ssr + str = snr. Positive -> downward
+# MA!!!! ATTENZIONE!!!! snr del hiresclim non è solo la radiazione, ci sono anche i flussi di calore: sshf (Sensible heat flux) e slhf (Latent heat flux), definiti POSITIVI verso l'alto, cioè dalla superficie all'atmosfera.
+# srf_net = (ssr + str) - (sshf + slhf)
 
 # energia assorbita da atm: tnr-snr
 
@@ -171,18 +173,29 @@ for varnam in allvars:
             resdic_err[(forc, change, let, varnam, 'glob')] = varstd
 
 
-for var in ['toa_net', 'srf_net']:
-    firl = var[0]
-    for forc in ['pi', 'c4']:
-        for band in bands+['glob']:
-            for nu, let, param in zip(nums, letts, testparams):
-                for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
-                    if (forc, change, let, firl+'tr', band) in resdic.keys():
-                        resdic[(forc, change, let, var, band)] = resdic[(forc, change, let, firl+'tr', band)]+resdic[(forc, change, let, firl+'sr', band)]
-                        resdic_err[(forc, change, let, var, band)] = np.mean(resdic_err[(forc, change, let, firl+'tr', band)]+resdic_err[(forc, change, let, firl+'sr', band)])
+var = 'toa_net'
+for forc in ['pi', 'c4']:
+    for band in bands+['glob']:
+        for nu, let, param in zip(nums, letts, testparams):
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, 'ttr', band) in resdic.keys():
+                    resdic[(forc, change, let, var, band)] = resdic[(forc, change, let, 'ttr', band)]+resdic[(forc, change, let, 'tsr', band)]
+                    resdic_err[(forc, change, let, var, band)] = np.mean([resdic_err[(forc, change, let, 'ttr', band)], resdic_err[(forc, change, let, 'tsr', band)]])
 
-            resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, firl+'tr', band)]+resdic[(forc, 0, 0, firl+'sr', band)]
-            resdic_err[(forc, 0, 0, var, band)] = np.mean(resdic_err[(forc, 0, 0, firl+'tr', band)]+resdic_err[(forc, 0, 0, firl+'sr', band)])
+        resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, 'ttr', band)]+resdic[(forc, 0, 0, 'tsr', band)]
+        resdic_err[(forc, 0, 0, var, band)] = np.mean([resdic_err[(forc, 0, 0, 'ttr', band)], resdic_err[(forc, 0, 0, 'tsr', band)]])
+
+var = 'srf_net'
+for forc in ['pi', 'c4']:
+    for band in bands+['glob']:
+        for nu, let, param in zip(nums, letts, testparams):
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, 'ttr', band) in resdic.keys():
+                    resdic[(forc, change, let, var, band)] = (resdic[(forc, change, let, 'str', band)]+resdic[(forc, change, let, 'ssr', band)]) - (resdic[(forc, change, let, 'sshf', band)]+resdic[(forc, change, let, 'slhf', band)])
+                    resdic_err[(forc, change, let, var, band)] = np.mean([resdic_err[(forc, change, let, 'str', band)], resdic_err[(forc, change, let, 'ssr', band)], resdic_err[(forc, change, let, 'slhf', band)], resdic_err[(forc, change, let, 'sshf', band)]])
+
+        resdic[(forc, 0, 0, var, band)] = (resdic[(forc, 0, 0, 'str', band)]+resdic[(forc, 0, 0, 'ssr', band)]) - (resdic[(forc, 0, 0, 'slhf', band)]+resdic[(forc, 0, 0, 'sshf', band)])
+        resdic_err[(forc, 0, 0, var, band)] = np.mean([resdic_err[(forc, 0, 0, 'str', band)], resdic_err[(forc, 0, 0, 'ssr', band)], resdic_err[(forc, 0, 0, 'slhf', band)], resdic_err[(forc, 0, 0, 'sshf', band)]])
 
 allvars.append('toa_net')
 allvars.append('srf_net')
