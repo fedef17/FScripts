@@ -112,8 +112,8 @@ allvars = ['ttr', 'tsr', 'str', 'ssr', 'sshf', 'slhf', 'tcc', 'cp', 'lsp']
 # ssr: This parameter is the amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth (both direct and diffuse) minus the amount reflected by the Earth's surface (which is governed by the albedo).
 # str: This parameter is the difference between downward and upward thermal radiation at the surface of the Earth. It the amount passing through a horizontal plane.
 # ssr + str = snr. Positive -> downward
-# MA!!!! ATTENZIONE!!!! snr del hiresclim non è solo la radiazione, ci sono anche i flussi di calore: sshf (Sensible heat flux) e slhf (Latent heat flux), definiti POSITIVI verso l'alto, cioè dalla superficie all'atmosfera.
-# srf_net = (ssr + str) - (sshf + slhf)
+# MA!!!! ATTENZIONE!!!! snr del hiresclim non è solo la radiazione, ci sono anche i flussi di calore: sshf (Sensible heat flux) e slhf (Latent heat flux), che sono già netti e definiti POSITIVI verso il basso. The ECMWF convention for vertical fluxes is positive downwards.
+# srf_net = ssr + str + sshf + slhf
 
 # energia assorbita da atm: tnr-snr
 
@@ -191,10 +191,10 @@ for forc in ['pi', 'c4']:
         for nu, let, param in zip(nums, letts, testparams):
             for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
                 if (forc, change, let, 'ttr', band) in resdic.keys():
-                    resdic[(forc, change, let, var, band)] = (resdic[(forc, change, let, 'str', band)]+resdic[(forc, change, let, 'ssr', band)]) - (resdic[(forc, change, let, 'sshf', band)]+resdic[(forc, change, let, 'slhf', band)])
+                    resdic[(forc, change, let, var, band)] = resdic[(forc, change, let, 'str', band)]+resdic[(forc, change, let, 'ssr', band)] + resdic[(forc, change, let, 'sshf', band)]+resdic[(forc, change, let, 'slhf', band)]
                     resdic_err[(forc, change, let, var, band)] = np.mean([resdic_err[(forc, change, let, 'str', band)], resdic_err[(forc, change, let, 'ssr', band)], resdic_err[(forc, change, let, 'slhf', band)], resdic_err[(forc, change, let, 'sshf', band)]])
 
-        resdic[(forc, 0, 0, var, band)] = (resdic[(forc, 0, 0, 'str', band)]+resdic[(forc, 0, 0, 'ssr', band)]) - (resdic[(forc, 0, 0, 'slhf', band)]+resdic[(forc, 0, 0, 'sshf', band)])
+        resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, 'str', band)]+resdic[(forc, 0, 0, 'ssr', band)] + resdic[(forc, 0, 0, 'slhf', band)]+resdic[(forc, 0, 0, 'sshf', band)]
         resdic_err[(forc, 0, 0, var, band)] = np.mean([resdic_err[(forc, 0, 0, 'str', band)], resdic_err[(forc, 0, 0, 'ssr', band)], resdic_err[(forc, 0, 0, 'slhf', band)], resdic_err[(forc, 0, 0, 'sshf', band)]])
 
 allvars.append('toa_net')
