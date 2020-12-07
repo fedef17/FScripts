@@ -171,6 +171,59 @@ def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = '
     return np.array(jac)
 
 
+def delta_c4pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+    newpar_set = dict(zip(okparams, newpars))
+    newpar_set.update(fix_parset)
+    var_change_glob, var_change_zonal = calc_change_c4pi_allparams(var, newpar_set, method = method)
+    return var_change_glob
+
+
+def jac_delta_c4pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+    newpar_set = dict(zip(okparams, newpars))
+    jac = []
+    for param in newpar_set:
+        der, _ = jac_calc_change_c4pi(param, var, newpar_set[param], method = method)
+        jac.append(der)
+
+    return np.array(jac)
+
+
+def delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_change = 1.0, method = 'deriv_edge'):
+    """
+    Minimizes the change for pi and gets the change in c4 closer to c4pi_change.
+    """
+    newpar_set = dict(zip(okparams, newpars))
+    newpar_set.update(fix_parset)
+    var_c4pi_glob, var_c4pi_zonal = calc_change_c4pi_allparams(var, newpar_set, method = method)
+    var_pi_glob, var_pi_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
+
+    delta = np.array([var_pi_glob, var_c4pi_glob - c4pi_change])
+
+    return delta
+
+
+def jac_delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_change = 1.0, method = 'deriv_edge'):
+    """
+    Minimizes the change for pi and gets the change in c4 closer to c4pi_change.
+    """
+
+    newpar_set = dict(zip(okparams, newpars))
+
+    jac1 = []
+    for param in newpar_set:
+        der1, _ = jac_calc_change_c4pi(param, var, newpar_set[param], method = method)
+        jac1.append(der1)
+
+    jac2 = []
+    for param in newpar_set:
+        der2, _ = jac_calc_change_c4pi(param, var, newpar_set[param], method = method)
+        jac2.append(der2)
+
+    jac = np.stack([jac1, jac2])
+    
+    return jac
+
+
 def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge'):
     """
     Gives the change in var in the c4 run wrt pi.
@@ -199,6 +252,22 @@ def calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge'):
     var_change_zonal = czon_c4 - czon_pi
 
     return var_change_glob, var_change_zonal
+
+
+def jac_calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
+    """
+    Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
+
+    Available methods: deriv, deriv_edge, spline
+    """
+
+    der_glob_c4, der_zonal_c4 = jac_calc_change_var('c4', param, var, newpar_set[param], method = method)
+    der_glob_pi, der_zonal_pi = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
+
+    der_glob = der_glob_c4-der_glob_pi
+    der_zonal = der_zonal_c4-der_zonal_pi
+
+    return der_glob, der_zonal
 
 
 def read_gregory(filnam):

@@ -100,7 +100,8 @@ changecol['r'] = 'violet'
 # Salvo la media nelle bande per ogni exp
 # poi faccio le derivate, banda per banda, e le plotto, normalizzate. un plot per pi e uno per c4, per ogni var.
 
-lats = [-90, -65, -40, -20, 20, 40, 65, 90]
+#lats = [-90, -65, -40, -20, 20, 40, 65, 90]
+lats = [-90, -60, -30, 30, 60, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
