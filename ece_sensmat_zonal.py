@@ -134,6 +134,9 @@ for varnam in allvars:
                     listafil = [fil.format(mok, ye, mok, ye, varnam) for ye in range(1851, 1855)] # skipping the first year
 
                 if tl.check_file(listafil[0]):
+                    if not tl.check_file(listafil[-1]): # Many jobs did not terminate!!
+                        listafil = listafil[:-1]
+
                     var, coords, aux_info = ctl.read_ensemble_iris(listafil, netcdf4_read = True)
                     varm, varstd = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
                     varstd = varstd/np.sqrt(len(listafil)-1)
