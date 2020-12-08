@@ -142,7 +142,7 @@ for rprval, c4pi_change in zip([0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019], 
 fig, ax = plt.subplots(figsize=(16,12))
 
 colors = ctl.color_set(len(allsets))
-for parset in allsets:
+for parset, col in zip(allsets, colors):
     parvals = [parset[param]/uff_params[param] for param in testparams]
     ax.scatter(np.arange(len(parvals)), parvals, color = col, s = 100, label = 'RPRCON = {:6.4f}'.format(parset['RPRCON']))
 
