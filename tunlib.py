@@ -189,7 +189,7 @@ def jac_delta_c4pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method =
     return np.array(jac)
 
 
-def delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_change = 1.0, method = 'deriv_edge'):
+def delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_change = 1.0, method = 'deriv_edge', pi_weight = 10.):
     """
     Minimizes the change for pi and gets the change in c4 closer to c4pi_change.
     """
@@ -199,7 +199,7 @@ def delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_chang
     var_pi_glob, var_pi_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
 
     print(var_pi_glob, var_c4pi_glob, c4pi_change)
-    delta = np.array([var_pi_glob, var_c4pi_glob - c4pi_change])
+    delta = np.array([pi_weight*var_pi_glob, var_c4pi_glob - c4pi_change])
 
     return delta
 
