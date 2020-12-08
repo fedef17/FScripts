@@ -198,6 +198,7 @@ def delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_chang
     var_c4pi_glob, var_c4pi_zonal = calc_change_c4pi_allparams(var, newpar_set, method = method)
     var_pi_glob, var_pi_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
 
+    print(var_pi_glob, var_c4pi_glob, c4pi_change)
     delta = np.array([var_pi_glob, var_c4pi_glob - c4pi_change])
 
     return delta

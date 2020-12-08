@@ -99,11 +99,17 @@ for var in allvars:
 
 print('\n\n ------------------------------ \n\n')
 
-for rprval in np.linspace(0.0008, 0.0018, 11):
+for rprval in [0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019]:
     print('\n\n ------------------------------ \n\n')
     parset = {'RPRCON' : rprval}
     print('\n PARSET: \n')
     print(parset)
+    if rprval < 0.00134:
+        print('HIGH ECS! \n')
+        c4pi_change = 1.5
+    else:
+        print('LOW ECS! \n')
+        c4pi_change = -1.5
 
     okparams = ['ENTRORG', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
     start = [uff_params[par] for par in okparams]
@@ -111,7 +117,7 @@ for rprval in np.linspace(0.0008, 0.0018, 11):
     okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
     okbounds = (okbounds_lo, okbounds_hi)
 
-    result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
+    result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
     nuvals = result.x
     nudic = dict(zip(okparams, nuvals))
     parset.update(nudic)
