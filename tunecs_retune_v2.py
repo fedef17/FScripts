@@ -99,6 +99,7 @@ for var in allvars:
 
 print('\n\n ------------------------------ \n\n')
 
+allsets = []
 for rprval, c4pi_change in zip([0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019], [1., 0.7, 0.5, -0.5, -1, -1.7]):
     print('\n\n ------------------------------ \n\n')
     parset = {'RPRCON' : rprval}
@@ -134,6 +135,25 @@ for rprval, c4pi_change in zip([0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019], 
         cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
         print(('{:8s}: '+5*' {:6.3e}').format('zonal', *czon))
+
+    allsets.append(parset)
+
+
+fig, ax = plt.subplots(figsize=(16,12))
+
+colors = ctl.color_set(len(allsets))
+for parset in allset:
+    parvals = [parset[param]/uff_params[param] for param in testparams]
+    ax.scatter(np.arange(len(parvals)), parvals, color = col, s = 100, label = 'RPRCON = {:6.4f}'.format(parset['RPRCON']))
+
+ax.set_xticks(np.arange(len(parvals)))
+ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+ax.grid()
+ax.set_ylabel('change wrt uff. value')
+ax.legend()
+
+fig.savefig(cart_out + 'tunecs_retune_v2.pdf')
+
 
 # Warming: RPRCON- : 0.0010, RSNOWLIN2+ : 0.05, ENTRORG- : 0.00014 (or less),
 # Cooling: RPRCON+ : 0.0018, RSNOWLIN2+ : 0.02,  ENTRORG+ : 0.00020, DETRPEN+/-, RMFDEPS +/-, RVICE +,  RCLDIFF-, RLCRIT_UPHYS +/-
