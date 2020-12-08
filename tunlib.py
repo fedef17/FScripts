@@ -55,7 +55,8 @@ uff_params['RCLDIFF'] = 3.E-6
 uff_params['RCLDIFFC'] = 5.0
 uff_params['RLCRIT_UPHYS'] = 0.875e-5
 
-lats = [-90, -65, -40, -20, 20, 40, 65, 90]
+#lats = [-90, -65, -40, -20, 20, 40, 65, 90]
+lats = [-90, -60, -30, 30, 60, 90]
 bands = [(la1, la2) for la1, la2 in zip(lats[:-1], lats[1:])]
 lacen = np.array([np.mean(laol) for laol in bands])
 
@@ -220,7 +221,7 @@ def jac_delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_c
         jac2.append(der2)
 
     jac = np.stack([jac1, jac2])
-    
+
     return jac
 
 
