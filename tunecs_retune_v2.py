@@ -99,17 +99,15 @@ for var in allvars:
 
 print('\n\n ------------------------------ \n\n')
 
-for rprval in [0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019]:
+for rprval, c4pi_change in zip([0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019], [1., 0.7, 0.5, -0.5, -1, -1.7]):
     print('\n\n ------------------------------ \n\n')
     parset = {'RPRCON' : rprval}
     print('\n PARSET: \n')
     print(parset)
     if rprval < 0.00134:
         print('HIGH ECS! \n')
-        c4pi_change = 1.5
     else:
         print('LOW ECS! \n')
-        c4pi_change = -1.5
 
     okparams = ['ENTRORG', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
     start = [uff_params[par] for par in okparams]
