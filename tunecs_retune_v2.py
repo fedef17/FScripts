@@ -102,7 +102,6 @@ print('\n\n ------------------------------ \n\n')
 for rprval in np.linspace(0.0008, 0.0018, 11):
     print('\n\n ------------------------------ \n\n')
     parset = {'RPRCON' : rprval}
-    print('\n\n\n--------  param set: {}     ----------\n'.format(nam))
     print('\n PARSET: \n')
     print(parset)
 
