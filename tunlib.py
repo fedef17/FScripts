@@ -263,8 +263,8 @@ def jac_calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge', derdic =
     Available methods: deriv, deriv_edge, spline
     """
 
-    der_glob_c4, der_zonal_c4 = jac_calc_change_var('c4', param, var, newpar_set[param], method = method)
-    der_glob_pi, der_zonal_pi = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
+    der_glob_c4, der_zonal_c4 = jac_calc_change_var('c4', param, var, newpar_val, method = method)
+    der_glob_pi, der_zonal_pi = jac_calc_change_var('pi', param, var, newpar_val, method = method)
 
     der_glob = der_glob_c4-der_glob_pi
     der_zonal = der_zonal_c4-der_zonal_pi
