@@ -129,13 +129,13 @@ for rprval in [0.0008, 0.001, 0.0012, 0.0015, 0.0017, 0.0019]:
     for var in allvars:
         cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
-        print(('{:8s}: '+5*' {:6.3e}').format('zonal', czon))
+        print(('{:8s}: '+5*' {:6.3e}').format('zonal', *czon))
 
     print('\nChange in sensitivity\n')
     for var in allvars:
         cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
         print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
-        print(('{:8s}: '+5*' {:6.3e}').format('zonal', czon))
+        print(('{:8s}: '+5*' {:6.3e}').format('zonal', *czon))
 
 # Warming: RPRCON- : 0.0010, RSNOWLIN2+ : 0.05, ENTRORG- : 0.00014 (or less),
 # Cooling: RPRCON+ : 0.0018, RSNOWLIN2+ : 0.02,  ENTRORG+ : 0.00020, DETRPEN+/-, RMFDEPS +/-, RVICE +,  RCLDIFF-, RLCRIT_UPHYS +/-
