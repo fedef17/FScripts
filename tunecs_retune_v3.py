@@ -111,7 +111,8 @@ for c4pi_change in np.arange(-2., 1.1, 0.5):
     okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
     okbounds = (okbounds_lo, okbounds_hi)
 
-    result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
+    #result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
+    result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'lm', xtol = xtol, gtol = gtol)
     nuvals = result.x
     nudic = dict(zip(okparams, nuvals))
     parset.update(nudic)
