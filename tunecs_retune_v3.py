@@ -100,6 +100,8 @@ for var in allvars:
 
 print('\n\n ------------------------------ \n\n')
 
+meto = 'spline'
+
 allpi = []
 allcha = []
 
@@ -110,6 +112,8 @@ perms = list(itt.product(list(facs), repeat = len(testparams)))
 print(len(perms))
 i = 0
 uffpars = np.array([uff_params[par] for par in testparams])
+okperms = []
+zonchan = []
 
 for perm in perms:
     i+=1
@@ -118,20 +122,33 @@ for perm in perms:
     newvals = np.array(perm)*uffpars
     #parset = dict(zip(testparams, newvals))
 
-    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = 'deriv_edge')
-    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = 'deriv_edge')
+    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
 
-    allpi.append(pichan)
-    allcha.append(c4pichan)
+    if pichan < 0.1:
+        allpi.append(pichan)
+        allcha.append(c4pichan)
+        okperms.append(perm)
+
+        parset = dict(zip(testparams, newvals))
+        var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
+        zonchan.append(var_change_zonal)
 
 allpi = np.array(allpi)
 allcha = np.array(allcha)
-pickle.dump([perms, allpi, allcha], open(cart_out + 'paramspace_v1_linder.p', 'wb'))
+zonchan = np.stack(zonchan)
 
-oks = np.abs(pichan) < 0.05
+pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v1_{}.p'.format(meto), 'wb'))
+
+zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
+oks = zonchan_mean < 0.5
+
 okchan = allcha[oks]
-
 print(okchan.min(), okchan.max())
 
-# plt.ion()
-# plt.hist(okchan)
+plt.ion()
+fig = plt.figure()
+plt.hist(okchan, bins = 30)
+
+fig = plt.figure()
+plt.hist(zonchan_mean[oks], bins = 30)
