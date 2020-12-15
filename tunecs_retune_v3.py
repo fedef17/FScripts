@@ -105,8 +105,9 @@ meto = 'spline'
 allpi = []
 allcha = []
 
-facs = np.arange(0.7, 1.4, 0.1)
+#facs = np.arange(0.7, 1.4, 0.1)
 #perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
+facs = np.arange(10)
 perms = list(itt.product(list(facs), repeat = len(testparams)))
 
 print(len(perms))
@@ -115,17 +116,24 @@ uffpars = np.array([uff_params[par] for par in testparams])
 okperms = []
 zonchan = []
 
+arrcos = np.array([False, True, True, False, True, True])
+range_ok = dict()
+for par in testparams:
+    print(par, np.min(valchange[par][arrcos]/uff_params[par]), np.max(valchange[par][arrcos]/uff_params[par]))
+    range_ok[par] = np.linspace(np.min(valchange[par][arrcos]), np.max(valchange[par][arrcos]), 10)
+
 for perm in perms:
     i+=1
     if i%1000 == 0:
         print(1.0*i/len(perms))
-    newvals = np.array(perm)*uffpars
+    #newvals = np.array(perm)*uffpars
+    newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
     #parset = dict(zip(testparams, newvals))
 
     pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
-    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+    if np.abs(pichan) < 0.1:
+        c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
 
-    if pichan < 0.1:
         allpi.append(pichan)
         allcha.append(c4pichan)
         okperms.append(perm)
@@ -138,7 +146,7 @@ allpi = np.array(allpi)
 allcha = np.array(allcha)
 zonchan = np.stack(zonchan)
 
-pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v1_{}.p'.format(meto), 'wb'))
+pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'wb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
 oks = zonchan_mean < 0.5
