@@ -18,6 +18,7 @@ from datetime import datetime
 
 from scipy import stats
 import pandas as pd
+from scipy.interpolate import UnivariateSpline as spline
 
 plt.rcParams['xtick.labelsize'] = 18
 plt.rcParams['ytick.labelsize'] = 18
@@ -31,7 +32,17 @@ cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
 # Loading the derivatives of the vars wrt params
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
-    resdic, _, derdic, _, linder, _ = pickle.load(filox)
+    resdic, _, derdic, _, linder, _, chandic, _ = pickle.load(filox)
+
+precalc_splines = True
+if precalc_splines:
+    print('precalculating splines....')
+    spldic = dict()
+    spldic_der = dict()
+    for ke in chandic:
+        xs, ys = chandic[ke]
+        spldic[ke] = spline(xs, ys, 3)
+        spldic_der[ke] = spldic[ke].derivative()
 
 # with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
 #     gigi = pickle.load(filox)
@@ -78,7 +89,7 @@ def clim_var(forc, var):
     return global_var, zonal_var
 
 
-def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
+def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, spldic_der = spldic_der, uff_params = uff_params, calc_zonal = True):
     """
     Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
 
@@ -89,8 +100,9 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic 
         der_g = derdic[(forc, param, var, 'glob')]
         var_change_glob = (newpar_val-uff_params[param])*der_g
 
-        der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
-        var_change_zonal = (newpar_val-uff_params[param])*der_z
+        if calc_zonal:
+            der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
+            var_change_zonal = (newpar_val-uff_params[param])*der_z
     elif method == 'deriv_edge':
         if newpar_val < uff_params[param]:
             edge = 'left'
@@ -99,17 +111,25 @@ def calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic 
         der_g = linder[(forc, param, var, 'glob', edge)]
         var_change_glob = (newpar_val-uff_params[param])*der_g
 
-        der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
-        var_change_zonal = (newpar_val-uff_params[param])*der_z
+        if calc_zonal:
+            der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
+            var_change_zonal = (newpar_val-uff_params[param])*der_z
     elif method == 'spline':
-        pass
+        spl = spldic[(forc, param, var, 'glob')]
+        var_change_glob = spl(newpar_val)
+
+        if calc_zonal:
+            var_change_zonal = np.array([spldic[(forc, param, var, band)](newpar_val) for band in bands])
     else:
         raise ValueError('method {} not available'.format(method))
 
-    return var_change_glob, var_change_zonal
+    if calc_zonal:
+        return var_change_glob, var_change_zonal
+    else:
+        return var_change_glob, None
 
 
-def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params):
+def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', derdic = derdic, linder = linder, spldic = spldic, uff_params = uff_params, calc_zonal = True):
     """
     Calculates the change in the global and zonal vars for a single parameter change, using the derivatives or the splines.
 
@@ -120,8 +140,9 @@ def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', der
         der_g = derdic[(forc, param, var, 'glob')]
         var_change_glob = der_g
 
-        der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
-        var_change_zonal = der_z
+        if calc_zonal:
+            der_z = np.array([derdic[(forc, param, var, band)] for band in bands])
+            var_change_zonal = der_z
     elif method == 'deriv_edge':
         if newpar_val < uff_params[param]:
             edge = 'left'
@@ -130,60 +151,74 @@ def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', der
         der_g = linder[(forc, param, var, 'glob', edge)]
         var_change_glob = der_g
 
-        der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
-        var_change_zonal = der_z
+        if calc_zonal:
+            der_z = np.array([linder[(forc, param, var, band, edge)] for band in bands])
+            var_change_zonal = der_z
     elif method == 'spline':
-        pass
+        spl = spldic_der[(forc, param, var, 'glob')]
+        var_change_glob = spl(newpar_val)
+
+        if calc_zonal:
+            var_change_zonal = np.array([spldic_der[(forc, param, var, band)](newpar_val) for band in bands])
     else:
         raise ValueError('method {} not available'.format(method))
 
-    return var_change_glob, var_change_zonal
+    if calc_zonal:
+        return var_change_glob, var_change_zonal
+    else:
+        return var_change_glob, None
 
 
-def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge'):
+def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge', calc_zonal = True):
     """
     Simply sums the change for each param.
     """
     var_change_glob = 0.
-    var_change_zonal = np.zeros(len(bands))
+    if calc_zonal:
+        var_change_zonal = np.zeros(len(bands))
+    else:
+        var_change_zonal = None
 
     for param in newpar_set:
-        cglob, czon = calc_change_var(forc, param, var, newpar_set[param], method = method)
+        cglob, czon = calc_change_var(forc, param, var, newpar_set[param], method = method, calc_zonal = calc_zonal)
         var_change_glob += cglob
-        var_change_zonal += czon
+        if calc_zonal:
+            var_change_zonal += czon
 
     return var_change_glob, var_change_zonal
 
 
-def delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+def delta_pi_glob(newpars, okparams, fix_parset = None, var = 'toa_net', method = 'deriv_edge'):
     newpar_set = dict(zip(okparams, newpars))
-    newpar_set.update(fix_parset)
-    var_change_glob, var_change_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method)
+    if fix_parset is not None:
+        newpar_set.update(fix_parset)
+    var_change_glob, var_change_zonal = calc_change_var_allparams('pi', var, newpar_set, method = method, calc_zonal = False)
     return var_change_glob
 
 
-def jac_delta_pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+def jac_delta_pi_glob(newpars, okparams, fix_parset = None, var = 'toa_net', method = 'deriv_edge'):
     newpar_set = dict(zip(okparams, newpars))
     jac = []
     for param in newpar_set:
-        der, _ = jac_calc_change_var('pi', param, var, newpar_set[param], method = method)
+        der, _ = jac_calc_change_var('pi', param, var, newpar_set[param], method = method, calc_zonal = False)
         jac.append(der)
 
     return np.array(jac)
 
 
-def delta_c4pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+def delta_c4pi_glob(newpars, okparams, fix_parset = None, var = 'toa_net', method = 'deriv_edge'):
     newpar_set = dict(zip(okparams, newpars))
-    newpar_set.update(fix_parset)
-    var_change_glob, var_change_zonal = calc_change_c4pi_allparams(var, newpar_set, method = method)
+    if fix_parset is not None:
+        newpar_set.update(fix_parset)
+    var_change_glob, var_change_zonal = calc_change_c4pi_allparams(var, newpar_set, method = method, calc_zonal = False)
     return var_change_glob
 
 
-def jac_delta_c4pi_glob(newpars, okparams, fix_parset, var = 'toa_net', method = 'deriv_edge'):
+def jac_delta_c4pi_glob(newpars, okparams, fix_parset = None, var = 'toa_net', method = 'deriv_edge'):
     newpar_set = dict(zip(okparams, newpars))
     jac = []
     for param in newpar_set:
-        der, _ = jac_calc_change_c4pi(param, var, newpar_set[param], method = method)
+        der, _ = jac_calc_change_c4pi(param, var, newpar_set[param], method = method, calc_zonal = False)
         jac.append(der)
 
     return np.array(jac)
@@ -226,32 +261,39 @@ def jac_delta_maxmin_glob(newpars, okparams, fix_parset, var = 'toa_net', c4pi_c
     return jac
 
 
-def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge'):
+def calc_change_c4pi_allparams(var, newpar_set, method = 'deriv_edge', calc_zonal = True):
     """
     Gives the change in var in the c4 run wrt pi.
     """
 
     var_change_glob = 0.
-    var_change_zonal = np.zeros(len(bands))
+    if calc_zonal:
+        var_change_zonal = np.zeros(len(bands))
+    else:
+        var_change_zonal = None
 
     for param in newpar_set:
-        cglob, czon = calc_change_c4pi(param, var, newpar_set[param], method = method)
+        cglob, czon = calc_change_c4pi(param, var, newpar_set[param], method = method, calc_zonal = calc_zonal)
         var_change_glob += cglob
-        var_change_zonal += czon
+        if calc_zonal:
+            var_change_zonal += czon
 
     return var_change_glob, var_change_zonal
 
 
-def calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge'):
+def calc_change_c4pi(param, var, newpar_val, method = 'deriv_edge', calc_zonal = True):
     """
     Gives the change in var in the c4 run wrt pi.
     """
 
-    cglob_c4, czon_c4 = calc_change_var('c4', param, var, newpar_val, method = method)
-    cglob_pi, czon_pi = calc_change_var('pi', param, var, newpar_val, method = method)
+    cglob_c4, czon_c4 = calc_change_var('c4', param, var, newpar_val, method = method, calc_zonal = calc_zonal)
+    cglob_pi, czon_pi = calc_change_var('pi', param, var, newpar_val, method = method, calc_zonal = calc_zonal)
 
     var_change_glob = cglob_c4 - cglob_pi
-    var_change_zonal = czon_c4 - czon_pi
+    if calc_zonal:
+        var_change_zonal = czon_c4 - czon_pi
+    else:
+        var_change_zonal = None
 
     return var_change_glob, var_change_zonal
 

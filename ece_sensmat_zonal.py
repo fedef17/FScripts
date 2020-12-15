@@ -336,8 +336,40 @@ for var in allvars:
                         linder_err[(forc, param, var, band, 'right')] = resdic_err[(forc, change, let, var, band)]/xdi
 
 
+### Saving ordered change values for spline fit
+chandic = dict()
+chandic_err = dict()
+for var in allvars:
+    for band in bands + ['glob']:
+        ctrl = dict()
+        ctrl['pi'] = resdic[('pi', 0, 0, var, band)]
+        ctrl['c4'] = resdic[('c4', 0, 0, var, band)]
+
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            for nu, let, param in zip(nums, letts, testparams):
+
+                parvals = []
+                chanvals = []
+                errs = []
+                for iic, change in zip([1, 2, 4, 5], ['n', 'p', 'l', 'r']):
+                    diff = resdic[(forc, change, let, var, band)] - ctrl[forc]
+                    err = resdic_err[(forc, change, let, var, band)]
+                    parvals.append(valchange[param][iic])
+                    chanvals.append(diff)
+                    errs.append(err)
+
+                parvals.append(uff_params[param])
+                chanvals.append(0)
+                errs.append(resdic_err[(forc, 0, 0, var, band)])
+
+                parvals, chanvals, errs = tl.order_increasing(parvals, chanvals, errs)
+
+                chandic[(forc, param, var, band)] = (parvals, chanvals)
+                chandic_err[(forc, param, var, band)] = (parvals, errs)
+
+
 with open(cart_out + 'der_sensmat_zonal.p', 'wb') as filox:
-    pickle.dump([resdic, resdic_err, derdic, derdic_err, linder, linder_err], filox)
+    pickle.dump([resdic, resdic_err, derdic, derdic_err, linder, linder_err, chandic, chandic_err], filox)
 
 
 ## Derivata con parametro normalizzato

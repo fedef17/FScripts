@@ -99,64 +99,35 @@ for var in allvars:
 
 print('\n\n ------------------------------ \n\n')
 
-allsets = []
-for c4pi_change in np.arange(-2., 1.1, 0.5):
-    print('\n\n ------------------------------ \n\n')
-    parset = dict()
-    print('Change in sensitivity: {}\n'.format(c4pi_change))
+allpi = []
+allcha = []
 
-    okparams = testparams #['ENTRORG', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
-    start = [uff_params[par] for par in okparams]
-    okbounds_lo = np.array([bo for bo, par in zip(bounds[0], testparams) if par in okparams])
-    okbounds_hi = np.array([bo for bo, par in zip(bounds[1], testparams) if par in okparams])
-    okbounds = (okbounds_lo, okbounds_hi)
+facs = np.arange(0.7, 1.4, 0.1)
+perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
 
-    #result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'trf', bounds = okbounds, xtol = xtol, gtol = gtol)
-    result = least_squares(tl.delta_maxmin_glob, start, jac = tl.jac_delta_maxmin_glob, args = (okparams, parset, 'toa_net', c4pi_change, 'deriv_edge', ), verbose=1, method = 'lm', xtol = xtol, gtol = gtol)
-    nuvals = result.x
-    nudic = dict(zip(okparams, nuvals))
-    parset.update(nudic)
+print(len(perms))
+i = 0
+uffpars = np.array([uff_params[par] for par in testparams])
 
-    print('\n PARSET: \n')
-    print(parset)
+for perm in perms:
+    i+=1
+    if i%1000 == 0:
+        print(perm)
+    newvals = np.array(perm)*uffpars
+    parset = dict(zip(testparams, newvals))
 
-    print('\nChange in pi\n')
-    for var in allvars:
-        cglob, czon = tl.calc_change_var_allparams('pi', var, parset)
-        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
-        print(('{:8s}: '+5*' {:6.3e}').format('zonal', *czon))
+    pichan = tl.delta_pi_glob(parset, testparams, var = 'toa_net', method = 'spline')
+    c4pichan = tl.delta_c4pi_glob(parset, testparams, var = 'toa_net', method = 'spline')
 
-    print('\nChange in sensitivity\n')
-    for var in allvars:
-        cglob, czon = tl.calc_change_c4pi_allparams(var, parset)
-        print('{:8s}: {:6.3e}  {:6.3f}'.format(var, cglob, cglob/climvars[var]))
-        print(('{:8s}: '+5*' {:6.3e}').format('zonal', *czon))
+    allpi.append(pichan)
+    allcha.append(c4pichan)
 
-    allsets.append(parset)
+allpi = np.array(allpi)
+allcha = np.array(allcha)
+pickle.dump([perms, allpi, allcha], open(cart_out + 'paramspace_v1.p', 'wb'))
 
+oks = np.abs(pichan) < 0.05
+okchan = allcha[oks]
 
-fig, ax = plt.subplots(figsize=(16,12))
-
-colors = ctl.color_set(len(allsets))
-for parset, col in zip(allsets, colors):
-    parvals = [parset[param]/uff_params[param] for param in testparams]
-    ax.scatter(np.arange(len(parvals)), parvals, color = col, s = 100, label = 'RPRCON = {:6.4f}'.format(parset['RPRCON']))
-
-ax.set_xticks(np.arange(len(parvals)))
-ax.set_xticklabels(testparams, size = 'large', rotation = 60)
-ax.grid()
-ax.set_ylabel('change wrt uff. value')
-ax.legend()
-
-fig.savefig(cart_out + 'tunecs_retune_v3.pdf')
-
-
-# Warming: RPRCON- : 0.0010, RSNOWLIN2+ : 0.05, ENTRORG- : 0.00014 (or less),
-# Cooling: RPRCON+ : 0.0018, RSNOWLIN2+ : 0.02,  ENTRORG+ : 0.00020, DETRPEN+/-, RMFDEPS +/-, RVICE +,  RCLDIFF-, RLCRIT_UPHYS +/-
-# More prec:
-
-# DETRPEN and RMFDEPS may be used to balance precipitation, in response to RPRCON/ENTRORG changes. Also, this might produce extreme wetting/drying in the future
-
-#cglob, czon = tl.calc_change_var_allparams(forc, var, new_set, method = 'deriv_edge')
-
-#cglob, czon = tl.calc_change_var(forc, param, var, valchange[param][iic], method = 'deriv_edge')
+plt.ion()
+plt.hist(okchan)
