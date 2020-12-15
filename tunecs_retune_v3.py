@@ -104,7 +104,8 @@ allpi = []
 allcha = []
 
 facs = np.arange(0.7, 1.4, 0.1)
-perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
+#perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
+perms = list(itt.product(list(facs), repeat = len(testparams)))
 
 print(len(perms))
 i = 0
@@ -113,7 +114,7 @@ uffpars = np.array([uff_params[par] for par in testparams])
 for perm in perms:
     i+=1
     if i%1000 == 0:
-        print(perm)
+        print(1.0*i/len(perms))
     newvals = np.array(perm)*uffpars
     #parset = dict(zip(testparams, newvals))
 
