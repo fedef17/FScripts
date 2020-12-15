@@ -44,7 +44,7 @@ if precalc_splines:
     spldic_der = dict()
     for ke in chandic:
         xs, ys = chandic[ke]
-        spldic[ke] = spline(xs, ys, k = 2, s = 0) # interpolating spline of order 2
+        spldic[ke] = spline(xs, ys, k = 2, s = 0, ext = 2) # interpolating spline of order 2, no extrapolation
         spldic_der[ke] = spldic[ke].derivative()
 
 # with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
