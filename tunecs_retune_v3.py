@@ -118,18 +118,20 @@ for perm in perms:
     newvals = np.array(perm)*uffpars
     #parset = dict(zip(testparams, newvals))
 
-    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = 'spline')
-    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = 'spline')
+    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = 'deriv_edge')
+    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = 'deriv_edge')
 
     allpi.append(pichan)
     allcha.append(c4pichan)
 
 allpi = np.array(allpi)
 allcha = np.array(allcha)
-pickle.dump([perms, allpi, allcha], open(cart_out + 'paramspace_v1.p', 'wb'))
+pickle.dump([perms, allpi, allcha], open(cart_out + 'paramspace_v1_linder.p', 'wb'))
 
 oks = np.abs(pichan) < 0.05
 okchan = allcha[oks]
 
-plt.ion()
-plt.hist(okchan)
+print(okchan.min(), okchan.max())
+
+# plt.ion()
+# plt.hist(okchan)
