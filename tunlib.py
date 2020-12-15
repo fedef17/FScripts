@@ -34,6 +34,9 @@ cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
     resdic, _, derdic, _, linder, _, chandic, _ = pickle.load(filox)
 
+spldic = None
+spldic_der = None
+
 precalc_splines = True
 if precalc_splines:
     print('precalculating splines....')
@@ -50,8 +53,6 @@ if precalc_splines:
 # derdic.update(derdic_glo)
 
 testparams = ['ENTRORG', 'RPRCON', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
-
-spldic = None
 
 uff_params = dict()
 uff_params['RPRCON'] = 1.34E-3
