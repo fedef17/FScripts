@@ -115,10 +115,10 @@ for perm in perms:
     if i%1000 == 0:
         print(perm)
     newvals = np.array(perm)*uffpars
-    parset = dict(zip(testparams, newvals))
+    #parset = dict(zip(testparams, newvals))
 
-    pichan = tl.delta_pi_glob(parset, testparams, var = 'toa_net', method = 'spline')
-    c4pichan = tl.delta_c4pi_glob(parset, testparams, var = 'toa_net', method = 'spline')
+    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = 'spline')
+    c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = 'spline')
 
     allpi.append(pichan)
     allcha.append(c4pichan)
