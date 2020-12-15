@@ -23,6 +23,7 @@ import glob
 import tunlib as tl
 
 from scipy.optimize import Bounds, minimize, least_squares
+import itertools as itt
 
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
