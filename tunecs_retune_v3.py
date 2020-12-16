@@ -171,58 +171,30 @@ def doforproc(q, i1, i2, meto = 'spline', facs = facs, testparams = testparams, 
 
 n_threads = 8
 
-processi = []
-coda = []
-outputs = []
-
-#ctx = get_context('spawn')
-
-n_ok = int(ncosi/n_threads)
-print(n_ok)
-for i in range(n_threads):
-    q = Queue()
-    coda.append(q)
-    #perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
-    processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
-    #processi.append(ctx.Process(target=doforproc,args=(perms_sp, )))
-    processi[i].start()
-
-for i in range(n_threads):
-    outputs.append(coda[i].get())
-
-for i in range(n_threads):
-    processi[i].join()
-
-# for perm in perms:
-#     i+=1
-#     if i%1000 == 0:
-#         print(1.0*i/len(perms))
-#     #newvals = np.array(perm)*uffpars
-#     newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
-#     #parset = dict(zip(testparams, newvals))
+# processi = []
+# coda = []
+# outputs = []
 #
-#     pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
-#     if np.abs(pichan) < 0.1:
-#         c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+# n_ok = int(ncosi/n_threads)
+# print(n_ok)
+# for i in range(n_threads):
+#     q = Queue()
+#     coda.append(q)
+#     processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
+#     processi[i].start()
 #
-#         allpi.append(pichan)
-#         allcha.append(c4pichan)
-#         okperms.append(perm)
+# for i in range(n_threads):
+#     outputs.append(coda[i].get())
 #
-#         parset = dict(zip(testparams, newvals))
-#         var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
-#         zonchan.append(var_change_zonal)
-
-allpi = np.append([out[0] for out in outputs])
-allcha = np.append([out[1] for out in outputs])
-okperms = np.append([out[2] for out in outputs])
-zonchan = np.stack(np.append([out[3] for out in outputs]))
-
-allpi = np.array(allpi)
-allcha = np.array(allcha)
-zonchan = np.stack(zonchan)
-
-pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'wb'))
+# for i in range(n_threads):
+#     processi[i].join()
+#
+# allpi = np.concatenate([out[0] for out in outputs])
+# allcha = np.concatenate([out[1] for out in outputs])
+# okperms = np.concatenate([out[2] for out in outputs])
+# zonchan = np.stack(np.concatenate([out[3] for out in outputs]))
+#
+# pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'wb'))
 [okperms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'rb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
@@ -242,8 +214,8 @@ plt.title('Alternative parametrizations with < 0.1 W/m2 effect on toa_net in pi 
 fig.savefig(cart_out + 'altparam_sens_v3a.pdf')
 
 newvals = np.stack([[range_ok[par][p] for par, p in zip(testparams, perm)] for perm in okperms])
-okvals = np.all(0.8 <= newvals/uffpars[np.newaxis, :] <= 1.2, axis = 1)
-
+pino = newvals/uffpars[np.newaxis, :]
+okvals = np.all([np.all(pino <= 1.2, axis = 1), np.all(pino >= 0.8, axis = 1)], axis = 0)
 
 fig = plt.figure()
 
@@ -269,3 +241,144 @@ plt.xlabel('delta sensitivity 4xCO2-pi (W/m2)')
 plt.title('Alt. par.: < 0.3 toa_net change in lat band, < 20% param change', fontsize = 'small')
 
 fig.savefig(cart_out + 'altparam_sens_v3c.pdf')
+
+### Now. Selecting the two params.
+oks = (zonchan_mean < 0.5)
+okpinok = pino[oks]
+oknewval = newvals[oks]
+okchan = allcha[oks]
+okzon = zonchan[oks, :]
+okpi = allpi[oks]
+okokper = okperms[oks]
+
+#### COLD PARAM
+chak = np.percentile(okchan, 1)
+zup = okchan <= chak
+print('selecting change larger than {} W/m2'.format(chak))
+
+fig, ax = plt.subplots(figsize=(16,12))
+#for co in okokper[zup]:
+for pin in okpinok[zup]:
+    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+zullo = np.argmin(okchan)
+ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
+print('coldest', oknewval[zullo])
+
+gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+ziko = np.argmin(gnizi)
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+print('lowest param variation', oknewval[zup][ziko])
+
+ziko = np.argmin(zonchan_mean[oks][zup])
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+print('lowest zonal variation', oknewval[zup][ziko])
+
+ax.legend()
+ax.set_xticks(np.arange(8))
+ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+ax.set_ylabel('Relative change of param')
+
+fig.savefig(cart_out + 'cold_params_zon05.pdf')
+
+
+#### WARM PARAM
+chak = np.percentile(okchan, 99)
+print('selecting change larger than {} W/m2'.format(chak))
+zup = okchan >= chak
+
+fig, ax = plt.subplots(figsize=(16,12))
+#for co in okokper[zup]:
+for pin in okpinok[zup]:
+    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+zullo = np.argmax(okchan)
+ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
+print('warmest', oknewval[zullo])
+
+gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+ziko = np.argmin(gnizi)
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+print('lowest param variation', oknewval[zup][ziko])
+
+ziko = np.argmin(zonchan_mean[oks][zup])
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+print('lowest zonal variation', oknewval[zup][ziko])
+
+ax.legend()
+ax.set_xticks(np.arange(8))
+ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+ax.set_ylabel('Relative change of param')
+
+fig.savefig(cart_out + 'warm_params_zon05.pdf')
+
+
+#### NOW without threshold on zonal change
+### Now. Selecting the two params.
+okpinok = pino
+oknewval = newvals
+okchan = allcha
+okzon = zonchan
+okpi = allpi
+okokper = okperms
+
+#### COLD PARAM
+chak = np.percentile(okchan, 1)
+zup = okchan <= chak
+print('selecting change larger than {} W/m2'.format(chak))
+
+fig, ax = plt.subplots(figsize=(16,12))
+#for co in okokper[zup]:
+for pin in okpinok[zup]:
+    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+zullo = np.argmin(okchan)
+ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
+print('coldest', oknewval[zullo])
+
+gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+ziko = np.argmin(gnizi)
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+print('lowest param variation', oknewval[zup][ziko])
+
+ziko = np.argmin(zonchan_mean[oks][zup])
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+print('lowest zonal variation', oknewval[zup][ziko])
+
+ax.legend()
+ax.set_xticks(np.arange(8))
+ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+ax.set_ylabel('Relative change of param')
+
+fig.savefig(cart_out + 'cold_params.pdf')
+
+
+#### WARM PARAM
+chak = np.percentile(okchan, 99)
+print('selecting change larger than {} W/m2'.format(chak))
+zup = okchan >= chak
+
+fig, ax = plt.subplots(figsize=(16,12))
+#for co in okokper[zup]:
+for pin in okpinok[zup]:
+    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+zullo = np.argmax(okchan)
+ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
+print('warmest', oknewval[zullo])
+
+gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+ziko = np.argmin(gnizi)
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+print('lowest param variation', oknewval[zup][ziko])
+
+ziko = np.argmin(zonchan_mean[oks][zup])
+ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+print('lowest zonal variation', oknewval[zup][ziko])
+
+ax.legend()
+ax.set_xticks(np.arange(8))
+ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+ax.set_ylabel('Relative change of param')
+
+fig.savefig(cart_out + 'warm_params.pdf')
