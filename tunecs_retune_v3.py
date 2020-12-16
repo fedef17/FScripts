@@ -115,7 +115,7 @@ zonchan = []
 
 #facs = np.arange(0.7, 1.4, 0.1)
 #perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
-facs = np.arange(10)
+facs = np.arange(11)
 #perms = list(itt.product(list(facs), repeat = len(testparams)))
 #random.shuffle(perms)
 ncosi = len(facs)**len(testparams)
@@ -127,9 +127,9 @@ arrcos = np.array([False, True, True, False, True, True])
 range_ok = dict()
 for par in testparams:
     print(par, np.min(valchange[par][arrcos]/uff_params[par]), np.max(valchange[par][arrcos]/uff_params[par]))
-    range_ok[par] = np.linspace(np.min(valchange[par][arrcos]), np.max(valchange[par][arrcos]), 10)
+    range_ok[par] = np.linspace(np.min(valchange[par][arrcos]), np.max(valchange[par][arrcos]), 11)
     if np.min(range_ok[par]/uff_params[par]) < 0.7 or np.max(range_ok[par]/uff_params[par]) > 1.3:
-        range_ok[par] = np.linspace(0.7*uff_params[par], 1.3*uff_params[par], 10)
+        range_ok[par] = np.linspace(0.7*uff_params[par], 1.3*uff_params[par], 11)
 
 
 ########## parallel
@@ -171,31 +171,31 @@ def doforproc(q, i1, i2, meto = 'spline', facs = facs, testparams = testparams, 
 
 n_threads = 8
 
-# processi = []
-# coda = []
-# outputs = []
-#
-# n_ok = int(ncosi/n_threads)
-# print(n_ok)
-# for i in range(n_threads):
-#     q = Queue()
-#     coda.append(q)
-#     processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
-#     processi[i].start()
-#
-# for i in range(n_threads):
-#     outputs.append(coda[i].get())
-#
-# for i in range(n_threads):
-#     processi[i].join()
-#
-# allpi = np.concatenate([out[0] for out in outputs])
-# allcha = np.concatenate([out[1] for out in outputs])
-# okperms = np.concatenate([out[2] for out in outputs])
-# zonchan = np.stack(np.concatenate([out[3] for out in outputs]))
-#
-# pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'wb'))
-[okperms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'rb'))
+processi = []
+coda = []
+outputs = []
+
+n_ok = int(ncosi/n_threads)
+print(n_ok)
+for i in range(n_threads):
+    q = Queue()
+    coda.append(q)
+    processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
+    processi[i].start()
+
+for i in range(n_threads):
+    outputs.append(coda[i].get())
+
+for i in range(n_threads):
+    processi[i].join()
+
+allpi = np.concatenate([out[0] for out in outputs])
+allcha = np.concatenate([out[1] for out in outputs])
+okperms = np.concatenate([out[2] for out in outputs])
+zonchan = np.stack(np.concatenate([out[3] for out in outputs]))
+
+pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v4_{}.p'.format(meto), 'wb'))
+[okperms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v4_{}.p'.format(meto), 'rb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
 
