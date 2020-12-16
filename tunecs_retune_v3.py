@@ -24,6 +24,8 @@ import tunlib as tl
 
 from scipy.optimize import Bounds, minimize, least_squares
 import itertools as itt
+from multiprocessing import Process, Queue
+
 
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
@@ -104,6 +106,8 @@ meto = 'spline'
 
 allpi = []
 allcha = []
+okperms = []
+zonchan = []
 
 #facs = np.arange(0.7, 1.4, 0.1)
 #perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
@@ -113,14 +117,61 @@ perms = list(itt.product(list(facs), repeat = len(testparams)))
 print(len(perms))
 i = 0
 uffpars = np.array([uff_params[par] for par in testparams])
-okperms = []
-zonchan = []
 
 arrcos = np.array([False, True, True, False, True, True])
 range_ok = dict()
 for par in testparams:
     print(par, np.min(valchange[par][arrcos]/uff_params[par]), np.max(valchange[par][arrcos]/uff_params[par]))
     range_ok[par] = np.linspace(np.min(valchange[par][arrcos]), np.max(valchange[par][arrcos]), 10)
+    if np.min(range_ok[par]/uff_params[par]) < 0.7 or np.max(range_ok[par]/uff_params[par]) > 1.3:
+        range_ok[par] = np.linspace(0.7*uff_params[par], 1.3*uff_params[par], 10)
+
+
+########## parallel
+def doforproc(perms_sp, meto = 'spline', testparams = testparams, range_ok = range_ok):
+    allpi = []
+    allcha = []
+    okperms = []
+    zonchan = []
+    i = 0
+    for perm in perms_sp:
+        if i%10000 == 0: print(1.0*i/len(perms_sp))
+        i+=1
+        newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
+
+        pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+        if np.abs(pichan) < 0.1:
+            c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+
+            allpi.append(pichan)
+            allcha.append(c4pichan)
+            okperms.append(perm)
+
+            parset = dict(zip(testparams, newvals))
+            var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
+            zonchan.append(var_change_zonal)
+
+    return allpi, allcha, okperms, zonchan
+
+
+n_threads = 4
+
+processi = []
+coda = []
+outputs = []
+
+n_ok = len(perms)/n_threads
+for i in range(n_threads):
+    coda.append(Queue())
+    perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
+    processi.append(Process(target=doforproc,args=(perms_sp)))
+    processi[i].start()
+
+for i in range(n_threads):
+    outputs.append(coda[i].get())
+
+for i in range(n_threads):
+    processi[i].join()
 
 # for perm in perms:
 #     i+=1
@@ -141,13 +192,18 @@ for par in testparams:
 #         parset = dict(zip(testparams, newvals))
 #         var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
 #         zonchan.append(var_change_zonal)
-#
-# allpi = np.array(allpi)
-# allcha = np.array(allcha)
-# zonchan = np.stack(zonchan)
-#
-# pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'wb'))
-[perms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'rb'))
+
+allpi = np.append([out[0] for out in outputs])
+allcha = np.append([out[1] for out in outputs])
+okperms = np.append([out[2] for out in outputs])
+zonchan = np.stack(np.append([out[3] for out in outputs]))
+
+allpi = np.array(allpi)
+allcha = np.array(allcha)
+zonchan = np.stack(zonchan)
+
+pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'wb'))
+[okperms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v3_{}.p'.format(meto), 'rb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
 
