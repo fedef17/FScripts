@@ -170,7 +170,8 @@ outputs = []
 
 n_ok = int(len(perms)/n_threads)
 for i in range(n_threads):
-    coda.append(Queue())
+    q = Queue()
+    coda.append(q)
     perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
     processi.append(Process(target=doforproc,args=(q, perms_sp, )))
     #processi.append(ctx.Process(target=doforproc,args=(perms_sp, )))
