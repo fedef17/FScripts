@@ -160,7 +160,7 @@ processi = []
 coda = []
 outputs = []
 
-n_ok = len(perms)/n_threads
+n_ok = int(len(perms)/n_threads)
 for i in range(n_threads):
     coda.append(Queue())
     perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
