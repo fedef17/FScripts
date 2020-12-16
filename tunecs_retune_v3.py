@@ -243,142 +243,74 @@ plt.title('Alt. par.: < 0.3 toa_net change in lat band, < 20% param change', fon
 fig.savefig(cart_out + 'altparam_sens_v3c.pdf')
 
 ### Now. Selecting the two params.
-oks = (zonchan_mean < 0.5)
-okpinok = pino[oks]
-oknewval = newvals[oks]
-okchan = allcha[oks]
-okzon = zonchan[oks, :]
-okpi = allpi[oks]
-okokper = okperms[oks]
+for thres in [1.0, 0.5, 0.4, 0.3]:
+    print('\n\n ------------------------------------------------ \n')
+    print('\n Threshold on zonal change in toa_net: {} W/m2 \n'.format(thres))
+    oks = (zonchan_mean < thres)
+    okpinok = pino[oks]
+    oknewval = newvals[oks]
+    okchan = allcha[oks]
+    okzon = zonchan[oks, :]
+    okpi = allpi[oks]
+    okokper = okperms[oks]
 
-#### COLD PARAM
-chak = np.percentile(okchan, 1)
-zup = okchan <= chak
-print('selecting change larger than {} W/m2'.format(chak))
+    #### COLD PARAM
+    chak = np.percentile(okchan, 1)
+    zup = okchan <= chak
+    print('selecting change larger than {} W/m2'.format(chak))
 
-fig, ax = plt.subplots(figsize=(16,12))
-#for co in okokper[zup]:
-for pin in okpinok[zup]:
-    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+    fig, ax = plt.subplots(figsize=(16,12))
+    #for co in okokper[zup]:
+    for pin in okpinok[zup]:
+        ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
 
-zullo = np.argmin(okchan)
-ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
-print('coldest', oknewval[zullo])
+    zullo = np.argmin(okchan)
+    ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
+    print('coldest', oknewval[zullo])
 
-gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
-ziko = np.argmin(gnizi)
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-print('lowest param variation', oknewval[zup][ziko])
+    gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+    ziko = np.argmin(gnizi)
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+    print('lowest param variation', oknewval[zup][ziko])
 
-ziko = np.argmin(zonchan_mean[oks][zup])
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-print('lowest zonal variation', oknewval[zup][ziko])
+    ziko = np.argmin(zonchan_mean[oks][zup])
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+    print('lowest zonal variation', oknewval[zup][ziko])
 
-ax.legend()
-ax.set_xticks(np.arange(8))
-ax.set_xticklabels(testparams, size = 'large', rotation = 60)
-ax.set_ylabel('Relative change of param')
+    ax.legend()
+    ax.set_xticks(np.arange(8))
+    ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+    ax.set_ylabel('Relative change of param')
 
-fig.savefig(cart_out + 'cold_params_zon05.pdf')
-
-
-#### WARM PARAM
-chak = np.percentile(okchan, 99)
-print('selecting change larger than {} W/m2'.format(chak))
-zup = okchan >= chak
-
-fig, ax = plt.subplots(figsize=(16,12))
-#for co in okokper[zup]:
-for pin in okpinok[zup]:
-    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
-
-zullo = np.argmax(okchan)
-ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
-print('warmest', oknewval[zullo])
-
-gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
-ziko = np.argmin(gnizi)
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-print('lowest param variation', oknewval[zup][ziko])
-
-ziko = np.argmin(zonchan_mean[oks][zup])
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-print('lowest zonal variation', oknewval[zup][ziko])
-
-ax.legend()
-ax.set_xticks(np.arange(8))
-ax.set_xticklabels(testparams, size = 'large', rotation = 60)
-ax.set_ylabel('Relative change of param')
-
-fig.savefig(cart_out + 'warm_params_zon05.pdf')
+    fig.savefig(cart_out + 'cold_params_zon{:02d}.pdf'.format(int(thres*10)))
 
 
-#### NOW without threshold on zonal change
-### Now. Selecting the two params.
-okpinok = pino
-oknewval = newvals
-okchan = allcha
-okzon = zonchan
-okpi = allpi
-okokper = okperms
+    #### WARM PARAM
+    chak = np.percentile(okchan, 99)
+    print('selecting change larger than {} W/m2'.format(chak))
+    zup = okchan >= chak
 
-#### COLD PARAM
-chak = np.percentile(okchan, 1)
-zup = okchan <= chak
-print('selecting change larger than {} W/m2'.format(chak))
+    fig, ax = plt.subplots(figsize=(16,12))
+    #for co in okokper[zup]:
+    for pin in okpinok[zup]:
+        ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
 
-fig, ax = plt.subplots(figsize=(16,12))
-#for co in okokper[zup]:
-for pin in okpinok[zup]:
-    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+    zullo = np.argmax(okchan)
+    ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
+    print('warmest', oknewval[zullo])
 
-zullo = np.argmin(okchan)
-ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
-print('coldest', oknewval[zullo])
+    gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
+    ziko = np.argmin(gnizi)
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+    print('lowest param variation', oknewval[zup][ziko])
 
-gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
-ziko = np.argmin(gnizi)
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-print('lowest param variation', oknewval[zup][ziko])
+    ziko = np.argmin(zonchan_mean[oks][zup])
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+    print('lowest zonal variation', oknewval[zup][ziko])
 
-ziko = np.argmin(zonchan_mean[oks][zup])
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-print('lowest zonal variation', oknewval[zup][ziko])
+    ax.legend()
+    ax.set_xticks(np.arange(8))
+    ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+    ax.set_ylabel('Relative change of param')
 
-ax.legend()
-ax.set_xticks(np.arange(8))
-ax.set_xticklabels(testparams, size = 'large', rotation = 60)
-ax.set_ylabel('Relative change of param')
-
-fig.savefig(cart_out + 'cold_params.pdf')
-
-
-#### WARM PARAM
-chak = np.percentile(okchan, 99)
-print('selecting change larger than {} W/m2'.format(chak))
-zup = okchan >= chak
-
-fig, ax = plt.subplots(figsize=(16,12))
-#for co in okokper[zup]:
-for pin in okpinok[zup]:
-    ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
-
-zullo = np.argmax(okchan)
-ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
-print('warmest', oknewval[zullo])
-
-gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
-ziko = np.argmin(gnizi)
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-print('lowest param variation', oknewval[zup][ziko])
-
-ziko = np.argmin(zonchan_mean[oks][zup])
-ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-print('lowest zonal variation', oknewval[zup][ziko])
-
-ax.legend()
-ax.set_xticks(np.arange(8))
-ax.set_xticklabels(testparams, size = 'large', rotation = 60)
-ax.set_ylabel('Relative change of param')
-
-fig.savefig(cart_out + 'warm_params.pdf')
+    fig.savefig(cart_out + 'warm_params_zon{:02d}.pdf'.format(int(thres*10)))
