@@ -119,7 +119,6 @@ facs = np.arange(10)
 #perms = list(itt.product(list(facs), repeat = len(testparams)))
 #random.shuffle(perms)
 
-print(len(perms))
 i = 0
 uffpars = np.array([uff_params[par] for par in testparams])
 
