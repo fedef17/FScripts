@@ -148,7 +148,7 @@ def doforproc(q, i1, i2, meto = 'spline', facs = facs, testparams = testparams, 
         elif i > i2:
             break
 
-        if (i-i1)%10000 == 0: print(1.0*(i-i1)/(i2-i1)))
+        if (i-i1)%10000 == 0: print(1.0*(i-i1)/(i2-i1))
         newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
 
         pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
