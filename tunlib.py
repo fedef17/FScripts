@@ -79,6 +79,27 @@ lacen = np.array([np.mean(laol) for laol in bands])
 #     climvars[(var, 'zonal')] = zon
 #     print(var, glo)
 
+# var = 'toa_net'
+# for var in ['toa_net', 'srf_net', 'ttr', 'tsr']:
+#     filok = cart_out + 'sensmat_{}.dat'.format(var)
+#     with open(filok, 'w') as flk:
+#         flk.write('---- Sensitivity of {} to IFS parameters (ece 3.3.1) ---- \n\n'.format(var))
+#         strfo = '{:8s}' + 5*'{:12.3e}' + '\n'
+#         for forc in ['pi', 'c4']:
+#             flk.write('\n\n\n ----------------- Forcing: ' + forc + '  -----------------\n')
+#             for param in testparams:
+#                 flk.write('\n' + param + '\n')
+#                 xs = chandic[(forc, param, var, 'glob')][0]
+#                 flk.write(strfo.format('val:', *xs))
+#                 for band in bands+['glob']:
+#                     chans = chandic[(forc, param, var, band)][1]
+#                     if type(band) is str:
+#                         flk.write(strfo.format(band, *chans))
+#                     else:
+#                         bandco = '{:2d}/{:2d}'.format(int(band[0]), int(band[1]))
+#                         flk.write(strfo.format(bandco, *chans))
+
+
 ##################################################################################
 def clim_var(forc, var):
     """

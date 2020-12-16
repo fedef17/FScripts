@@ -122,41 +122,51 @@ for par in testparams:
     print(par, np.min(valchange[par][arrcos]/uff_params[par]), np.max(valchange[par][arrcos]/uff_params[par]))
     range_ok[par] = np.linspace(np.min(valchange[par][arrcos]), np.max(valchange[par][arrcos]), 10)
 
-for perm in perms:
-    i+=1
-    if i%1000 == 0:
-        print(1.0*i/len(perms))
-    #newvals = np.array(perm)*uffpars
-    newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
-    #parset = dict(zip(testparams, newvals))
-
-    pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
-    if np.abs(pichan) < 0.1:
-        c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
-
-        allpi.append(pichan)
-        allcha.append(c4pichan)
-        okperms.append(perm)
-
-        parset = dict(zip(testparams, newvals))
-        var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
-        zonchan.append(var_change_zonal)
-
-allpi = np.array(allpi)
-allcha = np.array(allcha)
-zonchan = np.stack(zonchan)
-
-pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'wb'))
+# for perm in perms:
+#     i+=1
+#     if i%1000 == 0:
+#         print(1.0*i/len(perms))
+#     #newvals = np.array(perm)*uffpars
+#     newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
+#     #parset = dict(zip(testparams, newvals))
+#
+#     pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+#     if np.abs(pichan) < 0.1:
+#         c4pichan = tl.delta_c4pi_glob(newvals, testparams, var = 'toa_net', method = meto)
+#
+#         allpi.append(pichan)
+#         allcha.append(c4pichan)
+#         okperms.append(perm)
+#
+#         parset = dict(zip(testparams, newvals))
+#         var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
+#         zonchan.append(var_change_zonal)
+#
+# allpi = np.array(allpi)
+# allcha = np.array(allcha)
+# zonchan = np.stack(zonchan)
+#
+# pickle.dump([perms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'wb'))
+[perms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v2_{}.p'.format(meto), 'rb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
-oks = zonchan_mean < 0.5
-
-okchan = allcha[oks]
-print(okchan.min(), okchan.max())
 
 plt.ion()
 fig = plt.figure()
-plt.hist(okchan, bins = 30)
+
+for co in [1.0, 0.5, 0.4, 0.25]:
+    oks = zonchan_mean < co
+    okchan = allcha[oks]
+    plt.hist(okchan, bins = 30)
+    print(okchan.min(), okchan.max())
+
+newvals = np.stack([[range_ok[par][p] for par, p in zip(testparams, perm)] for perm in okperms])
+okvals = np.all(0.7 <= newvals/uffpars[np.newaxis, :] <= 1.3, axis = 1)
+
 
 fig = plt.figure()
-plt.hist(zonchan_mean[oks], bins = 30)
+
+oks = (zonchan_mean < 0.4) & okvals
+okchan = allcha[oks]
+plt.hist(okchan, bins = 30)
+print(okchan.min(), okchan.max())
