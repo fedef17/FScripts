@@ -265,18 +265,18 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
         ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
 
     zullo = np.argmin(okchan)
-    ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
+    ax.plot(np.arange(8), okpinok[zullo], color = 'orange', label = 'coldest', linewidth = 3)
     print('\ncoldest', okchan[zullo])
     print(oknewval[zullo])
 
     gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
     ziko = np.argmin(gnizi)
-    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation', linewidth = 3)
     print('\nlowest param variation', okchan[zup][ziko])
     print(oknewval[zup][ziko])
 
     ziko = np.argmin(zonchan_mean[oks][zup])
-    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation', linewidth = 3)
     print('\nlowest zonal variation', okchan[zup][ziko])
     print(oknewval[zup][ziko])
 
@@ -299,18 +299,18 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
         ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
 
     zullo = np.argmax(okchan)
-    ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
+    ax.plot(np.arange(8), okpinok[zullo], color = 'orange', label = 'warmest', linewidth = 3)
     print('\nwarmest', okchan[zullo])
     print(oknewval[zullo])
 
     gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
     ziko = np.argmin(gnizi)
-    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation', linewidth = 3)
     print('\nlowest param variation', okchan[zup][ziko])
     print(oknewval[zup][ziko])
 
     ziko = np.argmin(zonchan_mean[oks][zup])
-    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation', linewidth = 3)
     print('\nlowest zonal variation', okchan[zup][ziko])
     print(oknewval[zup][ziko])
 
