@@ -154,7 +154,7 @@ def doforproc(perms_sp, meto = 'spline', testparams = testparams, range_ok = ran
     return allpi, allcha, okperms, zonchan
 
 
-n_threads = 4
+n_threads = 8
 
 processi = []
 coda = []
