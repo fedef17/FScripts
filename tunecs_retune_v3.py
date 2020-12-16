@@ -116,8 +116,8 @@ zonchan = []
 #facs = np.arange(0.7, 1.4, 0.1)
 #perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
 facs = np.arange(10)
-perms = list(itt.product(list(facs), repeat = len(testparams)))
-random.shuffle(perms)
+#perms = list(itt.product(list(facs), repeat = len(testparams)))
+#random.shuffle(perms)
 
 print(len(perms))
 i = 0
@@ -133,15 +133,22 @@ for par in testparams:
 
 
 ########## parallel
-def doforproc(q, perms_sp, meto = 'spline', testparams = testparams, range_ok = range_ok):
+def doforproc(q, i1, i2, meto = 'spline', facs = facs, testparams = testparams, range_ok = range_ok):
+    perms = itt.product(list(facs), repeat = len(testparams))
+
     allpi = []
     allcha = []
     okperms = []
     zonchan = []
     i = 0
-    for perm in perms_sp:
-        if i%10000 == 0: print(1.0*i/len(perms_sp))
-        i+=1
+    for perm in perms:
+        if i < i1:
+            i+=1
+            continue
+        elif i > i2:
+            break
+
+        if (i-i1)%10000 == 0: print(1.0*(i-i1)/(i2-i1)))
         newvals = [range_ok[par][p] for par, p in zip(testparams, perm)]
 
         pichan = tl.delta_pi_glob(newvals, testparams, var = 'toa_net', method = meto)
@@ -155,6 +162,8 @@ def doforproc(q, perms_sp, meto = 'spline', testparams = testparams, range_ok = 
             parset = dict(zip(testparams, newvals))
             var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
             zonchan.append(var_change_zonal)
+
+        i+=1
 
     q.put([allpi, allcha, okperms, zonchan])
 
@@ -172,8 +181,8 @@ n_ok = int(len(perms)/n_threads)
 for i in range(n_threads):
     q = Queue()
     coda.append(q)
-    perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
-    processi.append(Process(target=doforproc,args=(q, perms_sp, )))
+    #perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
+    processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
     #processi.append(ctx.Process(target=doforproc,args=(perms_sp, )))
     processi[i].start()
 
