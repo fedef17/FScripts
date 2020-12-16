@@ -118,6 +118,7 @@ zonchan = []
 facs = np.arange(10)
 #perms = list(itt.product(list(facs), repeat = len(testparams)))
 #random.shuffle(perms)
+ncosi = len(facs)**len(testparams)
 
 i = 0
 uffpars = np.array([uff_params[par] for par in testparams])
@@ -176,7 +177,8 @@ outputs = []
 
 #ctx = get_context('spawn')
 
-n_ok = int(len(perms)/n_threads)
+n_ok = int(ncosi/n_threads)
+print(n_ok)
 for i in range(n_threads):
     q = Queue()
     coda.append(q)
