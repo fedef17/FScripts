@@ -24,7 +24,10 @@ import tunlib as tl
 
 from scipy.optimize import Bounds, minimize, least_squares
 import itertools as itt
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Pool
+#from multiprocessing import set_start_method
+#from multiprocessing import get_context
+#set_start_method("spawn")
 
 
 plt.rcParams['xtick.labelsize'] = 15
@@ -128,7 +131,7 @@ for par in testparams:
 
 
 ########## parallel
-def doforproc(perms_sp, meto = 'spline', testparams = testparams, range_ok = range_ok):
+def doforproc(q, perms_sp, meto = 'spline', testparams = testparams, range_ok = range_ok):
     allpi = []
     allcha = []
     okperms = []
@@ -151,8 +154,9 @@ def doforproc(perms_sp, meto = 'spline', testparams = testparams, range_ok = ran
             var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
             zonchan.append(var_change_zonal)
 
-    return allpi, allcha, okperms, zonchan
+    q.put(allpi, allcha, okperms, zonchan)
 
+    return
 
 n_threads = 8
 
@@ -160,11 +164,14 @@ processi = []
 coda = []
 outputs = []
 
+#ctx = get_context('spawn')
+
 n_ok = int(len(perms)/n_threads)
 for i in range(n_threads):
     coda.append(Queue())
     perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
-    processi.append(Process(target=doforproc,args=(perms_sp, )))
+    processi.append(Process(target=doforproc,args=(q, perms_sp, )))
+    #processi.append(ctx.Process(target=doforproc,args=(perms_sp, )))
     processi[i].start()
 
 for i in range(n_threads):
