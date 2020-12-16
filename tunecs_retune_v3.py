@@ -156,7 +156,7 @@ def doforproc(q, perms_sp, meto = 'spline', testparams = testparams, range_ok = 
             var_change_glob, var_change_zonal = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
             zonchan.append(var_change_zonal)
 
-    q.put(allpi, allcha, okperms, zonchan)
+    q.put([allpi, allcha, okperms, zonchan])
 
     return
 
