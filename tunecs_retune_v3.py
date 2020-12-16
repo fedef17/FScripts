@@ -255,9 +255,9 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
     okokper = okperms[oks]
 
     #### COLD PARAM
-    chak = np.percentile(okchan, 1)
+    chak = np.percentile(okchan, 0.1)
     zup = okchan <= chak
-    print('selecting change larger than {} W/m2'.format(chak))
+    print('\nselecting change larger than {} W/m2'.format(chak))
 
     fig, ax = plt.subplots(figsize=(16,12))
     #for co in okokper[zup]:
@@ -266,16 +266,19 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
 
     zullo = np.argmin(okchan)
     ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'coldest')
-    print('coldest', oknewval[zullo])
+    print('\ncoldest', okchan[zullo])
+    print(oknewval[zullo])
 
     gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
     ziko = np.argmin(gnizi)
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-    print('lowest param variation', oknewval[zup][ziko])
+    print('\nlowest param variation', okchan[zup][ziko])
+    print(oknewval[zup][ziko])
 
     ziko = np.argmin(zonchan_mean[oks][zup])
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-    print('lowest zonal variation', oknewval[zup][ziko])
+    print('\nlowest zonal variation', okchan[zup][ziko])
+    print(oknewval[zup][ziko])
 
     ax.legend()
     ax.set_xticks(np.arange(8))
@@ -286,8 +289,8 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
 
 
     #### WARM PARAM
-    chak = np.percentile(okchan, 99)
-    print('selecting change larger than {} W/m2'.format(chak))
+    chak = np.percentile(okchan, 99.9)
+    print('\n\nselecting change larger than {} W/m2'.format(chak))
     zup = okchan >= chak
 
     fig, ax = plt.subplots(figsize=(16,12))
@@ -297,16 +300,19 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
 
     zullo = np.argmax(okchan)
     ax.plot(np.arange(8), okpinok[zullo], color = 'black', label = 'warmest')
-    print('warmest', oknewval[zullo])
+    print('\nwarmest', okchan[zullo])
+    print(oknewval[zullo])
 
     gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup]])
     ziko = np.argmin(gnizi)
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'green', label = 'lowest param variation')
-    print('lowest param variation', oknewval[zup][ziko])
+    print('\nlowest param variation', okchan[zup][ziko])
+    print(oknewval[zup][ziko])
 
     ziko = np.argmin(zonchan_mean[oks][zup])
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation')
-    print('lowest zonal variation', oknewval[zup][ziko])
+    print('\nlowest zonal variation', okchan[zup][ziko])
+    print(oknewval[zup][ziko])
 
     ax.legend()
     ax.set_xticks(np.arange(8))
