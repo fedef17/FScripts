@@ -216,8 +216,13 @@ for co in [1.0, 0.5, 0.4, 0.25]:
     plt.hist(okchan, bins = 30)
     print(okchan.min(), okchan.max())
 
+plt.xlabel('delta sensitivity 4xCO2-pi (W/m2)')
+plt.title('Alternative parametrizations with < 0.1 W/m2 effect on toa_net in pi (< 0.5, 0.4, 0.25 in lat band)', fontsize = 'small')
+
+fig.savefig(cart_out + 'altparam_sens_v3a.pdf')
+
 newvals = np.stack([[range_ok[par][p] for par, p in zip(testparams, perm)] for perm in okperms])
-okvals = np.all(0.7 <= newvals/uffpars[np.newaxis, :] <= 1.3, axis = 1)
+okvals = np.all(0.8 <= newvals/uffpars[np.newaxis, :] <= 1.2, axis = 1)
 
 
 fig = plt.figure()
@@ -226,3 +231,21 @@ oks = (zonchan_mean < 0.4) & okvals
 okchan = allcha[oks]
 plt.hist(okchan, bins = 30)
 print(okchan.min(), okchan.max())
+
+plt.xlabel('delta sensitivity 4xCO2-pi (W/m2)')
+plt.title('Alt. par.: < 0.4 toa_net change in lat band, < 20% param change', fontsize = 'small')
+
+fig.savefig(cart_out + 'altparam_sens_v3b.pdf')
+
+
+fig = plt.figure()
+
+oks = (zonchan_mean < 0.3) & okvals
+okchan = allcha[oks]
+plt.hist(okchan, bins = 30)
+print(okchan.min(), okchan.max())
+
+plt.xlabel('delta sensitivity 4xCO2-pi (W/m2)')
+plt.title('Alt. par.: < 0.3 toa_net change in lat band, < 20% param change', fontsize = 'small')
+
+fig.savefig(cart_out + 'altparam_sens_v3c.pdf')
