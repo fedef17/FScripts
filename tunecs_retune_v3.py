@@ -25,6 +25,7 @@ import tunlib as tl
 from scipy.optimize import Bounds, minimize, least_squares
 import itertools as itt
 from multiprocessing import Process, Queue, Pool
+import random
 #from multiprocessing import set_start_method
 #from multiprocessing import get_context
 #set_start_method("spawn")
@@ -116,6 +117,7 @@ zonchan = []
 #perms = list(itt.combinations_with_replacement(list(facs), len(testparams)))
 facs = np.arange(10)
 perms = list(itt.product(list(facs), repeat = len(testparams)))
+random.shuffle(perms)
 
 print(len(perms))
 i = 0
