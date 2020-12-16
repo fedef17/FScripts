@@ -199,7 +199,7 @@ n_threads = 8
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
 
-plt.ion()
+#plt.ion()
 fig = plt.figure()
 
 for co in [1.0, 0.5, 0.4, 0.25]:
