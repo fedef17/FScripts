@@ -164,7 +164,7 @@ n_ok = int(len(perms)/n_threads)
 for i in range(n_threads):
     coda.append(Queue())
     perms_sp = perms[(i*n_ok):(i*n_ok)+n_ok]
-    processi.append(Process(target=doforproc,args=(perms_sp)))
+    processi.append(Process(target=doforproc,args=(perms_sp, )))
     processi[i].start()
 
 for i in range(n_threads):
