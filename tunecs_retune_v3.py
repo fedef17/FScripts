@@ -171,30 +171,30 @@ def doforproc(q, i1, i2, meto = 'spline', facs = facs, testparams = testparams, 
 
 n_threads = 8
 
-processi = []
-coda = []
-outputs = []
-
-n_ok = int(ncosi/n_threads)
-print(n_ok)
-for i in range(n_threads):
-    q = Queue()
-    coda.append(q)
-    processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
-    processi[i].start()
-
-for i in range(n_threads):
-    outputs.append(coda[i].get())
-
-for i in range(n_threads):
-    processi[i].join()
-
-allpi = np.concatenate([out[0] for out in outputs])
-allcha = np.concatenate([out[1] for out in outputs])
-okperms = np.concatenate([out[2] for out in outputs])
-zonchan = np.stack(np.concatenate([out[3] for out in outputs]))
-
-pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v4_{}.p'.format(meto), 'wb'))
+# processi = []
+# coda = []
+# outputs = []
+#
+# n_ok = int(ncosi/n_threads)
+# print(n_ok)
+# for i in range(n_threads):
+#     q = Queue()
+#     coda.append(q)
+#     processi.append(Process(target=doforproc,args=(q, i*n_ok, i*n_ok+n_ok, )))
+#     processi[i].start()
+#
+# for i in range(n_threads):
+#     outputs.append(coda[i].get())
+#
+# for i in range(n_threads):
+#     processi[i].join()
+#
+# allpi = np.concatenate([out[0] for out in outputs])
+# allcha = np.concatenate([out[1] for out in outputs])
+# okperms = np.concatenate([out[2] for out in outputs])
+# zonchan = np.stack(np.concatenate([out[3] for out in outputs]))
+#
+# pickle.dump([okperms, allpi, allcha, zonchan], open(cart_out + 'paramspace_v4_{}.p'.format(meto), 'wb'))
 [okperms, allpi, allcha, zonchan] = pickle.load(open(cart_out + 'paramspace_v4_{}.p'.format(meto), 'rb'))
 
 zonchan_mean = np.mean(np.abs(zonchan), axis = 1)
