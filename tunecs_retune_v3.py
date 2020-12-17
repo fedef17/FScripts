@@ -320,3 +320,46 @@ for thres in [1.0, 0.5, 0.4, 0.3]:
     ax.set_ylabel('Relative change of param')
 
     fig.savefig(cart_out + 'warm_params_zon{:02d}.pdf'.format(int(thres*10)))
+
+
+
+##########################################################################
+## campiono la distribuzione con 9 param alternative
+okpinok = pino
+oknewval = newvals
+okchan = allcha
+okzon = zonchan
+okpi = allpi
+okokper = okperms
+figs = []
+for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
+    print('\n\nselecting change close to {} W/m2'.format(delta))
+    zup = np.abs(okchan - delta) < 0.05
+
+    fig, ax = plt.subplots(figsize=(16,12))
+    #for co in okokper[zup]:
+    for pin in okpinok[zup]:
+        ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+    gnizi1 = np.array([np.max(np.abs(pin-1)) for pin in okpinok[zup]])
+    ziko1 = gnizi1 == np.min(gnizi1)
+    gnizi = np.array([np.sum(np.abs(pin-1)) for pin in okpinok[zup][ziko1]])
+    ziko = np.argmin(gnizi)
+    ax.plot(np.arange(8), okpinok[zup][ziko1][ziko], color = 'green', label = 'lowest param variation', linewidth = 5)
+    print('\nlowest param variation', okchan[zup][ziko1][ziko])
+    print(oknewval[zup][ziko1][ziko])
+
+    ziko = np.argmin(zonchan_mean[oks][zup])
+    ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation', linewidth = 5)
+    print('\nlowest zonal variation', okchan[zup][ziko])
+    print(oknewval[zup][ziko])
+
+    ax.legend()
+    ax.set_xticks(np.arange(8))
+    ax.set_xticklabels(testparams, size = 'large', rotation = 60)
+    ax.set_ylabel('Relative change of param')
+    fig.suptitle('Alternative param: c{}'.format(i))
+    #fig.savefig(cart_out + 'altparams_c{}.pdf'.format(i))
+    figs.append(fig)
+
+ctl.plot_pdfpages(cart_out + 'altparams_9set.pdf', figs)
