@@ -349,7 +349,7 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
     print('\nlowest param variation', okchan[zup][ziko1][ziko])
     print(oknewval[zup][ziko1][ziko])
 
-    ziko = np.argmin(zonchan_mean[oks][zup])
+    ziko = np.argmin(zonchan_mean[zup])
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation', linewidth = 5)
     print('\nlowest zonal variation', okchan[zup][ziko])
     print(oknewval[zup][ziko])
