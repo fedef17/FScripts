@@ -345,12 +345,13 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
     else:
         print('\n\nselecting change close to {} W/m2'.format(0.0))
         zup = np.abs(okchan) < 0.05
-        num = 0
 
     if delta < -0.1:
         num = i+1
-    else:
+    elif delta > 0.1:
         num = i
+    else:
+        num = 0
 
     fig, ax = plt.subplots(figsize=(16,12))
 
@@ -386,6 +387,8 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
     ax.set_xticks(np.arange(8))
     ax.set_xticklabels(testparams, size = 'large', rotation = 60)
     ax.set_ylabel('Relative change of param')
+
+    ax.set_ylim(0.67, 1.33)
     fig.suptitle('Alternative param: c{} -> {:6.2f} W/m2'.format(num, chak))
     #fig.savefig(cart_out + 'altparams_c{}.pdf'.format(i))
     if num == 0:
