@@ -42,6 +42,7 @@ plt.rcParams['axes.labelsize'] = 18
 
 cart_in = '/data-hobbes/fabiano/TunECS/AMIP_exps/'
 cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
+cart_out_2 = '/home/fabiano/Research/lavori/TunECS/tuning/coupled/'
 
 mname = '{:2s}{:1s}{:1s}'
 fil = cart_in + '{:4s}/post/mon/Post_{:4d}/{:4s}_{:4d}_{}.nc'
