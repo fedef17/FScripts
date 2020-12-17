@@ -342,11 +342,15 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
     if np.abs(delta) > 0.1:
         print('\n\nselecting change close to {} W/m2'.format(delta))
         zup = np.abs(okchan - delta) < 0.05
-        num = i+1
     else:
         print('\n\nselecting change close to {} W/m2'.format(0.0))
         zup = np.abs(okchan) < 0.05
         num = 0
+
+    if delta < -0.1:
+        num = i+1
+    else:
+        num = i
 
     fig, ax = plt.subplots(figsize=(16,12))
 
@@ -365,11 +369,12 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
     ax.plot(np.arange(8), okpinok[zup][ziko1][ziko], color = 'green', label = 'lowest param variation', linewidth = 5)
     print('\nlowest param variation', okchan[zup][ziko1][ziko])
     print(oknewval[zup][ziko1][ziko])
+    chak = okchan[zup][ziko1][ziko]
     if num == 0:
         newsets.insert(0, oknewval[zup][ziko1][ziko])
-        deltas.insert(0, okchan[zup][ziko1][ziko])
+        deltas.insert(0, chak)
     else:
-        deltas.append(okchan[zup][ziko1][ziko])
+        deltas.append(chak)
         newsets.append(oknewval[zup][ziko1][ziko])
 
     ziko = np.argmin(zonchan_mean[zup])
@@ -381,7 +386,7 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
     ax.set_xticks(np.arange(8))
     ax.set_xticklabels(testparams, size = 'large', rotation = 60)
     ax.set_ylabel('Relative change of param')
-    fig.suptitle('Alternative param: c{}'.format(num))
+    fig.suptitle('Alternative param: c{} -> {:6.2f} W/m2'.format(num, chak))
     #fig.savefig(cart_out + 'altparams_c{}.pdf'.format(i))
     if num == 0:
         figs.insert(0, fig)
