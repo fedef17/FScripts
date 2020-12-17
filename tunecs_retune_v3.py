@@ -337,9 +337,14 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
     zup = np.abs(okchan - delta) < 0.05
 
     fig, ax = plt.subplots(figsize=(16,12))
-    #for co in okokper[zup]:
-    for pin in okpinok[zup]:
-        ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+
+    if np.sum(zup) > 1000:
+        randcho = np.random.choice(np.sum(zup), 1000)
+        for pin in okpinok[zup][randcho]:
+            ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
+    else:
+        for pin in okpinok[zup]:
+            ax.plot(np.arange(8), pin, color = 'blue', linewidth = 0.1)
 
     gnizi1 = np.array([np.max(np.abs(pin-1)) for pin in okpinok[zup]])
     ziko1 = gnizi1 == np.min(gnizi1)
