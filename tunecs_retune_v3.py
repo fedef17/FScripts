@@ -331,10 +331,21 @@ okchan = allcha
 okzon = zonchan
 okpi = allpi
 okokper = okperms
+
+print('PIOOOOOOOOO', np.min(okpi), np.max(okpi))
+
+newsets = []
 figs = []
-for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
-    print('\n\nselecting change close to {} W/m2'.format(delta))
-    zup = np.abs(okchan - delta) < 0.05
+deltas = []
+for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
+    if np.abs(delta) > 0.1:
+        print('\n\nselecting change close to {} W/m2'.format(delta))
+        zup = np.abs(okchan - delta) < 0.05
+        num = i+1
+    else:
+        print('\n\nselecting change close to {} W/m2'.format(0.0))
+        zup = np.abs(okchan) < 0.05
+        num = 0
 
     fig, ax = plt.subplots(figsize=(16,12))
 
@@ -353,6 +364,12 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
     ax.plot(np.arange(8), okpinok[zup][ziko1][ziko], color = 'green', label = 'lowest param variation', linewidth = 5)
     print('\nlowest param variation', okchan[zup][ziko1][ziko])
     print(oknewval[zup][ziko1][ziko])
+    if num == 0:
+        newsets.insert(0, oknewval[zup][ziko1][ziko])
+        deltas.insert(0, okchan[zup][ziko1][ziko])
+    else:
+        deltas.append(okchan[zup][ziko1][ziko])
+        newsets.append(oknewval[zup][ziko1][ziko])
 
     ziko = np.argmin(zonchan_mean[zup])
     ax.plot(np.arange(8), okpinok[zup][ziko], color = 'violet', label = 'lowest zonal variation', linewidth = 5)
@@ -363,8 +380,18 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 9)):
     ax.set_xticks(np.arange(8))
     ax.set_xticklabels(testparams, size = 'large', rotation = 60)
     ax.set_ylabel('Relative change of param')
-    fig.suptitle('Alternative param: c{}'.format(i))
+    fig.suptitle('Alternative param: c{}'.format(num))
     #fig.savefig(cart_out + 'altparams_c{}.pdf'.format(i))
-    figs.append(fig)
+    if num == 0:
+        figs.insert(0, fig)
+    else:
+        figs.append(fig)
 
 ctl.plot_pdfpages(cart_out + 'altparams_9set.pdf', figs)
+
+ctl.mkdir(cart_out_2 + 'tun_params')
+for i, nuvals, deltas in enumerate(zip(newsets, deltas)):
+    parset = dict(zip(testparams, nuvals))
+    filename = cart_out_2 + 'tun_params/ifstun_c{}.sh'.format(i)
+    title = 'Alternative param: c{}. Should give a delta toa_net of {:6.2f} W/m2 in 4xCO2'.format(i, delta)
+    tl.write_tunparams(filename, parset, title)

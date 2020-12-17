@@ -52,6 +52,7 @@ if precalc_splines:
 #     derdic_glo = gigi[-2]
 # derdic.update(derdic_glo)
 
+allparams = ['RPRCON', 'RVICE', 'RLCRITSNOW', 'RSNOWLIN2', 'ENTRORG', 'DETRPEN', 'ENTRDD', 'RMFDEPS', 'RCLDIFF', 'RCLDIFFC', 'RLCRIT_UPHYS']
 testparams = ['ENTRORG', 'RPRCON', 'DETRPEN', 'RMFDEPS', 'RVICE', 'RSNOWLIN2', 'RCLDIFF', 'RLCRIT_UPHYS']
 
 uff_params = dict()
@@ -101,6 +102,21 @@ lacen = np.array([np.mean(laol) for laol in bands])
 
 
 ##################################################################################
+def write_tunparams(filename, new_parset, title):
+    filok = open(filename, 'w')
+    filok.write('# IFS tuning\n')
+    filok.write('# ' + title + '\n')
+
+    for par in allparams:
+        if par in new_parset:
+            filok.write('{}={:.3e}\n'.format(par, new_parset[par]))
+        else:
+            filok.write('{}={:.3e}\n'.format(par, uff_params[par]))
+
+    filok.close()
+
+    return
+
 def clim_var(forc, var):
     """
     Gives the climatological values of var with the official param.
