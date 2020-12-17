@@ -391,7 +391,7 @@ for i, delta in enumerate(np.linspace(-3.2, 0.8, 10)):
 ctl.plot_pdfpages(cart_out + 'altparams_9set.pdf', figs)
 
 ctl.mkdir(cart_out_2 + 'tun_params')
-for i, nuvals, deltas in enumerate(zip(newsets, deltas)):
+for i, (nuvals, deltas) in enumerate(zip(newsets, deltas)):
     parset = dict(zip(testparams, nuvals))
     filename = cart_out_2 + 'tun_params/ifstun_c{}.sh'.format(i)
     title = 'Alternative param: c{}. Should give a delta toa_net of {:6.2f} W/m2 in 4xCO2'.format(i, delta)
