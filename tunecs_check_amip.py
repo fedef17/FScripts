@@ -84,7 +84,7 @@ fig1, ax1 = plt.subplots(figsize=(16,12))
 fig2, ax2 = plt.subplots(figsize=(16,12))
 fig3, ax3 = plt.subplots(figsize=(16,12))
 fig4, ax4 = plt.subplots(figsize=(16,12))
-for parset, chanpi, chanc4, num in zip(parsets, pich, c4ch, num):
+for parset, chanpi, chanc4, num in zip(parsets, pich, c4ch, range(1, 10)):
     expnam = 'pia{}'.format(i)
     pi_score = tl.read_PI(carttab, expnam)
     toa_pi, err_toa_pi = tl.read_toa_net(carttab, expnam)
