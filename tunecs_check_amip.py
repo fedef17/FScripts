@@ -89,7 +89,7 @@ for parset, chanpi, chanc4, num in zip(parsets, pich, c4ch, range(1, 10)):
     pi_score = tl.read_PI(carttab, expnam)
     toa_pi, err_toa_pi = tl.read_toa_net(carttab, expnam)
 
-    expnam = 'c4a{}'.format(i)
+    expnam = 'c4a{}'.format(num)
     toa_c4, err_toa_c4 = tl.read_toa_net(carttab, expnam)
 
     ax1.scatter(num, chanpi, color = 'steelblue', marker = 'o', s = 100, label = 'predicted')
