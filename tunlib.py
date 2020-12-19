@@ -395,7 +395,7 @@ def read_PI(tablecart, expnam, amip = True):
     for fi in allfils:
         with open(cart + fi, 'r') as filoz:
             linee = filoz.readlines()
-            anno = int(linee[0].split()[-1])
+            anno = int(linee[3].split()[-1])
             if amip:
                 pi = float(linee[-1].split()[-1])
             else:
