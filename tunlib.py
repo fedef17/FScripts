@@ -372,6 +372,43 @@ def read_gregory(filnam):
 
     return anni, toa_net, srf_net, tas
 
+
+def read_toa_net(tablecart, expnam):
+    fil = tablecart + '{}/gregory_{}.txt'.format(expnam, expnam)
+    anni, toa_net, srf_net, tas = read_gregory(fil)
+    toa_ok = np.mean(toa_net[1:])
+    err_toa_ok = np.std(toa_net[1:])
+
+    return toa_ok, err_toa_ok
+
+
+def read_PI(tablecart, expnam, amip = True):
+    """
+    Reads the PI index for exps.
+    """
+
+    cart = tablecart + expnam + '/'
+    allfils = [fi for fi in os.listdir(cart) if fi[:3] == 'PI2']
+
+    pis = []
+    anni = []
+    for fi in allfils:
+        with open(cart + fi, 'r') as filoz:
+            linee = filoz.readlines()
+            anno = int(linee[0].split()[-1])
+            if amip:
+                pi = float(linee[-1].split()[-1])
+            else:
+                pi = float(linee[-2].split()[-1])
+            anni.append(anno)
+            pis.append(pi)
+
+    gigi = np.argsort(anni)
+    pis = np.array(pis)[gigi]
+
+    return np.mean(pis[1:])
+
+
 def check_file(filnam):
     if os.path.exists(filnam):
         return True

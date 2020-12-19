@@ -404,3 +404,17 @@ for i, (nuvals, delta) in enumerate(zip(newsets, deltas)):
     filename = cart_out_2 + 'tun_params/ifstun_c{}.sh'.format(i)
     title = 'Alternative param: c{}. Should give a delta toa_net of {:6.2f} W/m2 in 4xCO2'.format(i, delta)
     tl.write_tunparams(filename, parset, title)
+
+
+pich = []
+c4ch = []
+parsets = []
+for nuvals in newsets:
+    parset = dict(zip(testparams, nuvals))
+    var_change_pi, _ = tl.calc_change_var_allparams('pi', 'toa_net', parset, method = meto)
+    var_change_c4, _ = tl.calc_change_var_allparams('c4', 'toa_net', parset, method = meto)
+    pich.append(var_change_pi)
+    c4ch.append(var_change_c4)
+    parsets.append(parset)
+
+pickle.dump([parsets, pich, c4ch], open(cart_out_2 + 'altparams.p', 'wb'))
