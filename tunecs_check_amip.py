@@ -78,8 +78,6 @@ parsets = parsets[1:]
 pich = pich[1:]
 c4ch = c4ch[1:]
 
-nams_pi = [ for i in range(1,10)]
-
 carttab = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/table/'
 
 fig1, ax1 = plt.subplots(figsize=(16,12))
