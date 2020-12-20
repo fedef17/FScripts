@@ -92,17 +92,23 @@ for parset, chanpi, chanc4, num in zip(parsets, pich, c4ch, range(1, 10)):
     expnam = 'c4a{}'.format(num)
     toa_c4, err_toa_c4 = tl.read_toa_net(carttab, expnam)
 
-    ax1.scatter(num, chanpi, color = 'steelblue', marker = 'o', s = 100, label = 'predicted')
+    labp = None
+    laba = None
+    if num == 1:
+        labp = 'predicted'
+        laba = 'actual'
+
+    ax1.scatter(num, chanpi, color = 'steelblue', marker = 'o', s = 100, label = labp)
     ax1.errorbar(num, toa_pi - ctrl_pi, yerr = err_toa_pi, fmt = 'none', color = 'indianred', capsize = 2, elinewidth = 1)
-    ax1.scatter(num, toa_pi - ctrl_pi, color = 'indianred', marker = 'x', s = 100, label = 'actual')
+    ax1.scatter(num, toa_pi - ctrl_pi, color = 'indianred', marker = 'x', s = 100, label = laba)
 
-    ax2.scatter(num, chanc4, color = 'steelblue', marker = 'o', s = 100, label = 'predicted')
+    ax2.scatter(num, chanc4, color = 'steelblue', marker = 'o', s = 100, label = labp)
     ax2.errorbar(num, toa_c4 - ctrl_c4, yerr = err_toa_c4, fmt = 'none', color = 'indianred', capsize = 2, elinewidth = 1)
-    ax2.scatter(num, toa_c4 - ctrl_c4, color = 'indianred', marker = 'x', s = 100, label = 'actual')
+    ax2.scatter(num, toa_c4 - ctrl_c4, color = 'indianred', marker = 'x', s = 100, label = laba)
 
-    ax3.scatter(num, chanc4-chanpi, color = 'steelblue', marker = 'o', s = 100, label = 'predicted')
+    ax3.scatter(num, chanc4-chanpi, color = 'steelblue', marker = 'o', s = 100, label = labp)
     ax3.errorbar(num, (toa_c4 - ctrl_c4) - (toa_pi - ctrl_pi), yerr = (err_toa_pi+err_toa_c4)/2., fmt = 'none', color = 'indianred', capsize = 2, elinewidth = 1)
-    ax3.scatter(num, (toa_c4 - ctrl_c4) - (toa_pi - ctrl_pi), color = 'indianred', marker = 'x', s = 100, label = 'actual')
+    ax3.scatter(num, (toa_c4 - ctrl_c4) - (toa_pi - ctrl_pi), color = 'indianred', marker = 'x', s = 100, label = laba)
 
     ax4.scatter(num, pi_score, color = 'steelblue', marker = 'o', s = 100)
 
