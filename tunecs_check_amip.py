@@ -106,9 +106,13 @@ for parset, chanpi, chanc4, num in zip(parsets, pich, c4ch, range(1, 10)):
 
     ax4.scatter(num, pi_score, color = 'steelblue', marker = 'o', s = 100)
 
+pi_score = tl.read_PI(carttab, 'tpa1')
+ax4.axhline(pi_score)
+
 for ax in [ax1, ax2, ax3]:
     ax.grid()
     ax.axhline(0.)
+    ax.legend()
 ax1.set_ylabel('Change in pi toa_net (W/m2)')
 ax2.set_ylabel('Change in 4xCO2 toa_net (W/m2)')
 ax3.set_ylabel('Change in sensitivity at toa_net (W/m2)')
