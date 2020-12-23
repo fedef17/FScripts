@@ -37,7 +37,7 @@ cart_tas = '/data-hobbes/fabiano/cmip5_tas/'
 fil_tas = cart_tas + 'tas_Amon_{}_rcp85_{}_200601-210012.nc'
 
 cart_cmip5 = '/home/fabiano/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
-cart_out = cart_in + 'Results_SST_corrmap_cmip5/'
+cart_out = cart_in + 'Results_SST_corrmap/'
 ctl.mkdir(cart_out)
 
 yr10 = 10 # length of running mean

@@ -131,8 +131,8 @@ for area in ['EAT', 'PNA']:
                 cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
                 cose[(ssp, area, mod, 'trend', reg)]= trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
 
-tas_anom_cmip5, tas_trends_cmip5 = pickle.load(open(cart_out + 'tas_anom_ssp585.p', 'rb'))
-okmods_cmip5, cose_cmip5 = pickle.load(open(cart_out + 'cose_cmip5.p', 'rb'))
+tas_anom_cmip5, tas_trends_cmip5 = pickle.load(open(cart_out + 'tas_anom_rcp85.p', 'rb'))
+okmods_cmip5, cose_cmip5 = pickle.load(open(cart_out + 'cose_rcp85.p', 'rb'))
 
 tas_anom.update(tas_anom_cmip5)
 tas_trends.update(tas_trends_cmip5)
