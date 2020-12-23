@@ -294,11 +294,11 @@ for area in ['EAT', 'PNA']:
             coso2err = np.std(cosi, axis = 0)
 
             coso = np.concatenate([coso1, coso2])
-            seas20 = np.array(ctl.running_mean(coso), 20)
+            seas20 = np.array(ctl.running_mean(coso, 20))
             runfreq[(ssp, 'run20', reg)] = seas20
             coserr = np.std(cosi, axis = 0)
             cosoerr = np.concatenate([coso1err, coso2err])
-            seas20err = np.array(ctl.running_mean(cosoerr), 20)
+            seas20err = np.array(ctl.running_mean(cosoerr, 20))
             runfreq[(ssp, 'run20err', reg)] = seas20err
             ax.fill_between(yr, seas20-seas20err, seas20+seas20err, color = 'steelblue', alpha = 0.3)
             ax.plot(yr, coso, color = 'black', linewidth = 3)
