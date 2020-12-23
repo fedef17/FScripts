@@ -125,12 +125,18 @@ for area in ['EAT', 'PNA']:
         if ssp == 'ssp126':
             okmods = [mod for mod in okmods if mod != 'FGOALS-g3_r1i1p1f1']
         print(okmods)
-        
+
         for mod in okmods:
             for reg in range(4):
                 cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
                 cose[(ssp, area, mod, 'trend', reg)]= trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
 
+tas_anom_cmip5, tas_trends_cmip5 = pickle.load(open(cart_out + 'tas_anom_ssp585.p', 'rb'))
+okmods_cmip5, cose_cmip5 = pickle.load(open(cart_out + 'cose_cmip5.p', 'rb'))
+
+tas_anom.update(tas_anom_cmip5)
+tas_trends.update(tas_trends_cmip5)
+cose.update(cose_cmip5)
 
 #### ok.
 ### ORA ho tas_anom e cose
@@ -146,8 +152,11 @@ for area in ['EAT', 'PNA']:
 # sennò non ha molto senso, cioè beccherò le zone che si scaldano di più
 
 # devo dividere sst_trend e freq_trend per il global tas trend di ogni modello
+
+cart_out_wcmip5 = cart_out + 'wcmip5/'
+ctl.mkdir(cart_out_wcmip5)
+
 corrmaps = dict()
-ssp = 'ssp585'
 for seas in ['NDJFM', 'year']:
     for area in ['EAT', 'PNA']:
         for reg in range(4):
@@ -157,12 +166,23 @@ for seas in ['NDJFM', 'year']:
             nlat, nlon = trendmat.shape
             lat, lon = ctl.genlatlon(nlat, nlon)
 
-            gw = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods])
-            frok = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+            ssp = 'ssp585'
+            gw_cmip6 = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods])
+            frok_cmip6 = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
+
+            ssp = 'rcp85'
+            gw_cmip5 = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods_cmip5])
+            frok_cmip5 = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods_cmip5])
+
+            gw = np.concatenate([gw_cmip5, gw_cmip6])
+            frok = np.concatenate([frok_cmip5, frok_cmip6])
 
             for la in range(nlat):
                 for lo in range(nlon):
-                    tastr = np.array([tas_trends[(ssp, mod, seas)][la, lo] for mod in okmods])
+                    tastr_cmip6 = np.array([tas_trends[('ssp585', mod, seas)][la, lo] for mod in okmods])
+                    tastr_cmip5 = np.array([tas_trends[('rcp85', mod, seas)][la, lo] for mod in okmods_cmip5])
+                    tastr = np.concatenate([tastr_cmip5, tastr_cmip6])
+
                     pears, pval = stats.pearsonr(frok/gw, tastr/gw)
 
                     corr_map[la, lo] = pears
@@ -171,14 +191,14 @@ for seas in ['NDJFM', 'year']:
             corrmaps[('corr', area, reg)] = corr_map
             corrmaps[('pval', area, reg)] = pval_map
 
-            fnam = cart_out + 'tas_corrmap_{}_{}_{}.pdf'.format(area, reg, seas)
+            fnam = cart_out_wcmip5 + 'tas_corrmap_{}_{}_{}.pdf'.format(area, reg, seas)
             ctl.plot_map_contour(corr_map, lat, lon, filename = fnam, add_hatching = pval_map <= 0.05, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas), draw_grid = True)
 
-            fnam = cart_out + 'tas_pvalmap_{}_{}_{}.pdf'.format(area, reg, seas)
+            fnam = cart_out_wcmip5 + 'tas_pvalmap_{}_{}_{}.pdf'.format(area, reg, seas)
             ctl.plot_map_contour(pval_map, lat, lon, filename = fnam, cbar_range = (0., 0.1), plot_anomalies = False, extend_opt = 'neither', draw_grid = True, cb_label = 'P-value', title = 'area: {}, regime: {}, seas: {}'.format(area, reg_names_area[area][reg], seas))
 
         cmape = [corrmaps[('corr', area, reg)] for reg in range(4)]
         pvlep = [corrmaps[('pval', area, reg)] <= 0.05 for reg in range(4)]
 
-        fnam = cart_out + 'tas_corrmap_{}_allregs_{}.pdf'.format(area, seas)
+        fnam = cart_out_wcmip5 + 'tas_corrmap_{}_allregs_{}.pdf'.format(area, seas)
         ctl.plot_multimap_contour(cmape, lat, lon, filename = fnam, add_hatching = pvlep, cbar_range = (-1, 1), cb_label = 'Correlation', title = 'area: {}, seas: {}'.format(area, seas), subtitles = reg_names_area[area], draw_grid = True, figsize = (18,12))

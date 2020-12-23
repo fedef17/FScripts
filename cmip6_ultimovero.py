@@ -28,25 +28,15 @@ plt.rcParams['axes.titlesize'] = 18
 plt.rcParams['axes.labelsize'] = 18
 #############################################################################
 
-if os.uname()[1] == 'hobbes':
-    cart_in = '/home/fabiano/Research/lavori/CMIP6/'
-elif os.uname()[1] == 'ff-clevo':
-    cart_in = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/'
+cart_in = '/home/fedef/Research/lavori/CMIP6/'
 
 cart_out_orig = cart_in + 'Results_ultimo/'
 ctl.mkdir(cart_out_orig)
 
-cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
-
-file_hist_refEOF = cart_data + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1957-2005_refEOF_dtr.p'
-
-file_hist = cart_data + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
-gen_file_ssp = cart_data + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
-
 yr10 = 10 # length of running mean
 
-cart_cmip5 = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
-cart_v5 = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
+cart_cmip5 = '/home/fedef/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
+cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
 
 numclus = 4
 reg_names_area = dict()
@@ -98,7 +88,7 @@ for area in ['EAT', 'PNA']:
     # freqbias = np.array([np.mean(np.abs(results_hist_refEOF[cos][mod]['freq_clus']-results_ref['freq_clus'])) for mod in okmods[cos]])
     # cose[(area, 'freqbias')] = dict(zip(okmods[cos], freqbias))
 
-filbi = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/Results_cmip6_vs_cmip5_refEOF/histbiases.p'
+filbi = '/home/fedef/Research/lavori/CMIP6/Results_cmip6_vs_cmip5_refEOF/histbiases.p'
 with open(filbi, 'rb') as pino:
     res_short = pickle.load(pino)
 kesal = list(res_short.keys())
@@ -109,17 +99,17 @@ for ke in kesal:
         res_short[tuple(['ssp585'] + list(ke[1:]))] = res_short[ke]
 
 # da Virna
-vicar = '/home/fedefab/Scrivania/Research/Post-doc/lavori/CMIP6/virnas_tas/new/'
-fils = ['Indices_{}.txt', 'Slopes_{}_ndjfm.txt', 'Slopes_{}_temp.txt']
-nams = ['temp', 'slope', 'slope']
-tip = [0,0,1]
+vicar = '/home/fedef/Research/lavori/CMIP6/virnas_tas/new/'
+fils = ['Indices_{}.txt', 'Slopes_{}_ndjfm.txt', 'Slopes_{}_temp.txt', 'Trends_NDJFM_{}.txt']
+nams = ['temp', 'slope', 'slope', 'slope']
+tip = [0,0,1,2]
 
 resvi = dict()
 for na, fi, ti in zip(nams, fils, tip):
     for ssp in ['rcp85', 'ssp585']:
-        vmods, datatemp = ctl.read_from_txt(vicar + fi.format(ssp), n_skip = 2, sep = '\t')
 
         if ti == 0:
+            vmods, datatemp = ctl.read_from_txt(vicar + fi.format(ssp), n_skip = 2, sep = '\t')
             vkeys = ['AA', 'UTW', 'PST', 'PVS']
             for mod in okmods[ssp]:
                 if mod.split('_')[0] in vmods:
@@ -128,8 +118,18 @@ for na, fi, ti in zip(nams, fils, tip):
                     for ke, te in zip(vkeys, lin):
                         resvi[(ssp, mod, na, ke)] = te
                     resvi[(ssp, mod, na, 'RUTAW')] = resvi[(ssp, mod, na, 'UTW')]/resvi[(ssp, mod, na, 'AA')]
+        elif ti == 1:
+            vmods, datatemp = ctl.read_from_txt(vicar + fi.format(ssp), n_skip = 2, sep = '\t')
+            vkeys = ['GW', 'NAW_annual']
+            for mod in okmods[ssp]:
+                if mod.split('_')[0] in vmods:
+                    ind = np.where(vmods == mod.split('_')[0])[0][0]
+                    lin = datatemp[ind]
+                    for ke, te in zip(vkeys, lin):
+                        resvi[(ssp, mod, na, ke)] = te
         else:
-            vkeys = ['GW', 'NAW']
+            vmods, datatemp = ctl.read_from_txt(vicar + fi.format(ssp), n_skip = 3, sep = '\t')
+            vkeys = ['GW_ndjfm', 'NAW', 'SPGW', 'TNAW', 'TNAW2']
             for mod in okmods[ssp]:
                 if mod.split('_')[0] in vmods:
                     ind = np.where(vmods == mod.split('_')[0])[0][0]
@@ -137,20 +137,25 @@ for na, fi, ti in zip(nams, fils, tip):
                     for ke, te in zip(vkeys, lin):
                         resvi[(ssp, mod, na, ke)] = te
 
-vkeys = ['AA', 'UTW', 'PST', 'PVS', 'NAW', 'RUTAW', 'GW']
+vkeys = ['AA', 'UTW', 'PST', 'PVS', 'RUTAW', 'GW', 'NAW', 'SPGW', 'TNAW', 'TNAW2', 'NAW_annual']
 
 for ke in list(resvi.keys()):
     if 'temp' in ke: continue
-    for kk in vkeys[:-2]:
+    for kk in vkeys:
         if kk in ke:
             nuke = tuple(list(ke[:-1])+[kk+'rGW'])
             kegw = tuple(list(ke[:-1])+['GW'])
             resvi[nuke] = resvi[ke]/resvi[kegw]
 
+kose = np.unique([ke[:-1] for ke in resvi if 'slope' in ke], axis = 0)
+for ke in kose:
+    resvi[tuple(ke)+tuple(['NAW2rGW'])] = resvi[tuple(ke)+tuple(['TNAWrGW'])]+resvi[tuple(ke)+tuple(['SPGWrGW'])]
+    resvi[tuple(ke)+tuple(['NAW2'])] = resvi[tuple(ke)+tuple(['TNAW'])]+resvi[tuple(ke)+tuple(['SPGW'])]
+
 vkeys = np.unique([ke[-1] for ke in resvi])
 
 ctl.mkdir(cart_out_orig)
-cart_corr_sig = cart_out_orig + 'corrplots/'
+cart_corr_sig = cart_out_orig + 'corrplots_regs/'
 ctl.mkdir(cart_corr_sig)
 
 varli = dict()
@@ -166,6 +171,30 @@ for ssp in ['rcp85', 'ssp585']:
             varli[(ssp, mod, area, 'trend')] = np.array([trend_ssp[(ssp+cos, mod, 'trend', 'freq10', reg)] for reg in range(4)])
             varli[(ssp, mod, area, 'fr_fin')] = np.array(freqs[(ssp+cos, mod, 'tot50')])
             varli[(ssp, mod, area, 'fr_diff')] = np.array(freqs[(ssp+cos, mod, 'tot50')])-np.array(freqs[('hist'+cos, mod, 'tot50')])
+
+allpeas = dict()
+livar = 'trend'
+for reg1 in range(4):
+    for reg2 in range(4):
+        x = []
+        y = []
+        for ssp in ['ssp585', 'rcp85']:
+            xss = []
+            yss = []
+            for mod in okmods[ssp]:
+                xss.append(varli[(ssp, mod, 'EAT', livar)][reg1])
+                yss.append(varli[(ssp, mod, 'PNA', livar)][reg2])
+            x.append(xss)
+            y.append(yss)
+
+        pears, pval = stats.pearsonr(np.concatenate(x), np.concatenate(y))
+        filnam = cart_corr_sig + 'corr_EAT{}_PNA{}.pdf'.format(reg1, reg2)
+        pea = ctl.plotcorr_wgroups(x, y, filename = filnam, xlabel = reg_names_area['EAT'][reg1], ylabel = reg_names_area['PNA'][reg2], groups = ['rcp85', 'ssp585'], colors = ['blue', 'red'], single_group_corr = True)
+        allpeas[(reg1, reg2)] = (pears, pval)
+        if abs(pears) > 0.3:
+            print('-------->', reg1, reg2, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
+        else:
+            print(reg1, reg2, '{:5.2f}'.format(pears), '{:6.3e}'.format(pval))
 
 #### THE REGRESSION
 
@@ -345,13 +374,64 @@ for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
 
 
 # RESCALING THE FREQ TRENDS TO GW
-varall = ['RUTAW', 'PVSrGW', 'UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
-varall = ['UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW']
+#varall = ['UTWrGW', 'AArGW', 'NAWrGW', 'PSTrGW'] # FIRST version of the article
+#varall = ['UTWrGW', 'AArGW', 'PSTrGW', 'TNAWrGW', 'SPGWrGW'] # SECOND version of the article
+varall = ['UTWrGW', 'AArGW', 'PSTrGW', 'NAWrGW'] # SECOND version of the article
 pio2 = list(itt.combinations(varall, 2))
 pio3 = list(itt.combinations(varall, 3))
 pio4 = list(itt.combinations(varall, 4))
 
 tip = 'GWscaling'
+# partiamo con model1
+print('\n\n\n SCALING FREQ trends for GW!\n')
+for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
+    for area in ['EAT', 'PNA']:
+        allscores[(tip, num, area)] = []
+        for pi in pio:
+            # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
+            X = []
+            Y = []
+            for ssp in ['rcp85', 'ssp585']:
+                for mod in okmods[ssp]:
+                    if (ssp, mod, na, 'AA') in resvi:
+                        Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in pi])
+                        X.append(Xmod)
+
+                        Y.append(varli[(ssp, mod, area, varok)]/resvi[(ssp, mod, na, 'GW')])
+
+            Y = np.stack(Y)
+            # STANDARDIZZO LE FEATURES
+            X = np.stack(X)
+            scaler = StandardScaler().fit(X)
+            X = scaler.transform(X)
+
+            model = LinearRegression().fit(X, Y)
+            allscores[(tip, num, area)].append(model.score(X, Y))
+            print(pi, model.score(X, Y))
+
+        argma = np.argmax(allscores[(tip, num, area)])
+        bestset[(tip, num, area)] = list(pio)[argma]
+        X = []
+        for ssp in ['rcp85', 'ssp585']:
+            for mod in okmods[ssp]:
+                if (ssp, mod, na, 'AA') in resvi:
+                    Xmod = np.array([resvi[(ssp, mod, na, ke)] for ke in bestset[(tip, num, area)]])
+                    X.append(Xmod)
+        X = np.stack(X)
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        bestxs[(tip, num, area)] = X
+        bestys[(tip, num, area)] = Y
+        print(tip, num, area, list(pio)[argma], allscores[(tip, num, area)][argma], '\n')
+        print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
+
+
+varall = ['UTWrGW', 'AArGW', 'PSTrGW', 'TNAW2rGW', 'SPGWrGW'] # SECOND version of the article
+pio2 = list(itt.combinations(varall, 2))
+pio3 = list(itt.combinations(varall, 3))
+pio4 = list(itt.combinations(varall, 4))
+tip = 'GWscaling2'
 # partiamo con model1
 print('\n\n\n SCALING FREQ trends for GW!\n')
 for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
@@ -404,7 +484,7 @@ from scipy import stats
 # 3 EAT ('UTWrGW', 'AArGW', 'PSTrGW') 0.3278009127949955
 # 3 PNA ('PVSrGW', 'AArGW', 'NAWrGW') 0.26665645026370693
 resall = dict()
-for tip in ['conGW', 'unscal', 'senzaGW', 'GWscaling']:
+for tip in ['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2']:
     for num in [2,3,4]:
         for area in ['EAT', 'PNA']:
             xii = bestxs[(tip, num, area)]
@@ -444,7 +524,7 @@ cmappa = colors.ListedColormap(colo)
 cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
 
-for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05), (-0.05, 0.05), (-0.05, 0.05), (-1.2, 1.2)]):
+for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2'], [(-0.05, 0.05), (-0.05, 0.05), (-0.05, 0.05), (-1.2, 1.2), (-1.2, 1.2)]):
 
     piolo = np.concatenate([np.concatenate([resall[(tip, num, area, 'params')].flatten() for area in ['EAT', 'PNA']]) for num in [2,3]])
     vmin = np.min(piolo)
@@ -558,8 +638,8 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling'], [(-0.05, 0.05)
     fig.savefig(cart_out_orig + 'Rsquared_optimal_{}.pdf'.format(tip))
 
 
-#varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
-varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'NAWrGW']
+#varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'NAWrGW'] # First version
+varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'TNAWrGW', 'SPGWrGW', 'NAWrGW', 'TNAW2rGW']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
@@ -576,8 +656,8 @@ X = scaler.transform(X)
 print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
 
 
-#varall = ['GW', 'PVS', 'UTW', 'AA', 'NAW', 'PST']
-varall = ['GW', 'UTW', 'AA', 'NAW', 'PST']
+#varall = ['GW', 'UTW', 'AA', 'NAW', 'PST']  # First version
+varall = ['GW', 'UTW', 'AA', 'PST', 'TNAW', 'SPGW', 'NAW', 'TNAW2']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
