@@ -170,7 +170,7 @@ for seas in ['NDJFM', 'year']:
             gw_cmip6 = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods])
             frok_cmip6 = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods])
 
-            ssp = 'rcp85'
+            ssp = 'rcp85_cmip5'
             gw_cmip5 = np.array([ctl.global_mean(tas_trends[(ssp, mod, seas)], lat) for mod in okmods_cmip5])
             frok_cmip5 = np.array([cose[(ssp, area, mod, 'trend', reg)] for mod in okmods_cmip5])
 
@@ -180,7 +180,7 @@ for seas in ['NDJFM', 'year']:
             for la in range(nlat):
                 for lo in range(nlon):
                     tastr_cmip6 = np.array([tas_trends[('ssp585', mod, seas)][la, lo] for mod in okmods])
-                    tastr_cmip5 = np.array([tas_trends[('rcp85', mod, seas)][la, lo] for mod in okmods_cmip5])
+                    tastr_cmip5 = np.array([tas_trends[('rcp85_cmip5', mod, seas)][la, lo] for mod in okmods_cmip5])
                     tastr = np.concatenate([tastr_cmip5, tastr_cmip6])
 
                     pears, pval = stats.pearsonr(frok/gw, tastr/gw)

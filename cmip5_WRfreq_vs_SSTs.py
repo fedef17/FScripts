@@ -57,7 +57,7 @@ colssp = [coldic[ssp] for ssp in allssps]
 tas_anom = dict()
 tas_trends = dict()
 cose = dict()
-for ssp in ['rcp85']:
+for ssp in ['rcp85_cmip5']:
     print('SSP '+ssp)
 
     area = 'EAT'
