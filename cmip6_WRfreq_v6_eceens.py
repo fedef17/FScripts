@@ -452,19 +452,6 @@ for area in ['EAT', 'PNA']:
     colsim = [coldic[ssp] for ssp in allsims]
     colssp = [coldic[ssp] for ssp in allssps]
 
-    print('T-TEST for {}'.format(area))
-    for reg in range(4):
-        print('REGIME',reg)
-        for ssp in allssps:
-            if ssp == 'rcp85_cmip5':
-                a = freqs[('hist_cmip5', 'all', cos)][:, reg]
-            else:
-                a = freqs[('hist', 'all', cos)][:, reg]
-            print(ssp)
-            b = freqs[(ssp, 'all', cos)][:, reg]
-            ttests[('freq', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
-            print(ttests[('freq', area, reg, ssp)])
-
     figall = plt.figure(figsize = (16,12))
     axes = []
     cos = 'tot50'
@@ -488,9 +475,9 @@ for area in ['EAT', 'PNA']:
         if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
 
         #ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
-        for pos, ssp in zip(positions[1:], allsims[1:]):
-            if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, -10, color = 'black', marker = '*', s = 30)
+        # for pos, ssp in zip(positions[1:], allsims[1:]):
+        #     if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
+        #         ax.scatter(pos, -10, color = 'black', marker = '*', s = 30)
 
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         xli = ax.get_xlim()
