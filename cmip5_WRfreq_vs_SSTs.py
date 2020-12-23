@@ -54,6 +54,7 @@ allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5
 coldic = dict(zip(allsimcol, ctl.color_set(7)))
 colssp = [coldic[ssp] for ssp in allssps]
 
+cart_tas_cmip6 = '/data-woodstock/CMIP6/tasOld/ssp585/remap/'
 ref_fil = cart_tas_cmip6 + 'tas_Amon_EC-Earth3_ssp585_r1i1p1f1_201501-210012_remap.nc'
 
 tas_anom = dict()
