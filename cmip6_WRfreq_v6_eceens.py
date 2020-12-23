@@ -33,7 +33,7 @@ cart_cmip5 = '/home/fabiano/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
 yr10 = 10 # length of running mean
 #dtrtyp = 'light'
 dtrtyp = 'histrebase'
-cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
+cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_eceens/'
 ctl.mkdir(cart_out_orig)
 
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
