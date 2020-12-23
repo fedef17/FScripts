@@ -54,6 +54,8 @@ allsimcol = ['hist', 'ssp126', 'ssp245', 'bau', 'ssp370', 'ssp585', 'rcp85_cmip5
 coldic = dict(zip(allsimcol, ctl.color_set(7)))
 colssp = [coldic[ssp] for ssp in allssps]
 
+ref_fil = cart_tas_cmip6 + 'tas_Amon_EC-Earth3_ssp585_r1i1p1f1_201501-210012_remap.nc'
+
 tas_anom = dict()
 tas_trends = dict()
 cose = dict()
@@ -77,7 +79,8 @@ for ssp in ['rcp85_cmip5']:
     for mod in okmods:
         okfil = fil_tas.format(*(mod.split('_')))
         # leggo tas, faccio detrend, calcolo anom e ok.
-        var, coords, aux_info = ctl.readxDncfield(okfil)
+        #var, coords, aux_info = ctl.readxDncfield(okfil)
+        var, coords, aux_info = ctl.read_iris_nc(okfil, regrid_to_reference_file = ref_fil)
         lat = coords['lat']
         lon = coords['lon']
         dates = coords['dates']
