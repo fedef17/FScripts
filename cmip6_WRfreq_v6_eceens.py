@@ -320,7 +320,7 @@ for area in ['EAT', 'PNA']:
     residtimes = dict() # mean e p90
     patterns = dict()
 
-    for mem in okmods:
+    for mem in okmods_hist:
         freqs[('hist', mem, 'tot50')] = ctl.calc_clus_freq(results_hist[mem]['labels'], numclus)
 
         for reg in range(numclus):
@@ -346,7 +346,7 @@ for area in ['EAT', 'PNA']:
         freqs[('hist', mem, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
 
     for ssp in allssps:
-        for mem in okmods:
+        for mem in okmods_ssp:
             if mem not in results_ssp[ssp].keys(): continue
             ## Attach all members labels
             dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
@@ -383,17 +383,17 @@ for area in ['EAT', 'PNA']:
 
     ##### salvo le distrib per ogni ssp. Quelle assolute (con tutti i modelli) e quelle relative (solo con i modelli che ci sono anche in hist)
     ### questo è cambiato, uso gli stessi modelli per tutto
-    freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in okmods])
-    freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in okmods])
+    freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in okmods_hist])
+    freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in okmods_hist])
 
     for cos in ['last20', 'tot50']:
-        patterns[('hist', 'mean', cos)] = np.mean([patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
-        patterns[('hist', 'std', cos)] = np.std([patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
+        patterns[('hist', 'mean', cos)] = np.mean([patterns[('hist', mod, cos)] for mod in okmods_hist], axis = 0)
+        patterns[('hist', 'std', cos)] = np.std([patterns[('hist', mod, cos)] for mod in okmods_hist], axis = 0)
 
 
     for reg in range(numclus):
         for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
-            residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in okmods])
+            residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in okmods_hist])
 
     for ssp in allssps:
         freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in okmods])
@@ -403,19 +403,16 @@ for area in ['EAT', 'PNA']:
             patterns[(ssp, 'mean', cos)] = np.mean([patterns[(ssp, mod, cos)] for mod in okmods], axis = 0)
             patterns[(ssp, 'std', cos)] = np.std([patterns[(ssp, mod, cos)] for mod in okmods], axis = 0)
 
-            patterns[(ssp, 'mean_diff', cos)] = np.mean([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
-            patterns[(ssp, 'std_diff', cos)] = np.std([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
-
         # rel
-        modoks = okmods
-        freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
-        freqs[(ssp, 'rel', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')]-freqs[('hist', mod, 'last20')] for mod in modoks])
+        # modoks = okmods
+        # freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
+        # freqs[(ssp, 'rel', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')]-freqs[('hist', mod, 'last20')] for mod in modoks])
 
         for reg in range(numclus):
             for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
                 residtimes[(ssp, 'all', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)] for mod in okmods])
-
-                residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
+                #
+                # residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
     for ke in patterns.keys():
         gigi = patterns[ke][..., np.newaxis, np.newaxis] * results_ref['eofs_ref_pcs'][np.newaxis, ...]
