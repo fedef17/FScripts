@@ -53,8 +53,8 @@ histbases = []
 for mod in reshist.keys():
     histbases.append(np.mean(reshist[mod]['climate_mean'][:, 50:70, -8], axis = 0))
 
-lat = reshist[mod]['lat']
-lon = reshist[mod]['lon']
+lat = reshist[mod]['lat'][50:70]
+lon = reshist[mod]['lon'][50:70]
 
 sspbases = []
 for mod in resssp_noreb.keys():
