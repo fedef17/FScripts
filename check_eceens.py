@@ -74,11 +74,12 @@ histbases = []
 for mod in reshist.keys():
     histbases.append(np.mean(reshist[mod]['climate_mean'][:, 50:70, -8], axis = 1))
 
+dates = reshist[mod]['climate_mean_dates']
+
 sspbases = []
 for mod in resssp_noreb.keys():
     sspbases.append(np.mean(resssp_noreb[mod]['climate_mean'][:, 50:70, -8], axis = 1))
 
-dates = reshist[mod]['climate_mean_dates']
 
 fig = plt.figure()
 for ci in histbases:
