@@ -90,3 +90,19 @@ for ci in sspbases:
 plt.plot_date(dates, np.mean(sspbases, axis = 0), color = 'red', linewidth = 2, label = 'ssp585')
 plt.legend()
 fig.savefig(cart_out_orig + 'check_climatemean_vtime.pdf')
+
+
+histbases = []
+for mod in reshist.keys():
+    histbases.append(np.mean(reshist[mod]['climate_mean'], axis = 0))
+histcoso = np.mean(histbases, axis = 0)
+
+lat = reshist[mod]['lat']
+lon = reshist[mod]['lon']
+
+sspbases = []
+for mod in resssp_noreb.keys():
+    sspbases.append(np.mean(resssp_noreb[mod]['climate_mean'], axis = 0))
+sspcoso = np.mean(sspbases, axis = 0)
+
+ctl.plot_double_sidebyside(sspcoso, histcoso, lat, lon, filename = cart_out_orig + 'mapdiff_rebase.pdf', visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = None, xlabel = None, ylabel = None, cb_label = None, stitle_1 = 'ssp585', stitle_2 = 'hist', cbar_range = None, plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), use_different_grids = False, bounding_lat = 30, plot_margins = 'EAT', add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
