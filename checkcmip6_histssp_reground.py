@@ -94,7 +94,7 @@ for area in ['EAT', 'PNA']:
         gogo, _, _ = ctl.sel_area(lat, lon, gigi, area)
 
         diff = ref_solver.projectField(gogo, neofs=4, eofscaling=0, weighted=True)
-        stri = 4*'{:7.2f}\n'
+        stri = 4*'{:7.2f}' + '\n'
         cosi = [ctl.cosine(diff, cen) for cen in results_ref['centroids']]
         print(stri.format(*cosi))
 
