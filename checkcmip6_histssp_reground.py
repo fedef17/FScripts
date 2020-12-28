@@ -95,7 +95,7 @@ for area in ['EAT', 'PNA']:
 
         diff = ref_solver.projectField(gogo, neofs=4, eofscaling=0, weighted=True)
         stri = 4*'{:7.2f}\n'
-        cosi = [ctl.cosine(diff, cen) for cen in enumerate(results_ref['centroids'])]
+        cosi = [ctl.cosine(diff, cen) for cen in results_ref['centroids']]
         print(stri.format(*cosi))
 
     ctl.plot_pdfpages(cart_out_orig + 'map_rebase_diff_{}.pdf'.format(area), figs)
