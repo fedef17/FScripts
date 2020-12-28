@@ -106,3 +106,5 @@ for mod in resssp_noreb.keys():
 sspcoso = np.mean(sspbases, axis = 0)
 
 ctl.plot_double_sidebyside(sspcoso, histcoso, lat, lon, filename = cart_out_orig + 'mapdiff_rebase.pdf', visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = None, xlabel = None, ylabel = None, cb_label = None, stitle_1 = 'ssp585', stitle_2 = 'hist', cbar_range = None, plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), use_different_grids = False, bounding_lat = 30, plot_margins = 'EAT', add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
+
+ctl.plot_map_contour(sspcoso-histcoso, lat, lon, filename = cart_out_orig + 'mapdiff_rebase_diff.pdf', visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = None, xlabel = None, ylabel = None, cb_label = None, cbar_range = None, plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), bounding_lat = 30, plot_margins = 'EAT', add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)

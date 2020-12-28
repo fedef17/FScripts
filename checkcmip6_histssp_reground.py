@@ -39,12 +39,13 @@ reg_names_area['PNA'] = ['PT', 'PNA+', 'PNA-', 'AR']
 
 area = 'EAT'
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
-for area in ['EAT']:#, 'PNA']:
+for area in ['EAT', 'PNA']:
+    print(area)
     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
     results_ref = pickle.load(open(filref.format(area), 'rb'))
     del results_ref['var_glob']
     del results_ref['var_area']
-    del results_ref['solver']
+    ref_solver = results_ref['solver']
 
     for mod in results_hist.keys():
         if mod == 'MPI-ESM1-2-LR_r1i1p1f1':
@@ -70,7 +71,36 @@ for area in ['EAT']:#, 'PNA']:
     plt.plot(results_hist[mod]['climate_mean'][:, 50:70, -8])
     plt.plot(results_ssp[mod]['climate_mean'][:, 50:70, -8], linestyle = '--')
     plt.plot(climate_rebase[:, 50:70, -8], linestyle = ':')
-    fig.savefig(cart_out_orig + 'baugigicheck.pdf')
+    fig.savefig(cart_out_orig + 'baugigicheck_{}.pdf'.format(area))
+
+    figs = []
+    for mod in results_ssp.keys():
+        print(mod)
+        if mod not in results_hist:
+            print('skipping '+mod)
+            continue
+
+        climate_rebase = results_hist[mod]['climate_mean']-results_ssp[mod]['climate_mean']
+        histcoso = np.mean(results_hist[mod]['climate_mean'], axis = 0)
+        lat = results_hist[mod]['lat']
+        lon = results_hist[mod]['lon']
+        sspcoso = np.mean(results_ssp[mod]['climate_mean'], axis = 0)
+
+        fig = ctl.plot_map_contour(sspcoso-histcoso, lat, lon, filename = None, visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = None, xlabel = None, ylabel = None, cb_label = None, cbar_range = None, plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), bounding_lat = 30, plot_margins = area, add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
+
+        figs.append(fig)
+
+        gigi = sspcoso - histcoso
+        gogo, _, _ = ctl.sel_area(lat, lon, gigi, area)
+
+        diff = ref_solver.projectField(gogo, neofs=4, eofscaling=0, weighted=True)
+        stri = 4*'{:7.2f}\n'
+        cosi = [ctl.cosine(diff, cen) for cen in enumerate(results_ref['centroids'])]
+        print(stri.format(*cosi))
+
+    ctl.plot_pdfpages(cart_out_orig + 'map_rebase_diff_{}.pdf'.format(area), figs)
+
+    continue
 
     bau = results_hist[mod]['var_dtr']
     bauda = np.arange(1965, 2015)
