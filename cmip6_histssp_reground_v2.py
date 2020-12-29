@@ -103,12 +103,13 @@ for area in ['EAT', 'PNA']:
 
             dates_mod = np.concatenate([results_hist[mod]['dates'], results_ssp[mod]['dates']])
 
-            var_set, dates_set = seasonal_set(var_mod, dates_mod, 'NDJFM', seasonal_average = False)
+            var_set, dates_set = ctl.seasonal_set(var_mod, dates_mod, 'NDJFM', seasonal_average = False)
             var_mod_new = []
             for va, ye, cos in zip(var_set, annette, diffit):
                 var_mod_new.append(va + cos)
 
             var_mod = np.concatenate(var_mod_new, axis = 0)
+            print(np.mean(var_mod))
 
             # Corretto la discrepanza nel fit. Ora faccio due prove: una con la hist climate mean, l'altra facendo ricalcolare la climate_mean, quindi con una climate_mean media tra hist e ssp.
             climate_rebase = results_hist[mod]['climate_mean']
