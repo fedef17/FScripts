@@ -32,7 +32,7 @@ gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS
 
 file_refit = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit.p'
 file_refit_2 = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit_rebasetot.p'
-ece_ssp = cart_in + 'out_eceens_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
+fil_ece_ssp = cart_in + 'out_eceens_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
 
 filref = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/out_ERA_NDJFM_{}_4clus_4pcs_1964-2014_dtr.p'
 
@@ -58,16 +58,21 @@ for area in ['EAT', 'PNA']:
     restot['models'] = results_hist
     restot['reference'] = results_ref
 
+
     for ssp in ['ssp585']:
         print(ssp)
         results_ssp, _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
+        for mod in results_ssp.keys():
+            del results_ssp[mod]['var_area']
+            del results_ssp[mod]['solver']
+
         res_rebase = dict()
         res_rebase_tot = dict()
 
         # Adding the ece ensemble
+        ece_ssp, _ = ctl.load_wrtool(fil_ece_ssp.format(ssp, area))
         for mod in ece_ssp.keys():
             results_hist[mod] = results_hist['EC-Earth3_r1i1p1f1']
-
         del ece_ssp['EC-Earth3_r1i1p1f1']
         results_ssp.update(ece_ssp)
 
