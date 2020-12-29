@@ -130,7 +130,7 @@ for area in ['EAT', 'PNA']:
 
             res_rebase_tot[mod] = reres
 
-            del results_hist[mod]['var_glob']
+            if mod != 'EC-Earth3_r1i1p1f1': del results_hist[mod]['var_glob']
             del results_ssp[mod]['var_glob']
 
         restot = dict()
