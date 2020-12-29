@@ -140,6 +140,12 @@ for area in ['EAT', 'PNA']:
             plt.plot(bauda, np.polyval(results_hist[mod]['coeffs_dtr'], bauda), color = co, linewidth = 0.5)
             plt.scatter(gigida, gigi, color = co, s = 2)
             plt.plot(gigida, np.polyval(results_ssp[mod]['coeffs_dtr'], gigida), color = co, linewidth = 0.5)
+
+            annette = np.concatenate([bauda, gigida])
+            cosette = np.concatenate([bau, gigi])
+            coeffs, covmat = np.polyfit(annette, cosette, deg = 3, cov = True)
+            plt.plot(annette, np.polyval(coeffs, annette), color = 'black', linewidth = 0.5, linestyle = '--')
+
             diff2015 = np.polyval(results_ssp[mod]['coeffs_dtr'], gigida)[0]-np.polyval(results_hist[mod]['coeffs_dtr'], bauda)[-1]
             plt.title('{} - diff2015: {:9.1f}'.format(mod, diff2015))
             figs.append(fig)
