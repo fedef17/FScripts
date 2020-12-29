@@ -28,7 +28,8 @@ file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_
 file_hist_light = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
 file_light = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_light.p'
 
-gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
+#gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
 
 file_refit = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit.p'
 file_refit_2 = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit_rebasetot.p'
@@ -92,7 +93,10 @@ for area in ['EAT', 'PNA']:
             coeffs, covmat = np.polyfit(annette, cosette, deg = 3, cov = True)
             new_fit = np.polyval(coeffs, annette)
 
-            var_mod = np.concatenate([results_hist[mod]['var_glob'],results_ssp[mod]['var_glob']], axis = 0)
+            hist_var = ctl.restore_fullfield_from_anomalies_daily(results_hist[mod]['var_glob'], results_hist[mod]['dates'], results_hist[mod]['climate_mean'], results_hist[mod]['climate_mean_dates'])
+            ssp_var = ctl.restore_fullfield_from_anomalies_daily(results_ssp[mod]['var_glob'], results_ssp[mod]['dates'], results_ssp[mod]['climate_mean'], results_ssp[mod]['climate_mean_dates'])
+
+            var_mod = np.concatenate([hist_var, ssp_var], axis = 0)
             old_fit = np.concatenate([np.polyval(results_hist[mod]['coeffs_dtr'], bauda), np.polyval(results_ssp[mod]['coeffs_dtr'], gigida)])
 
             diffit = new_fit - old_fit
@@ -106,10 +110,10 @@ for area in ['EAT', 'PNA']:
 
             var_mod = np.concatenate(var_mod_new, axis = 0)
 
-            # Corretto la discrepanza nel fit. Ora faccio due prove: una facendo ricalcolare la climate_mean, quindi con una climate_mean media tra hist e ssp. L'altra lasciando una matrice nulla come climate_mean.
-            climate_rebase = np.zeros(results_hist[mod]['climate_mean'].shape)
+            # Corretto la discrepanza nel fit. Ora faccio due prove: una con la hist climate mean, l'altra facendo ricalcolare la climate_mean, quindi con una climate_mean media tra hist e ssp.
+            climate_rebase = results_hist[mod]['climate_mean']
 
-            reres = cd.WRtool_core(var_mod, results_ssp[mod]['lat'], results_ssp[mod]['lon'], dates_mod, area, wnd_days = 20, numpcs = 4, numclus = 4, ref_solver = results_ref['solver'], ref_patterns_area = results_ref['cluspattern_area'], heavy_output = False, run_significance_calc = False, use_reference_eofs = True, use_reference_clusters = True, ref_clusters_centers = results_ref['centroids'], climate_mean = climate_rebase, dates_climate_mean = results_ssp[mod]['climate_mean_dates'])
+            reres = cd.WRtool_core(var_mod, results_ssp[mod]['lat'], results_ssp[mod]['lon'], dates_mod, area, wnd_days = 20, numpcs = 4, numclus = 4, ref_solver = results_ref['solver'], ref_patterns_area = results_ref['cluspattern_area'], heavy_output = False, run_significance_calc = False, use_reference_eofs = True, use_reference_clusters = True, ref_clusters_centers = results_ref['centroids'], climate_mean = climate_rebase, dates_climate_mean = results_hist[mod]['climate_mean_dates'])
 
             res_rebase[mod] = reres
 
