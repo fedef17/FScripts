@@ -85,8 +85,16 @@ for area in ['EAT', 'PNA']:
 
             bau = results_hist[mod]['var_dtr']
             bauda = np.arange(1965, 2015)
+
+            if len(bau) != len(bauda):
+                dates_set, _ = ctl.seasonal_set(results_hist[mod]['dates'], results_hist[mod]['dates'], 'NDJFM', seasonal_average = False)
+                bauda = np.array([da[0].year for da in dates_set])
+
             gigi = results_ssp[mod]['var_dtr']
             gigida = np.arange(2015, 2100)
+            if len(gigi) != len(gigida):
+                dates_set, _ = ctl.seasonal_set(results_ssp[mod]['dates'], results_ssp[mod]['dates'], 'NDJFM', seasonal_average = False)
+                gigida = np.array([da[0].year for da in dates_set])
 
             annette = np.concatenate([bauda, gigida])
             cosette = np.concatenate([bau, gigi])
@@ -109,7 +117,7 @@ for area in ['EAT', 'PNA']:
                 var_mod_new.append(va + cos)
 
             var_mod = np.concatenate(var_mod_new, axis = 0)
-            print(np.mean(var_mod))
+            print(np.nanmean(var_mod))
 
             # Corretto la discrepanza nel fit. Ora faccio due prove: una con la hist climate mean, l'altra facendo ricalcolare la climate_mean, quindi con una climate_mean media tra hist e ssp.
             climate_rebase = results_hist[mod]['climate_mean']
