@@ -100,8 +100,6 @@ for area in ['EAT', 'PNA']:
 
     ctl.plot_pdfpages(cart_out_orig + 'map_rebase_diff_{}.pdf'.format(area), figs)
 
-    continue
-
     bau = results_hist[mod]['var_dtr']
     bauda = np.arange(1965, 2015)
     gigi = results_ssp[mod]['var_dtr']
@@ -128,3 +126,21 @@ for area in ['EAT', 'PNA']:
         except:
             pass
     fig.savefig(cart_out_orig + 'vardtr_check_allmods.pdf')
+
+    cols = ctl.color_set(len(results_ssp.keys()))
+    for mod, co in zip(results_ssp.keys(), cols):
+        fig = plt.figure()
+        try:
+            bau = results_hist[mod]['var_dtr']
+            bauda = np.arange(1965, 2015)
+            gigi = results_ssp[mod]['var_dtr']
+            gigida = np.arange(2015, 2100)
+            plt.scatter(bauda, bau, color = co, s = 2)
+            plt.plot(bauda, np.polyval(results_hist[mod]['coeffs_dtr'], bauda), color = co, linewidth = 0.5)
+            plt.scatter(gigida, gigi, color = co, s = 2)
+            plt.plot(gigida, np.polyval(results_ssp[mod]['coeffs_dtr'], gigida), color = co, linewidth = 0.5)
+            diff2015 = np.polyval(results_ssp[mod]['coeffs_dtr'], gigida)[0]-np.polyval(results_hist[mod]['coeffs_dtr'], bauda)[-1]
+            plt.title('{} - diff2015: {:9.1f}'.format(mod, diff2015))
+        except:
+            pass
+    fig.savefig(cart_out_orig + 'vardtr_check_allmods_single.pdf')
