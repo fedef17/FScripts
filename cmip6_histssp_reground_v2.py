@@ -130,6 +130,9 @@ for area in ['EAT', 'PNA']:
 
             res_rebase_tot[mod] = reres
 
+            del results_hist[mod]['var_glob']
+            del results_ssp[mod]['var_glob']
+
         restot = dict()
         restot['models'] = res_rebase
         restot['reference'] = results_ref
