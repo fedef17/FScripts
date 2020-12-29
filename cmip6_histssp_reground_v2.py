@@ -30,8 +30,8 @@ file_light = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_d
 
 gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
 
-file_refit = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_dtrcontinuo.p'
-file_refit_2 = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_dtrcontinuo_rebasetot.p'
+file_refit = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit.p'
+file_refit_2 = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit_rebasetot.p'
 ece_ssp = cart_in + 'out_eceens_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
 
 filref = '/home/fabiano/Research/lavori/WeatherRegimes/ERA_ref_r25_v4/out_ERA_NDJFM_{}_4clus_4pcs_1964-2014_dtr.p'
