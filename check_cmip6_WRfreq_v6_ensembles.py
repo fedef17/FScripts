@@ -33,7 +33,7 @@ ctl.mkdir(cart_out_orig)
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
 
-fil_ece_hist = cart_in + 'out_eceens_hist_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr.p'
+fil_ece_hist = cart_in + 'out_eceens_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
 fil_ece = cart_in + 'out_eceens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 fil_mpi = cart_in + 'mpiens_ssp585/out_mpiens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 
