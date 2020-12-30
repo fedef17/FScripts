@@ -154,7 +154,6 @@ for area in ['EAT', 'PNA']:
     figs = []
     for mem in okmods:
         fig = plt.figure(figsize = (16,12))
-        plt.title(mem)
         for reg in range(4):
             ax = fig.add_subplot(2, 2, reg+1)
             cosi = []
@@ -166,6 +165,7 @@ for area in ['EAT', 'PNA']:
                 ax.plot(yr, seas1, label = tip, color = col)
             ax.set_title(reg_names_area[area][reg])
             ax.legend()
+        fig.suptitle(mem)
         figs.append(fig)
 
     ctl.plot_pdfpages(cart_out + 'check_models_refit_{}.pdf'.format(area), figs)
