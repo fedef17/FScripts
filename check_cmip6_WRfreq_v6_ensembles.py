@@ -35,6 +35,7 @@ file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_
 
 fil_ece_hist = cart_in + 'out_eceens_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
 fil_ece = cart_in + 'out_eceens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
+fil_ece_r4 = cart_in + 'out_eceens_ssp585_r4_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 fil_mpi = cart_in + 'mpiens_ssp585/out_mpiens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 
 ssp = 'ssp585'
@@ -51,8 +52,7 @@ clatlo['PNA'] = (70., -120.)
 #allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allssps = ['ssp585']
 
-oknam = ['EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']
-okmo = ['ece', 'mpi']
+oknam = ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']
 
 ttests = dict()
 for area in ['EAT', 'PNA']:
@@ -69,6 +69,7 @@ for area in ['EAT', 'PNA']:
             del results_hist[ke]
 
     ece_ssp, _ = ctl.load_wrtool(fil_ece.format(area))
+    ece_ssp_r4, _ = ctl.load_wrtool(fil_ece_r4.format(area))
     mpi_ssp, _ = ctl.load_wrtool(fil_mpi.format(area))
 
     # Erasing incomplete runs
@@ -94,12 +95,8 @@ for area in ['EAT', 'PNA']:
     #             cosone[ke]['pcs'] = np.concatenate(pcs_ok)
 
     # appiccico hist e ssp
-    for cosone in [ece_ssp, mpi_ssp]:
+    for cosone, histmem in zip([ece_ssp, ece_ssp_r4, mpi_ssp], ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']):
         for mem in cosone.keys():
-            if 'EC-Earth' in mem:
-                histmem = 'EC-Earth3_r4i1p1f1'
-            elif 'MPI' in mem:
-                histmem = 'MPI-ESM1-2-LR_r1i1p1f1'
             labs = np.concatenate([results_hist[histmem]['labels'], cosone[mem]['labels']])
             dats = np.concatenate([results_hist[histmem]['dates'], cosone[mem]['dates']])
             pcs = np.concatenate([results_hist[histmem]['pcs'], cosone[mem]['pcs']], axis = 0)
@@ -109,6 +106,7 @@ for area in ['EAT', 'PNA']:
 
     resdict = dict()
     resdict['EC-Earth3'] = ece_ssp
+    resdict['EC-Earth3_histr4'] = ece_ssp
     resdict['MPI-ESM1-2-LR'] = mpi_ssp
 
     alltips = tuple(resdict.keys())
