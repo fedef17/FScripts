@@ -198,8 +198,8 @@ for area in ['EAT', 'PNA']:
                 trend_ssp[(mem, tip, reg)] = m
                 trend_ssp[(mem, tip, reg, 'err')] = err_m
 
-            trend_ssp[(tip, reg)] = np.stack([trend_ssp[(mem, tip, reg)] for mem in okmods])
-            trend_ssp[(tip, reg, 'err')] = np.stack([trend_ssp[(mem, tip, reg, 'err')] for mem in okmods])
+            trend_ssp[(tip, reg)] = np.array([trend_ssp[(mem, tip, reg)] for mem in okmods])
+            trend_ssp[(tip, reg, 'err')] = np.array([trend_ssp[(mem, tip, reg, 'err')] for mem in okmods])
 
 
     freqs = dict()
@@ -258,7 +258,7 @@ for area in ['EAT', 'PNA']:
 
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(tip, reg)][:, reg], nu) for tip in alltips]
+            allpercs['p{}'.format(nu)] = [np.percentile(trend_ssp[(tip, reg)], nu) for tip in alltips]
 
         ctl.boxplot_on_ax(ax, allpercs, alltips, colorz, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
 
