@@ -109,6 +109,12 @@ ctl.plot_double_sidebyside(sspcoso, histcoso, lat, lon, filename = cart_out_orig
 
 ctl.plot_map_contour(sspcoso-histcoso, lat, lon, filename = cart_out_orig + 'mapdiff_rebase_diff.pdf', visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = None, xlabel = None, ylabel = None, cb_label = None, cbar_range = None, plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), bounding_lat = 30, plot_margins = 'EAT', add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
 
+figs = []
+for mod in reshist.keys():
+    histbase = np.mean(reshist[mod]['climate_mean'], axis = 0)
+    fig = ctl.plot_map_contour(histbase-histcoso, lat, lon, filename = None, visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = mod, xlabel = None, ylabel = None, cb_label = None, cbar_range = (-50, 50), plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), bounding_lat = 30, plot_margins = 'EAT', add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
+ctl.plot_pdfpages(cart_out_orig + 'check_climate_mean_allmem.pdf', figs)
+
 
 fig = plt.figure()
 noreb = ctl.running_mean(resssp_noreb['EC-Earth3_r1i1p1f1']['pcs'][:, 0], 10)

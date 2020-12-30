@@ -137,6 +137,7 @@ for area in ['EAT', 'PNA']:
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
         for tip, col in zip(alltips, colorz):
+            okmods = resdict[tip].keys()
             cosi = [runfreq[(tip, mem, reg)] for mem in okmods]
             coso = np.mean(cosi, axis = 0)
             runfreq[(tip, reg)] = coso
@@ -193,8 +194,8 @@ for area in ['EAT', 'PNA']:
     axes = []
     for reg in range(4):
         ax = figall.add_subplot(2, 2, reg + 1)
+        
         axes.append(ax)
-
         histmean = dict()
         for tip in alltips:
             histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
