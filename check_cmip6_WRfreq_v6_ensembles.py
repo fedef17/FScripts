@@ -27,7 +27,7 @@ plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
-cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Check_ece_vs_mpi/'
+cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Check_ece_vs_mpi/ece_r4_hist/'
 ctl.mkdir(cart_out_orig)
 
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
@@ -93,7 +93,7 @@ for area in ['EAT', 'PNA']:
     for cosone in [ece_ssp, mpi_ssp]:
         for mem in cosone.keys():
             if 'EC-Earth' in mem:
-                histmem = 'EC-Earth3_r1i1p1f1'
+                histmem = 'EC-Earth3_r4i1p1f1'
             elif 'MPI' in mem:
                 histmem = 'MPI-ESM1-2-LR_r1i1p1f1'
             labs = np.concatenate([results_hist[histmem]['labels'], cosone[mem]['labels']])
@@ -194,7 +194,7 @@ for area in ['EAT', 'PNA']:
     axes = []
     for reg in range(4):
         ax = figall.add_subplot(2, 2, reg + 1)
-        
+
         axes.append(ax)
         histmean = dict()
         for tip in alltips:
