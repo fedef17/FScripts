@@ -77,10 +77,11 @@ for area in ['EAT', 'PNA']:
     ece_ssp_rebase, _ = ctl.load_wrtool(fil_ece_ssp_rebase.format(ssp, area))
     for mod in ece_ssp.keys():
         results_hist[mod] = results_hist['EC-Earth3_r1i1p1f1']
-        del ece_ssp['EC-Earth3_r1i1p1f1']
-        del ece_ssp_rebase['EC-Earth3_r1i1p1f1']
-        results_ssp.update(ece_ssp)
-        results_ssp_rebase.update(ece_ssp_rebase)
+        
+    del ece_ssp['EC-Earth3_r1i1p1f1']
+    del ece_ssp_rebase['EC-Earth3_r1i1p1f1']
+    results_ssp.update(ece_ssp)
+    results_ssp_rebase.update(ece_ssp_rebase)
 
     # Erasing incomplete runs
     for ke in tuple(results_ssp.keys()):
