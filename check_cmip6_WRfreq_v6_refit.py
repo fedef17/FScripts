@@ -77,7 +77,7 @@ for area in ['EAT', 'PNA']:
     ece_ssp_rebase, _ = ctl.load_wrtool(fil_ece_ssp_rebase.format(ssp, area))
     for mod in ece_ssp.keys():
         results_hist[mod] = results_hist['EC-Earth3_r1i1p1f1']
-        
+
     del ece_ssp['EC-Earth3_r1i1p1f1']
     del ece_ssp_rebase['EC-Earth3_r1i1p1f1']
     results_ssp.update(ece_ssp)
@@ -89,7 +89,7 @@ for area in ['EAT', 'PNA']:
             del results_ssp[ke]
         elif len(results_ssp[ke]['labels']) > 13000:
             # there is some duplicated year
-            for cosone in zip(results_ssp, results_ssp_rebase):
+            for cosone in [results_ssp, results_ssp_rebase]:
                 labs, dats = ctl.seasonal_set(cosone[ke]['labels'], cosone[ke]['dates'], None)
                 pcs, dats = ctl.seasonal_set(cosone[ke]['pcs'], cosone[ke]['dates'], None)
                 yeas = np.array([da[0].year for da in dats])
@@ -106,7 +106,7 @@ for area in ['EAT', 'PNA']:
                 cosone[ke]['pcs'] = np.concatenate(pcs_ok)
 
             # same for results_refit
-            for cosone in zip(results_refit, results_refit2):
+            for cosone in [results_refit, results_refit2]:
                 labs, dats = ctl.seasonal_set(cosone[ke]['labels'], cosone[ke]['dates'], None)
                 pcs, dats = ctl.seasonal_set(cosone[ke]['pcs'], cosone[ke]['dates'], None)
                 yeas = np.array([da[0].year for da in dats])
@@ -131,7 +131,7 @@ for area in ['EAT', 'PNA']:
     okmods = [mod for mod in okmods_ssp if mod in okmods_hist]
 
     # appiccico hist e ssp
-    for cosone in zip(results_ssp, results_ssp_rebase):
+    for cosone in [results_ssp, results_ssp_rebase]:
         for mem in okmods:
             labs = np.concatenate([results_hist[mem]['labels'], cosone[mem]['labels']])
             dats = np.concatenate([results_hist[mem]['dates'], cosone[mem]['dates']])
