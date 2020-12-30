@@ -169,6 +169,9 @@ for area in ['EAT', 'PNA']:
 
     ctl.plot_pdfpages(cart_out + 'check_models_refit_{}.pdf'.format(area), figs)
 
+    okmods = [mod for mod in okmods if 'EC-Earth3' not in mod]
+    okmods.append('EC-Earth3_r1i1p1f1')
+
     fig = plt.figure(figsize = (16,12))
     for reg in range(4):
         ax = fig.add_subplot(2, 2, reg+1)
