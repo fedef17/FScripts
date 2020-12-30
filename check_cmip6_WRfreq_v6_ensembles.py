@@ -64,8 +64,8 @@ for area in ['EAT', 'PNA']:
         if ke not in oknam:
             del results_hist[ke]
 
-    ece_ssp, _ = ctl.load_wrtool(file_ece.format(area))
-    mpi_ssp, _ = ctl.load_wrtool(file_mpi.format(area))
+    ece_ssp, _ = ctl.load_wrtool(fil_ece.format(area))
+    mpi_ssp, _ = ctl.load_wrtool(fil_mpi.format(area))
 
     # Erasing incomplete runs
     # for ke in tuple(results_ssp.keys()):
