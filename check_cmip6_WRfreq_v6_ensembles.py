@@ -50,7 +50,7 @@ clatlo['PNA'] = (70., -120.)
 #allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allssps = ['ssp585']
 
-oknam = ['EC-Earth3', 'MPI-ESM1-2-LR']
+oknam = ['EC-Earth3_r1i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']
 okmo = ['ece', 'mpi']
 
 ttests = dict()
