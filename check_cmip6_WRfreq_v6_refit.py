@@ -289,7 +289,7 @@ for area in ['EAT', 'PNA']:
 
         data = [freqs[(ssp, tip)][:, reg]-histmean[tip] for tip in alltips]
 
-        parts = ax.violinplot(data, positions = None, widths=0.4, showmeans=True, showextrema=True, showmedians=True, quantiles=[0.25, 0.75], bw_method=0.5)
+        parts = ax.violinplot(data, positions = None, widths=0.4, showmeans=True, showextrema=True, showmedians=True, bw_method=0.5)#, quantiles=[0.25, 0.75]
         for pc, col in zip(parts['bodies'], colorz):
             pc.set_facecolor(col)
             pc.set_edgecolor(col)
