@@ -40,6 +40,7 @@ fil_ece_ssp_rebase = cart_in + 'out_eceens_{}_NDJFM_{}_4clus_4pcs_2015-2100_refC
 file_refit = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit.p'
 file_refit2 = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_refit_rebasetot.p'
 
+ssp = 'ssp585'
 numclus = 4
 reg_names_area = dict()
 reg_names_area['EAT'] = ['NAO+', 'SBL', 'AR', 'NAO-']
