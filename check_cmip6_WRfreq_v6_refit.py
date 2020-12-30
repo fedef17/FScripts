@@ -154,6 +154,7 @@ for area in ['EAT', 'PNA']:
     figs = []
     for mem in okmods:
         fig = plt.figure(figsize = (16,12))
+        plt.title(mem)
         for reg in range(4):
             ax = fig.add_subplot(2, 2, reg+1)
             cosi = []
@@ -274,3 +275,33 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(figall, colorz, alltips, ncol = 3)
     figall.savefig(cart_out + 'check_trends_alltips_{}.pdf'.format(area))
+
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        histmean = dict()
+        for tip in alltips:
+            histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
+
+        data = [freqs[(ssp, tip)][:, reg]-histmean[tip] for tip in alltips]
+
+        parts = ax.violinplot(data, positions = None, widths=0.4, showmeans=True, showextrema=True, showmedians=True, quantiles=[0.25, 0.75], bw_method=0.5)
+        for pc, col in zip(parts['bodies'], colorz):
+            pc.set_facecolor(col)
+            pc.set_edgecolor(col)
+            pc.set_alpha(0.5)
+
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colorz, alltips, ncol = 2)
+    figall.savefig(cart_out + 'check_WRfreq_alltips_violin_{}.pdf'.format(area))
