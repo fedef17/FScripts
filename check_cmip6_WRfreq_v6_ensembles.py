@@ -106,7 +106,7 @@ for area in ['EAT', 'PNA']:
 
     resdict = dict()
     resdict['EC-Earth3'] = ece_ssp
-    resdict['EC-Earth3_histr4'] = ece_ssp
+    resdict['EC-Earth3_histr4'] = ece_ssp_r4
     resdict['MPI-ESM1-2-LR'] = mpi_ssp
 
     alltips = tuple(resdict.keys())
