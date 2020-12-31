@@ -60,9 +60,12 @@ for area in ['EAT', 'PNA']:
     ctl.mkdir(cart_out)
 
     results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
+
     ece_hist, _ = ctl.load_wrtool(fil_ece_hist.format(area))
     del ece_hist['EC-Earth3_r1i1p1f1']
     results_hist.update(ece_hist)
+
+    histme = np.mean([results_hist[ke]['freq_clus'] for ke in results_hist.keys()], axis = 0)
 
     for ke in tuple(results_hist):
         if ke not in oknam:
@@ -196,17 +199,11 @@ for area in ['EAT', 'PNA']:
     axes = []
     for reg in range(4):
         ax = figall.add_subplot(2, 2, reg + 1)
-
         axes.append(ax)
-        histmean = dict()
-        for tip in alltips:
-            histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
-
-        #histme = np.mean([histmean[tip] for tip in alltips])
 
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg], nu) - histmean[tip] for tip in alltips]
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg], nu) - histme for tip in alltips]
 
         ctl.boxplot_on_ax(ax, allpercs, alltips, colorz, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
         ax.axhline(0, color = 'gray', linewidth = 0.5)
@@ -219,6 +216,33 @@ for area in ['EAT', 'PNA']:
 
     ctl.custom_legend(figall, colorz, alltips, ncol = 2)
     figall.savefig(cart_out + 'check_ece_vs_mpi_WRfreq_{}.pdf'.format(area))
+
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+
+        axes.append(ax)
+        histmean = dict()
+        for tip in alltips:
+            histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
+
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg]-freqs[('hist', tip)][:, reg], nu) for tip in alltips]
+
+        ctl.boxplot_on_ax(ax, allpercs, alltips, colorz, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colorz, alltips, ncol = 2)
+    figall.savefig(cart_out + 'check_ece_vs_mpi_WRfreqREL_{}.pdf'.format(area))
 
 
     figall = plt.figure(figsize = (16,12))
