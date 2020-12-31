@@ -202,6 +202,8 @@ for area in ['EAT', 'PNA']:
         for tip in alltips:
             histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
 
+        #histme = np.mean([histmean[tip] for tip in alltips])
+
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg], nu) - histmean[tip] for tip in alltips]

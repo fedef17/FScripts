@@ -259,6 +259,33 @@ for area in ['EAT', 'PNA']:
     axes = []
     for reg in range(4):
         ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        histmean = dict()
+        for tip in alltips:
+            histmean[tip] = np.mean(freqs[('hist', tip)][:, reg])
+
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg]-freqs[('hist', tip)][:, reg], nu) for tip in alltips]
+
+        ctl.boxplot_on_ax(ax, allpercs, alltips, colorz, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly (relative to corresponding hist)')
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colorz, alltips, ncol = 2)
+    figall.savefig(cart_out + 'check_WRfreqREL_alltips_{}.pdf'.format(area))
+
+
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
 
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
