@@ -203,7 +203,7 @@ for area in ['EAT', 'PNA']:
 
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg], nu) - histme for tip in alltips]
+            allpercs['p{}'.format(nu)] = [np.percentile(freqs[(ssp, tip)][:, reg], nu) - histme[reg] for tip in alltips]
 
         ctl.boxplot_on_ax(ax, allpercs, alltips, colorz, plot_mean = False, plot_ensmeans = False, plot_minmax = False)
         ax.axhline(0, color = 'gray', linewidth = 0.5)
