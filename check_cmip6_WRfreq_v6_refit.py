@@ -274,7 +274,7 @@ for area in ['EAT', 'PNA']:
         ax.set_xticks([])
         ax.set_title(reg_names[reg])
 
-        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly (relative to corresponding hist)')
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
 
     ctl.adjust_ax_scale(axes)
 
