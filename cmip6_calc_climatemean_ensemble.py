@@ -72,6 +72,10 @@ for mod in okmods_mo:
     climmeans['EAT'] = []
     climmeans['PNA'] = []
 
+    if len(all_mems[mod] == 1):
+        print('Only first member available, skipping..')
+        continue
+
     for mem in all_mems[mod]:
         try:
             var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
