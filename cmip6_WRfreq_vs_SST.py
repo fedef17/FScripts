@@ -160,7 +160,7 @@ corrmaps = dict()
 for seas in ['NDJFM', 'year']:
     for area in ['EAT', 'PNA']:
         for reg in range(4):
-            trendmat = tas_trends[(ssp, okmods[0], seas)]
+            trendmat = tas_trends[('ssp585', okmods[0], seas)]
             corr_map = np.empty_like(trendmat)
             pval_map = np.empty_like(trendmat)
             nlat, nlon = trendmat.shape
