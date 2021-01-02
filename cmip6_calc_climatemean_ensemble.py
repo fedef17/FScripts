@@ -74,7 +74,7 @@ for mod in okmods_mo:
 
     for mem in all_mems[mod]:
         try:
-            var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = 'ONDJFMA', select_area_first = 'NML')
+            var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
         except Exception as exp:
             print('Unable to read data for {}, going on with next model..'.format(mod + '_' + mem))
             print(exp)
@@ -96,6 +96,7 @@ for mod in okmods_mo:
     for area in ['EAT', 'PNA']:
         climate_mean[(area, mod)] = np.mean(climmeans[area], axis = 0)
         climate_std[(area, mod)] = np.std(climmeans[area], axis = 0)
+
     climate_mean_dates[mod] = dates_cm
     num_members[mod] = len(climmeans)
 
