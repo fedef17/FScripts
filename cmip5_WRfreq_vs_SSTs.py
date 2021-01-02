@@ -64,18 +64,19 @@ for ssp in ['rcp85_cmip5']:
     print('SSP '+ssp)
 
     area = 'EAT'
-    cart_lui = cart_cmip5.format(area)
+    for area in ['EAT', 'PNA']:
+        cart_lui = cart_cmip5.format(area)
 
-    freqs, trend_ssp, residtimes = pickle.load(open(cart_cmip5.format(area) + 'freqs_cmip5_{}.p'.format(area), 'rb'))
-    seasfreq, runfreq = pickle.load(open(cart_cmip5.format(area) + 'seasfreqs_cmip5_{}.p'.format(area), 'rb'))
+        freqs, trend_ssp, residtimes = pickle.load(open(cart_cmip5.format(area) + 'freqs_cmip5_{}.p'.format(area), 'rb'))
+        seasfreq, runfreq = pickle.load(open(cart_cmip5.format(area) + 'seasfreqs_cmip5_{}.p'.format(area), 'rb'))
 
-    okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
-    print(okmods)
+        okmods = [ke[1] for ke in freqs if ssp in ke and 'tot50' in ke and 'all' not in ke and 'rel' not in ke]
+        print(okmods)
 
-    for mod in okmods:
-        for reg in range(4):
-            cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
-            cose[(ssp, area, mod, 'trend', reg)]= trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
+        for mod in okmods:
+            for reg in range(4):
+                cose[(ssp, area, mod, 'freq', reg)] = freqs[(ssp, mod, 'tot50')][reg]
+                cose[(ssp, area, mod, 'trend', reg)] = trend_ssp[(ssp, mod, 'trend', 'seafreq', reg)]
 
     for mod in okmods:
         okfil = fil_tas.format(*(mod.split('_')))
