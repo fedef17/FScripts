@@ -72,7 +72,7 @@ for mod in okmods_mo:
     climmeans['EAT'] = []
     climmeans['PNA'] = []
 
-    if len(all_mems[mod] == 1):
+    if len(all_mems[mod]) == 1:
         print('Only first member available, skipping..')
         continue
 
