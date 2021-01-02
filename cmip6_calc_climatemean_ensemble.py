@@ -88,15 +88,15 @@ for mod in okmods_mo:
 
         for area in ['EAT', 'PNA']:
             zg_ok, _, _ = ctl.sel_area(lat, lon, zg_dtr, area)
-            climate_mean, dates_climate_mean, _ = ctl.daily_climatology(zg_ok, dates_seas, window = 20)
-            climmeans[area].append(climate_mean)
+            cmean, dates_cm, _ = ctl.daily_climatology(zg_ok, dates_seas, window = 20)
+            climmeans[area].append(cmean)
         #trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
         #field_trends[(ssp, mod, 'NDJFM')] = trendmat
 
     for area in ['EAT', 'PNA']:
         climate_mean[(area, mod)] = np.mean(climmeans[area], axis = 0)
         climate_std[(area, mod)] = np.std(climmeans[area], axis = 0)
-    climate_mean_dates[mod] = dates_climate_mean
+    climate_mean_dates[mod] = dates_cm
     num_members[mod] = len(climmeans)
 
 pickle.dump([climate_mean, climate_mean_dates, climate_std, num_members], open(cart_out + 'climate_mean_hist.p', 'wb'))
