@@ -36,7 +36,8 @@ elif os.uname()[1] == 'wilma':
     cart_out = '/home/federico/work/CMIP6/Climate_mean/'
     ctl.mkdir(cart_out)
 
-cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
+#cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
+cart_data = '/home/federico/work/CMIP6/data_25deg/historical/'
 yr10 = 10 # length of running mean
 
 numclus = 4
@@ -56,11 +57,16 @@ num_members = dict()
 climate_mean_dates = dict()
 levok = 500
 
-all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
-all_mods = [co[1] for co in all_data]
+with open(cart_data + 'lista_all_hist.dat', 'r') as fillo:
+    filli = [fi.rstrip() for fi in fillo.readlines()]
+
+all_mods = np.unique([fi.split('/')[0] for fi in filli])
 all_mems = dict()
 for mod in all_mods:
-    all_mems[mod] = [co[2] for co in all_data if co[1] == mod]
+   all_mems[mod] = [fi.split('/')[1] for fi in filli if fi.split('/')[0] == mod]
+
+#all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
+#all_mods = [co[1] for co in all_data]
 
 for mod in okmods_mo:
     print(mod)
@@ -72,13 +78,11 @@ for mod in okmods_mo:
     climmeans['EAT'] = []
     climmeans['PNA'] = []
 
-    if len(all_mems[mod]) == 1:
-        print('Only first member available, skipping..')
-        continue
-
     for mem in all_mems[mod]:
+        okfil = [fi for fi in filli if mod in fi and mem in fi][0]
         try:
-            var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
+            #var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
+            var, coords, aux_info = ctl.readxDncfield(cart_data + okfil)
         except Exception as exp:
             print('Unable to read data for {}, going on with next model..'.format(mod + '_' + mem))
             print(exp)
