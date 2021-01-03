@@ -36,6 +36,8 @@ elif os.uname()[1] == 'wilma':
     cart_out = '/home/federico/work/CMIP6/Climate_mean/'
     ctl.mkdir(cart_out)
 
+print('ciaociao sto partendo')
+
 #cart_data = '/data-hobbes/fabiano/WR_CMIP6/'
 cart_data = '/home/federico/work/CMIP6/data_25deg/historical/'
 yr10 = 10 # length of running mean
