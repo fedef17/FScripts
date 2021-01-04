@@ -135,7 +135,7 @@ for mod in all_mods:
     all_mems[mod] = [fi.split('/')[1] for fi in filli if fi.split('/')[0] == mod]
     print(all_mems[mod])
 
-all_mems_wilma = pickle.load(open(cart_out + 'all_mems_wilma.p', 'rb'))
+#all_mems_wilma = pickle.load(open(cart_out + 'all_mems_wilma.p', 'rb'))
 #all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
 #all_mods = [co[1] for co in all_data]
 
@@ -154,7 +154,7 @@ for mod in okmods_mo:
         else:
             print(mod, num_members[mod])
             print('On hobbes:', all_mems[mod])
-            print('On wilma:', all_mems_wilma[mod])
+            #print('On wilma:', all_mems_wilma[mod])
             continue
 
     for mem in all_mems[mod]:
@@ -201,6 +201,6 @@ for area in ['EAT', 'PNA']:
 
 print('------------------------\n')
 for mod in okmods_mo:
-    gigi = np.unique(all_mems[mod] + all_mems_wilma[mod])
+    gigi = all_mems[mod]
     strinz = '{:16s} : ' + len(gigi)*'{:8s}, '
     print(strinz.format(mod, *gigi))
