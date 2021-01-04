@@ -65,8 +65,13 @@ with open(cart_data + 'lista_all_hist.dat', 'r') as fillo:
 all_mods = np.unique([fi.split('/')[0] for fi in filli])
 all_mems = dict()
 for mod in all_mods:
-   all_mems[mod] = [fi.split('/')[1] for fi in filli if fi.split('/')[0] == mod]
+    print(mod)
+    all_mems[mod] = [fi.split('/')[1] for fi in filli if fi.split('/')[0] == mod]
+    print(all_mems[mod])
 
+pickle.dump(all_mems, open(cart_out + 'all_mems_wilma.p', 'wb'))
+
+sys.exit()
 #all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
 #all_mods = [co[1] for co in all_data]
 
