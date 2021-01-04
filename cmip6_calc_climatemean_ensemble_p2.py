@@ -149,7 +149,7 @@ for mod in okmods_mo:
     climmeans = dict()
     climmeans['EAT'] = []
     climmeans['PNA'] = []
-    
+
     if mod not in all_mods:
         print('NO data for {}'.format(mod))
         continue
@@ -178,6 +178,8 @@ for mod in okmods_mo:
         lat = coords['lat']
         lon = coords['lon']
         dates = coords['dates']
+
+        var, dates = ctl.sel_time_range(var, dates, ctl.range_years(1964, 2014))
 
         zg_dtr, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 1, area = 'NML', print_trend = True)
 

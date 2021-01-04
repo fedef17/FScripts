@@ -99,6 +99,8 @@ for mod in okmods_mo:
         lon = coords['lon']
         dates = coords['dates']
 
+        var, dates = ctl.sel_time_range(var, dates, ctl.range_years(1964, 2014))
+
         zg_dtr, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 1, area = 'NML', print_trend = True)
 
         for area in ['EAT', 'PNA']:
