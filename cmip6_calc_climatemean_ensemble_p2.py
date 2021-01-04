@@ -147,6 +147,9 @@ num_members = dict()
 for mod in okmods_mo:
     print(mod)
     climmeans = dict()
+    climmeans['EAT'] = []
+    climmeans['PNA'] = []
+    
     if mod not in all_mods:
         print('NO data for {}'.format(mod))
         continue
