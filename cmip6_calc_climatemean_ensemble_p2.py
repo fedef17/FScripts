@@ -135,6 +135,11 @@ for mod in all_mods:
     all_mems[mod] = [fi.split('/')[1] for fi in filli if fi.split('/')[0] == mod]
     print(all_mems[mod])
 
+climate_mean = dict()
+climate_mean_dates = dict()
+climate_std = dict()
+num_members = dict()
+
 #all_mems_wilma = pickle.load(open(cart_out + 'all_mems_wilma.p', 'rb'))
 #all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
 #all_mods = [co[1] for co in all_data]
@@ -145,17 +150,17 @@ for mod in okmods_mo:
     if mod not in all_mods:
         print('NO data for {}'.format(mod))
         continue
-    elif ('EAT', mod) in climate_mean:
-        if num_members[mod] == 1:
-            #climmeans['EAT'] = [climate_mean[('EAT', mod)]]
-            #climmeans['PNA'] = [climate_mean[('PNA', mod)]]
-            if len(all_mems[mod]) == 1:
-                continue
-        else:
-            print(mod, num_members[mod])
-            print('On hobbes:', all_mems[mod])
-            #print('On wilma:', all_mems_wilma[mod])
-            continue
+    # elif ('EAT', mod) in climate_mean:
+    #     if num_members[mod] == 1:
+    #         #climmeans['EAT'] = [climate_mean[('EAT', mod)]]
+    #         #climmeans['PNA'] = [climate_mean[('PNA', mod)]]
+    #         if len(all_mems[mod]) == 1:
+    #             continue
+    #     else:
+    #         print(mod, num_members[mod])
+    #         print('On hobbes:', all_mems[mod])
+    #         #print('On wilma:', all_mems_wilma[mod])
+    #         continue
 
     for mem in all_mems[mod]:
         okfil = [fi for fi in filli if mod in fi and mem in fi][0]
