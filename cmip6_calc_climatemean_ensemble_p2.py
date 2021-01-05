@@ -208,8 +208,8 @@ for area in ['EAT', 'PNA']:
         modmem = [ke for ke in res_old.keys() if mod in ke][0]
         newcoso = np.mean(climate_mean[(area, mod)], axis = 0)
         oldcoso = np.mean(res_old[modmem]['climate_mean'], axis = 0)
-        lat = res_old[mod]['lat']
-        lon = res_old[mod]['lon']
+        lat = res_old[modmem]['lat']
+        lon = res_old[modmem]['lon']
         fig = ctl.plot_map_contour(newcoso-oldcoso, lat, lon, filename = None, visualization = 'standard', central_lat_lon = None, cmap = 'RdBu_r', title = mod, xlabel = None, ylabel = None, cb_label = None, cbar_range = (-60, 60), plot_anomalies = True, n_color_levels = 21, draw_contour_lines = False, n_lines = 5, color_percentiles = (0,100), bounding_lat = 30, plot_margins = area, add_rectangles = None, draw_grid = True, plot_type = 'filled_contour', verbose = False, lw_contour = 0.5)
 
         figs.append(fig)
