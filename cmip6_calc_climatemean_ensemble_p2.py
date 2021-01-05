@@ -144,65 +144,65 @@ num_members = dict()
 #all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
 #all_mods = [co[1] for co in all_data]
 
-# for mod in okmods_mo:
-#     print(mod)
-#     climmeans = []#dict()
-#     # climmeans['EAT'] = []
-#     # climmeans['PNA'] = []
-#
-#     if mod not in all_mods:
-#         print('NO data for {}'.format(mod))
-#         continue
-#     # elif ('EAT', mod) in climate_mean:
-#     #     if num_members[mod] == 1:
-#     #         #climmeans['EAT'] = [climate_mean[('EAT', mod)]]
-#     #         #climmeans['PNA'] = [climate_mean[('PNA', mod)]]
-#     #         if len(all_mems[mod]) == 1:
-#     #             continue
-#     #     else:
-#     #         print(mod, num_members[mod])
-#     #         print('On hobbes:', all_mems[mod])
-#     #         #print('On wilma:', all_mems_wilma[mod])
-#     #         continue
-#
-#     for mem in all_mems[mod]:
-#         okfil = [fi for fi in filli if mod in fi and mem in fi][0]
-#         try:
-#             #var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
-#             var, coords, aux_info = ctl.readxDncfield(cart_data + okfil)
-#         except Exception as exp:
-#             print('Unable to read data for {}, going on with next model..'.format(mod + '_' + mem))
-#             print(exp)
-#             continue
-#
-#         lat = coords['lat']
-#         lon = coords['lon']
-#         dates = coords['dates']
-#
-#         var, dates = ctl.sel_time_range(var, dates, ctl.range_years(1964, 2014))
-#
-#         zg_dtr, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 1, area = 'NML', print_trend = True)
-#
-#         cmean, dates_cm, _ = ctl.daily_climatology(zg_dtr, dates_seas, window = 20)
-#         climmeans.append(cmean)
-#         # for area in ['EAT', 'PNA']:
-#         #     zg_ok, _, _ = ctl.sel_area(lat, lon, zg_dtr, area)
-#         #     cmean, dates_cm, _ = ctl.daily_climatology(zg, dates_seas, window = 20)
-#         #     climmeans[area].append(cmean)
-#         #trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
-#         #field_trends[(ssp, mod, 'NDJFM')] = trendmat
-#
-#     # for area in ['EAT', 'PNA']:
-#     #     climate_mean[(area, mod)] = np.mean(climmeans[area], axis = 0)
-#     #     climate_std[(area, mod)] = np.std(climmeans[area], axis = 0)
-#     climate_mean[mod] = np.mean(climmeans, axis = 0)
-#     climate_std[mod] = np.std(climmeans, axis = 0)
-#
-#     climate_mean_dates[mod] = dates_cm
-#     num_members[mod] = len(climmeans)
-#
-# pickle.dump([climate_mean, climate_mean_dates, climate_std, num_members], open(cart_out + 'climate_mean_hist_p2.p', 'wb'))
-climate_mean, climate_mean_dates, climate_std, num_members = pickle.load(open(cart_out + 'climate_mean_hist_p2.p', 'rb'))
+for mod in okmods_mo:
+    print(mod)
+    climmeans = []#dict()
+    # climmeans['EAT'] = []
+    # climmeans['PNA'] = []
+
+    if mod not in all_mods:
+        print('NO data for {}'.format(mod))
+        continue
+    # elif ('EAT', mod) in climate_mean:
+    #     if num_members[mod] == 1:
+    #         #climmeans['EAT'] = [climate_mean[('EAT', mod)]]
+    #         #climmeans['PNA'] = [climate_mean[('PNA', mod)]]
+    #         if len(all_mems[mod]) == 1:
+    #             continue
+    #     else:
+    #         print(mod, num_members[mod])
+    #         print('On hobbes:', all_mems[mod])
+    #         #print('On wilma:', all_mems_wilma[mod])
+    #         continue
+
+    for mem in all_mems[mod]:
+        okfil = [fi for fi in filli if mod in fi and mem in fi][0]
+        try:
+            #var, coords, aux_info = ctl.read_cmip6_data(fieldnam, 'day', 'historical', mod, sel_member = mem, extract_level_hPa = levok, regrid_to_reference_file = ref_file, sel_yr_range = (1964, 2014), select_season_first = True, season = 'ONDJFMA', select_area_first = True, area = 'NML')
+            var, coords, aux_info = ctl.readxDncfield(cart_data + okfil)
+        except Exception as exp:
+            print('Unable to read data for {}, going on with next model..'.format(mod + '_' + mem))
+            print(exp)
+            continue
+
+        lat = coords['lat']
+        lon = coords['lon']
+        dates = coords['dates']
+
+        var, dates = ctl.sel_time_range(var, dates, ctl.range_years(1964, 2014))
+
+        zg_dtr, coeffs, var_regional, dates_seas = ctl.remove_global_polytrend(lat, lon, var, dates, 'NDJFM', deg = 1, area = 'NML', print_trend = True)
+
+        cmean, dates_cm, _ = ctl.daily_climatology(zg_dtr, dates_seas, window = 20)
+        climmeans.append(cmean)
+        # for area in ['EAT', 'PNA']:
+        #     zg_ok, _, _ = ctl.sel_area(lat, lon, zg_dtr, area)
+        #     cmean, dates_cm, _ = ctl.daily_climatology(zg, dates_seas, window = 20)
+        #     climmeans[area].append(cmean)
+        #trendmat, errtrendmat, cmat, errcmat = ctl.local_lineartrend_climate(lat, lon, var, dates, 'NDJFM', print_trend = True, remove_global_trend = False, global_deg = 3, global_area = 'global')
+        #field_trends[(ssp, mod, 'NDJFM')] = trendmat
+
+    # for area in ['EAT', 'PNA']:
+    #     climate_mean[(area, mod)] = np.mean(climmeans[area], axis = 0)
+    #     climate_std[(area, mod)] = np.std(climmeans[area], axis = 0)
+    climate_mean[mod] = np.mean(climmeans, axis = 0)
+    climate_std[mod] = np.std(climmeans, axis = 0)
+
+    climate_mean_dates[mod] = dates_cm
+    num_members[mod] = len(climmeans)
+
+pickle.dump([climate_mean, climate_mean_dates, climate_std, num_members], open(cart_out + 'climate_mean_hist_p2.p', 'wb'))
+# climate_mean, climate_mean_dates, climate_std, num_members = pickle.load(open(cart_out + 'climate_mean_hist_p2.p', 'rb'))
 
 
 for area in ['EAT', 'PNA']:
