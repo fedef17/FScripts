@@ -202,7 +202,7 @@ climate_mean, climate_mean_dates, climate_std, num_members = pickle.load(open(ca
 
 
 for area in ['EAT', 'PNA']:
-    res_old, _ = ctl.load_wrtool('/data-hobbes/fabiano/WR_CMIP6/out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p')
+    res_old, _ = ctl.load_wrtool('/data-hobbes/fabiano/WR_CMIP6/out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'.format(area))
     figs = []
     for mod in okmods_mo:
         newcoso = np.mean(climate_mean[(area, mod)], axis = 0)
