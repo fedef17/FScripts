@@ -144,6 +144,8 @@ num_members = dict()
 #all_data = ctl.check_available_cmip6_data(fieldnam, 'day', 'historical')
 #all_mods = [co[1] for co in all_data]
 
+thres_inf = 1.e9
+
 for mod in okmods_mo:
     print(mod)
     climmeans = []#dict()
