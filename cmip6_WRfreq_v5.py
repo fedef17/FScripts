@@ -421,7 +421,7 @@ for area in ['EAT', 'PNA']:
             alltimes = results_hist[mem]['resid_times'][reg]
             residtimes[('hist', mem, 'mean', reg)] = np.mean(alltimes)
             residtimes[('hist', mem, 'p90', reg)] = np.percentile(alltimes, 90)
-            num_event[('hist', mod, reg)] = freqs[('hist', mod, 'tot50')][reg]/residtimes[('hist', mod, 'mean', reg)]
+            num_event[('hist', mem, reg)] = freqs[('hist', mem, 'tot50')][reg]/residtimes[('hist', mem, 'mean', reg)]
 
         patterns[('hist', mem, 'tot50')] = results_hist[mem]['eff_centroids']
 
@@ -458,7 +458,7 @@ for area in ['EAT', 'PNA']:
             for reg in range(numclus):
                 residtimes[(ssp, mem, 'mean', reg)] = np.mean(restim[reg])
                 residtimes[(ssp, mem, 'p90', reg)] = np.percentile(restim[reg], 90)
-                num_event[(ssp, mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
+                num_event[(ssp, mem, reg)] = freqs[(ssp, mem, 'tot50')][reg]/residtimes[(ssp, mem, 'mean', reg)]
 
             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
@@ -489,7 +489,7 @@ for area in ['EAT', 'PNA']:
     for reg in range(numclus):
         for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
             residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in okmods])
-        num_event[('hist', 'all', reg)] = np.array([num_event[('hist', mod, reg)] for mod in mod_hist])
+        num_event[('hist', 'all', reg)] = np.array([num_event[('hist', mod, reg)] for mod in okmods])
 
     for ssp in allssps:
         freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in okmods])
@@ -514,7 +514,7 @@ for area in ['EAT', 'PNA']:
 
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
 
-            num_event[(ssp, 'all', reg)] = np.array([num_event[(ssp, mod, reg)] for mod in mod_ssp[ssp]])
+            num_event[(ssp, 'all', reg)] = np.array([num_event[(ssp, mod, reg)] for mod in modoks])
 
     for ke in patterns.keys():
         gigi = patterns[ke][..., np.newaxis, np.newaxis] * results_ref['eofs_ref_pcs'][np.newaxis, ...]
