@@ -27,7 +27,6 @@ plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
-cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
 cart_cmip5 = '/home/fabiano/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
 
 yr10 = 10 # length of running mean
@@ -36,9 +35,11 @@ cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 tip = 'ensrebase'
 if tip == 'r1_rebase':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
+    cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
     file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
 elif tip == 'ensrebase':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_ensrebase/'
+    cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_ensrebase/{}_NDJFM/'
     file_hist = cart_in + 'out_cmip6_ensrebase_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_reb.p'
 
 ctl.mkdir(cart_out_orig)

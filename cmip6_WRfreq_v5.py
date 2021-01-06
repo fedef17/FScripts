@@ -31,7 +31,7 @@ cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 
 yr10 = 10 # length of running mean
 
-tip = 'ensrebase'
+tip = 'r1_rebase'
 if tip == 'r1_rebase':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/'
     file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
