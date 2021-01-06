@@ -111,8 +111,6 @@ for area in ['EAT', 'PNA']:
     print(okmods)
     print(len(okmods))
 
-    sys.exit()
-
     runfreq = dict()
     seasfreq = dict()
 
