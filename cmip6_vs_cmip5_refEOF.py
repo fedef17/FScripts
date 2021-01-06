@@ -66,6 +66,7 @@ area = 'EAT'
 plocos = dict()
 res_short = dict()
 for area in ['EAT', 'PNA']:
+    print(area)
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
@@ -90,9 +91,23 @@ for area in ['EAT', 'PNA']:
 
         for mod in resdict[ke]:
             res_short[(ke, mod, area, 'var_ratio')] = resdict[ke][mod]['var_ratio']
-            # res_short[(ke, mod, area, 'var_ratio_bias')] = np.abs(resdict[ke][mod]['var_ratio']-results_ref['var_ratio'])
+            res_short[(ke, mod, area, 'var_ratio_bias')] = np.abs(resdict[ke][mod]['var_ratio']-results_ref['var_ratio'])
             res_short[(ke, mod, area, 'freqbias')] = np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus']))
             res_short[(ke, mod, area, 'patcor')] = resdict[ke][mod]['patcor']
+
+    print(area)
+    matmods = 'access bcc cnrm canesm fgoals gfdl hadgem ipsl miroc mpi noresm'.split()
+    for tip in ['', '_refEOF']:
+        for cose in ['var_ratio_bias', 'freqbias', 'patcor']:
+            gigi = []
+            for mo in matmods:
+                okke5 = [ke for ke in resdict['cmip5'+tip].keys() if mo in ke.lower()]
+                okke6 = [ke for ke in resdict['cmip6'+tip].keys() if mo in ke.lower()]
+
+                zup = np.mean([res_short[('cmip6'+tip, ke, area, cose)] for ke in okke6]) - np.mean([res_short[('cmip5'+tip, ke, area, cose)] for ke in okke5])
+                gigi.append(zup)
+
+            print(tip, cose, np.sum(gigi > 0), len(gigi))
 
     for tip in ['', '_refEOF']:
         fig = plt.figure(figsize = (16,12))
@@ -168,6 +183,37 @@ for tip in ['', '_refEOF']:
     ctl.adjust_ax_scale(axes)
     fig.savefig(cart_out + 'var_fr_plot_{}.pdf'.format(tip))
 
+    positions = [0., 0.7, 1.8, 2.5]
+    # Fig. 3 with boxes
+    fig = plt.figure(figsize = (20,12))
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
+    for ax, cose, tit in zip([ax1, ax2], ['var_ratio', 'freqbias'], ['Variance ratio', 'Frequency bias']):
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(plocos[cose, cos + tip, area], nu) for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PNA']]
+        colorzi = [colormip[(cos, area)] for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PNA']]
+        nomi = [cos+' '+area for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PAC']]
+        ctl.boxplot_on_ax(ax, allpercs, ['cmip5', 'cmip6'], colorzi, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        # ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(tit)
+        #ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+
+        ax.axvline(1.25, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        ax.text(0.25, 0.9, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
+        ax.text(0.75, 0.9, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
+
+    ax1.scatter(0.35, plocos[('var_ratio', 'ref', 'EAT')], color = 'black', marker = '*', s = 5)
+    ax1.scatter(2.15, plocos[('var_ratio', 'ref', 'PNA')], color = 'black', marker = '*', s = 5)
+
+
+    ctl.custom_legend(fig, colorzi, nomi, ncol = 2)
+    ax1.set_ylabel('Variance ratio')
+    ax2.set_ylabel('Frequency bias')
+    #plt.title('cmip6 vs cmip6 var_fr '+tip)
+    fig.savefig(cart_out + 'var_fr_boxes_{}.pdf'.format(tip))
+
 
 # taylor with clouds
 for tip in ['', '_refEOF']:
@@ -186,5 +232,30 @@ for tip in ['', '_refEOF']:
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = True, ellipse_color = colors[0], max_val_sd = 1.6)
 
     ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
-    ax.text(0.05, 0.25, 'PNA', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     fig.savefig(cart_out + 'taylor_{}.pdf'.format(tip))
+
+
+    fig = plt.figure(figsize=(24,12))
+    for i, area in enumerate(['EAT', 'PNA']):
+        patnames = reg_names_area[area]
+        for num, patt in enumerate(patnames):
+            ax = plt.subplot(2, 4, num+1+4*i, polar = True)
+
+            obs = plocos[('patterns', 'ref', area, num)]
+            meapats = dict()
+            for cos in ['cmip5', 'cmip6']:
+                modpats = plocos[('patterns', cos+tip, area, num)]
+
+                colors = [colormip[(cos, area)]]*len(modpats)
+                marknum = ['${}$'.format(nu) for nu in range(len(colors))]
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum)
+
+    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    fig.savefig(cart_out + 'taylor_{}_wnumbers.pdf'.format(tip))
+
+
+    #### IMPROVEMENTS CHECK
+
+    corrs_pred = np.array([Rcorr(observation, var) for var in models])

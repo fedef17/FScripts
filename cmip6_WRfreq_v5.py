@@ -30,18 +30,19 @@ plt.rcParams['axes.labelsize'] = 18
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 
 yr10 = 10 # length of running mean
-#dtrtyp = 'light'
-dtrtyp = 'histrebase'
 
-if dtrtyp == 'light':
-    cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5/'
-else:
+tip = 'ensrebase'
+if tip == 'r1_rebase':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/'
+    file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+    gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+elif tip == 'ensrebase':
+    cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v5_ensrebase/'
+    file_hist = cart_in + 'out_cmip6_ensrebase_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_reb.p'
+    gen_file_ssp = cart_in + 'out_cmip6_ensrebase_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 ctl.mkdir(cart_out_orig)
 
 file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
-gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_{}.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -70,7 +71,7 @@ for area in ['EAT', 'PNA']:
 
     results_ssp = dict()
     for ssp in allssps:
-        results_ssp[ssp], _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area, dtrtyp))
+        results_ssp[ssp], _ = ctl.load_wrtool(gen_file_ssp.format(ssp, area))
 
         # Erasing incomplete runs
         for ke in tuple(results_ssp[ssp].keys()):
@@ -413,6 +414,7 @@ for area in ['EAT', 'PNA']:
     freqs = dict() # tot50 e last20
     residtimes = dict() # mean e p90
     patterns = dict()
+    num_event = dict()
 
     for mem in okmods:
         freqs[('hist', mem, 'tot50')] = ctl.calc_clus_freq(results_hist[mem]['labels'], numclus)
@@ -421,6 +423,7 @@ for area in ['EAT', 'PNA']:
             alltimes = results_hist[mem]['resid_times'][reg]
             residtimes[('hist', mem, 'mean', reg)] = np.mean(alltimes)
             residtimes[('hist', mem, 'p90', reg)] = np.percentile(alltimes, 90)
+            num_event[('hist', mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
 
         patterns[('hist', mem, 'tot50')] = results_hist[mem]['eff_centroids']
 
@@ -457,7 +460,7 @@ for area in ['EAT', 'PNA']:
             for reg in range(numclus):
                 residtimes[(ssp, mem, 'mean', reg)] = np.mean(restim[reg])
                 residtimes[(ssp, mem, 'p90', reg)] = np.percentile(restim[reg], 90)
-
+                num_event[(ssp, mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
 
             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
@@ -488,6 +491,7 @@ for area in ['EAT', 'PNA']:
     for reg in range(numclus):
         for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
             residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in okmods])
+        num_event[('hist', 'all', reg)] = np.array([num_event[('hist', mod, reg)] for mod in mod_hist])
 
     for ssp in allssps:
         freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in okmods])
@@ -500,6 +504,7 @@ for area in ['EAT', 'PNA']:
             patterns[(ssp, 'mean_diff', cos)] = np.mean([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
             patterns[(ssp, 'std_diff', cos)] = np.std([patterns[(ssp, mod, cos)]-patterns[('hist', mod, cos)] for mod in okmods], axis = 0)
 
+
         # rel
         modoks = okmods
         freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
@@ -510,6 +515,8 @@ for area in ['EAT', 'PNA']:
                 residtimes[(ssp, 'all', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)] for mod in okmods])
 
                 residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
+
+            num_event[(ssp, 'all', reg)] = np.array([num_event[(ssp, mod, reg)] for mod in mod_ssp[ssp]])
 
     for ke in patterns.keys():
         gigi = patterns[ke][..., np.newaxis, np.newaxis] * results_ref['eofs_ref_pcs'][np.newaxis, ...]

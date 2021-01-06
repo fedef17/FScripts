@@ -20,14 +20,16 @@ from scipy import stats
 import pandas as pd
 
 #############################################################################
-cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v2_rebase/'
+cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v2_ensrebase/'
 ctl.mkdir(cart_out_orig)
 
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 
 file_hist_refEOF = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refEOF_dtr.p'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
-gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+# file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+# gen_file_ssp = cart_in + 'out_NEW_cmip6_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_histrebase.p'
+file_hist = cart_in + 'out_cmip6_ensrebase_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_reb.p'
+gen_file_ssp = cart_in + 'out_cmip6_ensrebase_{}_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 
 numclus = 4
 reg_names_area = dict()
@@ -70,130 +72,135 @@ for area in ['EAT', 'PNA']:
     mod_hist = [mod for mod in mod_hist if np.any([mod in mod_ssp[ssp] for ssp in allssps])]
     print(mod_hist)
 
-    # ### Voglio: freqs, resid_time, resid_time_90, eff_centroids_ssp, centroids_hist (e patcor, rms)
-    # freqs = dict() # tot50 e last20
-    # residtimes = dict() # mean e p90
-    # eff_centroids = dict()
-    #
-    # patterns_refEOF = dict()
-    #
-    # for mod in mod_hist:
-    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-    #     ## Attach all members labels
-    #     alllabs = np.concatenate([results_hist[mem]['labels'] for mem in allmems])
-    #     freqs[('hist', mod, 'tot50')] = ctl.calc_clus_freq(alllabs, numclus)
-    #
-    #     for reg in range(numclus):
-    #         alltimes = np.concatenate([results_hist[mem]['resid_times'][reg] for mem in allmems])
-    #         residtimes[('hist', mod, 'mean', reg)] = np.mean(alltimes)
-    #         residtimes[('hist', mod, 'p90', reg)] = np.percentile(alltimes, 90)
-    #
-    #     alllabs_20 = []
-    #     alltimes_20 = []
-    #     for mem in allmems:
-    #         dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
-    #         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
-    #         labs, dats = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], (dat1, dat2))
-    #         alllabs_20.append(labs)
-    #         print(mem, len(labs))
-    #
-    #         restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
-    #         alltimes_20.append(restim)
-    #
-    #     alllabs_20 = np.concatenate(alllabs_20)
-    #     alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
-    #     for reg in range(numclus):
-    #         residtimes[('hist', mod, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
-    #         residtimes[('hist', mod, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
-    #
-    #     freqs[('hist', mod, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
-    #
-    #     for reg in range(numclus):
-    #         patterns_refEOF[('centroids', mod, reg)] = np.mean([res_hist_refEOF[mem]['centroids'][reg] for mem in allmems], axis = 0)
-    #         patterns_refEOF[('patcor', mod, reg)] = np.mean([res_hist_refEOF[mem]['patcor'][reg] for mem in allmems])
-    #         patterns_refEOF[('centdist', mod, reg)] = np.mean([ctl.distance(res_hist_refEOF[mem]['centroids'][reg], results_ref['centroids'][reg]) for mem in allmems])
-    #
-    #     patterns_refEOF[('var_ratio', mod)] = np.mean([res_hist_refEOF[mem]['var_ratio'] for mem in allmems])
-    #
-    #     for reg in range(numclus):
-    #         eff_centroids[('hist', mod, reg)] = np.mean([results_hist[mem]['eff_centroids'][reg] for mem in allmems], axis = 0)
-    #
-    #
-    # for ssp in allssps:
-    #     for mod in mod_ssp[ssp]:
-    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-    #         ## Attach all members labels
-    #         alllabs = np.concatenate([results_ssp[ssp][mem]['labels'] for mem in allmems])
-    #
-    #         alllabs_20 = []
-    #         alltimes_20 = []
-    #         for mem in allmems:
-    #             dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
-    #             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-    #             labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
-    #             alllabs_20.append(labs)
-    #             restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
-    #             alltimes_20.append(restim)
-    #
-    #         alllabs_20 = np.concatenate(alllabs_20)
-    #         alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
-    #         freqs[(ssp, mod, 'tot50')] = ctl.calc_clus_freq(alllabs_20, numclus)
-    #
-    #         for reg in range(numclus):
-    #             # alltimes = np.concatenate([results_ssp[ssp][mem]['resid_times'][reg] for mem in allmems])
-    #             residtimes[(ssp, mod, 'mean', reg)] = np.mean(alltimes_20[reg])
-    #             residtimes[(ssp, mod, 'p90', reg)] = np.percentile(alltimes_20[reg], 90)
-    #
-    #         alllabs_20 = []
-    #         alltimes_20 = []
-    #         for mem in allmems:
-    #             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
-    #             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-    #             labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
-    #             alllabs_20.append(labs)
-    #             restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
-    #             alltimes_20.append(restim)
-    #
-    #         alllabs_20 = np.concatenate(alllabs_20)
-    #         alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
-    #         for reg in range(numclus):
-    #             residtimes[(ssp, mod, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
-    #             residtimes[(ssp, mod, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
-    #
-    #         freqs[(ssp, mod, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
-    #
-    #         for reg in range(numclus):
-    #             eff_centroids[(ssp, mod, reg)] = np.mean([results_ssp[ssp][mem]['eff_centroids'][reg] for mem in allmems], axis = 0)
-    #
-    # ##### salvo le distrib per ogni ssp. Quelle assolute (con tutti i modelli) e quelle relative (solo con i modelli che ci sono anche in hist)
-    # freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in mod_hist])
-    # freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in mod_hist])
-    # for reg in range(numclus):
-    #     for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
-    #         residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in mod_hist])
-    #
-    # for ssp in allssps:
-    #     freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in mod_ssp[ssp]])
-    #     freqs[(ssp, 'all', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')] for mod in mod_ssp[ssp]])
-    #
-    #     # rel
-    #     modoks = [mod for mod in mod_hist if mod in mod_ssp[ssp]]
-    #     freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
-    #     freqs[(ssp, 'rel', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')]-freqs[('hist', mod, 'last20')] for mod in modoks])
-    #
-    #     for reg in range(numclus):
-    #         for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
-    #             residtimes[(ssp, 'all', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)] for mod in mod_ssp[ssp]])
-    #
-    #             residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
-    #
-    #
-    # pickle.dump([freqs, residtimes, eff_centroids, patterns_refEOF], open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'wb'))
+    ### Voglio: freqs, resid_time, resid_time_90, eff_centroids_ssp, centroids_hist (e patcor, rms)
+    freqs = dict() # tot50 e last20
+    residtimes = dict() # mean e p90
+    eff_centroids = dict()
+    num_event = dict()
+
+    patterns_refEOF = dict()
+
+    for mod in mod_hist:
+        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+        ## Attach all members labels
+        alllabs = np.concatenate([results_hist[mem]['labels'] for mem in allmems])
+        freqs[('hist', mod, 'tot50')] = ctl.calc_clus_freq(alllabs, numclus)
+
+        for reg in range(numclus):
+            alltimes = np.concatenate([results_hist[mem]['resid_times'][reg] for mem in allmems])
+            residtimes[('hist', mod, 'mean', reg)] = np.mean(alltimes)
+            residtimes[('hist', mod, 'p90', reg)] = np.percentile(alltimes, 90)
+            num_event[('hist', mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
+
+        alllabs_20 = []
+        alltimes_20 = []
+        for mem in allmems:
+            dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+            dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+            labs, dats = ctl.sel_time_range(results_hist[mem]['labels'], results_hist[mem]['dates'], (dat1, dat2))
+            alllabs_20.append(labs)
+            print(mem, len(labs))
+
+            restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+            alltimes_20.append(restim)
+
+        alllabs_20 = np.concatenate(alllabs_20)
+        alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
+        for reg in range(numclus):
+            residtimes[('hist', mod, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
+            residtimes[('hist', mod, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
+
+        freqs[('hist', mod, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
+
+        for reg in range(numclus):
+            patterns_refEOF[('centroids', mod, reg)] = np.mean([res_hist_refEOF[mem]['centroids'][reg] for mem in allmems], axis = 0)
+            patterns_refEOF[('patcor', mod, reg)] = np.mean([res_hist_refEOF[mem]['patcor'][reg] for mem in allmems])
+            patterns_refEOF[('centdist', mod, reg)] = np.mean([ctl.distance(res_hist_refEOF[mem]['centroids'][reg], results_ref['centroids'][reg]) for mem in allmems])
+
+        patterns_refEOF[('var_ratio', mod)] = np.mean([res_hist_refEOF[mem]['var_ratio'] for mem in allmems])
+
+        for reg in range(numclus):
+            eff_centroids[('hist', mod, reg)] = np.mean([results_hist[mem]['eff_centroids'][reg] for mem in allmems], axis = 0)
+
+
+    for ssp in allssps:
+        for mod in mod_ssp[ssp]:
+            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+            ## Attach all members labels
+            alllabs = np.concatenate([results_ssp[ssp][mem]['labels'] for mem in allmems])
+
+            alllabs_20 = []
+            alltimes_20 = []
+            for mem in allmems:
+                dat1 = pd.Timestamp('09-01-2050').to_pydatetime()
+                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+                labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
+                alllabs_20.append(labs)
+                restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+                alltimes_20.append(restim)
+
+            alllabs_20 = np.concatenate(alllabs_20)
+            alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
+            freqs[(ssp, mod, 'tot50')] = ctl.calc_clus_freq(alllabs_20, numclus)
+
+            for reg in range(numclus):
+                # alltimes = np.concatenate([results_ssp[ssp][mem]['resid_times'][reg] for mem in allmems])
+                residtimes[(ssp, mod, 'mean', reg)] = np.mean(alltimes_20[reg])
+                residtimes[(ssp, mod, 'p90', reg)] = np.percentile(alltimes_20[reg], 90)
+                num_event[(ssp, mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
+
+            alllabs_20 = []
+            alltimes_20 = []
+            for mem in allmems:
+                dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+                labs, dats = ctl.sel_time_range(results_ssp[ssp][mem]['labels'], results_ssp[ssp][mem]['dates'], (dat1, dat2))
+                alllabs_20.append(labs)
+                restim, _, _ = ctl.calc_regime_residtimes(labs, dats)
+                alltimes_20.append(restim)
+
+            alllabs_20 = np.concatenate(alllabs_20)
+            alltimes_20 = [np.concatenate([cos[reg] for cos in alltimes_20]) for reg in range(numclus)]
+            for reg in range(numclus):
+                residtimes[(ssp, mod, 'mean_last20', reg)] = np.mean(alltimes_20[reg])
+                residtimes[(ssp, mod, 'p90_last20', reg)] = np.percentile(alltimes_20[reg], 90)
+
+            freqs[(ssp, mod, 'last20')] = ctl.calc_clus_freq(alllabs_20, numclus)
+
+            for reg in range(numclus):
+                eff_centroids[(ssp, mod, reg)] = np.mean([results_ssp[ssp][mem]['eff_centroids'][reg] for mem in allmems], axis = 0)
+
+    ##### salvo le distrib per ogni ssp. Quelle assolute (con tutti i modelli) e quelle relative (solo con i modelli che ci sono anche in hist)
+    freqs[('hist', 'all', 'tot50')] = np.stack([freqs[('hist', mod, 'tot50')] for mod in mod_hist])
+    freqs[('hist', 'all', 'last20')] = np.stack([freqs[('hist', mod, 'last20')] for mod in mod_hist])
+    for reg in range(numclus):
+        for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
+            residtimes[('hist', 'all', cos, reg)] = np.array([residtimes[('hist', mod, cos, reg)] for mod in mod_hist])
+        num_event[('hist', 'all', reg)] = np.array([num_event[('hist', mod, reg)] for mod in mod_hist])
+
+    for ssp in allssps:
+        freqs[(ssp, 'all', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')] for mod in mod_ssp[ssp]])
+        freqs[(ssp, 'all', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')] for mod in mod_ssp[ssp]])
+
+        # rel
+        modoks = [mod for mod in mod_hist if mod in mod_ssp[ssp]]
+        freqs[(ssp, 'rel', 'tot50')] = np.stack([freqs[(ssp, mod, 'tot50')]-freqs[('hist', mod, 'tot50')] for mod in modoks])
+        freqs[(ssp, 'rel', 'last20')] = np.stack([freqs[(ssp, mod, 'last20')]-freqs[('hist', mod, 'last20')] for mod in modoks])
+
+        for reg in range(numclus):
+            for cos in ['mean', 'p90', 'mean_last20', 'p90_last20']:
+                residtimes[(ssp, 'all', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)] for mod in mod_ssp[ssp]])
+
+                residtimes[(ssp, 'rel', cos, reg)] = np.array([residtimes[(ssp, mod, cos, reg)]-residtimes[('hist', mod, cos, reg)] for mod in modoks])
+
+            num_event[(ssp, 'all', reg)] = np.array([num_event[(ssp, mod, reg)] for mod in mod_ssp[ssp]])
+
+    pickle.dump([freqs, residtimes, eff_centroids, patterns_refEOF, num_event], open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'wb'))
     # freqs, residtimes, eff_centroids, patterns_refEOF = pickle.load(open(cart_out + 'allresults_dicts_{}_v2.p'.format(area), 'rb'))
     #
     # #### Grafico con tutti gli ssp
-    allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
-    colsim = ctl.color_set(5)
+    # allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
+    # colsim = ctl.color_set(5)
     #
     # reg_names = reg_names_area[area]
     # for cos in ['last20', 'tot50']:
@@ -480,315 +487,315 @@ for area in ['EAT', 'PNA']:
     # fig.savefig(cart_out + 'Phasespace_allssp_refCLUS_{}.pdf'.format(area))
 
 
-    print('Building pdfs...')
-    fig = plt.figure(figsize = (16,12))
-    ax = fig.add_subplot(111)
-
-    xss = np.linspace(-2500., 2500., 201)
-    xi_grid, yi_grid = np.meshgrid(xss, xss)
-
-    print('hist')
-    okpcs_all = []
-    #for modmem in results_hist.keys():
-    for mod in mod_hist:
-        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        modmem = np.sort(allmems)[0]
-        dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
-        dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
-        okpc = results_hist[modmem]['pcs'][:, :2]
-        okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
-        okpcs_all.append(okpcok)
-
-    okpc = np.concatenate(okpcs_all, axis = 0)
-    cent = np.mean(okpc, axis = 0)
-
-    kufu = ctl.calc_pdf(okpc.T)
-
-    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-    zi = zi/np.max(zi)
-    pdfssp[('hist', 'all_last20')] = zi
-
-    okpcs_all = []
-    #for modmem in results_hist.keys():
-    for mod in mod_hist:
-        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        modmem = np.sort(allmems)[0]
-
-        okpc = results_hist[modmem]['pcs'][:, :2]
-        okpcs_all.append(okpc)
-
-    okpc = np.concatenate(okpcs_all, axis = 0)
-    cent = np.mean(okpc, axis = 0)
-
-    kufu = ctl.calc_pdf(okpc.T)
-
-    zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-    zi = zi/np.max(zi)
-    pdfssp[('hist', 'all')] = zi
-
-    for reg in range(numclus):
-        print(reg)
-        okpcs_all = []
-        #for mod in mod_hist:
-        for mod in mod_hist:
-            allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            okclus = results_hist[modmem]['labels'] == reg
-            okpc = results_hist[modmem]['pcs'][okclus, :2]
-            okpcs_all.append(okpc)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-        #pdfssp[('hist', reg)] = kufu
-
-        cmappa = ctl.custom_alphagradient_cmap(colsim[0])
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        pdfssp[('hist', reg)] = zi
-
-        cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)#, linewidths = lw)
-        ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
-
-    for ssp, col in zip(allssps, colsim[1:]):
-        okpcs_all = []
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
-            dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-            okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
-            okpcs_all.append(okpcok)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        pdfssp[(ssp, 'all_last20')] = zi
-
-        okpcs_all = []
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            modmem = np.sort(allmems)[0]
-            okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-            okpcs_all.append(okpc)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        pdfssp[(ssp, 'all')] = zi
-
-        for reg in range(numclus):
-            print(ssp, reg)
-            okpcs_all = []
-            #for modmem in results_ssp[ssp].keys():
-            for mod in mod_ssp[ssp]:
-                allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-                modmem = np.sort(allmems)[0]
-                okclus = results_ssp[ssp][modmem]['labels'] == reg
-                okpc = results_ssp[ssp][modmem]['pcs'][okclus, :2]
-                okpcs_all.append(okpc)
-
-            okpc = np.concatenate(okpcs_all, axis = 0)
-            cent = np.mean(okpc, axis = 0)
-
-            kufu = ctl.calc_pdf(okpc.T)
-
-            cmappa = ctl.custom_alphagradient_cmap(col)
-
-            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-            zi = zi/np.max(zi)
-            pdfssp[(ssp, reg)] = zi
-
-            cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)
-            ax.scatter(cent[0], cent[1], color = col, s = 10, marker = 'x')
-
-    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
-    fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
-
-    pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_last20_{}.p'.format(area), 'wb'))
-
-
-    print('Building pdfs for each model...')
-    modpdf = dict()
-
-    fig = plt.figure(figsize = (16,12))
-    ax = fig.add_subplot(111)
-
-    xss = np.linspace(-3000., 3000., 301)
-    xi_grid, yi_grid = np.meshgrid(xss, xss)
-
-    print('hist')
-    okpcs_all = []
-    #for modmem in results_hist.keys():
-    for mod in mod_hist:
-        print(mod)
-        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        okpcs_all = []
-        for modmem in allmems:
-            dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
-            dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
-            okpc = results_hist[modmem]['pcs'][:, :2]
-            okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
-            okpcs_all.append(okpcok)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        modpdf[('hist', mod, 'last20')] = zi
-
-        okpcs_all = []
-        for modmem in allmems:
-            okpc = results_hist[modmem]['pcs'][:, :2]
-            okpcs_all.append(okpc)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        modpdf[('hist', mod, 'tot50')] = zi
-
-    for ssp, col in zip(allssps, colsim[1:]):
-        print(ssp)
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            print(mod)
-            okpcs_all = []
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            for modmem in allmems:
-                dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
-                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-                okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
-                okpcs_all.append(okpcok)
-
-            okpc = np.concatenate(okpcs_all, axis = 0)
-
-            kufu = ctl.calc_pdf(okpc.T)
-
-            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-            zi = zi/np.max(zi)
-            modpdf[(ssp, mod, 'last20')] = zi
-
-            okpcs_all = []
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            for modmem in allmems:
-                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-                okpcs_all.append(okpc)
-
-            okpc = np.concatenate(okpcs_all, axis = 0)
-
-            kufu = ctl.calc_pdf(okpc.T)
-
-            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-            zi = zi/np.max(zi)
-            modpdf[(ssp, mod, 'tot50')] = zi
-
-    pickle.dump(modpdf, open(cart_out + 'modpdfs_refCLUS_{}.p'.format(area), 'wb'))
-
-    print('Building pdfs for each model with 6 day lanczos filter...')
-    modpdf = dict()
-
-    fig = plt.figure(figsize = (16,12))
-    ax = fig.add_subplot(111)
-
-    xss = np.linspace(-3000., 3000., 301)
-    xi_grid, yi_grid = np.meshgrid(xss, xss)
-
-    print('hist')
-    okpcs_all = []
-    #for modmem in results_hist.keys():
-    for mod in mod_hist:
-        print(mod)
-        allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
-        okpcs_all = []
-        for modmem in allmems:
-            dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
-            dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
-            okpc = results_hist[modmem]['pcs'][:, :2]
-            okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
-            okpcs_all.append(okpcok)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        okpc = ctl.lowpass_lanczos(okpc, 6)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        modpdf[('hist', mod, 'last20')] = zi
-
-        okpcs_all = []
-        for modmem in allmems:
-            okpc = results_hist[modmem]['pcs'][:, :2]
-            okpcs_all.append(okpc)
-
-        okpc = np.concatenate(okpcs_all, axis = 0)
-        okpc = ctl.lowpass_lanczos(okpc, 6)
-        cent = np.mean(okpc, axis = 0)
-
-        kufu = ctl.calc_pdf(okpc.T)
-
-        zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-        zi = zi/np.max(zi)
-        modpdf[('hist', mod, 'tot50')] = zi
-
-    for ssp, col in zip(allssps, colsim[1:]):
-        print(ssp)
-        #for modmem in results_ssp[ssp].keys():
-        for mod in mod_ssp[ssp]:
-            print(mod)
-            okpcs_all = []
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            for modmem in allmems:
-                dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
-                dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
-                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-                okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
-                okpcs_all.append(okpcok)
-
-            okpc = np.concatenate(okpcs_all, axis = 0)
-            okpc = ctl.lowpass_lanczos(okpc, 6)
-
-            kufu = ctl.calc_pdf(okpc.T)
-
-            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-            zi = zi/np.max(zi)
-            modpdf[(ssp, mod, 'last20')] = zi
-
-            okpcs_all = []
-            allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
-            for modmem in allmems:
-                okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
-                okpcs_all.append(okpc)
-
-            okpc = np.concatenate(okpcs_all, axis = 0)
-            okpc = ctl.lowpass_lanczos(okpc, 6)
-
-            kufu = ctl.calc_pdf(okpc.T)
-
-            zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
-            zi = zi/np.max(zi)
-            modpdf[(ssp, mod, 'tot50')] = zi
-
-    pickle.dump(modpdf, open(cart_out + 'modpdfs_6days_refCLUS_{}.p'.format(area), 'wb'))
+    # print('Building pdfs...')
+    # fig = plt.figure(figsize = (16,12))
+    # ax = fig.add_subplot(111)
+    #
+    # xss = np.linspace(-2500., 2500., 201)
+    # xi_grid, yi_grid = np.meshgrid(xss, xss)
+    #
+    # print('hist')
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     modmem = np.sort(allmems)[0]
+    #     dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+    #     dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+    #     okpc = results_hist[modmem]['pcs'][:, :2]
+    #     okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
+    #     okpcs_all.append(okpcok)
+    #
+    # okpc = np.concatenate(okpcs_all, axis = 0)
+    # cent = np.mean(okpc, axis = 0)
+    #
+    # kufu = ctl.calc_pdf(okpc.T)
+    #
+    # zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    # zi = zi/np.max(zi)
+    # pdfssp[('hist', 'all_last20')] = zi
+    #
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     modmem = np.sort(allmems)[0]
+    #
+    #     okpc = results_hist[modmem]['pcs'][:, :2]
+    #     okpcs_all.append(okpc)
+    #
+    # okpc = np.concatenate(okpcs_all, axis = 0)
+    # cent = np.mean(okpc, axis = 0)
+    #
+    # kufu = ctl.calc_pdf(okpc.T)
+    #
+    # zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    # zi = zi/np.max(zi)
+    # pdfssp[('hist', 'all')] = zi
+    #
+    # for reg in range(numclus):
+    #     print(reg)
+    #     okpcs_all = []
+    #     #for mod in mod_hist:
+    #     for mod in mod_hist:
+    #         allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         okclus = results_hist[modmem]['labels'] == reg
+    #         okpc = results_hist[modmem]['pcs'][okclus, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #     #pdfssp[('hist', reg)] = kufu
+    #
+    #     cmappa = ctl.custom_alphagradient_cmap(colsim[0])
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[('hist', reg)] = zi
+    #
+    #     cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)#, linewidths = lw)
+    #     ax.scatter(cent[0], cent[1], color = colsim[0], s = 10, marker = 'x')
+    #
+    # for ssp, col in zip(allssps, colsim[1:]):
+    #     okpcs_all = []
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+    #         dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+    #         okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #         okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+    #         okpcs_all.append(okpcok)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[(ssp, 'all_last20')] = zi
+    #
+    #     okpcs_all = []
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         modmem = np.sort(allmems)[0]
+    #         okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     pdfssp[(ssp, 'all')] = zi
+    #
+    #     for reg in range(numclus):
+    #         print(ssp, reg)
+    #         okpcs_all = []
+    #         #for modmem in results_ssp[ssp].keys():
+    #         for mod in mod_ssp[ssp]:
+    #             allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #             modmem = np.sort(allmems)[0]
+    #             okclus = results_ssp[ssp][modmem]['labels'] == reg
+    #             okpc = results_ssp[ssp][modmem]['pcs'][okclus, :2]
+    #             okpcs_all.append(okpc)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #         cent = np.mean(okpc, axis = 0)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         cmappa = ctl.custom_alphagradient_cmap(col)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         pdfssp[(ssp, reg)] = zi
+    #
+    #         cont = ax.contour(xi_grid, yi_grid, zi.reshape(xi_grid.shape), [0.5, 0.8], cmap = cmappa)
+    #         ax.scatter(cent[0], cent[1], color = col, s = 10, marker = 'x')
+    #
+    # ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    # fig.savefig(cart_out + 'Clouds_allssp_refCLUS_{}.pdf'.format(area))
+    #
+    # pickle.dump(pdfssp, open(cart_out + 'pdfs_refCLUS_last20_{}.p'.format(area), 'wb'))
+    #
+    #
+    # print('Building pdfs for each model...')
+    # modpdf = dict()
+    #
+    # fig = plt.figure(figsize = (16,12))
+    # ax = fig.add_subplot(111)
+    #
+    # xss = np.linspace(-3000., 3000., 301)
+    # xi_grid, yi_grid = np.meshgrid(xss, xss)
+    #
+    # print('hist')
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     print(mod)
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     okpcs_all = []
+    #     for modmem in allmems:
+    #         dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+    #         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+    #         okpc = results_hist[modmem]['pcs'][:, :2]
+    #         okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
+    #         okpcs_all.append(okpcok)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     modpdf[('hist', mod, 'last20')] = zi
+    #
+    #     okpcs_all = []
+    #     for modmem in allmems:
+    #         okpc = results_hist[modmem]['pcs'][:, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     modpdf[('hist', mod, 'tot50')] = zi
+    #
+    # for ssp, col in zip(allssps, colsim[1:]):
+    #     print(ssp)
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         print(mod)
+    #         okpcs_all = []
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         for modmem in allmems:
+    #             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+    #             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+    #             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #             okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+    #             okpcs_all.append(okpcok)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         modpdf[(ssp, mod, 'last20')] = zi
+    #
+    #         okpcs_all = []
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         for modmem in allmems:
+    #             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #             okpcs_all.append(okpc)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         modpdf[(ssp, mod, 'tot50')] = zi
+    #
+    # pickle.dump(modpdf, open(cart_out + 'modpdfs_refCLUS_{}.p'.format(area), 'wb'))
+    #
+    # print('Building pdfs for each model with 6 day lanczos filter...')
+    # modpdf = dict()
+    #
+    # fig = plt.figure(figsize = (16,12))
+    # ax = fig.add_subplot(111)
+    #
+    # xss = np.linspace(-3000., 3000., 301)
+    # xi_grid, yi_grid = np.meshgrid(xss, xss)
+    #
+    # print('hist')
+    # okpcs_all = []
+    # #for modmem in results_hist.keys():
+    # for mod in mod_hist:
+    #     print(mod)
+    #     allmems = [cos for cos in results_hist.keys() if cos.split('_')[0] == mod]
+    #     okpcs_all = []
+    #     for modmem in allmems:
+    #         dat1 = pd.Timestamp('09-01-1995').to_pydatetime()
+    #         dat2 = pd.Timestamp('04-01-2014').to_pydatetime()
+    #         okpc = results_hist[modmem]['pcs'][:, :2]
+    #         okpcok, dats = ctl.sel_time_range(okpc, results_hist[modmem]['dates'], (dat1, dat2))
+    #         okpcs_all.append(okpcok)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     okpc = ctl.lowpass_lanczos(okpc, 6)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     modpdf[('hist', mod, 'last20')] = zi
+    #
+    #     okpcs_all = []
+    #     for modmem in allmems:
+    #         okpc = results_hist[modmem]['pcs'][:, :2]
+    #         okpcs_all.append(okpc)
+    #
+    #     okpc = np.concatenate(okpcs_all, axis = 0)
+    #     okpc = ctl.lowpass_lanczos(okpc, 6)
+    #     cent = np.mean(okpc, axis = 0)
+    #
+    #     kufu = ctl.calc_pdf(okpc.T)
+    #
+    #     zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #     zi = zi/np.max(zi)
+    #     modpdf[('hist', mod, 'tot50')] = zi
+    #
+    # for ssp, col in zip(allssps, colsim[1:]):
+    #     print(ssp)
+    #     #for modmem in results_ssp[ssp].keys():
+    #     for mod in mod_ssp[ssp]:
+    #         print(mod)
+    #         okpcs_all = []
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         for modmem in allmems:
+    #             dat1 = pd.Timestamp('09-01-2081').to_pydatetime()
+    #             dat2 = pd.Timestamp('04-01-2100').to_pydatetime()
+    #             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #             okpcok, dats = ctl.sel_time_range(okpc, results_ssp[ssp][modmem]['dates'], (dat1, dat2))
+    #             okpcs_all.append(okpcok)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #         okpc = ctl.lowpass_lanczos(okpc, 6)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         modpdf[(ssp, mod, 'last20')] = zi
+    #
+    #         okpcs_all = []
+    #         allmems = [cos for cos in results_ssp[ssp].keys() if cos.split('_')[0] == mod]
+    #         for modmem in allmems:
+    #             okpc = results_ssp[ssp][modmem]['pcs'][:, :2]
+    #             okpcs_all.append(okpc)
+    #
+    #         okpc = np.concatenate(okpcs_all, axis = 0)
+    #         okpc = ctl.lowpass_lanczos(okpc, 6)
+    #
+    #         kufu = ctl.calc_pdf(okpc.T)
+    #
+    #         zi = kufu(np.vstack([xi_grid.flatten(), yi_grid.flatten()]))
+    #         zi = zi/np.max(zi)
+    #         modpdf[(ssp, mod, 'tot50')] = zi
+    #
+    # pickle.dump(modpdf, open(cart_out + 'modpdfs_6days_refCLUS_{}.p'.format(area), 'wb'))

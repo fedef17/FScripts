@@ -31,13 +31,17 @@ cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
 cart_cmip5 = '/home/fabiano/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
 
 yr10 = 10 # length of running mean
-#dtrtyp = 'light'
-dtrtyp = 'histrebase'
-cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
-ctl.mkdir(cart_out_orig)
-
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+
+tip = 'ensrebase'
+if tip == 'r1_rebase':
+    cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
+    file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+elif tip == 'ensrebase':
+    cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_ensrebase/'
+    file_hist = cart_in + 'out_cmip6_ensrebase_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_reb.p'
+
+ctl.mkdir(cart_out_orig)
 
 numclus = 4
 reg_names_area = dict()
@@ -77,7 +81,12 @@ for area in ['EAT', 'PNA']:
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'rcp85_cmip5']
     allsims_wcmip5 = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585', 'hist_cmip5', 'rcp85_cmip5']
     allsimcol = ['hist', 'ssp126', 'ssp245', 'hist_cmip5', 'ssp370', 'ssp585', 'rcp85_cmip5']
-    coldic = dict(zip(allsimcol, ctl.color_set(7)))
+
+    colorzi = ctl.color_set(7)
+    allsimcol = ['ssp370', 'ssp245', 'ssp126', 'bau', 'rcp85_cmip5', 'ssp585', 'bau2']
+    coldic = dict(zip(allsimcol, colorzi))
+    coldic['hist'] = 'darkslategray'
+    coldic['hist_cmip5'] = 'saddlebrown'
     colsim = [coldic[ssp] for ssp in allsims]
     colssp = [coldic[ssp] for ssp in allssps]
     colsim_wcmip5 = [coldic[ssp] for ssp in allsims_wcmip5]
@@ -219,6 +228,45 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim, allsims, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL.pdf'.format(area, cos))
 
+    figall = plt.figure(figsize = (16,12))
+    axes = []
+    cos = 'tot50'
+    for reg in range(4):
+        ax = figall.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        histmean = np.mean(freqs[('hist', 'all', 'tot50')][:, reg])
+        ax.axhline(0, color = 'gray', linewidth = 0.5)
+
+        positions = list(np.arange(len(allsims)-1)*0.7)
+        positions.append(positions[-1]+0.3+0.7)
+
+        data = [freqs[(ssp, 'all', cos)][:, reg] - histmean for ssp in allsims]
+
+        parts = ax.violinplot(data, positions = positions, widths=0.4, showmeans=False, showextrema=True, showmedians=True)#, quantiles=[0.25, 0.75]
+        for pc, col in zip(parts['bodies'], colsim):
+            pc.set_facecolor(col)
+            pc.set_edgecolor(col)
+            pc.set_alpha(0.5)
+
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        #ax.text(1.0, 1.0, na, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 20)
+        if reg == 0 or reg == 2: ax.set_ylabel('Regime frequency anomaly')
+
+        #ax.scatter(0, results_ref['freq_clus'][reg], color = 'black', marker = '*', s = 5)
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('freq', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, -10, color = 'black', marker = '*', s = 30)
+
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        xli = ax.get_xlim()
+
+    ctl.adjust_ax_scale(axes)
+
+    ctl.custom_legend(figall, colsim, allsims, ncol = 3)
+    figall.savefig(cart_out + 'WRfreq_{}_{}_violin.pdf'.format(area, cos))
+
 
     figall = plt.figure(figsize = (16,12))
     axes = []
@@ -293,6 +341,18 @@ for area in ['EAT', 'PNA']:
             ttests[('residtimes', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
             print(ttests[('residtimes', area, reg, ssp)])
 
+    for reg in range(4):
+        print('REGIME',reg)
+        for ssp in allssps:
+            if ssp == 'rcp85_cmip5':
+                a = num_event[('hist_cmip5', 'all', cos, reg)]
+            else:
+                a = num_event[('hist', 'all', cos, reg)]
+            print(ssp)
+            b = num_event[(ssp, 'all', cos, reg)]
+            ttests[('num_event', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
+            print(ttests[('num_event', area, reg, ssp)])
+
     fig = plt.figure(figsize = (16,12))
     axes = []
     for reg in range(4):
@@ -320,6 +380,35 @@ for area in ['EAT', 'PNA']:
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
     fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
+
+
+    fig = plt.figure(figsize = (16,12))
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(2, 2, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', reg)], nu) for ssp in allsims]
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        # ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('num_event', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
+
+        if reg == 0 or reg == 2:
+            ax.set_ylabel('Av. persistence (days)')
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    fig.savefig(cart_out + 'Num_event_allssp_{}_{}_wcmip5.pdf'.format(area, cos))
 
 
     fig = plt.figure(figsize = (27,6))

@@ -46,6 +46,7 @@ for area in ['EAT', 'PNA']:
     freqs = dict() # tot50 e last20
     trend_ssp = dict()
     residtimes = dict()
+    num_event = dict()
 
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
@@ -112,7 +113,6 @@ for area in ['EAT', 'PNA']:
     print(okmods)
     print(len(okmods))
     print('BAUUUUUUUUUUUUUUUUUUUUUUUUU')
-    sys.exit()
     ## plots
     runfreq = dict()
     seasfreq = dict()
@@ -249,6 +249,7 @@ for area in ['EAT', 'PNA']:
         for reg in range(numclus):
             residtimes[('hist_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
             residtimes[('hist_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
+            num_event[('hist_cmip5', mem, reg)] = freqs[('hist_cmip5', mem, 'tot50')][reg]/residtimes[('hist_cmip5', mem, 'mean', reg)]
 
     freqs[('hist_cmip5', 'all', 'tot50')] = np.array([freqs[('hist_cmip5', ke, 'tot50')] for ke in okmods])
 
@@ -264,6 +265,7 @@ for area in ['EAT', 'PNA']:
         for reg in range(numclus):
             residtimes[('rcp85_cmip5', mem, 'mean', reg)] = np.mean(restim[reg])
             residtimes[('rcp85_cmip5', mem, 'p90', reg)] = np.percentile(restim[reg], 90)
+            num_event[('rcp85_cmip5', mem, reg)] = freqs[('rcp85_cmip5', mem, 'tot50')][reg]/residtimes[('rcp85_cmip5', mem, 'mean', reg)]
 
     freqs[('rcp85_cmip5', 'all', 'tot50')] = np.array([freqs[('rcp85_cmip5', ke, 'tot50')] for ke in okmods])
 
@@ -271,6 +273,8 @@ for area in ['EAT', 'PNA']:
         for cos in ['mean', 'p90']:
             residtimes[('hist_cmip5', 'all', cos, reg)] = np.array([residtimes[('hist_cmip5', mod, cos, reg)] for mod in okmods])
             residtimes[('rcp85_cmip5', 'all', cos, reg)] = np.array([residtimes[('rcp85_cmip5', mod, cos, reg)] for mod in okmods])
+        num_event[('rcp85_cmip5', 'all', reg)] = np.array([num_event[('rcp85_cmip5', mod, reg)] for mod in okmods])
+        num_event[('hist_cmip5', 'all', reg)] = np.array([num_event[('hist_cmip5', mod, reg)] for mod in okmods])
 
     ssp = 'rcp85_cmip5'
     for reg in range(4):
@@ -279,7 +283,7 @@ for area in ['EAT', 'PNA']:
         trend_ssp[(ssp, 'all', 'trend', 'freq10', reg)] = np.array([trend_ssp[(ssp, mem, 'trend', 'freq10', reg)] for mem in okmods])
         trend_ssp[(ssp, 'all', 'errtrend', 'freq10', reg)] = np.array([trend_ssp[(ssp, mem, 'errtrend', 'freq10', reg)] for mem in okmods])
 
-    pickle.dump([freqs, trend_ssp, residtimes], open(cart_out + 'freqs_cmip5_{}.p'.format(area), 'wb'))
+    pickle.dump([freqs, trend_ssp, residtimes, num_event], open(cart_out + 'freqs_cmip5_{}.p'.format(area), 'wb'))
     pickle.dump([seasfreq, runfreq], open(cart_out + 'seasfreqs_cmip5_{}.p'.format(area), 'wb'))
 
     allsims = ['hist_cmip5', 'rcp85_cmip5']
