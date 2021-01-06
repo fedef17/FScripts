@@ -421,7 +421,7 @@ for area in ['EAT', 'PNA']:
             alltimes = results_hist[mem]['resid_times'][reg]
             residtimes[('hist', mem, 'mean', reg)] = np.mean(alltimes)
             residtimes[('hist', mem, 'p90', reg)] = np.percentile(alltimes, 90)
-            num_event[('hist', mod, reg)] = freqs[(ssp, mod, 'tot50')][reg]/residtimes[(ssp, mod, 'mean', reg)]
+            num_event[('hist', mod, reg)] = freqs[('hist', mod, 'tot50')][reg]/residtimes[('hist', mod, 'mean', reg)]
 
         patterns[('hist', mem, 'tot50')] = results_hist[mem]['eff_centroids']
 
