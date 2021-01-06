@@ -520,8 +520,8 @@ for area in ['EAT', 'PNA']:
         gigi = patterns[ke][..., np.newaxis, np.newaxis] * results_ref['eofs_ref_pcs'][np.newaxis, ...]
         patterns[ke] = np.sum(gigi, axis = 1)
 
-    pickle.dump([freqs, residtimes, patterns], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
-    freqs, residtimes, patterns = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
+    pickle.dump([freqs, residtimes, patterns, num_event], open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'wb'))
+    freqs, residtimes, patterns, num_event = pickle.load(open(cart_out + 'allresults_dicts_{}_v3.p'.format(area), 'rb'))
 
     #### Grafico con tutti gli ssp
     allsims = ['hist', 'ssp126', 'ssp245', 'ssp370', 'ssp585']
