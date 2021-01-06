@@ -347,14 +347,14 @@ for area in ['EAT', 'PNA']:
         print('REGIME',reg)
         for ssp in allssps:
             if ssp == 'rcp85_cmip5':
-                a = num_event[('hist_cmip5', 'all', cos, reg)]
+                a = num_event[('hist_cmip5', 'all', reg)]
             else:
-                a = num_event[('hist', 'all', cos, reg)]
+                a = num_event[('hist', 'all', reg)]
             print(ssp)
-            b = num_event[(ssp, 'all', cos, reg)]
+            b = num_event[(ssp, 'all', reg)]
             ttests[('num_event', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
-            print(ttests[('num_event', area, reg, ssp)])
 
+            print(ttests[('num_event', area, reg, ssp)])
     fig = plt.figure(figsize = (16,12))
     axes = []
     for reg in range(4):
@@ -393,7 +393,7 @@ for area in ['EAT', 'PNA']:
         allpercs = dict()
 
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', reg)], nu) for ssp in allsims]
+            allpercs['p{}'.format(nu)] = [np.percentile(num_event[(ssp, 'all', reg)], nu) for ssp in allsims]
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
