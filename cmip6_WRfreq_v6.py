@@ -306,6 +306,8 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(figall, colsim_wcmip5, allsims_wcmip5, ncol = 3)
     figall.savefig(cart_out + 'WRfreq_{}_{}_FINAL_whistcmip5.pdf'.format(area, cos))
 
+    positions = list(np.arange(len(allsims)-1)*0.7)
+    positions.append(positions[-1]+0.3+0.7)
 
     figall = plt.figure(figsize = (16,12))
     axes = []
@@ -355,6 +357,7 @@ for area in ['EAT', 'PNA']:
             ttests[('num_event', area, reg, ssp)] = stats.ttest_ind(a, b, equal_var = False)
 
             print(ttests[('num_event', area, reg, ssp)])
+
     fig = plt.figure(figsize = (16,12))
     axes = []
     for reg in range(4):
