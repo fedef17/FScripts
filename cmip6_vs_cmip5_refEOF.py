@@ -148,6 +148,7 @@ for area in ['EAT', 'PNA']:
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
                 models = resdict[cos+tip].keys()
+                models.sort()
                 print(cos, models)
                 modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
                 #modpats = [resdict[cos+tip][mod]['eff_centroids'][num, ...] for mod in models]
@@ -196,10 +197,10 @@ for tip in ['', '_refEOF']:
     for ax, cose, tit in zip([ax1, ax2], ['var_ratio', 'freqbias'], ['Variance ratio', 'Frequency bias']):
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
-            allpercs['p{}'.format(nu)] = [np.percentile(plocos[cose, cos + tip, area], nu) for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PNA']]
-        colorzi = [colormip[(cos, area)] for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PNA']]
-        nomi = [cos+' '+area for cos in ['cmip5', 'cmip6'] for area in ['EAT', 'PAC']]
-        ctl.boxplot_on_ax(ax, allpercs, ['cmip5', 'cmip6'], colorzi, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+            allpercs['p{}'.format(nu)] = [np.percentile(plocos[cose, cos + tip, area], nu) for area in ['EAT', 'PNA'] for cos in ['cmip5', 'cmip6']]
+        colorzi = [colormip[(cos, area)] for area in ['EAT', 'PAC'] for cos in ['cmip5', 'cmip6']]
+        nomi = [cos+' '+area for area in ['EAT', 'PAC'] for cos in ['cmip5', 'cmip6']]
+        ctl.boxplot_on_ax(ax, allpercs, nomi, colorzi, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
         ax.set_title(tit)
@@ -253,8 +254,8 @@ for tip in ['', '_refEOF']:
                 modpats = plocos[('patterns', cos+tip, area, num)]
 
                 colors = [colormip[(cos, area)]]*len(modpats)
-                marknum = ['${}$'.format(nu) for nu in range(len(colors))]
-                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum)
+                marknum = ['${:2d}$'.format(nu) for nu in range(len(colors))]
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum, mod_points_size = 40)
 
     ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
