@@ -137,7 +137,7 @@ for area in ['EAT', 'PNA']:
     axes[0].text(0.05, 0.5, areana, horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
 
     ctl.adjust_ax_scale(axes)
-    ctl.custom_legend(fig, colssp, allssps, ncol = 3, add_space_below = 0.13)
+    ctl.custom_legend(fig, colssp, allssps, ncol = 3, add_space_below = 0.15)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5_line.pdf'.format(area))
 
     figall = plt.figure(figsize = (28,12))
