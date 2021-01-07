@@ -57,6 +57,7 @@ clatlo['PNA'] = (70., -120.)
 allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 
 ttests = dict()
+cosette = dict()
 
 area = 'EAT'
 for area in ['EAT', 'PNA']:
@@ -427,6 +428,38 @@ for area in ['EAT', 'PNA']:
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', cos, reg)], nu) for ssp in allsims]
 
+        cosette[(area, 'residtimes')] = allpercs
+
+        ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+        ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+        # ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks([])
+        ax.set_title(reg_names[reg])
+        ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+        if reg == 0 or reg == 2:
+            ax.set_ylabel('Num. events per 100 days')
+        for pos, ssp in zip(positions[1:], allsims[1:]):
+            if ttests[('residtimes', area, reg, ssp)].pvalue < 0.05:
+                ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+    fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
+
+
+    fig = plt.figure(figsize = (27,6))
+    axes = []
+    for reg in range(4):
+        ax = fig.add_subplot(1, 4, reg + 1)
+        axes.append(ax)
+
+        allpercs = dict()
+
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(num_event[(ssp, 'all', reg)], nu) for ssp in allsims]
+
+        cosette[(area, 'num_event')] = allpercs
+
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
@@ -441,7 +474,49 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)
-    fig.savefig(cart_out + 'Restime_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
+    fig.savefig(cart_out + 'Num_event_allssp_{}_{}_wcmip5_line.pdf'.format(area, cos))
+
+
+for nometti in ['residtimes', 'num_event']:
+    fig = plt.figure(figsize = (27,11))
+    axes = []
+    i = 0
+    for area in ['EAT', 'PNA']:
+        for reg in range(4):
+            ax = fig.add_subplot(2, 4, 4*i + reg + 1)
+            axes.append(ax)
+
+            allpercs = cosette[(area, nometti)]
+
+            ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
+            ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
+            # ax.axhline(0, color = 'gray', linewidth = 0.5)
+            ax.set_xticks([])
+            ax.set_title(reg_names[reg])
+            ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
+            if reg == 0:
+                if nometti == 'residtimes':
+                    ax.set_ylabel('Av. persistence (days)')
+                    poscoso = 3.5
+                else:
+                    ax.set_ylabel('Num. events per 100 days')
+                    poscoso = 2.7
+
+            for pos, ssp in zip(positions[1:], allsims[1:]):
+                if ttests[(nometti, area, reg, ssp)].pvalue < 0.05:
+                    ax.scatter(pos, poscoso, color = 'black', marker = '*', s = 30)
+
+        i += 1
+
+    ctl.adjust_ax_scale(axes)
+    ctl.custom_legend(fig, colsim, allsims, ncol = 3)
+
+    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+
+    fig.savefig(cart_out_orig + '{}_allssp_{}_wcmip5_FINAL.pdf'.format(nometti, cos))
+
+
 
 with open(cart_out + 'ttests.p', 'wb') as fillo:
     pickle.dump(ttests, fillo)
