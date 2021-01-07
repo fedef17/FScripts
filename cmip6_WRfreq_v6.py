@@ -482,6 +482,7 @@ for nometti in ['residtimes', 'num_event']:
     axes = []
     i = 0
     for area in ['EAT', 'PNA']:
+        reg_names = reg_names_area[area]
         for reg in range(4):
             ax = fig.add_subplot(2, 4, 4*i + reg + 1)
             axes.append(ax)
