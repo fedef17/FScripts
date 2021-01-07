@@ -133,7 +133,7 @@ for area in ['EAT', 'PNA']:
             ax.set_ylabel('Frequency anomaly')
 
     ctl.adjust_ax_scale(axes)
-    ctl.custom_legend(fig, colssp, allssps, ncol = 3, add_space_below = 0.05)
+    ctl.custom_legend(fig, colssp, allssps, ncol = 3, add_space_below = 0.10)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5_line.pdf'.format(area))
 
     figall = plt.figure(figsize = (28,12))
