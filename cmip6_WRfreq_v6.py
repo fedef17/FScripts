@@ -403,10 +403,10 @@ for area in ['EAT', 'PNA']:
         ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
         for pos, ssp in zip(positions[1:], allsims[1:]):
             if ttests[('num_event', area, reg, ssp)].pvalue < 0.05:
-                ax.scatter(pos, 3.5, color = 'black', marker = '*', s = 30)
+                ax.scatter(pos, 2.7, color = 'black', marker = '*', s = 30)
 
         if reg == 0 or reg == 2:
-            ax.set_ylabel('Av. persistence (days)')
+            ax.set_ylabel('Num. events per 100 days')
 
     ctl.adjust_ax_scale(axes)
     ctl.custom_legend(fig, colsim, allsims, ncol = 3)

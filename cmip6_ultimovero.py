@@ -30,13 +30,14 @@ plt.rcParams['axes.labelsize'] = 18
 
 cart_in = '/home/fedef/Research/lavori/CMIP6/'
 
-cart_out_orig = cart_in + 'Results_ultimo/'
+cart_out_orig = cart_in + 'Results_ultimo_ensrebase/'
 ctl.mkdir(cart_out_orig)
 
 yr10 = 10 # length of running mean
 
 cart_cmip5 = '/home/fedef/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
-cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
+#cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
+cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_ensrebase/{}_NDJFM/'
 
 numclus = 4
 reg_names_area = dict()
