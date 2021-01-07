@@ -115,7 +115,7 @@ for area in ['EAT', 'PNA']:
     ctl.custom_legend(fig, colssp, allssps, ncol = 3)
     fig.savefig(cart_out + 'allssps_freq20_{}_anom_wcmip5.pdf'.format(area))
 
-    fig = plt.figure(figsize = (27,6))
+    fig = plt.figure(figsize = (27,8))
     axes = []
     for reg in range(4):
         ax = fig.add_subplot(1, 4, reg+1)
