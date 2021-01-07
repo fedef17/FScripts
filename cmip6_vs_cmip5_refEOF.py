@@ -191,7 +191,7 @@ for tip in ['', '_refEOF']:
 
     positions = [0., 0.7, 1.8, 2.5]
     # Fig. 3 with boxes
-    fig = plt.figure(figsize = (20,12))
+    fig = plt.figure(figsize = (16,6))
     ax1 = fig.add_subplot(121)
     ax2 = fig.add_subplot(122)
     for ax, cose, tit in zip([ax1, ax2], ['var_ratio', 'freqbias'], ['Variance ratio', 'Frequency bias']):
@@ -203,15 +203,15 @@ for tip in ['', '_refEOF']:
         ctl.boxplot_on_ax(ax, allpercs, nomi, colorzi, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
-        ax.set_title(tit)
+        #ax.set_title(tit)
         #ax.axvline(np.mean([positions[-1], positions[-2]]), color = 'lightslategray', linewidth = 0.2, linestyle = '--')
 
         ax.axvline(1.25, color = 'lightslategray', linewidth = 0.2, linestyle = '--')
-        ax.text(0.25, 0.9, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
-        ax.text(0.75, 0.9, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
+        ax.text(0.25, 0.95, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
+        ax.text(0.75, 0.95, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='horizontal',transform=ax.transAxes, fontsize = 25)
 
-    ax1.scatter(0.35, plocos[('var_ratio', 'ref', 'EAT')], color = 'black', marker = '*', s = 5)
-    ax1.scatter(2.15, plocos[('var_ratio', 'ref', 'PNA')], color = 'black', marker = '*', s = 5)
+    ax1.scatter(0.35, plocos[('var_ratio', 'ref', 'EAT')], color = 'black', marker = '*', s = 50)
+    ax1.scatter(2.15, plocos[('var_ratio', 'ref', 'PNA')], color = 'black', marker = '*', s = 50)
 
 
     ctl.custom_legend(fig, colorzi, nomi, ncol = 2)
