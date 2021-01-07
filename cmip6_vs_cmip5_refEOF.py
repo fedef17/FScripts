@@ -107,6 +107,7 @@ for area in ['EAT', 'PNA']:
                 zup = np.mean([res_short[('cmip6'+tip, ke, area, cose)] for ke in okke6]) - np.mean([res_short[('cmip5'+tip, ke, area, cose)] for ke in okke5])
                 gigi.append(zup)
 
+            gigi = np.array(gigi)
             print(tip, cose, np.sum(gigi > 0), len(gigi))
 
     for tip in ['', '_refEOF']:
