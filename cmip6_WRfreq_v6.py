@@ -32,7 +32,7 @@ cart_cmip5 = '/home/fabiano/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
 yr10 = 10 # length of running mean
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
 
-tip = 'ensrebase'
+tip = 'r1_rebase'
 if tip == 'r1_rebase':
     cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Results_v6_rebase/'
     cart_v5 = '/home/fabiano/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
