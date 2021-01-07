@@ -147,7 +147,7 @@ for area in ['EAT', 'PNA']:
             plocos[('patterns', 'ref', area, num)] = obs
             meapats = dict()
             for cos in ['cmip5', 'cmip6']:
-                models = resdict[cos+tip].keys()
+                models = list(resdict[cos+tip].keys())
                 models.sort()
                 print(cos, models)
                 modpats = [resdict[cos+tip][mod]['cluspattern_area'][num, ...] for mod in models]
