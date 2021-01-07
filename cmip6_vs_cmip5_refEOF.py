@@ -108,7 +108,11 @@ for area in ['EAT', 'PNA']:
                 gigi.append(zup)
 
             gigi = np.array(gigi)
-            print(tip, cose, np.sum(gigi > 0), len(gigi))
+            if cose == 'patcor':
+                print(tip, cose, np.sum(gigi > 0), len(gigi)) # se gigi > 0 la patcor migliora (è più alta) in cmip6
+            else:
+                print(tip, cose, np.sum(gigi < 0), len(gigi)) # se gigi < 0 il bias migliora in cmip6
+            print(gigi)
 
     for tip in ['', '_refEOF']:
         fig = plt.figure(figsize = (16,12))
@@ -259,4 +263,4 @@ for tip in ['', '_refEOF']:
 
     #### IMPROVEMENTS CHECK
 
-    corrs_pred = np.array([Rcorr(observation, var) for var in models])
+    #corrs_pred = np.array([Rcorr(observation, var) for var in models])
