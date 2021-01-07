@@ -428,7 +428,7 @@ for area in ['EAT', 'PNA']:
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(residtimes[(ssp, 'all', cos, reg)], nu) for ssp in allsims]
 
-        cosette[(area, 'residtimes')] = allpercs
+        cosette[(area, 'residtimes', reg)] = allpercs
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
@@ -458,7 +458,7 @@ for area in ['EAT', 'PNA']:
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(num_event[(ssp, 'all', reg)], nu) for ssp in allsims]
 
-        cosette[(area, 'num_event')] = allpercs
+        cosette[(area, 'num_event', reg)] = allpercs
 
         ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
         ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
@@ -486,7 +486,7 @@ for nometti in ['residtimes', 'num_event']:
             ax = fig.add_subplot(2, 4, 4*i + reg + 1)
             axes.append(ax)
 
-            allpercs = cosette[(area, nometti)]
+            allpercs = cosette[(area, nometti, reg)]
 
             ax.axhline(allpercs['p50'][0], color = 'gray', linewidth = 0.5)
             ctl.boxplot_on_ax(ax, allpercs, allsims, colsim, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
