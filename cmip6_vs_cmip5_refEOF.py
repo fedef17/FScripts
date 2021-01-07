@@ -198,8 +198,8 @@ for tip in ['', '_refEOF']:
         allpercs = dict()
         for nu in [10, 25, 50, 75, 90]:
             allpercs['p{}'.format(nu)] = [np.percentile(plocos[cose, cos + tip, area], nu) for area in ['EAT', 'PNA'] for cos in ['cmip5', 'cmip6']]
-        colorzi = [colormip[(cos, area)] for area in ['EAT', 'PAC'] for cos in ['cmip5', 'cmip6']]
-        nomi = [cos+' '+area for area in ['EAT', 'PAC'] for cos in ['cmip5', 'cmip6']]
+        colorzi = [colormip[(cos, area)] for area in ['EAT', 'PNA'] for cos in ['cmip5', 'cmip6']]
+        nomi = [cos+' '+aa for aa in ['EAT', 'PAC'] for cos in ['cmip5', 'cmip6']]
         ctl.boxplot_on_ax(ax, allpercs, nomi, colorzi, plot_mean = False, plot_ensmeans = False, plot_minmax = False, positions = positions)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks([])
