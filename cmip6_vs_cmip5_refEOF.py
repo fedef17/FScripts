@@ -244,7 +244,7 @@ for tip in ['', '_refEOF']:
 
 
     for i, area in enumerate(['EAT', 'PNA']):
-        fig = plt.figure(figsize=(24,12))
+        fig = plt.figure(figsize=(16,12))
         patnames = reg_names_area[area]
         for num, patt in enumerate(patnames):
             ax = plt.subplot(2, 2, num+1, polar = True)
