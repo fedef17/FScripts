@@ -30,14 +30,14 @@ plt.rcParams['axes.labelsize'] = 18
 
 cart_in = '/home/fedef/Research/lavori/CMIP6/'
 
-cart_out_orig = cart_in + 'Results_ultimo_ensrebase/'
+cart_out_orig = cart_in + 'Results_ultimo_v2/'
 ctl.mkdir(cart_out_orig)
 
 yr10 = 10 # length of running mean
 
 cart_cmip5 = '/home/fedef/Research/lavori/CMIP6/Results_cmip5/{}_NDJFM/'
-#cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
-cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_ensrebase/{}_NDJFM/'
+cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_rebase/{}_NDJFM/'
+#cart_v5 = '/home/fedef/Research/lavori/CMIP6/Results_v5_ensrebase/{}_NDJFM/'
 
 numclus = 4
 reg_names_area = dict()
@@ -130,7 +130,7 @@ for na, fi, ti in zip(nams, fils, tip):
                         resvi[(ssp, mod, na, ke)] = te
         else:
             vmods, datatemp = ctl.read_from_txt(vicar + fi.format(ssp), n_skip = 3, sep = '\t')
-            vkeys = ['GW_ndjfm', 'NAW', 'SPGW', 'TNAW', 'TNAW2']
+            vkeys = ['GW_ndjfm', 'NAW', 'SPGW', 'TNAW1', 'TNAW']
             for mod in okmods[ssp]:
                 if mod.split('_')[0] in vmods:
                     ind = np.where(vmods == mod.split('_')[0])[0][0]
@@ -138,7 +138,7 @@ for na, fi, ti in zip(nams, fils, tip):
                     for ke, te in zip(vkeys, lin):
                         resvi[(ssp, mod, na, ke)] = te
 
-vkeys = ['AA', 'UTW', 'PST', 'PVS', 'RUTAW', 'GW', 'NAW', 'SPGW', 'TNAW', 'TNAW2', 'NAW_annual']
+vkeys = ['AA', 'UTW', 'PST', 'PVS', 'RUTAW', 'GW', 'NAW', 'SPGW', 'TNAW1', 'TNAW', 'NAW_annual']
 
 for ke in list(resvi.keys()):
     if 'temp' in ke: continue
@@ -428,17 +428,22 @@ for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
         print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
 
 
-varall = ['UTWrGW', 'AArGW', 'PSTrGW', 'TNAW2rGW', 'SPGWrGW'] # SECOND version of the article
+varall = ['UTWrGW', 'AArGW', 'PSTrGW', 'TNAWrGW', 'SPGWrGW'] # SECOND version of the article
 pio2 = list(itt.combinations(varall, 2))
 pio3 = list(itt.combinations(varall, 3))
 pio4 = list(itt.combinations(varall, 4))
+pio5 = [varall]
 tip = 'GWscaling2'
 # partiamo con model1
 print('\n\n\n SCALING FREQ trends for GW!\n')
-for num, pio in zip([2,3,4], [pio2, pio3, pio4]):
+for num, pio in zip([2,3,4,5], [pio2, pio3, pio4, pio5]):
     for area in ['EAT', 'PNA']:
         allscores[(tip, num, area)] = []
         for pi in pio:
+            # if area == 'EAT' and ('TNAWrGW' in pi or 'SPGWrGW' in pi):
+            #     print('bauuu')
+            #     allscores[(tip, num, area)].append(0.)
+            #     continue
             # if 'PVSrGW' in pi and 'PSTrGW' in pi: continue
             X = []
             Y = []
@@ -486,8 +491,10 @@ from scipy import stats
 # 3 PNA ('PVSrGW', 'AArGW', 'NAWrGW') 0.26665645026370693
 resall = dict()
 for tip in ['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2']:
-    for num in [2,3,4]:
+    for num in [2,3,4,5]:
         for area in ['EAT', 'PNA']:
+            if (tip, num, area) not in bestxs:
+                continue
             xii = bestxs[(tip, num, area)]
             varfii = bestset[(tip, num, area)]
             y = bestys[(tip, num, area)]
@@ -565,7 +572,11 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2'], 
             ax.set_xticklabels(reg_names_area[area], ha='center')
             ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
             ax.set_yticklabels(varf, va='center')
-            if num == 3: ax.set_title(area)
+            if num == 3:
+                if area == 'EAT':
+                    ax.set_title(area)
+                else:
+                    ax.set_title('PAC')
 
     #cax = fig.add_subplot(gs[6, :])
     cax = plt.axes([0.1, 0.1, 0.8, 0.05])
@@ -622,6 +633,54 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2'], 
 
     fig.savefig(cart_out_orig + 'Regr_model_optimal_{}_4drivers.pdf'.format(tip))
 
+
+    if (tip, 5, area) in bestxs:
+        bau = -1
+        num = 5
+        fig = plt.figure(figsize=(16,8))
+        gs = gridspec.GridSpec(5, 2)
+        axes = []
+        axes.append(fig.add_subplot(gs[:4, 0]))
+        axes.append(fig.add_subplot(gs[:4, 1]))
+
+        for area in ['EAT', 'PNA']:
+            varf = bestset[(tip, num, area)]
+            varf = [va if 'rGW' not in va else va[:-3] for va in varf]
+            nvars = len(varf)
+            ext = [0, 4, 0, nvars]
+
+            bau += 1
+            ax = axes[bau]
+            gigi = ax.imshow(resall[(tip, num, area, 'params')].T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+
+            pvaok = resall[(tip, num, area, 'pvals')].T
+            for ix in range(4):
+                for iy in range(nvars):
+                    if pvaok[iy, ix] < 0.01:
+                        ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
+                    elif pvaok[iy, ix] < 0.05:
+                        ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
+
+            ax.xaxis.tick_top()
+            ax.set_xticks(0.5+np.arange(4), minor = False)
+            ax.set_xticklabels(reg_names_area[area], ha='center')
+            ax.set_yticks(0.5+np.arange(len(varf)), minor = False)
+            ax.set_yticklabels(varf, va='center')
+
+            if area == 'EAT':
+                ax.set_title(area)
+            else:
+                ax.set_title('PAC')
+
+        #cax = fig.add_subplot(gs[6, :])
+        cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+        cb = plt.colorbar(gigi, cax=cax, orientation='horizontal')
+        cb.ax.tick_params(labelsize=18)
+        cb.set_label(r'Regression coefficient ($yr^{-1}$)', fontsize=20)
+        plt.subplots_adjust(left=0.02, bottom=0.13, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+
+        fig.savefig(cart_out_orig + 'Regr_model_TOT_{}_5drivers.pdf'.format(tip))
+
     fig = plt.figure(figsize=(12,8))
     ax = fig.add_subplot(111)
     for num, col in zip([2,3,4], ['indianred', 'steelblue', 'forestgreen']):
@@ -640,7 +699,7 @@ for tip, vlim in zip(['conGW', 'unscal', 'senzaGW', 'GWscaling', 'GWscaling2'], 
 
 
 #varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'NAWrGW'] # First version
-varall = ['GW', 'PSTrGW', 'UTWrGW', 'AArGW', 'TNAWrGW', 'SPGWrGW', 'NAWrGW', 'TNAW2rGW']
+varall = ['GW', 'UTWrGW', 'AArGW', 'PSTrGW', 'TNAWrGW', 'SPGWrGW']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
@@ -650,6 +709,7 @@ for ssp in ['rcp85', 'ssp585']:
 X = np.stack(X)
 np.set_printoptions(precision=3)
 print(varall)
+print(np.mean(X, axis = 0))
 print(np.std(X, axis = 0))
 
 scaler = StandardScaler().fit(X)
@@ -658,7 +718,7 @@ print(np.cov(X.T)/np.cov(X.T)[0,0], '\n')
 
 
 #varall = ['GW', 'UTW', 'AA', 'NAW', 'PST']  # First version
-varall = ['GW', 'UTW', 'AA', 'PST', 'TNAW', 'SPGW', 'NAW', 'TNAW2']
+varall = ['GW', 'UTW', 'AA', 'PST', 'TNAW', 'SPGW']
 X = []
 for ssp in ['rcp85', 'ssp585']:
     for mod in okmods[ssp]:
@@ -668,6 +728,7 @@ for ssp in ['rcp85', 'ssp585']:
 X = np.stack(X)
 np.set_printoptions(precision=3)
 print(varall)
+print(np.mean(X, axis = 0))
 print(np.std(X, axis = 0))
 
 scaler = StandardScaler().fit(X)

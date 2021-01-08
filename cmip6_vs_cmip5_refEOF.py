@@ -242,11 +242,12 @@ for tip in ['', '_refEOF']:
     fig.savefig(cart_out + 'taylor_{}.pdf'.format(tip))
 
 
-    fig = plt.figure(figsize=(24,12))
+
     for i, area in enumerate(['EAT', 'PNA']):
+        fig = plt.figure(figsize=(24,12))
         patnames = reg_names_area[area]
         for num, patt in enumerate(patnames):
-            ax = plt.subplot(2, 4, num+1+4*i, polar = True)
+            ax = plt.subplot(2, 2, num+1, polar = True)
 
             obs = plocos[('patterns', 'ref', area, num)]
             meapats = dict()
@@ -258,9 +259,9 @@ for tip in ['', '_refEOF']:
                 marknum += ['${}$'.format(nu) for nu in range(10, len(colors))]
                 ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum, mod_points_size = 40)
 
-    ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
-    ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
-    fig.savefig(cart_out + 'taylor_{}_wnumbers.pdf'.format(tip))
+    # ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+    # ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
+        fig.savefig(cart_out + 'taylor_{}_wnumbers_{}.pdf'.format(tip, area))
 
 
     #### IMPROVEMENTS CHECK
