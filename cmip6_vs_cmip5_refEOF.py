@@ -257,7 +257,7 @@ for tip in ['', '_refEOF']:
                 colors = [colormip[(cos, area)]]*len(modpats)
                 marknum = ['$_{}$'.format(nu) for nu in range(10)]
                 marknum += ['${}$'.format(nu) for nu in range(10, len(colors))]
-                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum, mod_points_size = 40)
+                ctl.Taylor_plot(modpats, obs, ax = ax, title = patt, colors = colors, only_first_quarter = True, plot_ellipse = False, ellipse_color = colors[0], max_val_sd = 1.6, markers = marknum, mod_points_size = 60, alpha_markers = 0.5)
 
     # ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
     # ax.text(0.05, 0.25, 'PAC', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
