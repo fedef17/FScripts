@@ -27,16 +27,21 @@ plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
-cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Check_ece_vs_mpi/ece_r4_hist/'
+cart_out_orig = '/home/fabiano/Research/lavori/CMIP6/Check_ece_vs_mpi/FINAL/'
 ctl.mkdir(cart_out_orig)
 
 cart_in = '/data-hobbes/fabiano/WR_CMIP6/'
-file_hist = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+file_hist_tot = cart_in + 'out_NEW_cmip6_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_light.p'
+#
+# fil_ece_hist = cart_in + 'out_eceens_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
+# fil_ece = cart_in + 'out_eceens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
+# fil_ece_r4 = cart_in + 'out_eceens_ssp585_r4_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
+# fil_mpi = cart_in + 'mpiens_ssp585/out_mpiens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 
-fil_ece_hist = cart_in + 'out_eceens_hist_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr.p'
-fil_ece = cart_in + 'out_eceens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
-fil_ece_r4 = cart_in + 'out_eceens_ssp585_r4_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
-fil_mpi = cart_in + 'mpiens_ssp585/out_mpiens_ssp585_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
+fil_hist = cart_in + '{}ens_hist_rbtot/out_{}ens_hist_rbtot_NDJFM_{}_4clus_4pcs_1964-2014_refCLUS_dtr_reb.p'
+fil_ssp = cart_in + '{}ens_ssp585_rbtot/out_{}ens_ssp585_rbtot_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
+
+tips = 'ece mpi uk'.split()
 
 ssp = 'ssp585'
 numclus = 4
@@ -52,65 +57,38 @@ clatlo['PNA'] = (70., -120.)
 #allssps = 'ssp126 ssp245 ssp370 ssp585'.split()
 allssps = ['ssp585']
 
-oknam = ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']
+#oknam = ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']
 
 ttests = dict()
 for area in ['EAT', 'PNA']:
     cart_out = cart_out_orig + '{}_NDJFM/'.format(area)
     ctl.mkdir(cart_out)
 
-    results_hist, results_ref = ctl.load_wrtool(file_hist.format(area))
-
-    ece_hist, _ = ctl.load_wrtool(fil_ece_hist.format(area))
-    del ece_hist['EC-Earth3_r1i1p1f1']
-    results_hist.update(ece_hist)
-
+    results_hist, results_ref = ctl.load_wrtool(file_hist_tot.format(area))
     histme = np.mean([results_hist[ke]['freq_clus'] for ke in results_hist.keys()], axis = 0)
+    del results_hist
 
-    for ke in tuple(results_hist):
-        if ke not in oknam:
-            del results_hist[ke]
-
-    ece_ssp, _ = ctl.load_wrtool(fil_ece.format(area))
-    ece_ssp_r4, _ = ctl.load_wrtool(fil_ece_r4.format(area))
-    mpi_ssp, _ = ctl.load_wrtool(fil_mpi.format(area))
-
-    # Erasing incomplete runs
-    # for ke in tuple(results_ssp.keys()):
-    #     if len(results_ssp[ke]['labels']) < 12000:
-    #         del results_ssp[ke]
-    #     elif len(results_ssp[ke]['labels']) > 13000:
-    #         # there is some duplicated year
-    #         for cosone in [results_ssp, results_ssp_rebase]:
-    #             labs, dats = ctl.seasonal_set(cosone[ke]['labels'], cosone[ke]['dates'], None)
-    #             pcs, dats = ctl.seasonal_set(cosone[ke]['pcs'], cosone[ke]['dates'], None)
-    #             yeas = np.array([da[0].year for da in dats])
-    #             labs_ok = []
-    #             dats_ok = []
-    #             pcs_ok = []
-    #             for ye in np.arange(2015, 2100):
-    #                 okse = np.where(yeas == ye)[0][0]
-    #                 labs_ok.append(labs[okse])
-    #                 dats_ok.append(dats[okse])
-    #                 pcs_ok.append(pcs[okse])
-    #             cosone[ke]['labels'] = np.concatenate(labs_ok)
-    #             cosone[ke]['dates'] = np.concatenate(dats_ok)
-    #             cosone[ke]['pcs'] = np.concatenate(pcs_ok)
+    rescoso = dict()
+    for tip in tips:
+        rescoso[(tip, 'hist')], _ = ctl.load_wrtool(fil_hist.format(tip, tip, area))
+        rescoso[(tip, 'ssp585')], _ = ctl.load_wrtool(fil_ssp.format(tip, tip, area))
 
     # appiccico hist e ssp
-    for cosone, histmem in zip([ece_ssp, ece_ssp_r4, mpi_ssp], ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']):
-        for mem in cosone.keys():
-            labs = np.concatenate([results_hist[histmem]['labels'], cosone[mem]['labels']])
-            dats = np.concatenate([results_hist[histmem]['dates'], cosone[mem]['dates']])
-            pcs = np.concatenate([results_hist[histmem]['pcs'], cosone[mem]['pcs']], axis = 0)
+    #for cosone, histmem in zip([ece_ssp, ece_ssp_r4, mpi_ssp], ['EC-Earth3_r1i1p1f1', 'EC-Earth3_r4i1p1f1', 'MPI-ESM1-2-LR_r1i1p1f1']):
+    resdict = dict()
+    for tip in tips:
+        cosone = dict()
+        for mem in rescoso[(tip, 'ssp585')].keys():
+            cosone[mem] = dict()
+            labs = np.concatenate([rescoso[(tip, 'hist')][mem]['labels'], rescoso[(tip, 'ssp585')][mem]['labels']])
+            dats = np.concatenate([rescoso[(tip, 'hist')][mem]['dates'], rescoso[(tip, 'ssp585')][mem]['dates']])
+            pcs = np.concatenate([rescoso[(tip, 'hist')][mem]['pcs'], rescoso[(tip, 'ssp585')][mem]['pcs']], axis = 0)
+
             cosone[mem]['labels'] = labs
             cosone[mem]['dates'] = dats
             cosone[mem]['pcs'] = pcs
 
-    resdict = dict()
-    resdict['EC-Earth3'] = ece_ssp
-    resdict['EC-Earth3_histr4'] = ece_ssp_r4
-    resdict['MPI-ESM1-2-LR'] = mpi_ssp
+        resdict[tip] = cosone
 
     alltips = tuple(resdict.keys())
     colorz = ctl.color_set(len(alltips))
