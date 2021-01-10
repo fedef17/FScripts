@@ -131,8 +131,9 @@ for area in ['EAT', 'PNA']:
             ax.plot(yr, coso, label = tip, color = col)
 
         ax.set_title(reg_names_area[area][reg])
-        ax.legend()
+        #ax.legend()
 
+    ctl.custom_legend(fig, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2)
     fig.savefig(cart_out + 'check_ece_vs_mpi_{}.pdf'.format(area))
 
     trend_ssp = dict()
@@ -194,7 +195,8 @@ for area in ['EAT', 'PNA']:
 
     ctl.adjust_ax_scale(axes)
 
-    ctl.custom_legend(figall, colorz, alltips, ncol = 2)
+    #ctl.custom_legend(figall, colorz, alltips, ncol = 2)
+    ctl.custom_legend(figall, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2)
     figall.savefig(cart_out + 'check_ece_vs_mpi_WRfreq_{}.pdf'.format(area))
 
 
