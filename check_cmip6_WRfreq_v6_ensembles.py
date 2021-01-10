@@ -42,6 +42,7 @@ fil_hist = cart_in + '{}ens_hist_rbtot/out_{}ens_hist_rbtot_NDJFM_{}_4clus_4pcs_
 fil_ssp = cart_in + '{}ens_ssp585_rbtot/out_{}ens_ssp585_rbtot_NDJFM_{}_4clus_4pcs_2015-2100_refCLUS_dtr_reb.p'
 
 tips = 'ece mpi uk'.split()
+tips = ['mpi', 'uk']
 
 ssp = 'ssp585'
 numclus = 4
@@ -78,6 +79,7 @@ for area in ['EAT', 'PNA']:
     resdict = dict()
     for tip in tips:
         cosone = dict()
+        print(rescoso[(tip, 'ssp585')].keys())
         for mem in rescoso[(tip, 'ssp585')].keys():
             cosone[mem] = dict()
             labs = np.concatenate([rescoso[(tip, 'hist')][mem]['labels'], rescoso[(tip, 'ssp585')][mem]['labels']])
