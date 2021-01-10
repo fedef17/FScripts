@@ -126,7 +126,7 @@ for area in ['EAT', 'PNA']:
             cosi = [runfreq[(tip, mem, reg)] for mem in okmods]
             coso = np.mean(cosi, axis = 0)
             runfreq[(tip, reg)] = coso
-            coserr = np.std(cosi, axis = 0)
+            coserr = np.std(cosi, axis = 0)/np.sqrt(len(okmods)-1)
             ax.fill_between(yr, coso-coserr, coso+coserr, color = col, alpha = 0.3)
             ax.plot(yr, coso, label = tip, color = col)
 
