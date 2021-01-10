@@ -133,7 +133,7 @@ for area in ['EAT', 'PNA']:
         ax.set_title(reg_names_area[area][reg])
         #ax.legend()
 
-    ctl.custom_legend(fig, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2)
+    ctl.custom_legend(fig, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2, add_space_below = 0.12)
     fig.savefig(cart_out + 'check_ece_vs_mpi_{}.pdf'.format(area))
 
     trend_ssp = dict()
@@ -196,7 +196,7 @@ for area in ['EAT', 'PNA']:
     ctl.adjust_ax_scale(axes)
 
     #ctl.custom_legend(figall, colorz, alltips, ncol = 2)
-    ctl.custom_legend(figall, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2)
+    ctl.custom_legend(figall, colorz, ['MPI-ESM1-2-LR', 'UKESM1-0-LL'], ncol = 2, add_space_below = 0.1)
     figall.savefig(cart_out + 'check_ece_vs_mpi_WRfreq_{}.pdf'.format(area))
 
 
