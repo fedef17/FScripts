@@ -127,7 +127,7 @@ ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 gregb100 = '/home/fabiano/Research/lavori/TunECS/gregory_b100.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregb100)
 
-col = 'violet'
+col = 'orange'
 
 toa5 = []
 tas5 = []
