@@ -124,6 +124,23 @@ ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
 ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
+gregb100 = '/home/fabiano/Research/lavori/TunECS/gregory_b100.txt'
+anni, toa_net, srf_net, tas = tl.read_gregory(gregb100)
+
+col = 'violet'
+
+toa5 = []
+tas5 = []
+for i in range(0, len(anni), 5):
+    if len(anni) - i < 2: continue
+    toa5.append(np.mean(toa_net[i:i+5]))
+    tas5.append(np.mean(tas[i:i+5]))
+
+ax.scatter(tas5[1:-1], toa5[1:-1], color = col, marker = mar, label = 'b100 (bottino)')
+ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
+ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
+ax.plot(tas5, toa5, color = col, linewidth = 0.5)
+
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_c4.pdf')
