@@ -124,6 +124,10 @@ ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
 ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
+ax.grid()
+ax.legend()
+fig.savefig(cart_out + 'gregory_5y_c4.pdf')
+
 gregb100 = '/home/fabiano/Research/lavori/TunECS/gregory_b100.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregb100)
 
@@ -141,6 +145,5 @@ ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
 ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
-ax.grid()
 ax.legend()
-fig.savefig(cart_out + 'gregory_5y_c4.pdf')
+fig.savefig(cart_out + 'gregory_5y_c4_wb100.pdf')
