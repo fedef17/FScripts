@@ -575,7 +575,7 @@ for var in allvars:
             ax.legend()
             ax.grid()
             ax.axhline(0., color = 'black')
-            if nu == 0 or nu == 3:
+            if nu == 0 or nu == 4:
                 ax.set_ylabel('change of '+ var)
             ax.set_xlabel(param)
             ax.ticklabel_format(axis='x',style='sci')
