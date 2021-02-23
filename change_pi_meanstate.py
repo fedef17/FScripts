@@ -112,11 +112,11 @@ for varnam, clab in zip(allvars, cblabels):
     for co in couples:
         field = cose[(co[0], varnam, 'mean_field')]-cose[(co[1], varnam, 'mean_field')]
         filename = cart_fig + 'mean_state_{}_vs_{}_{}.pdf'.format(co[0], co[1], varnam)
-        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (5, 95))
+        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98))
 
     field = (cose[('c4c9', varnam, 'mean_field')]-cose[('pic9', varnam, 'mean_field')])-(cose[('c4c5', varnam, 'mean_field')]-cose[('pic5', varnam, 'mean_field')])
     filename = cart_fig + 'mean_state_change_9vs5_{}.pdf'.format(varnam)
-    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (5, 95))
+    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98))
 
 
 #### Figure zonal
@@ -134,6 +134,7 @@ for varnam in allvars:
     ax.set_xlabel('Latitude')
     ax.set_ylabel(varnam)
     ax.set_title('pre-industrial mean state')
+    ax.legend()
 
     ax = plt.subplot(1, 2, 2)
     for exp in ['pic5', 'pic9']:
@@ -146,6 +147,7 @@ for varnam in allvars:
     ax.set_xlabel('Latitude')
     ax.set_ylabel(varnam)
     ax.set_title('change 4xCO2-PI')
+    ax.legend()
 
     filename = cart_fig + 'zon_mean_9vs5_{}.pdf'.format(varnam)
     fig.savefig(filename)
