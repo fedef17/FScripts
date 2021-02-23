@@ -63,6 +63,8 @@ for exp, col, mar in zip(exps, colors, markers):
     ax.scatter(tas5, toa5, color = col, marker = mar, label = exp)
     ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
+ax.set_xlabel('Global mean TAS (K)')
+ax.set_ylabel('Global mean net TOA flux (W/m2)')
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y.pdf')
@@ -85,6 +87,8 @@ for exp, col, mar in zip(exps[:5], colors[:5], markers[:5]):
     ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
     ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
+ax.set_xlabel('Global mean TAS (K)')
+ax.set_ylabel('Global mean net TOA flux (W/m2)')
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_pi.pdf')
@@ -124,6 +128,8 @@ ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
 ax.plot(tas5, toa5, color = col, linewidth = 0.5)
 
+ax.set_xlabel('Global mean TAS (K)')
+ax.set_ylabel('Global mean net TOA flux (W/m2)')
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_c4.pdf')
@@ -144,6 +150,9 @@ ax.scatter(tas5[1:-1], toa5[1:-1], color = col, marker = mar, label = 'b100 (bot
 ax.scatter(tas5[0], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1], toa5[-1], color = col, marker = '<')
 ax.plot(tas5, toa5, color = col, linewidth = 0.5)
+
+ax.set_xlabel('Global mean TAS (K)')
+ax.set_ylabel('Global mean net TOA flux (W/m2)')
 
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_c4_wb100.pdf')
