@@ -528,15 +528,59 @@ for var in allvars:
             ax.legend()
             ax.grid()
             ax.axhline(0., color = 'black')
-            ax.set_ylabel('change of '+ var)
+            ax.set_ylabel(var)
             ax.set_xlabel(param)
 
         axes.append(ax)
-        fig.suptitle('change of {} wrt {}'.format(var, param))
+        fig.suptitle('{} - {}'.format(var, param))
         figs.append(fig)
 
     ctl.adjust_ax_scale(axes, sel_axis = 'y')
     ctl.plot_pdfpages(cart_out + '{}_changemat_global.pdf'.format(var), figs)
+
+
+for var in allvars:
+    axes = []
+    fig = plt.figure(figsize=(24,12))
+    for nu, let, param in zip(nums, letts, testparams):
+        ax = plt.subplot(4, 2, nu + 1)
+        for forc, shift in zip(allforc, [-0.05, 0.05]):
+            ctrl = resdic[(forc, 0, 0, var, 'glob')]
+            ctrl_err = resdic_err[(forc, 0, 0, var, 'glob')]
+
+            vals = []
+            err_vals = []
+            xval = []
+            for iic, change in enumerate(['m', 'n', 'p', 'q', 'l', 'r']):
+                if (forc, change, let, var, 'glob') not in resdic:
+                    continue
+                vals.append(resdic[(forc, change, let, var, 'glob')]-ctrl)
+                err_vals.append(resdic_err[(forc, change, let, var, 'glob')])
+                xval.append(valchange[param][iic])
+
+            xval.append(uff_params[param])
+            vals.append(ctrl-ctrl)
+            err_vals.append(ctrl_err)
+            xval, vals, err_vals = tl.order_increasing(xval, vals, err_vals)
+
+            ax.fill_between(xval, vals-err_vals, vals+err_vals, color = forccol[forc], alpha = 0.3)
+            ax.plot(xval, vals, color = forccol[forc], label = forc)
+            ax.scatter(xval, vals, color = forccol[forc], marker = forcsym[forc], s = 100)
+
+            ax.legend()
+            ax.grid()
+            ax.axhline(0., color = 'black')
+            if nu == 0 or nu == 3:
+                ax.set_ylabel('change of '+ var)
+            ax.set_xlabel(param)
+
+        axes.append(ax)
+    fig.suptitle('change of {} wrt {}'.format(var, param))
+    figs.append(fig)
+
+    ctl.adjust_ax_scale(axes, sel_axis = 'y')
+    fig.savefig(cart_out + '{}_changemat_global_singlefig.pdf'.format(var))
+
 
 for var in allvars:
     figs = []
