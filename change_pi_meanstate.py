@@ -78,7 +78,7 @@ for exp, scen in zip(exps, scens):
             listafilye = glob.glob(finamok)
             print(finamok, len(listafilye))
             if len(listafilye) == 1:
-                listfil.append(listafilye[0])
+                listafil.append(listafilye[0])
             else:
                 #if not (exp == 'pic0' & year > 1870
                 raise ValueError('MISSING FILE or too many!')
