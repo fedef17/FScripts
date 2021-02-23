@@ -61,7 +61,7 @@ allvars = ['tas', 'pr', 'rlut', 'rsut']
 
 #cart_in = '/scratch/ms/it/ccff/ece3/'
 cart_in = '/data-hobbes/fabiano/TunECS/coupled/'
-finam = cart_in + '{expname}/cmorized/cmor_{year}/CMIP6/CMIP/EC-Earth-Consortium/EC-Earth3/{scenario}/r1i1p{expname[-1]}f1/Amon/{varnam}/gr/v*/{varnam}_Amon_EC-Earth3_{scenario}_r1i1p{expname[-1]}f1_gr_{year}01-{year}12.nc'
+finam = cart_in + '{expname}/cmorized/cmor_{year}/CMIP6/CMIP/EC-Earth-Consortium/EC-Earth3/{scenario}/r1i1p{expname[3]}f1/Amon/{varnam}/gr/v*/{varnam}_Amon_EC-Earth3_{scenario}_r1i1p{expname[3]}f1_gr_{year}01-{year}12.nc'
 
 cose = dict()
 
