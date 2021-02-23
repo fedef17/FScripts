@@ -201,10 +201,10 @@ allvars = ['ttr', 'tsr', 'str', 'ssr', 'sshf', 'slhf', 'tcc', 'cp', 'lsp']
 #         resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, 'str', band)]+resdic[(forc, 0, 0, 'ssr', band)] + resdic[(forc, 0, 0, 'slhf', band)]+resdic[(forc, 0, 0, 'sshf', band)]
 #         resdic_err[(forc, 0, 0, var, band)] = np.mean([resdic_err[(forc, 0, 0, 'str', band)], resdic_err[(forc, 0, 0, 'ssr', band)], resdic_err[(forc, 0, 0, 'slhf', band)], resdic_err[(forc, 0, 0, 'sshf', band)]])
 #
-# allvars.append('toa_net')
-# allvars.append('srf_net')
-#
-# allforc = ['pi', 'c4']
+allvars.append('toa_net')
+allvars.append('srf_net')
+
+allforc = ['pi', 'c4']
 #
 # derdic = dict()
 # derdic_err = dict()
@@ -577,8 +577,7 @@ for var in allvars:
             ax.set_xlabel(param)
 
         axes.append(ax)
-    fig.suptitle('change of {} wrt {}'.format(var, param))
-    figs.append(fig)
+    fig.suptitle('change of {}'.format(var))
 
     ctl.adjust_ax_scale(axes, sel_axis = 'y')
     fig.savefig(cart_out + '{}_changemat_global_singlefig.pdf'.format(var))
