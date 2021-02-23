@@ -578,6 +578,7 @@ for var in allvars:
             if nu == 0 or nu == 3:
                 ax.set_ylabel('change of '+ var)
             ax.set_xlabel(param)
+            ax.ticklabel_format(axis='x',style='sci')
 
         axes.append(ax)
     fig.suptitle('change of {}'.format(var))
