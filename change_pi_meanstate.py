@@ -63,63 +63,65 @@ allvars = ['tas', 'pr', 'rlut', 'rsut']
 cart_in = '/data-hobbes/fabiano/TunECS/coupled/'
 finam = cart_in + '{expname}/cmorized/cmor_{year}/CMIP6/CMIP/EC-Earth-Consortium/EC-Earth3/{scenario}/r1i1p{expname[3]}f1/Amon/{varnam}/gr/v*/{varnam}_Amon_EC-Earth3_{scenario}_r1i1p{expname[3]}f1_gr_{year}01-{year}12.nc'
 
-cose = dict()
-
-for exp, scen in zip(exps, scens):
-    if scen == 'piControl':
-        year_range = (1881, 1900)
-    else:
-        year_range = (1901, 1920)
-    print(exp, scen, year_range)
-    for varnam in allvars:
-        listafil = []
-        for year in np.arange(year_range[0], year_range[1]+1):
-            finamok = finam.format(varnam = varnam, expname = exp, year = year, scenario = scen)
-            listafilye = glob.glob(finamok)
-            print(finamok, len(listafilye))
-            if len(listafilye) == 1:
-                listafil.append(listafilye[0])
-            else:
-                #if not (exp == 'pic0' & year > 1870
-                raise ValueError('MISSING FILE or too many!')
-        var, coords, aux_info = ctl.read_ensemble_iris(listafil, select_var = varnam)
-
-        mean_field = np.mean(var, axis = 0)
-        zon_mean, zon_std = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
-        glob_mean, glob_std = ctl.global_seas_climatology(var, coords['lat'], coords['dates'], 'year')
-
-        cose[(exp, varnam, 'mean_field')] = mean_field
-        cose[(exp, varnam, 'zon_mean')] = zon_mean
-        cose[(exp, varnam, 'zon_std')] = zon_std
-        cose[(exp, varnam, 'glob_mean')] = glob_mean
-        cose[(exp, varnam, 'glob_std')] = glob_std
-
-
-lat = coords['lat']
-lon = coords['lon']
-
-pickle.dump([cose, lat, lon], open(cart_out + 'mean_state_coupled.p', 'wb'))
+# cose = dict()
+#
+# for exp, scen in zip(exps, scens):
+#     if scen == 'piControl':
+#         year_range = (1881, 1900)
+#     else:
+#         year_range = (1901, 1920)
+#     print(exp, scen, year_range)
+#     for varnam in allvars:
+#         listafil = []
+#         for year in np.arange(year_range[0], year_range[1]+1):
+#             finamok = finam.format(varnam = varnam, expname = exp, year = year, scenario = scen)
+#             listafilye = glob.glob(finamok)
+#             print(finamok, len(listafilye))
+#             if len(listafilye) == 1:
+#                 listafil.append(listafilye[0])
+#             else:
+#                 #if not (exp == 'pic0' & year > 1870
+#                 raise ValueError('MISSING FILE or too many!')
+#         var, coords, aux_info = ctl.read_ensemble_iris(listafil, select_var = varnam)
+#
+#         mean_field = np.mean(var, axis = 0)
+#         zon_mean, zon_std = ctl.zonal_seas_climatology(var, coords['dates'], 'year')
+#         glob_mean, glob_std = ctl.global_seas_climatology(var, coords['lat'], coords['dates'], 'year')
+#
+#         cose[(exp, varnam, 'mean_field')] = mean_field
+#         cose[(exp, varnam, 'zon_mean')] = zon_mean
+#         cose[(exp, varnam, 'zon_std')] = zon_std
+#         cose[(exp, varnam, 'glob_mean')] = glob_mean
+#         cose[(exp, varnam, 'glob_std')] = glob_std
+#
+#
+# lat = coords['lat']
+# lon = coords['lon']
+#
+# pickle.dump([cose, lat, lon], open(cart_out + 'mean_state_coupled.p', 'wb'))
+cose, lat, lon = pickle.load(open(cart_out + 'mean_state_coupled.p', 'rb'))
 
 cart_fig = cart_out + 'mean_state/'
 ctl.mkdir(cart_fig)
 
+cblabels = ['Temp (K)', 'pr', 'rlut (W/m2)', 'rsut (W/m2)']
+
 #### Figure mean field
 couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9')]
-for varnam in allvars:
+for varnam, clab in zip(allvars, cb_label):
     for co in couples:
         field = cose[(co[0], varnam, 'mean_field')]-cose[(co[1], varnam, 'mean_field')]
         filename = cart_fig + 'mean_state_{}_vs_{}_{}.pdf'.format(co[0], co[1], varnam)
-        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None)
+        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (5, 95))
 
     field = (cose[('c4c9', varnam, 'mean_field')]-cose[('pic9', varnam, 'mean_field')])-(cose[('c4c5', varnam, 'mean_field')]-cose[('pic5', varnam, 'mean_field')])
     filename = cart_fig + 'mean_state_change_9vs5_{}.pdf'.format(varnam)
-    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None)
+    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (5, 95))
 
 
 #### Figure zonal
 couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9')]
 for varnam in allvars:
-    filename = cart_fig + 'zonmean_pi_{}.pdf'.format(varnam)
     fig = plt.figure(figsize=(24,12))
     ax = plt.subplot(1, 2, 1)
     for exp in ['pic5', 'pic9']:
@@ -146,3 +148,4 @@ for varnam in allvars:
     ax.set_title('change 4xCO2-PI')
 
     filename = cart_fig + 'zon_mean_9vs5_{}.pdf'.format(varnam)
+    fig.savefig(filename)
