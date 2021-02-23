@@ -120,7 +120,7 @@ for varnam, clab in zip(allvars, cblabels):
 
 
 #### Figure zonal
-couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9')]
+couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9'), ('c4c9', 'c4c5')]
 for varnam in allvars:
     fig = plt.figure(figsize=(24,12))
     ax = plt.subplot(1, 2, 1)
