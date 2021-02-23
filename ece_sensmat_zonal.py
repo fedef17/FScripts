@@ -201,6 +201,7 @@ allvars = ['ttr', 'tsr', 'str', 'ssr', 'sshf', 'slhf', 'tcc', 'cp', 'lsp']
 #         resdic[(forc, 0, 0, var, band)] = resdic[(forc, 0, 0, 'str', band)]+resdic[(forc, 0, 0, 'ssr', band)] + resdic[(forc, 0, 0, 'slhf', band)]+resdic[(forc, 0, 0, 'sshf', band)]
 #         resdic_err[(forc, 0, 0, var, band)] = np.mean([resdic_err[(forc, 0, 0, 'str', band)], resdic_err[(forc, 0, 0, 'ssr', band)], resdic_err[(forc, 0, 0, 'slhf', band)], resdic_err[(forc, 0, 0, 'sshf', band)]])
 #
+
 allvars.append('toa_net')
 allvars.append('srf_net')
 
@@ -374,6 +375,7 @@ allforc = ['pi', 'c4']
 with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
     resdic, resdic_err, derdic, derdic_err, linder, linder_err, chandic, chandic_err = pickle.load(filox)
 
+print(allvars)
 ## Derivata con parametro normalizzato
 for var in allvars:
     figs = []
@@ -542,6 +544,7 @@ for var in allvars:
 
 
 for var in allvars:
+    print(var)
     axes = []
     fig = plt.figure(figsize=(24,12))
     for nu, let, param in zip(nums, letts, testparams):
