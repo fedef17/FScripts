@@ -108,7 +108,7 @@ cblabels = ['Temp (K)', 'pr', 'rlut (W/m2)', 'rsut (W/m2)']
 
 #### Figure mean field
 couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9')]
-for varnam, clab in zip(allvars, cb_label):
+for varnam, clab in zip(allvars, cblabels):
     for co in couples:
         field = cose[(co[0], varnam, 'mean_field')]-cose[(co[1], varnam, 'mean_field')]
         filename = cart_fig + 'mean_state_{}_vs_{}_{}.pdf'.format(co[0], co[1], varnam)
