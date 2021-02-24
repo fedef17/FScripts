@@ -109,17 +109,22 @@ cblabels = ['Temp (K)', 'pr', 'rlut (W/m2)', 'rsut (W/m2)']
 #### Figure mean field
 couples = [('pic9', 'pic5'), ('c4c5', 'pic5'), ('c4c9', 'pic9'), ('c4c9', 'c4c5')]
 for varnam, clab in zip(allvars, cblabels):
+    if varnam == 'pr':
+        cbar_range = (-1e-5, 1e-5)
+    else:
+        cbar_range = None
+
     for co in couples:
         field = cose[(co[0], varnam, 'mean_field')]-cose[(co[1], varnam, 'mean_field')]
         filename = cart_fig + 'mean_state_{}_vs_{}_{}.pdf'.format(co[0], co[1], varnam)
-        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98))
+        ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98), cbar_range = cbar_range)
 
         # filename = cart_fig + 'trimean_state_{}_vs_{}_{}.pdf'.format(co[0], co[1], varnam)
         # ctl.plot_triple_sidebyside(cose[(co[0], varnam, 'mean_field')], cose[(co[1], varnam, 'mean_field')], lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = False, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98))
 
     field = (cose[('c4c9', varnam, 'mean_field')]-cose[('pic9', varnam, 'mean_field')])-(cose[('c4c5', varnam, 'mean_field')]-cose[('pic5', varnam, 'mean_field')])
     filename = cart_fig + 'mean_state_change_9vs5_{}.pdf'.format(varnam)
-    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98))
+    ctl.plot_map_contour(field, lat, lon, filename = filename, visualization = 'standard', cmap = 'RdBu_r', title = None, plot_anomalies = True, draw_grid = True, plot_type = 'filled_contour', add_hatching = None, cb_label = clab, color_percentiles = (2, 98), cbar_range = cbar_range)
 
 
 #### Figure zonal
