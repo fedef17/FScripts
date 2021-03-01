@@ -162,8 +162,8 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     ax.scatter(tas5[-1]-reftas[exp], toa5[-1], color = col, marker = '<')
     ax.plot(tas5-reftas[exp], toa5, color = col, linewidth = 0.5)
 
-    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5], toa_net[:5])
-    xino = np.array([0]+list(tas[:5]))
+    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5]-reftas[exp], toa_net[:5])
+    xino = np.array([0]+list(tas[:5]-reftas[exp]))
     ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
     print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, c/2., err_c/2.))
 
@@ -187,8 +187,8 @@ ax.scatter(tas5[0]-reftas['c4co'], toa5[0], color = col, marker = '>')
 ax.scatter(tas5[-1]-reftas['c4co'], toa5[-1], color = col, marker = '<')
 ax.plot(tas5-reftas['c4co'], toa5, color = col, linewidth = 0.5)
 
-m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5], toa_net[:5])
-xino = np.array([0]+list(tas[:5]))
+m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5]-reftas['c4co'], toa_net[:5])
+xino = np.array([0]+list(tas[:5]-reftas['c4co']))
 ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
 print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format('c4co', c/2., err_c/2.))
 
