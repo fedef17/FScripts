@@ -37,7 +37,7 @@ with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
 spldic = None
 spldic_der = None
 
-precalc_splines = True
+precalc_splines = False
 if precalc_splines:
     print('precalculating splines....')
     spldic = dict()
@@ -99,6 +99,46 @@ lacen = np.array([np.mean(laol) for laol in bands])
 #                     else:
 #                         bandco = '{:2d}/{:2d}'.format(int(band[0]), int(band[1]))
 #                         flk.write(strfo.format(bandco, *chans))
+
+
+
+def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirst = 5, nlast = 30):
+    """
+    Plots on a gregory plot and calculates ERF (using first nfirst points) and ECS (using last nlast points, after performing the runnning mean).
+    """
+
+    # toa5 = []
+    # tas5 = []
+    # for i in range(0, len(anni), 5):
+    #     if len(anni) - i < 2: continue
+    #     toa5.append(np.mean(toa_net[i:i+5]))
+    #     tas5.append(np.mean(tas[i:i+5]))
+    #
+    # toa5 = np.array(toa5)
+    # tas5 = np.array(tas5)
+
+    toa5 = ctl.running_mean(toa, 5, remove_nans = True)
+    tas5 = ctl.running_mean(tas, 5, remove_nans = True)
+
+    #ax.scatter(tas5, toa5, color = col, marker = mar, label = exp)
+    ax.scatter(tas5[1:-1], toa5[1:-1], color = color, marker = marker, label = lab)
+    ax.scatter(tas5[0], toa5[0], color = color, marker = '>')
+    ax.scatter(tas5[-1], toa5[-1], color = color, marker = '<')
+    ax.plot(tas5, toa5, color = color, linewidth = 0.5)
+
+    ax.scatter(tas[:nfirst], toa[:nfirst], s = 2, color = color)
+    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:nfirst], toa[:nfirst])
+    xino = np.array([0]+list(tas[:nfirst]))
+    ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
+    print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(lab, c/2., err_c/2.))
+
+    ax.scatter(tas5[-nlast:], toa5[-nlast:], s = 2, color = color)
+    m, c, err_m, err_c = ctl.linear_regre_witherr(tas5[-nlast:], toa5[-nlast:])
+    xino = np.array(list(tas[-nlast:])+[-c/m])
+    ax.plot(xino, c+m*xino, color = color, linestyle = '--', linewidth = 0.5)
+    print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(lab, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
+
+    return
 
 
 ##################################################################################

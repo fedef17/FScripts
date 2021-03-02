@@ -145,74 +145,59 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
     anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
 
-    toa5 = []
-    tas5 = []
-    for i in range(0, len(anni), 5):
-        if len(anni) - i < 2: continue
-        toa5.append(np.mean(toa_net[i:i+5]))
-        tas5.append(np.mean(tas[i:i+5]))
-
-    toa5 = np.array(toa5)
-    tas5 = np.array(tas5)
-
-
-    #ax.scatter(tas5, toa5, color = col, marker = mar, label = exp)
-    ax.scatter(tas5[1:-1]-reftas[exp], toa5[1:-1], color = col, marker = mar, label = exp)
-    ax.scatter(tas5[0]-reftas[exp], toa5[0], color = col, marker = '>')
-    ax.scatter(tas5[-1]-reftas[exp], toa5[-1], color = col, marker = '<')
-    ax.plot(tas5-reftas[exp], toa5, color = col, linewidth = 0.5)
-
-    ax.scatter(tas[:5]-reftas[exp], toa_net[:5], s = 2, color = col)
-    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5]-reftas[exp], toa_net[:5])
-    xino = np.array([0]+list(tas[:5]-reftas[exp]))
-    ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-    print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, c/2., err_c/2.))
-
-    ax.scatter(tas[-30:]-reftas[exp], toa_net[-30:], s = 2, color = col)
-    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-30:]-reftas[exp], toa_net[-30:])
-    xino = np.array(list(tas[-30:]-reftas[exp])+[-c/m])
-    ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-    print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
-
+    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
 col = 'black'
 
-toa5 = []
-tas5 = []
-for i in range(0, len(anni), 5):
-    if len(anni) - i < 2: continue
-    toa5.append(np.mean(toa_net[i:i+5]))
-    tas5.append(np.mean(tas[i:i+5]))
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
 
-toa5 = np.array(toa5)
-tas5 = np.array(tas5)
-
-#ax.scatter(tas5, toa5, color = col, marker = mar, label = exp)
-ax.scatter(tas5[1:-1]-reftas['c4co'], toa5[1:-1], color = col, marker = mar, label = 'c4co (cmip6 r4)')
-ax.scatter(tas5[0]-reftas['c4co'], toa5[0], color = col, marker = '>')
-ax.scatter(tas5[-1]-reftas['c4co'], toa5[-1], color = col, marker = '<')
-ax.plot(tas5-reftas['c4co'], toa5, color = col, linewidth = 0.5)
-
-m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5]-reftas['c4co'], toa_net[:5])
-xino = np.array([0]+list(tas[:5]-reftas['c4co']))
-ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format('c4co', c/2., err_c/2.))
-
-exp = 'c4co'
-ax.scatter(tas[:5]-reftas[exp], toa_net[:5], s = 2, color = col)
-ax.scatter(tas[-30:]-reftas[exp], toa_net[-30:], s = 2, color = col)
-m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-30:]-reftas[exp], toa_net[-30:])
-xino = np.array(list(tas[-30:]-reftas[exp])+[-c/m])
-ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
-
-ax.set_xlabel('Global mean TAS (K)')
+ax.set_xlabel('Global mean TAS change (K)')
 ax.set_ylabel('Global mean net TOA flux (W/m2)')
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_c4_withF.pdf')
+
+
+fig, ax = plt.subplots(figsize=(16,12))
+for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
+    gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
+    anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
+
+    tl.gregplot_on_ax(ax, tas-reftas[exp], srf_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
+
+gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
+anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
+col = 'black'
+
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], srf_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
+
+ax.set_xlabel('Global mean TAS change (K)')
+ax.set_ylabel('Global mean net SRF flux (W/m2)')
+ax.grid()
+ax.legend()
+fig.savefig(cart_out + 'srfgregory_5y_c4_withF.pdf')
+
+
+fig, ax = plt.subplots(figsize=(16,12))
+for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
+    gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
+    anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
+
+    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net-srf_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
+
+gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
+anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
+col = 'black'
+
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net-srf_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
+
+ax.set_xlabel('Global mean TAS change (K)')
+ax.set_ylabel('Global mean net TOA - SRF flux (W/m2) (atmos. sink)')
+ax.grid()
+ax.legend()
+fig.savefig(cart_out + 'sinkgreg_5y_c4_withF.pdf')
 
 
 
