@@ -109,9 +109,9 @@ def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirs
 
     toa5 = []
     tas5 = []
-    for i in range(0, len(anni), 5):
+    for i in range(0, len(tas), 5):
         if len(anni) - i < 2: continue
-        toa5.append(np.mean(toa_net[i:i+5]))
+        toa5.append(np.mean(toa[i:i+5]))
         tas5.append(np.mean(tas[i:i+5]))
 
     toa5 = np.array(toa5)
