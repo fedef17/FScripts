@@ -162,10 +162,18 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     ax.scatter(tas5[-1]-reftas[exp], toa5[-1], color = col, marker = '<')
     ax.plot(tas5-reftas[exp], toa5, color = col, linewidth = 0.5)
 
+    ax.scatter(tas[:5]-reftas[exp], toa_net[:5], s = 2)
     m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:5]-reftas[exp], toa_net[:5])
     xino = np.array([0]+list(tas[:5]-reftas[exp]))
     ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
     print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, c/2., err_c/2.))
+
+    ax.scatter(tas[-30:]-reftas[exp], toa_net[-30:], s = 2)
+    m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-30:]-reftas[exp], toa_net[-30:])
+    xino = np.array(list(tas[-30:]-reftas[exp])+[-c/m])
+    ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
+    print('ECS: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
+
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
@@ -197,7 +205,6 @@ ax.set_ylabel('Global mean net TOA flux (W/m2)')
 ax.grid()
 ax.legend()
 fig.savefig(cart_out + 'gregory_5y_c4_withF.pdf')
-
 
 
 
