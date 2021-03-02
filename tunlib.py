@@ -121,7 +121,7 @@ def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirs
     tas5 = ctl.running_mean(tas, 5, remove_nans = True)
 
     #ax.scatter(tas5, toa5, color = col, marker = mar, label = exp)
-    ax.scatter(tas5[1:-1], toa5[1:-1], color = color, marker = marker, label = lab)
+    ax.scatter(tas5[1:-1], toa5[1:-1], color = color, marker = marker, label = label)
     ax.scatter(tas5[0], toa5[0], color = color, marker = '>')
     ax.scatter(tas5[-1], toa5[-1], color = color, marker = '<')
     ax.plot(tas5, toa5, color = color, linewidth = 0.5)
