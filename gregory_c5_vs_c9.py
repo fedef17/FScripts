@@ -172,7 +172,7 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-30:]-reftas[exp], toa_net[-30:])
     xino = np.array(list(tas[-30:]-reftas[exp])+[-c/m])
     ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-    print('ECS: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
+    print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
 
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
@@ -205,7 +205,7 @@ ax.scatter(tas[-30:]-reftas[exp], toa_net[-30:], s = 2)
 m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-30:]-reftas[exp], toa_net[-30:])
 xino = np.array(list(tas[-30:]-reftas[exp])+[-c/m])
 ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-print('ECS: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
+print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(exp, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
 
 ax.set_xlabel('Global mean TAS (K)')
 ax.set_ylabel('Global mean net TOA flux (W/m2)')
