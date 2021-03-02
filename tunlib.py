@@ -129,14 +129,14 @@ def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirs
     ax.scatter(tas[:nfirst], toa[:nfirst], s = 2, color = color)
     m, c, err_m, err_c = ctl.linear_regre_witherr(tas[:nfirst], toa[:nfirst])
     xino = np.array([0]+list(tas[:nfirst]))
-    ax.plot(xino, c+m*xino, color = col, linestyle = '--', linewidth = 0.5)
-    print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(lab, c/2., err_c/2.))
+    ax.plot(xino, c+m*xino, color = color, linestyle = '--', linewidth = 0.5)
+    print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(label, c/2., err_c/2.))
 
     ax.scatter(tas5[-nlast:], toa5[-nlast:], s = 2, color = color)
     m, c, err_m, err_c = ctl.linear_regre_witherr(tas5[-nlast:], toa5[-nlast:])
     xino = np.array(list(tas[-nlast:])+[-c/m])
     ax.plot(xino, c+m*xino, color = color, linestyle = '--', linewidth = 0.5)
-    print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(lab, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
+    print('ECS: {} -> {:6.3f} +/- {:6.3f} K'.format(label, -0.5*c/m, 0.5*(np.abs(err_c/c)+np.abs(err_m/m))*(-c/m)))
 
     return
 
