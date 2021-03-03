@@ -185,15 +185,9 @@ for exp, col, mar in zip(exps[:5], colors[:5], markers[:5]):
     gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
     anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
 
-    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net-srf_net, color = col, label = exp, marker = mar, calc_ERF = False, calc_ECS = False)
+    tl.gregplot_on_ax(ax, tas, toa_net-srf_net, color = col, label = exp, marker = mar, calc_ERF = False, calc_ECS = False)
 
-gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
-anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
-col = 'black'
-
-tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net-srf_net, color = col, label = 'c4co', marker = mar, calc_ERF = False, calc_ECS = False)
-
-ax.set_xlabel('Global mean TAS change (K)')
+ax.set_xlabel('Global mean TAS (K)')
 ax.set_ylabel('Global mean net TOA - SRF flux (W/m2) (atmos. sink)')
 ax.grid()
 ax.legend()
