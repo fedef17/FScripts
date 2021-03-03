@@ -181,23 +181,23 @@ fig.savefig(cart_out + 'srfgregory_5y_c4_withF.pdf')
 
 
 fig, ax = plt.subplots(figsize=(16,12))
-for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
+for exp, col, mar in zip(exps[:5], colors[:5], markers[:5]):
     gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
     anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
 
-    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net-srf_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
+    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net-srf_net, color = col, label = exp, marker = mar, calc_ERF = False, calc_ECS = False)
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
 col = 'black'
 
-tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net-srf_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net-srf_net, color = col, label = 'c4co', marker = mar, calc_ERF = False, calc_ECS = False)
 
 ax.set_xlabel('Global mean TAS change (K)')
 ax.set_ylabel('Global mean net TOA - SRF flux (W/m2) (atmos. sink)')
 ax.grid()
 ax.legend()
-fig.savefig(cart_out + 'sinkgreg_5y_c4_withF.pdf')
+fig.savefig(cart_out + 'sinkgreg_5y_pi_withF.pdf')
 
 
 
