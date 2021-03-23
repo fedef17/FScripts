@@ -18,7 +18,7 @@ from matplotlib.animation import ImageMagickFileWriter
 #cart = '/home/fabiano/Research/lavori/SPHINX_for_lisboa/'
 cart = '/home/fedefab/Scrivania/Research/Post-doc/SPHINX/'
 
-cart_data = '/data-hobbes/fabiano/SPHINX/tas_mon/'
+cart_data = '/home/fabiano/DATA/SPHINX/tas_mon/'
 
 ensmem = ['lcb0','lcb1','lcb2','lcs0','lcs1','lcs2']
 
@@ -58,7 +58,7 @@ ref_period = ctl.range_years(1850,1900)
 #     zonal_anom = ctl.zonal_mean(yearly_anom)
 #     global_anom = ctl.global_mean(yearly_anom, lat)
 #
-#     month_anom = ctl.anomalies_monthly(var, dates, climate_mean = climat_mon, dates_climate_mean = dates_mon)
+#     month_anom = ctl.anomalies_monthly(var, dates, climat_mean = climat_mon, dates_climate_mean = dates_mon)
 #
 #     # On the Mediterranean area
 #     var_med, lat_med, lon_med = ctl.sel_area(lat,lon,var,'Med')
@@ -70,7 +70,7 @@ ref_period = ctl.range_years(1850,1900)
 #     yearly_anom_med = yearly_anom_med - climat_year_med
 #     med_anom = ctl.global_mean(yearly_anom_med, lat_med)
 #
-#     month_anom_med = ctl.anomalies_monthly(var_med, dates, climate_mean = climat_monmed, dates_climate_mean = dates_monmed)
+#     month_anom_med = ctl.anomalies_monthly(var_med, dates, climat_mean = climat_monmed, dates_climate_mean = dates_monmed)
 #
 #     # On Mediterranean, summer
 #     var_med_sum, dates_sum = ctl.sel_season(var_med, dates, 'JJA')
@@ -98,7 +98,7 @@ ref_period = ctl.range_years(1850,1900)
 #
 
 # LEGGO DAL PICKLE
-# pickle.dump([lat, lon, years, zonal_anom_ens, global_anom_ens, yearly_anom_ens], open(cart+'temp_proj.p','wb'))
+# pickle.dump([lat, lon, years, zonal_anom_ens, global_anom_ens, yearly_anom_ens], open(cart+'temp_proj.p','w'))
 lat, lon, years, zonal_anom_ens, global_anom_ens, yearly_anom_ens = pickle.load(open(cart+'temp_proj.p'))
 
 
