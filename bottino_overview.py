@@ -62,6 +62,7 @@ for ru, col in zip(allru, colors):
     lat = np.array(gigi.latitude.data)
     okslat = lat > 40.
 
+    areaok = areaT[okslat]
     oksi = seaice[:, okslat]
     oksi[oksi < 15.] = 0.
     oksi[oksi > 15.] = 1.
@@ -83,6 +84,10 @@ fig.savefig(cart_out + 'bottseaice.pdf')
 #pinuc = xclim.indices.sea_ice_area(gigi, acel.data)
 
 ### Mean state temperature e varianza?
+miptab = 'Amon'
+var = 'tas'
+
+
 
 ### Mean state precipitazione e varianza
 
