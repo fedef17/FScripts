@@ -93,11 +93,13 @@ var = 'tas'
 
 resdict = dict()
 for varnam in ['tas', 'pr', 'uas']:
+    print(var)
     for ru, col in zip(allru, colors):
+        print(ru)
         filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
         gigi = xr.open_mfdataset(filist, use_cftime=True)
 
-        var = np.array(gigi[var].data)
+        var = np.array(gigi[varnam].data)
         lat = np.array(gigi.lat.data)
         lon = np.array(gigi.lon.data)
         dates = np.array(gigi.time.data)
