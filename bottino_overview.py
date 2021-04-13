@@ -98,8 +98,8 @@ for var in ['tas', 'pr', 'uas']:
         gigi = xr.open_mfdataset(filist, use_cftime=True)
 
         var = np.array(gigi[var].data)
-        lat = np.array(gigi.latitude.data)
-        lon = np.array(gigi.longitude.data)
+        lat = np.array(gigi.lat.data)
+        lon = np.array(gigi.lon.data)
         dates = np.array(gigi.time.data)
 
         yearall = np.array([da.year for da in dates])
