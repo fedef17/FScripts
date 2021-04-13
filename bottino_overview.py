@@ -92,9 +92,9 @@ miptab = 'Amon'
 var = 'tas'
 
 resdict = dict()
-for var in ['tas', 'pr', 'uas']:
+for varnam in ['tas', 'pr', 'uas']:
     for ru, col in zip(allru, colors):
-        filist = glob.glob(filna.format(ru, ru[1:], miptab, var))
+        filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
         gigi = xr.open_mfdataset(filist, use_cftime=True)
 
         var = np.array(gigi[var].data)
@@ -114,23 +114,35 @@ for var in ['tas', 'pr', 'uas']:
         varok = var[ok200]
         dateok = dates[ok200]
 
-        pino = ctl.seasonal_climatology(varok, dateok, 'year')
-        resdict[(ru, var, 'mean200')] = pino[0]
-        resdict[(ru, var, 'std200')] = pino[1]
-        resdict[(ru, var, 'glomean')] = glomean
+        resdict[(ru, varnam, 'mean200')], resdict[(ru, varnam, 'std200')] = ctl.seasonal_climatology(varok, dateok, 'year')
+        resdict[(ru, varnam, 'mean200', 'DJFM')], resdict[(ru, varnam, 'std200', 'DJFM')] = ctl.seasonal_climatology(varok, dateok, 'DJFM')
+        resdict[(ru, varnam, 'mean200', 'JJAS')], resdict[(ru, varnam, 'std200', 'JJAS')] = ctl.seasonal_climatology(varok, dateok, 'JJAS')
+
+        resdict[(ru, varnam, 'glomean')] = glomean
 
 
-for var in ['tas', 'pr', 'uas']:
-    fiout = cart_out + '{}_mean200.pdf'.format(var)
-    varall = [resdict[(ru, var, 'mean200')] for ru in allru] + [resdict[(ru, var, 'std200')] for ru in allru]
+for varnam in ['tas', 'pr', 'uas']:
+    fiout = cart_out + '{}_mean200.pdf'.format(varnam)
+    varall = [resdict[(ru, varnam, 'mean200')] for ru in allru] + [resdict[(ru, varnam, 'std200')] for ru in allru]
     ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 3))
 
-    fiout = cart_out + '{}_mean200_rsp025.pdf'.format(var)
-    varall = [resdict[(ru, var, 'mean200')]-resdict[('b025', var, 'mean200')] for ru in allru[1:]] + [resdict[(ru, var, 'std200')] for ru in allru[1:]]
+    fiout = cart_out + '{}_mean200_rsp025.pdf'.format(varnam)
+    varall = [resdict[(ru, varnam, 'mean200')]-resdict[('b025', varnam, 'mean200')] for ru in allru[1:]] + [resdict[(ru, varnam, 'std200')] for ru in allru[1:]]
     ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 2))
 
     fig = plt.figure(figsize = (16,12))
     for ru, col in zip(allru, colors):
-        plt.plot(years, resdict[(ru, var, 'glomean')], color = col, label = ru)
+        plt.plot(years, resdict[(ru, varnam, 'glomean')], color = col, label = ru)
     plt.legend()
-    fig.savefig(cart_out + '{}_glomean.pdf'.format(var))
+    fig.savefig(cart_out + '{}_glomean.pdf'.format(varnam))
+
+
+for season in ['DJFM', 'JJAS']:
+    for varnam in ['tas', 'pr', 'uas']:
+        fiout = cart_out + '{}_mean200_{}.pdf'.format(varnam, season)
+        varall = [resdict[(ru, varnam, 'mean200', season)] for ru in allru] + [resdict[(ru, varnam, 'std200', season)] for ru in allru]
+        ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 3))
+
+        fiout = cart_out + '{}_mean200_rsp025_{}.pdf'.format(varnam, season)
+        varall = [resdict[(ru, varnam, 'mean200', season)]-resdict[('b025', varnam, 'mean200', season)] for ru in allru[1:]] + [resdict[(ru, varnam, 'std200', season)] for ru in allru[1:]]
+        ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 2))
