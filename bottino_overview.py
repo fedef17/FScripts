@@ -114,7 +114,9 @@ for var in ['tas', 'pr', 'uas']:
         varok = var[ok200]
         dateok = dates[ok200]
 
-        resdict[(ru, var, 'mean200')], resdict[(ru, var, 'std200')] = ctl.seasonal_climatology(varok, dateok, 'year')
+        pino = ctl.seasonal_climatology(varok, dateok, 'year')
+        resdict[(ru, var, 'mean200')] = pino[0]
+        resdict[(ru, var, 'std200')] = pino[1]
         resdict[(ru, var, 'glomean')] = glomean
 
 
