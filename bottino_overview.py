@@ -46,7 +46,6 @@ colors = ['forestgreen', 'orange', 'violet']
 areacelfi = '/nas/BOTTINO/areas.nc'
 acel = xr.open_dataset(areacelfi)
 areaT = np.array(acel['O1t0.srf'].data)
-okslat = lat > 40.
 
 miptab = 'SImon'
 var = 'siconc'
@@ -61,6 +60,7 @@ for ru, col in zip(allru, colors):
 
     seaice = np.array(gigi.siconc.data)
     lat = np.array(gigi.latitude.data)
+    okslat = lat > 40.
 
     oksi = seaice[:, okslat]
     oksi[oksi < 15.] = 0.
