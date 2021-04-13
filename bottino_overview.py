@@ -110,7 +110,7 @@ for var in ['tas', 'pr', 'uas']:
             glomean.append(np.mean(ctl.global_mean(var[okye], lat)))
         glomean = np.array(glomean)
 
-        ok200 = np.array([da.year > da[-1].year-200 for da in dates])
+        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
         varok = var[ok200]
         dateok = dates[ok200]
 
