@@ -30,4 +30,8 @@ import iris
 import climtools_lib as ctl
 import climdiags as cd
 
+import xarray as xr
+import xesmf as xe
+import xclim
+
 from importlib import reload

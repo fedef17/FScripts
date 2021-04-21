@@ -36,12 +36,15 @@ import xclim
 
 cart_out = '/home/fabiano/Research/lavori/BOTTINO/analisi/'
 
-filna = '/nas/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2{}/r1i1p1f1/{}/{}/*/v20210315/*nc'
+#filna = '/nas/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2{}/r1i1p1f1/{}/{}/*/v20210315/*nc'
+filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/r1i1p1f1/{}/{}/*nc'
 
 # filist = glob.glob('/nas/BOTTINO/b100/cmorized/cmor_2*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2100/r1i1p1f1/SImon/siconc/gn/v20210315/*nc')
 
-allru = ['b025', 'b050', 'b100']
-colors = ['forestgreen', 'orange', 'violet']
+allru = ['pi', 'b025', 'b050', 'b100']
+allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+
+colors = ['black', 'forestgreen', 'orange', 'violet']
 
 #############################################################################
 ## SEA ICE
@@ -50,40 +53,61 @@ acel = xr.open_dataset(areacelfi)
 areaT = np.array(acel['O1t0.srf'].data)
 
 miptab = 'SImon'
-var = 'siconc'
+varnam = 'siconc'
 
-# fig = plt.figure(figsize = (24,12))
-# ax1 = plt.subplot(1, 2, 1)
-# ax2 = plt.subplot(1, 2, 2)
-#
-# for ru, col in zip(allru, colors):
-#     filist = glob.glob(filna.format(ru, ru[1:], miptab, var))
-#     gigi = xr.open_mfdataset(filist, use_cftime=True)
-#
-#     seaice = np.array(gigi.siconc.data)
-#     lat = np.array(gigi.latitude.data)
-#     okslat = lat > 40.
-#
-#     areaok = areaT[okslat]
-#     oksi = seaice[:, okslat]
-#     oksi[oksi < 15.] = 0.
-#     oksi[oksi > 15.] = 1.
-#     oksiarea = oksi*areaok[np.newaxis, :]
-#     seaicearea = np.nansum(oksiarea, axis = 1)
-#
-#     date = np.array(gigi.time.data)
-#     okmarch = np.array([da.month == 3 for da in date])
-#     oksept = np.array([da.month == 9 for da in date])
-#
-#     ax1.plot_date(date[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
-#     ax2.plot_date(date[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
-#
-# ax1.set_title('March')
-# ax2.set_title('September')
-# ax2.legend()
-# fig.savefig(cart_out + 'bottseaice.pdf')
+resdict = dict()
+
+fig = plt.figure(figsize = (24,12))
+ax1 = plt.subplot(1, 2, 1)
+ax2 = plt.subplot(1, 2, 2)
+
+for na, ru, col in zip(allnams, allru, colors):
+    filist = glob.glob(filna.format(na, miptab, varnam))
+    gigi = xr.open_mfdataset(filist, use_cftime=True)
+
+    seaice = np.array(gigi.siconc.data)
+    lat = np.array(gigi.latitude.data)
+    okslat = lat > 40.
+
+    areaok = areaT[okslat]
+    oksi = seaice[:, okslat]
+    oksi[oksi < 15.] = 0.
+    oksi[oksi > 15.] = 1.
+    oksiarea = oksi*areaok[np.newaxis, :]
+    seaicearea = np.nansum(oksiarea, axis = 1)
+
+    dates = np.array(gigi.time.data)
+    okmarch = np.array([da.month == 3 for da in dates])
+    oksept = np.array([da.month == 9 for da in dates])
+
+    resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
+    resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
+
+    if ru != 'pi':
+        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
+        varok = var[ok200]
+        dateok = dates[ok200]
+    else:
+        varok = var
+        dateok = dates
+
+    resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
+    resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
+
+    ax1.plot_date(dates[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
+    ax2.plot_date(dates[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
+
+ax1.set_title('March')
+ax2.set_title('September')
+ax1.set_ylabel(r'Sea ice extent (m$^2$)')
+ax2.set_ylabel(r'Sea ice extent (m$^2$)')
+ax2.legend()
+fig.savefig(cart_out + 'bottseaice.pdf')
 
 #pinuc = xclim.indices.sea_ice_area(gigi, acel.data)
+
+#To describe the stratospheric polar vortex (SPV), we follow Wu et al. (2019) and compute the average zonal wind velocity over 60–75 ◦ N but at 20 hPa instead of 10 hPa.
+
 
 ### Mean state temperature e varianza?
 ### Mean state precipitazione e varianza
@@ -91,9 +115,8 @@ var = 'siconc'
 miptab = 'Amon'
 var = 'tas'
 
-resdict = dict()
 for varnam in ['tas', 'pr', 'uas']:
-    print(var)
+    print(varnam)
     for ru, col in zip(allru, colors):
         print(ru)
         filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
@@ -104,13 +127,9 @@ for varnam in ['tas', 'pr', 'uas']:
         lon = np.array(gigi.lon.data)
         dates = np.array(gigi.time.data)
 
-        yearall = np.array([da.year for da in dates])
-        years = np.unique(yearall)
-        glomean = []
-        for ye in years:
-            okye = yearall == ye
-            glomean.append(np.mean(ctl.global_mean(var[okye], lat)))
-        glomean = np.array(glomean)
+        varye, datye = ctl.yearly_average(var, dates)
+        glomean = ctl.global_mean(varye, lat)
+        resdict[(ru, varnam, 'glomean')] = glomean
 
         ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
         varok = var[ok200]
@@ -120,7 +139,34 @@ for varnam in ['tas', 'pr', 'uas']:
         resdict[(ru, varnam, 'mean200', 'DJFM')], resdict[(ru, varnam, 'std200', 'DJFM')] = ctl.seasonal_climatology(varok, dateok, 'DJFM')
         resdict[(ru, varnam, 'mean200', 'JJAS')], resdict[(ru, varnam, 'std200', 'JJAS')] = ctl.seasonal_climatology(varok, dateok, 'JJAS')
 
+
+# 3D vars
+for varnam in ['ta', 'ua', 'zg']:
+    print(varnam)
+    for ru, col in zip(allru, colors):
+        print(ru)
+        filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
+        gigi = xr.open_mfdataset(filist, use_cftime=True)
+
+        var = np.array(gigi[varnam].data)
+        lat = np.array(gigi.lat.data)
+        lon = np.array(gigi.lon.data)
+        dates = np.array(gigi.time.data)
+
+        varye, datye = ctl.yearly_average(var, dates)
+        glomean = ctl.global_mean(varye, lat)
         resdict[(ru, varnam, 'glomean')] = glomean
+
+        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
+        varok = var[ok200]
+        dateok = dates[ok200]
+
+        resdict[(ru, varnam, 'mean200')], resdict[(ru, varnam, 'std200')] = ctl.seasonal_climatology(varok, dateok, 'year')
+        resdict[(ru, varnam, 'mean200', 'DJFM')], resdict[(ru, varnam, 'std200', 'DJFM')] = ctl.seasonal_climatology(varok, dateok, 'DJFM')
+        resdict[(ru, varnam, 'mean200', 'JJAS')], resdict[(ru, varnam, 'std200', 'JJAS')] = ctl.seasonal_climatology(varok, dateok, 'JJAS')
+
+
+pickle.dump(glomean, open(cart_out + 'mean_climate.p', 'wb'))
 
 
 for varnam in ['tas', 'pr', 'uas']:
