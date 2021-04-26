@@ -84,8 +84,8 @@ fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon
 fils_HR = np.concatenate([glob.glob(fir_HR.format(var, var)) for var in allvars])
 fils_LR = np.concatenate([glob.glob(fir_LR.format(var, var)) for var in allvars])
 
-flux_lr = xr.open_dataset(fils_LR, use_cftime = True)
-flux_hr = xr.open_dataset(fils_HR, use_cftime = True)
+flux_lr = xr.open_mfdataset(fils_LR, use_cftime = True)
+flux_hr = xr.open_mfdataset(fils_HR, use_cftime = True)
 
 flux_hr.assign(net_sfc = flux_hr.rss + flux_hr.rls - flux_hr.hfss - flux_hr.hfls) # net downward energy flux at surface
 flux_hr.assign(net_toa = flux_hr.rsdt - flux_hr.rlut - flux_hr.rsus) # net downward energy flux at TOA
