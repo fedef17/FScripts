@@ -102,15 +102,15 @@ flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     vmax = np.nanpercentile(flux_diff_season[var], 95)
     guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
-    plt.savefig(cart + '{}_seas_799-cntrl.pdf')
+    plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
 
     plt.figure()
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
-    plt.savefig(cart + '{}_ovmol_1ye_799-cntrl.pdf')
+    plt.savefig(cart + '{}_ovmol_1ye_799-cntrl.pdf'.format(var))
 
     plt.figure()
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
-    plt.savefig(cart + '{}_ovmol_4mo_799-cntrl.pdf')
+    plt.savefig(cart + '{}_ovmol_4mo_799-cntrl.pdf'.format(var))
 
     plt.close('all')
 
