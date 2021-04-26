@@ -100,7 +100,7 @@ flux_hr = flux_hr.drop_vars('time_bnds')
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
-    vmax = np.nanpercentile(flux_diff_season[var], 95)
+    vmax = np.nanpercentile(flux_diff_season[var], 98)
     guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
     plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
 
