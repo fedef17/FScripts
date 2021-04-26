@@ -27,6 +27,8 @@ from datetime import datetime
 import pickle
 import iris
 
+import glob
+
 import climtools_lib as ctl
 import climdiags as cd
 
