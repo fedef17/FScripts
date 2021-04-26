@@ -75,7 +75,7 @@ cart = '/home/federico/work/reforge/'
 
 #srf_net = ssr + str + sshf + slhf
 surf_fluxs = ['rsds', 'rlds', 'rsus', 'rlus', 'hfss', 'hfls']
-toa_fluxs = ['rlut', 'rsus', 'rsdt']
+toa_fluxs = ['rlut', 'rsut', 'rsdt']
 allvars = surf_fluxs + toa_fluxs
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
