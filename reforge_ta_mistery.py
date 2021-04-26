@@ -94,6 +94,9 @@ flux_lr.assign(net_toa = flux_lr.rsdt - flux_lr.rlut - flux_lr.rsus) # net downw
 
 allvars = allvars + ['net_sfc', 'net_toa']
 
+flux_lr = flux_lr.drop_vars('time_bnds')
+flux_hr = flux_hr.drop_vars('time_bnds')
+
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
