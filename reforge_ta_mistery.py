@@ -89,7 +89,7 @@ flux_hr = xr.open_mfdataset(fils_HR, use_cftime = True)
 
 flux_hr = flux_hr.assign(net_sfc = flux_hr.rsds + flux_hr.rlds - flux_hr.rsus - flux_hr.rlus - flux_hr.hfss - flux_hr.hfls) # net downward energy flux at surface
 flux_hr = flux_hr.assign(net_toa = flux_hr.rsdt - flux_hr.rlut - flux_hr.rsut) # net downward energy flux at TOA
-flux_lr = flux_lr.assign(net_sfc = flux_hr.rsds + flux_hr.rlds - flux_hr.rsus - flux_hr.rlus - flux_lr.hfss - flux_lr.hfls) # net downward energy flux at surface
+flux_lr = flux_lr.assign(net_sfc = flux_lr.rsds + flux_lr.rlds - flux_lr.rsus - flux_lr.rlus - flux_lr.hfss - flux_lr.hfls) # net downward energy flux at surface
 flux_lr = flux_lr.assign(net_toa = flux_lr.rsdt - flux_lr.rlut - flux_lr.rsut) # net downward energy flux at TOA
 
 allvars = allvars + ['net_sfc', 'net_toa']
@@ -133,7 +133,7 @@ flux_hr = xr.open_mfdataset(fils_HR, use_cftime = True)
 
 flux_hr = flux_hr.assign(in_sfc = flux_hr.rsds + flux_hr.rlds - flux_hr.rsus - flux_hr.rlus) # downward radiative flux at surface
 flux_hr = flux_hr.assign(in_toa = -flux_hr.rlut - flux_hr.rsus + flux_hr.rsds) # approx. net downward energy flux at TOA
-flux_lr = flux_lr.assign(in_sfc = flux_hr.rsds + flux_hr.rlds - flux_hr.rsus - flux_hr.rlus)
+flux_lr = flux_lr.assign(in_sfc = flux_lr.rsds + flux_lr.rlds - flux_lr.rsus - flux_lr.rlus)
 flux_lr = flux_lr.assign(in_toa = -flux_lr.rlut - flux_lr.rsus + flux_lr.rsds)
 
 allvars = allvars + ['in_sfc', 'in_toa']
