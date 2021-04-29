@@ -42,33 +42,33 @@ from importlib import reload
 
 cart = '/home/federico/work/reforge/'
 
-gigi = xr.load_dataset('/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/day/ta/ta_day_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_19990101-20291231.nc', use_cftime = True)
-gigi2 = xr.load_dataset('/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/day/ta/ta_day_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_19990101-20231231.nc', use_cftime = True)
-ta_hr = gigi2['ta']
-ta_lr = gigi['ta']
-ta_lr_mean = ta_lr.mean(['time', 'lon'])
-ta_hr_mean = ta_hr.mean(['time', 'lon'])
-clim_diff = ta_hr_mean-ta_lr_mean
-
-ta_diff = ta_hr - ta_lr
-ta_diff_zon = ta_diff.mean('lon')
-guplo = ta_diff_zon.sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 6, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = 20.)
-#guplo.set_titles(template='{value}', maxchar = 13)
-#plt.savefig(cart + 'ta_diff_799-cntrl_4mo.pdf')
-
-clim_diff_season = ta_diff_zon.groupby("time.season").mean()
-guplose = clim_diff_season.plot.contourf(x = 'lat', y = 'plev', col = 'season', col_wrap = 2, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')
-# plt.savefig(cart + 'season_diff_799-cntrl.pdf')
-
-clim_diff_month = ta_diff_zon.groupby("time.month").mean()
-guplomo = clim_diff_month.plot.contourf(x = 'lat', y = 'plev', col = 'month', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')
-# plt.savefig(cart + 'month_diff_799-cntrl.pdf')
-
-ta_diff_zon_mon = ta_diff_zon.resample(time = "M").mean()
-jandiffs = ta_diff_zon_mon[ta_diff_zon_mon.groupby("time.month").groups[1]]
-guplojan = jandiffs.plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 5, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = 20.)
-# guplojan.set_titles(template='{value}', maxchar = 13)
-# plt.savefig(cart + 'Jan_diffs_799-cntrl.pdf')
+# gigi = xr.load_dataset('/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/day/ta/ta_day_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_19990101-20291231.nc', use_cftime = True)
+# gigi2 = xr.load_dataset('/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/day/ta/ta_day_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_19990101-20231231.nc', use_cftime = True)
+# ta_hr = gigi2['ta']
+# ta_lr = gigi['ta']
+# ta_lr_mean = ta_lr.mean(['time', 'lon'])
+# ta_hr_mean = ta_hr.mean(['time', 'lon'])
+# clim_diff = ta_hr_mean-ta_lr_mean
+#
+# ta_diff = ta_hr - ta_lr
+# ta_diff_zon = ta_diff.mean('lon')
+# guplo = ta_diff_zon.sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 6, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = 20.)
+# #guplo.set_titles(template='{value}', maxchar = 13)
+# #plt.savefig(cart + 'ta_diff_799-cntrl_4mo.pdf')
+#
+# clim_diff_season = ta_diff_zon.groupby("time.season").mean()
+# guplose = clim_diff_season.plot.contourf(x = 'lat', y = 'plev', col = 'season', col_wrap = 2, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')
+# # plt.savefig(cart + 'season_diff_799-cntrl.pdf')
+#
+# clim_diff_month = ta_diff_zon.groupby("time.month").mean()
+# guplomo = clim_diff_month.plot.contourf(x = 'lat', y = 'plev', col = 'month', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')
+# # plt.savefig(cart + 'month_diff_799-cntrl.pdf')
+#
+# ta_diff_zon_mon = ta_diff_zon.resample(time = "M").mean()
+# jandiffs = ta_diff_zon_mon[ta_diff_zon_mon.groupby("time.month").groups[1]]
+# guplojan = jandiffs.plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 5, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = 20.)
+# # guplojan.set_titles(template='{value}', maxchar = 13)
+# # plt.savefig(cart + 'Jan_diffs_799-cntrl.pdf')
 
 
 ### RLUT
@@ -161,8 +161,9 @@ for var in allvars:
     plt.close('all')
 
     plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(time = '1999-01-01'), 98)
-    guplo2 = flux_diff[var].sel(time = '1999-01-01').plot.contourf(levels = 11, vmax = vmax)
+    vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-12')), 98)
+    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-12')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
+    guplo2.set_titles(template='{value}', maxchar = 13)
     plt.savefig(cart + '{}_firstday_799-cntrl.pdf'.format(var))
 
     plt.close('all')
