@@ -76,7 +76,7 @@ cart = '/home/federico/work/reforge/'
 #srf_net = ssr + str + sshf + slhf
 surf_fluxs = ['rsds', 'rlds', 'rsus', 'rlus', 'hfss', 'hfls']
 toa_fluxs = ['rlut', 'rsut', 'rsdt']
-allvars = surf_fluxs + toa_fluxs + ['clt', 'clwvi']
+allvars = surf_fluxs + toa_fluxs + ['clt', 'clwvi', 'evspsbl']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon/{}/{}_Amon_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -112,11 +112,11 @@ for var in allvars:
     print(var)
     vmax = np.nanpercentile(flux_diff_season[var], 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    fig = plt.figure()
+    #fig = plt.figure()
     guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
-    figs_clim.append(fig)
+    figs_clim.append(guplo.fig)
 
     vmax = np.nanpercentile(flux_diff[var].mean('lon'), 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
@@ -124,13 +124,13 @@ for var in allvars:
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_1ye_799-cntrl.pdf'.format(var))
-    figs_ovmol.append(fig)
+    figs_ovmol.append(guplo2.fig)
 
     fig = plt.figure()
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_4mo_799-cntrl.pdf'.format(var))
-    figs_ovmol_4m.append(fig)
+    figs_ovmol_4m.append(guplo2.fig)
 
     fig = plt.figure()
     vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
@@ -139,7 +139,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
-    figs_facet_mo.append(fig)
+    figs_facet_mo.append(guplo2.fig)
 
 ctl.plot_pdfpages(cart + 'month_clim.pdf', figs_clim)
 ctl.plot_pdfpages(cart + 'month_ovmol_1e.pdf', figs_ovmol)
@@ -148,7 +148,7 @@ ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 
 ################# 3d month
 
-allvars = ['ta', 'hus', 'wap']
+allvars = ['ta', 'hus', 'wap', 'stream']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon/{}/{}_Amon_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -179,7 +179,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
-    figs_facet_mo.append(fig)
+    figs_facet_mo.append(guplo2.fig)
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))), 98)
@@ -187,7 +187,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1ye_3d_799-cntrl.pdf'.format(var))
-    figs_facet_mo_3d.append(fig)
+    figs_facet_mo_3d.append(guplo2.fig)
 
 ctl.plot_pdfpages(cart + 'month_facet_1y.pdf', figs_facet_mo+figs_facet_mo_3d)
 #ctl.plot_pdfpages(cart + 'day_ovmol_2m.pdf', figs_ovmol)
@@ -202,7 +202,7 @@ plt.close('all')
 ##################### daily
 figs_facet = []
 figs_ovmol = []
-allvars = ['rsds', 'rlds', 'rsus', 'rlus', 'rlut', 'clt']
+allvars = ['rsds', 'rlds', 'rsus', 'rlus', 'rlut', 'clt', 'sfcWindmax']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/day/{}/{}_day_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/day/{}/{}_day_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -232,7 +232,7 @@ for var in allvars:
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
-    figs_ovmol.append(fig)
+    figs_ovmol.append(guplo2.fig)
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30'))), 98)
@@ -240,7 +240,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1mo_799-cntrl.pdf'.format(var))
-    figs_facet.append(fig)
+    figs_facet.append(guplo2.fig)
 
 
 ##################### daily 3D
@@ -278,7 +278,7 @@ for var in allvars:
     guplo2 = flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
-    figs_ovmol.append(fig)
+    figs_ovmol.append(guplo2.fig)
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30'))), 98)
@@ -286,7 +286,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1mo_799-cntrl.pdf'.format(var))
-    figs_facet.append(fig)
+    figs_facet.append(guplo2.fig)
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30'))), 98)
@@ -294,7 +294,7 @@ for var in allvars:
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1mo_3d_799-cntrl.pdf'.format(var))
-    figs_facet_3d.append(fig)
+    figs_facet_3d.append(guplo2.fig)
 
 ctl.plot_pdfpages(cart + 'day_facet_1m.pdf', figs_facet+figs_facet_3d)
 ctl.plot_pdfpages(cart + 'day_ovmol_2m.pdf', figs_ovmol)
