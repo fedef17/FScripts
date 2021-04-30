@@ -103,6 +103,8 @@ flux_hr = flux_hr.drop_vars('time_bnds')
 figs_clim = []
 figs_ovmol = []
 figs_ovmol_4m = []
+figs_facet_mo = []
+
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
