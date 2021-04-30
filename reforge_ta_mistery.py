@@ -111,7 +111,7 @@ flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     print(var)
     vmax = np.nanpercentile(flux_diff_season[var], 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 5.
+    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
     fig = plt.figure()
     guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
     plt.title(var)
@@ -119,7 +119,7 @@ for var in allvars:
     figs_clim.append(fig)
 
     vmax = np.nanpercentile(flux_diff[var].mean('lon'), 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 5.
+    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
     fig = plt.figure()
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
@@ -134,7 +134,7 @@ for var in allvars:
 
     fig = plt.figure()
     vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 5.
+    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
     guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -174,7 +174,7 @@ for var in allvars:
     # figs_ovmol.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))), 98)
     guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -182,7 +182,7 @@ for var in allvars:
     figs_facet_mo.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))), 98)
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -228,14 +228,14 @@ flux_diff = flux_hr-flux_lr
 for var in allvars:
     print(var)
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01'))), 98)
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
     figs_ovmol.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30'))), 98)
     guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -267,21 +267,21 @@ for var in allvars:
     print(var)
     if var == 'zg':
         flux_diff_season = flux_diff.groupby("time.season").mean()
-        vmax = np.nanpercentile(flux_diff_season[var], 98)
+        vmax = np.nanpercentile(np.abs(flux_diff_season[var]), 98)
         fig = plt.figure()
         guplo = flux_diff_season[var].mean('lon').plot.contourf(x = 'lat', y ='plev', col = 'season', col_wrap = 2, levels = 11, vmax = vmax, ylim = (1.e5, 1.e3), yscale = 'log')
         plt.title(var)
         plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')), 98)
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01'))), 98)
+    guplo2 = flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
     figs_ovmol.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30'))), 98)
     guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -289,7 +289,7 @@ for var in allvars:
     figs_facet.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30')), 98)
+    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30'))), 98)
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 6, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
