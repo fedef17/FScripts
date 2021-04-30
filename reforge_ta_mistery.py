@@ -106,13 +106,15 @@ figs_ovmol_4m = []
 figs_facet_mo = []
 figs_facet_mo_3d = []
 
+figs_global = []
+
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     print(var)
     vmax = np.nanpercentile(flux_diff_season[var], 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    #fig = plt.figure()
+    fig = plt.figure()
     guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
@@ -141,10 +143,23 @@ for var in allvars:
     plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
     figs_facet_mo.append(guplo2.fig)
 
+    ### Add global mean timeseries
+    fig = plt.figure()
+    coso = flux_diff[var].mean('lon')
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
+    glomean.plot()
+    plt.title(var)
+    figs_global.append(fig)
+
+
+ctl.plot_pdfpages(cart + 'global_timeseries.pdf', figs_global)
 ctl.plot_pdfpages(cart + 'month_clim.pdf', figs_clim)
 ctl.plot_pdfpages(cart + 'month_ovmol_1e.pdf', figs_ovmol)
 ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 #plt.close('all')
+
+
+sys.exit()
 
 ################# 3d month
 
