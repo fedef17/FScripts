@@ -104,6 +104,7 @@ figs_clim = []
 figs_ovmol = []
 figs_ovmol_4m = []
 figs_facet_mo = []
+figs_facet_mo_3d = []
 
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
@@ -147,8 +148,6 @@ ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 
 ################# 3d month
 
-figs_facet = []
-figs_facet_3d = []
 allvars = ['ta', 'zg', 'hus']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
