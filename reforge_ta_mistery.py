@@ -76,7 +76,7 @@ cart = '/home/federico/work/reforge/'
 #srf_net = ssr + str + sshf + slhf
 surf_fluxs = ['rsds', 'rlds', 'rsus', 'rlus', 'hfss', 'hfls']
 toa_fluxs = ['rlut', 'rsut', 'rsdt']
-allvars = surf_fluxs + toa_fluxs + ['clt', 'clwvi']
+allvars = surf_fluxs + toa_fluxs + ['clt', 'clwvi', 'wap']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon/{}/{}_Amon_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -148,7 +148,7 @@ ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 
 ################# 3d month
 
-allvars = ['ta', 'zg', 'hus']
+allvars = ['ta', 'hus']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon/{}/{}_Amon_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -265,6 +265,14 @@ flux_diff = flux_hr-flux_lr
 #flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     print(var)
+    if var == 'zg':
+        flux_diff_season = flux_diff.groupby("time.season").mean()
+        vmax = np.nanpercentile(flux_diff_season[var], 98)
+        fig = plt.figure()
+        guplo = flux_diff_season[var].mean('lon').plot.contourf(x = 'lat', y ='plev', col = 'season', col_wrap = 2, levels = 11, vmax = vmax, ylim = (1.e5, 1.e3), yscale = 'log')
+        plt.title(var)
+        plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
+
     fig = plt.figure()
     vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')), 98)
     guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
