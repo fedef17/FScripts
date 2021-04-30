@@ -149,7 +149,7 @@ ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 
 figs_facet = []
 figs_facet_3d = []
-allvars = ['tas', 'zg', 'hus']
+allvars = ['ta', 'zg', 'hus']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/mon/{}/{}_Amon_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/mon/{}/{}_Amon_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
@@ -248,7 +248,7 @@ for var in allvars:
 #figs_facet = []
 #figs_ovmol = []
 figs_facet_3d = []
-allvars = ['tas', 'zg']
+allvars = ['ta', 'zg']
 
 fir_HR = '/home/paolo/work/data/REFORGE/EC-Earth3-TL799/rfrg-orog255-noparam/r2i1p1f1/day/{}/{}_day_EC-Earth3-TL799_rfrg-orog255-noparam_r2i1p1f1_r144x73_*nc'
 fir_LR = '/home/paolo/work/data/REFORGE/EC-Earth3/rfrg-ctrl-noparam/r1i1p1f1/day/{}/{}_day_EC-Earth3_rfrg-ctrl-noparam_r1i1p1f1_r144x73_*nc'
