@@ -183,8 +183,8 @@ for var in allvars:
     figs_facet_mo.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
+    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')), 98)
+    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1ye_3d_799-cntrl.pdf'.format(var))
@@ -282,8 +282,8 @@ for var in allvars:
     figs_facet.append(fig)
 
     fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')), 98)
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 6, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
+    vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30')), 98)
+    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 6, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
     plt.savefig(cart + '{}_facet_1mo_3d_799-cntrl.pdf'.format(var))
