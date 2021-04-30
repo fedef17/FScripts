@@ -145,9 +145,10 @@ for var in allvars:
 
     ### Add global mean timeseries
     fig = plt.figure()
-    coso = flux_diff[var].mean('lon')
+    coso = flux_diff[var].mean('lon').groupby("time.year").mean()
     glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
-    glomean.plot()
+    plt.plot(coso.year.data, glomean)
+    plt.grid()
     plt.title(var)
     figs_global.append(fig)
 
