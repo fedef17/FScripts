@@ -112,36 +112,36 @@ flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     print(var)
-    vmax = np.nanpercentile(flux_diff_season[var], 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    fig = plt.figure()
-    guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
-    plt.title(var)
-    plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
-    figs_clim.append(guplo.fig)
-
-    vmax = np.nanpercentile(flux_diff[var].mean('lon'), 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    fig = plt.figure()
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
-    plt.title(var)
-    plt.savefig(cart + '{}_ovmol_1ye_799-cntrl.pdf'.format(var))
-    figs_ovmol.append(fig)
-
-    fig = plt.figure()
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
-    plt.title(var)
-    plt.savefig(cart + '{}_ovmol_4mo_799-cntrl.pdf'.format(var))
-    figs_ovmol_4m.append(fig)
-
-    fig = plt.figure()
-    vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
-    if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
-    guplo2.set_titles(template='{value}', maxchar = 13)
-    plt.title(var)
-    plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
-    figs_facet_mo.append(guplo2.fig)
+    # vmax = np.nanpercentile(flux_diff_season[var], 98)
+    # if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
+    # fig = plt.figure()
+    # guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
+    # figs_clim.append(guplo.fig)
+    #
+    # vmax = np.nanpercentile(flux_diff[var].mean('lon'), 98)
+    # if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
+    # fig = plt.figure()
+    # guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_ovmol_1ye_799-cntrl.pdf'.format(var))
+    # figs_ovmol.append(fig)
+    #
+    # fig = plt.figure()
+    # guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-30')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_ovmol_4mo_799-cntrl.pdf'.format(var))
+    # figs_ovmol_4m.append(fig)
+    #
+    # fig = plt.figure()
+    # vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
+    # if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
+    # guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
+    # guplo2.set_titles(template='{value}', maxchar = 13)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
+    # figs_facet_mo.append(guplo2.fig)
 
     ### Add global mean timeseries
     fig = plt.figure()
