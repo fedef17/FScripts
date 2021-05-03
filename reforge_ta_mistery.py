@@ -95,7 +95,7 @@ flux_lr = flux_lr.assign(net_sfc = flux_lr.rsds + flux_lr.rlds - flux_lr.rsus - 
 flux_lr = flux_lr.assign(net_toa = flux_lr.rsdt - flux_lr.rlut - flux_lr.rsut) # net downward energy flux at TOA
 flux_lr = flux_lr.assign(in_atm = flux_lr.net_toa - flux_lr.net_sfc)
 
-allvars = allvars + ['net_sfc', 'net_toa']
+allvars = allvars + ['net_sfc', 'net_toa', 'in_atm']
 
 flux_lr = flux_lr.drop_vars('time_bnds')
 flux_hr = flux_hr.drop_vars('time_bnds')
@@ -143,13 +143,15 @@ for var in allvars:
     plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
     figs_facet_mo.append(guplo2.fig)
 
+    signc = 1
+    if var == 'evspsbl': signc = -1
     ### Add global mean timeseries
     fig = plt.figure()
     coso = flux_lr[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
-    plt.plot_date(coso.time.data, glomean, label = 'LR', color = 'forestgreen')
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    plt.plot_date(coso.time.data, signc*glomean, label = 'LR', color = 'forestgreen')
     coso = flux_hr[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
     plt.plot_date(coso.time.data, glomean, label = 'HR', color = 'indianred')
     plt.grid()
     plt.title(var)
@@ -159,10 +161,10 @@ for var in allvars:
     ### Add global mean timeseries
     fig = plt.figure()
     coso = flux_lr[var].mean('lon').groupby("time.year").mean()
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
-    plt.plot(coso.year.data, glomean, label = 'LR', color = 'forestgreen')
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
     coso = flux_hr[var].mean('lon').groupby("time.year").mean()
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_diff.lat))), axis = -1)
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
     plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
     plt.grid()
     plt.title(var)
