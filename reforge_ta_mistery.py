@@ -111,6 +111,11 @@ figs_global = []
 flux_diff = flux_hr-flux_lr
 flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
+    signc = 1
+    if var == 'evspsbl':
+        flux_diff[var] = flux_hr[var]+flux_lr[var]
+        signc = -1
+        
     print(var)
     vmax = np.nanpercentile(flux_diff_season[var], 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
@@ -143,8 +148,6 @@ for var in allvars:
     plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
     figs_facet_mo.append(guplo2.fig)
 
-    signc = 1
-    if var == 'evspsbl': signc = -1
     ### Add global mean timeseries
     fig = plt.figure()
     coso = flux_lr[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))
