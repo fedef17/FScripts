@@ -153,6 +153,7 @@ for var in allvars:
     plt.plot_date(coso.time.data, glomean, label = 'HR', color = 'indianred')
     plt.grid()
     plt.title(var)
+    plt.legend()
     figs_global.append(fig)
 
     ### Add global mean timeseries
@@ -165,6 +166,7 @@ for var in allvars:
     plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
     plt.grid()
     plt.title(var)
+    plt.legend()
     figs_global.append(fig)
 
 
