@@ -228,10 +228,10 @@ for var in allvars:
 
     ### Add global mean timeseries
     fig = plt.figure()
-    coso = flux_lr[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))
+    coso = flux_lr[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).mean('lon')
     glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
     plt.plot_date(coso.time.data, signc*glomean, 'b-o', label = 'LR', color = 'forestgreen')
-    coso = flux_hr[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))
+    coso = flux_hr[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).mean('lon')
     glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
     plt.plot_date(coso.time.data, glomean, 'b-o', label = 'HR', color = 'indianred')
     plt.grid()
@@ -244,7 +244,7 @@ for var in allvars:
     coso = flux_lr[var].sel(plev = 5000.).mean('lon').groupby("time.year").mean()
     glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
     plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
-    coso = flux_hr[var].mean('lon').groupby("time.year").mean()
+    coso = flux_hr[var].sel(plev = 5000.).mean('lon').groupby("time.year").mean()
     glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
     plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
     plt.grid()
