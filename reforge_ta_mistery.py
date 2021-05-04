@@ -226,6 +226,7 @@ for var in allvars:
     # plt.savefig(cart + '{}_facet_1ye_3d_799-cntrl.pdf'.format(var))
     # figs_facet_mo_3d.append(guplo2.fig)
 
+    if var in ['wap', 'stream']: continue
     ### Add global mean timeseries
     fig = plt.figure()
     coso = flux_lr[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).mean('lon')
@@ -300,12 +301,13 @@ plt.title(var + '- 30 hPa - npole')
 plt.legend()
 figs_global.append(fig)
 
+seasok = 'DJF'
 ### Add global mean timeseries
 fig = plt.figure()
-coso = flux_lr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+coso = flux_lr[var].sel(plev = plok, lat = slice(lat1, lat2), time = flux_lr['time.season'] == seasok).mean('lon').groupby("time.year").mean()
 glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
 plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
-coso = flux_hr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+coso = flux_hr[var].sel(plev = plok, lat = slice(lat1, lat2), time = flux_lr['time.season'] == seasok).mean('lon').groupby("time.year").mean()
 glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
 plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
 plt.grid()
