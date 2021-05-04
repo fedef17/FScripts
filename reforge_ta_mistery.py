@@ -228,14 +228,23 @@ for var in allvars:
 
     fig = plt.figure()
     coso = flux_lr[var].sel(lat = slice(-20., 20.)).mean(['lon', 'time'])
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-    plt.plot(glomean, coso.plev, label = 'LR', color = 'forestgreen')
+    glomean1 = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+    plt.plot(glomean1, coso.plev, label = 'LR', color = 'forestgreen')
     coso = flux_hr[var].sel(lat = slice(-20., 20.)).mean(['lon', 'time'])
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-    plt.plot(glomean, coso.plev, label = 'HR', color = 'indianred')
+    glomean2 = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+    plt.plot(glomean2, coso.plev, label = 'HR', color = 'indianred')
+    plt.legend()
     plt.ylim(1.e5, 1.e3)
     plt.yscale('log')
     plt.title(var + ' - vprof - tropics')
+    figs_global.append(fig)
+
+    fig = plt.figure()
+    plt.plot(glomean2-glomean1, coso.plev, label = 'HR-LR', color = 'steelblue')
+    plt.legend()
+    plt.ylim(1.e5, 1.e3)
+    plt.yscale('log')
+    plt.title(var + ' - vprof diff')
     figs_global.append(fig)
 
     if var in ['wap', 'stream']: continue
