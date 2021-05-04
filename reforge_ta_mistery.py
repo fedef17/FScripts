@@ -228,10 +228,10 @@ for var in allvars:
 
     fig = plt.figure()
     coso = flux_lr[var].sel(lat = slice(-20., 20.)).mean(['lon', 'time'])
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
     plt.plot(glomean, coso.plev, label = 'LR', color = 'forestgreen', ylim = (1.e5, 1.e3), yscale = 'log')
     coso = flux_hr[var].sel(lat = slice(-20., 20.)).mean(['lon', 'time'])
-    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
     plt.plot(glomean, coso.plev, label = 'HR', color = 'indianred', ylim = (1.e5, 1.e3), yscale = 'log')
     plt.title(var + ' - vprof - tropics')
     figs_global.append(fig)
