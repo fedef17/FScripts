@@ -115,7 +115,7 @@ for var in allvars:
     if var == 'evspsbl':
         flux_diff[var] = flux_hr[var]+flux_lr[var]
         signc = -1
-        
+
     print(var)
     vmax = np.nanpercentile(flux_diff_season[var], 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
@@ -175,14 +175,13 @@ for var in allvars:
     figs_global.append(fig)
 
 
-ctl.plot_pdfpages(cart + 'global_timeseries.pdf', figs_global)
 ctl.plot_pdfpages(cart + 'month_clim.pdf', figs_clim)
 ctl.plot_pdfpages(cart + 'month_ovmol_1e.pdf', figs_ovmol)
 ctl.plot_pdfpages(cart + 'month_ovmol_4m.pdf', figs_ovmol_4m)
 #plt.close('all')
 
 
-sys.exit()
+#sys.exit()
 
 ################# 3d month
 
@@ -211,25 +210,52 @@ for var in allvars:
     # plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
     # figs_ovmol.append(fig)
 
-    fig = plt.figure()
-    vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))), 98)
-    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
-    guplo2.set_titles(template='{value}', maxchar = 13)
-    plt.title(var)
-    plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
-    figs_facet_mo.append(guplo2.fig)
+    # fig = plt.figure()
+    # vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))), 98)
+    # guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4)
+    # guplo2.set_titles(template='{value}', maxchar = 13)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_facet_1ye_799-cntrl.pdf'.format(var))
+    # figs_facet_mo.append(guplo2.fig)
+    #
+    # fig = plt.figure()
+    # vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))), 98)
+    # guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
+    # guplo2.set_titles(template='{value}', maxchar = 13)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_facet_1ye_3d_799-cntrl.pdf'.format(var))
+    # figs_facet_mo_3d.append(guplo2.fig)
 
+    ### Add global mean timeseries
     fig = plt.figure()
-    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))), 98)
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(x = 'lat', y = 'plev', col = 'time', col_wrap = 4, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vmax)
-    guplo2.set_titles(template='{value}', maxchar = 13)
-    plt.title(var)
-    plt.savefig(cart + '{}_facet_1ye_3d_799-cntrl.pdf'.format(var))
-    figs_facet_mo_3d.append(guplo2.fig)
+    coso = flux_lr[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    plt.plot_date(coso.time.data, signc*glomean, label = 'LR', color = 'forestgreen')
+    coso = flux_hr[var].mean('lon').sel(time = slice('1999-01-01', '1999-12-30'))
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
+    plt.plot_date(coso.time.data, glomean, label = 'HR', color = 'indianred')
+    plt.grid()
+    plt.title(var + '- 50 hPa')
+    plt.legend()
+    figs_global.append(fig)
 
-ctl.plot_pdfpages(cart + 'month_facet_1y.pdf', figs_facet_mo+figs_facet_mo_3d)
+    ### Add global mean timeseries
+    fig = plt.figure()
+    coso = flux_lr[var].sel(plev = 5000.).mean('lon').groupby("time.year").mean()
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
+    coso = flux_hr[var].mean('lon').groupby("time.year").mean()
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
+    plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
+    plt.grid()
+    plt.title(var + '- 50 hPa')
+    plt.legend()
+    figs_global.append(fig)
+
+#ctl.plot_pdfpages(cart + 'month_facet_1y.pdf', figs_facet_mo+figs_facet_mo_3d)
 #ctl.plot_pdfpages(cart + 'day_ovmol_2m.pdf', figs_ovmol)
 
+ctl.plot_pdfpages(cart + 'global_timeseries.pdf', figs_global)
 plt.close('all')
 
 
@@ -238,6 +264,7 @@ plt.close('all')
 ### TA lat/time
 
 ##################### daily
+figs_global = []
 figs_facet = []
 figs_ovmol = []
 allvars = ['rsds', 'rlds', 'rsus', 'rlus', 'rlut', 'clt', 'sfcWindmax']
@@ -261,26 +288,42 @@ allvars = allvars + ['in_sfc', 'in_toa']
 flux_lr = flux_lr.drop_vars('time_bnds')
 flux_hr = flux_hr.drop_vars('time_bnds')
 
+figs_global = []
 flux_diff = flux_hr-flux_lr
 #flux_diff_season = flux_diff.groupby("time.season").mean()
 for var in allvars:
     print(var)
+    # fig = plt.figure()
+    # vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01'))), 98)
+    # guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
+    # figs_ovmol.append(fig)
+    #
+    # fig = plt.figure()
+    # vmax = np.nanpercentile(np.abs(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30'))), 98)
+    # guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6)
+    # guplo2.set_titles(template='{value}', maxchar = 13)
+    # plt.title(var)
+    # plt.savefig(cart + '{}_facet_1mo_799-cntrl.pdf'.format(var))
+    # figs_facet.append(guplo2.fig)
+
+    ### Add global mean timeseries
     fig = plt.figure()
-    vmax = np.nanpercentile(np.abs(flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01'))), 98)
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    coso = flux_lr[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-01'))
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+    plt.plot_date(coso.time.data, signc*glomean, label = 'LR', color = 'forestgreen')
+    coso = flux_hr[var].mean('lon').sel(time = slice('1999-01-01', '1999-04-01'))
+    glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_hr.lat))), axis = -1)
+    plt.plot_date(coso.time.data, glomean, label = 'HR', color = 'indianred')
+    plt.grid()
     plt.title(var)
-    plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
-    figs_ovmol.append(fig)
+    plt.legend()
+    figs_global.append(fig)
 
-    fig = plt.figure()
-    vmax = np.nanpercentile(np.abs(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30'))), 98)
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6)
-    guplo2.set_titles(template='{value}', maxchar = 13)
-    plt.title(var)
-    plt.savefig(cart + '{}_facet_1mo_799-cntrl.pdf'.format(var))
-    figs_facet.append(guplo2.fig)
+ctl.plot_pdfpages(cart + 'global_timeseries_daily.pdf', figs_global)
 
-
+sys.exit()
 ##################### daily 3D
 #figs_facet = []
 #figs_ovmol = []
