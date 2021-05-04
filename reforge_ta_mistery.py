@@ -252,6 +252,67 @@ for var in allvars:
     plt.legend()
     figs_global.append(fig)
 
+var = 'wap'
+plok = 20000.
+lat1 = -20.
+lat2 = 20.
+### Add global mean timeseries
+fig = plt.figure()
+coso = flux_lr[var].sel(plev = plok, time = slice('1999-01-01', '1999-12-30'), lat = slice(lat1, lat2)).mean('lon')
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot_date(coso.time.data, signc*glomean, 'b-o', label = 'LR', color = 'forestgreen')
+coso = flux_hr[var].sel(plev = plok, time = slice('1999-01-01', '1999-12-30'), lat = slice(lat1, lat2)).mean('lon')
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot_date(coso.time.data, glomean, 'b-o', label = 'HR', color = 'indianred')
+plt.grid()
+plt.title(var + '- 200 hPa - tropics')
+plt.legend()
+figs_global.append(fig)
+
+### Add global mean timeseries
+fig = plt.figure()
+coso = flux_lr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
+coso = flux_hr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
+plt.grid()
+plt.title(var + '- 200 hPa - tropics')
+plt.legend()
+figs_global.append(fig)
+
+
+var = 'stream'
+plok = 3000.
+lat1 = 60.
+lat2 = 80.
+### Add global mean timeseries
+fig = plt.figure()
+coso = flux_lr[var].sel(plev = plok, time = slice('1999-01-01', '1999-12-30'), lat = slice(lat1, lat2)).mean('lon')
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot_date(coso.time.data, signc*glomean, 'b-o', label = 'LR', color = 'forestgreen')
+coso = flux_hr[var].sel(plev = plok, time = slice('1999-01-01', '1999-12-30'), lat = slice(lat1, lat2)).mean('lon')
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot_date(coso.time.data, glomean, 'b-o', label = 'HR', color = 'indianred')
+plt.grid()
+plt.title(var + '- 30 hPa - npole')
+plt.legend()
+figs_global.append(fig)
+
+### Add global mean timeseries
+fig = plt.figure()
+coso = flux_lr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot(coso.year.data, signc*glomean, label = 'LR', color = 'forestgreen')
+coso = flux_hr[var].sel(plev = plok, lat = slice(lat1, lat2)).mean('lon').groupby("time.year").mean()
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+plt.plot(coso.year.data, glomean, label = 'HR', color = 'indianred')
+plt.grid()
+plt.title(var + '- 30 hPa - npole')
+plt.legend()
+figs_global.append(fig)
+
 #ctl.plot_pdfpages(cart + 'month_facet_1y.pdf', figs_facet_mo+figs_facet_mo_3d)
 #ctl.plot_pdfpages(cart + 'day_ovmol_2m.pdf', figs_ovmol)
 
