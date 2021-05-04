@@ -413,7 +413,6 @@ for var in allvars:
 
 ctl.plot_pdfpages(cart + 'global_timeseries_daily.pdf', figs_global)
 
-sys.exit()
 ##################### daily 3D
 #figs_facet = []
 #figs_ovmol = []
