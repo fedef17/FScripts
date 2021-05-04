@@ -209,7 +209,7 @@ for var in allvars:
     print(var)
     fig = plt.figure()
     vmax = np.nanpercentile(flux_diff[var].mean('lon').sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')), 98)
-    guplo2 = flux_diff[var].mean('lon').sel(time = slice('1999-01-01', '1999-03-01')).plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
+    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-03-01')).mean('lon').plot.contourf(x = 'time', y = 'lat', levels = 11, vmax = vmax)
     plt.title(var)
     plt.savefig(cart + '{}_ovmol_2mo_799-cntrl.pdf'.format(var))
     figs_ovmol.append(fig)
