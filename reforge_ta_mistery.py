@@ -106,7 +106,7 @@ figs_ovmol_4m = []
 figs_facet_mo = []
 figs_facet_mo_3d = []
 
-proj = ccrs.PlateCarree()
+proj = ccrs.PlateCarree(central_longitude = 180)
 
 figs_global = []
 
@@ -122,7 +122,7 @@ for var in allvars:
     vmax = np.nanpercentile(flux_diff_season[var], 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
     fig = plt.figure()
-    guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax, transform = proj, subplot_kws = {"projection": proj})
+    guplo = flux_diff_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
     guplo.map(lambda: plt.gca().coastlines())
     plt.title(var)
     plt.savefig(cart + '{}_seas_799-cntrl.pdf'.format(var))
@@ -145,7 +145,7 @@ for var in allvars:
     fig = plt.figure()
     vmax = np.nanpercentile(flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')), 98)
     if var in surf_fluxs or var in toa_fluxs or var in ['net_sfc', 'net_toa', 'in_atm']: vmax = 10.
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4, transform = proj, subplot_kws = {"projection": proj})
+    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
     guplo2.set_titles(template='{value}', maxchar = 13)
     guplo2.map(lambda: plt.gca().coastlines())
     plt.title(var)
@@ -216,7 +216,7 @@ for var in allvars:
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30'))), 98)
-    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4, transform = proj, subplot_kws = {"projection": proj})
+    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-12-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 4, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
     guplo2.set_titles(template='{value}', maxchar = 13)
     guplo2.map(lambda: plt.gca().coastlines())
     plt.title(var)
@@ -391,7 +391,7 @@ for var in allvars:
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30'))), 98)
-    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6, transform = proj, subplot_kws = {"projection": proj})
+    guplo2 = flux_diff[var].sel(time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
     guplo2.map(lambda: plt.gca().coastlines())
     guplo2.set_titles(template='{value}', maxchar = 13)
     plt.title(var)
@@ -452,7 +452,7 @@ for var in allvars:
 
     fig = plt.figure()
     vmax = np.nanpercentile(np.abs(flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30'))), 98)
-    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6, transform = proj, subplot_kws = {"projection": proj})
+    guplo2 = flux_diff[var].sel(plev = 5000., time = slice('1999-01-01', '1999-01-30')).plot.contourf(levels = 11, vmax = vmax, col = 'time', col_wrap = 6, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
     guplo2.set_titles(template='{value}', maxchar = 13)
     guplo2.map(lambda: plt.gca().coastlines())
     plt.title(var)
