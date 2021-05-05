@@ -106,7 +106,7 @@ figs_ovmol_4m = []
 figs_facet_mo = []
 figs_facet_mo_3d = []
 
-proj = ccrs.PlateCarree(central_longitude = 180)
+proj = ccrs.PlateCarree()
 
 figs_global = []
 
