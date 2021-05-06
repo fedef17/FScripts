@@ -128,10 +128,13 @@ fig.savefig(cart_out + 'bottseaice.pdf')
 miptab = 'Amon'
 allvars_2D = 'clt  pr  psl  rlut  rsdt  rsut  tas  uas'.split()
 
+exp = 'b025'
 fils = np.concatenate([glob.glob(filna.format(exp, miptab, var)) for var in allvars_2D])
 
 kose = xr.open_mfdataset(fils, use_cftime = True)
 kose = kose.drop_vars('time_bnds')
+
+sys.exit()
 
 var_glob_mean = 'tas pr clt net_toa'.split()  # plot global timeseries, including ssp585
 var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
