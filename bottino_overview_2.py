@@ -88,19 +88,19 @@ for na, ru, col in zip(allnams + ['ssp585'], allru + ['ssp585'], colors + ['indi
     ax1.plot_date(dates[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
     ax2.plot_date(dates[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
 
-    if ru == 'ssp585':
-        continue
-
-    if ru != 'pi':
-        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-        varok = var[ok200]
-        dateok = dates[ok200]
-    else:
-        varok = var
-        dateok = dates
-
-    resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
-    resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
+    # if ru == 'ssp585':
+    #     continue
+    #
+    # if ru != 'pi':
+    #     ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
+    #     varok = var[ok200]
+    #     dateok = dates[ok200]
+    # else:
+    #     varok = var
+    #     dateok = dates
+    #
+    # resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
+    # resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
 
 
 ax1.set_title('March')
@@ -109,6 +109,72 @@ ax1.set_ylabel(r'Sea ice extent (m$^2$)')
 ax2.set_ylabel(r'Sea ice extent (m$^2$)')
 ax2.legend()
 fig.savefig(cart_out + 'bottseaice.pdf')
+
+
+
+%run bottino_overview_2.py
+plt.ion()
+gogo
+gigi
+gigi['siconc']
+gigi['siconc'].sel(latitude = slice(40., 90.))
+gigi['siconc'].sel(lat = slice(40., 90.))
+gigi['siconc'].sel(gigi.latitude > 40.)
+gigi['siconc']
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.PlateCarree());
+gigi['siconc'].plot.pcolormesh(ax=ax, x='i', y='j');
+ax.coastlines();
+from cartopy import crs as ccrs
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.PlateCarree());
+gigi['siconc'].plot.pcolormesh(ax=ax, x='i', y='j');
+ax.coastlines();
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.PlateCarree());
+gigi['siconc'].sel(time = time.month == 3).mean('time').plot.pcolormesh(ax=ax, x='i', y='j');
+ax.coastlines();
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.PlateCarree());
+gigi['siconc'].sel(time = gigi.time.month == 3).mean('time').plot.pcolormesh(ax=ax, x='i', y='j');
+ax.coastlines();
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.PlateCarree());
+gigi['siconc'].sel(time = gigi['time.month'] == 3).mean('time').plot.pcolormesh(ax=ax, x='i', y='j');
+ax.coastlines();
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.Orthographic(central_latitude=90, central_longitude = 0.));
+gigi['siconc'].sel(time = gigi['time.month'] == 3).mean('time').plot.pcolormesh(ax=ax, x='latitude', y='longitude');
+ax.coastlines();
+plt.close('all')
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.Orthographic(central_latitude=90, central_longitude = 0.));
+gigi['siconc'].sel(time = gigi['time.month'] == 3).mean('time').plot.pcolormesh(ax=ax, x='longitude', y='latitude');
+ax.coastlines();
+coso = gigi['siconc'].sel(time = gigi['time.month'] == 3).mean('time')
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.Orthographic(central_latitude=90, central_longitude = 0.));
+coso.plot.contourf(ax=ax, x='longitude', y='latitude', levels = np.arange(0.1, 1.01, 0.1), transform = ccrs.PlateCarree());
+ax.coastlines();
+plt.figure(figsize=(12,8));
+ax = plt.axes(projection=ccrs.Orthographic(central_latitude=90, central_longitude = 0.));
+coso.plot.pcolormesh(ax=ax, x='longitude', y='latitude', vmin = 0.1, vmax = 1.0, transform = ccrs.PlateCarree(), extend = None);
+ax.coastlines();
+fig, ax = get_cartopy_fig_ax('nearside', (90., 0.), 30.)
+coso.plot.pcolormesh(ax=ax, x='longitude', y='latitude', vmin = 0.1, vmax = 1.0, transform = ccrs.PlateCarree(), extend = None);
+fig, ax = ctl.get_cartopy_fig_ax('nearside', (90., 0.), 30.)
+coso.plot.pcolormesh(ax=ax, x='longitude', y='latitude', vmin = 0.1, vmax = 1.0, transform = ccrs.PlateCarree(), extend = None);
+reload(ctl)
+from importlib import reload
+reload(ctl)
+fig, ax = ctl.get_cartopy_fig_ax('nearside', (90., 0.), 30.)
+coso.plot.pcolormesh(ax=ax, x='longitude', y='latitude', vmin = 0.1, vmax = 1.0, transform = ccrs.PlateCarree(), extend = None);
+gogo = gigi.rename({'latitude': 'lat', 'longitude': 'lon'})
+ds_out = xe.util.grid_global(1, 1)
+import xesmf as xe
+ds_out = xe.util.grid_global(1, 1)
+regridder = xe.Regridder(gogo, ds_out, 'bilinear')
+
 
 
 sys.exit()
