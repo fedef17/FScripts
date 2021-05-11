@@ -115,11 +115,16 @@ for var in allvars:
     for col, nam in zip(colors, resuu.keys()):
         coso = resuu[nam][var].mean('lon').groupby("time.year").mean()
         glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-        plt.plot(coso.year.data, glomean, label = nam, color = col)
+        if var == 'evspsbl':
+            if np.mean(glomean) < 0:
+                plt.plot(coso.year.data, -glomean, label = nam, color = col)
+        else:
+            plt.plot(coso.year.data, glomean, label = nam, color = col)
 
     plt.grid()
     plt.title(var)
-    plt.legend()
+    #plt.legend()
+    ctl.custom_legend(fig, colors, resuu.keys(), ncol = 4)
     figs_global.append(fig)
 
 ctl.plot_pdfpages(cart + 'global_timeseries_allmems.pdf', figs_global)
