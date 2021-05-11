@@ -110,7 +110,7 @@ colors = ctl.color_set(len(resuu))
 figs_global = []
 for var in allvars:
     print(var)
-    fig = plt.figure()
+    fig = plt.figure(figsize = (16,12))
 
     for col, nam in zip(colors, resuu.keys()):
         coso = resuu[nam][var].mean('lon').groupby("time.year").mean()
