@@ -73,6 +73,58 @@ cart = '/home/federico/work/reforge/'
 
 ### RLUT
 
+mods = 'EC-Earth3 EC-Earth3-TL511 EC-Earth3-TL799'.split()
+tips = 'rfrg-ctrl-noparam  rfrg-ctrl-param  rfrg-orog255-noparam'.split()
+
+base = '/home/paolo/work/data/REFORGE/{}/{}/'
+fir_HR = '/home/paolo/work/data/REFORGE/{}/{}/{}/mon/{}/{}_Amon*nc'
+
+surf_fluxs = ['rsds', 'rlds', 'rsus', 'rlus', 'hfss', 'hfls']
+toa_fluxs = ['rlut', 'rsut', 'rsdt']
+allvars = surf_fluxs + toa_fluxs + ['clt', 'clwvi', 'evspsbl']
+
+resuu = dict()
+for mod, na in zip(mods, ['LR', 'MR', 'HR']):
+    for tip, tipna in zip(tips, ['noparam', 'param', 'o255-nopar']):
+        if os.path.exists(base.format(mod, tip)):
+            allmems = os.listdir(base.format(mod, tip))
+            allmems.sort()
+            mem = allmems[0]
+
+            fils_HR = np.concatenate([glob.glob(fir_HR.format(mod, tip, mem, var, var)) for var in allvars])
+            flux_hr = xr.open_mfdataset(fils_HR, use_cftime = True)
+
+            flux_hr = flux_hr.assign(net_sfc = flux_hr.rsds + flux_hr.rlds - flux_hr.rsus - flux_hr.rlus - flux_hr.hfss - flux_hr.hfls) # net downward energy flux at surface
+            flux_hr = flux_hr.assign(net_toa = flux_hr.rsdt - flux_hr.rlut - flux_hr.rsut) # net downward energy flux at TOA
+            flux_hr = flux_hr.assign(in_atm = flux_hr.net_toa - flux_hr.net_sfc)
+
+            flux_hr = flux_hr.drop_vars('time_bnds')
+
+            resuu[na+'_'+tipna] = flux_hr
+
+allvars = allvars + ['net_sfc', 'net_toa', 'in_atm']
+
+colors = ctl.color_set(len(resuu))
+
+### Add global mean timeseries
+figs_global = []
+for var in allvars:
+    print(var)
+    fig = plt.figure()
+
+    for col, nam in zip(colors, resuu.keys()):
+        coso = resuu[nam][var].mean('lon').groupby("time.year").mean()
+        glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(flux_lr.lat))), axis = -1)
+        plt.plot(coso.year.data, glomean, label = nam, color = col)
+
+    plt.grid()
+    plt.title(var)
+    plt.legend()
+    figs_global.append(fig)
+
+ctl.plot_pdfpages(cart + 'global_timeseries_allmems.pdf', figs_global)
+sys.exit()
+
 #srf_net = ssr + str + sshf + slhf
 surf_fluxs = ['rsds', 'rlds', 'rsus', 'rlus', 'hfss', 'hfls']
 toa_fluxs = ['rlut', 'rsut', 'rsdt']
