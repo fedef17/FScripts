@@ -46,6 +46,7 @@ for area in ['EAT', 'PNA', 'NML']:
             gigi[ke] = np.concatenate(cose, axis = 0)
 
         for tip in ['pos', 'neg']:
+            print(area, season, tip)
             with open(filmask.format(season.lower(), tip), 'rb') as filok:
                 mask = pickle.load(filok) # ci sono anche i leap!
                 print(len(mask))
@@ -53,6 +54,7 @@ for area in ['EAT', 'PNA', 'NML']:
             nmiss = np.nansum(mask[:skip*4])
             print('missing {} events'.format(nmiss))
             mask = mask[skip*4:] # skip first 2 months (JF), these are 6-hourly data
+            print('ok events: {}'.format(np.nansum(mask)))
 
             print(len(gigi['labels']), len(mask))
 

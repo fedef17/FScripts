@@ -18,8 +18,8 @@ from datetime import datetime
 
 from scipy import stats
 import xarray as xr
-import xclim as xcl
 import glob
+import xclim
 
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
@@ -30,9 +30,6 @@ plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
-import glob
-import xarray as xr
-import xclim
 
 cart_out = '/home/fabiano/Research/lavori/BOTTINO/analisi/'
 
@@ -129,7 +126,10 @@ miptab = 'Amon'
 allvars_2D = 'clt  pr  psl  rlut  rsdt  rsut  tas  uas'.split()
 
 exp = 'b025'
-fils = np.concatenate([glob.glob(filna.format(exp, miptab, var)) for var in allvars_2D])
+'stabilization-ssp585-2025'
+for exp in
+if exp == 'pi'
+fils = np.concatenate([glob.glob(filna.format(exp, mem, miptab, var)) for var in allvars_2D])
 
 kose = xr.open_mfdataset(fils, use_cftime = True)
 kose = kose.drop_vars('time_bnds')
@@ -138,6 +138,35 @@ sys.exit()
 
 var_glob_mean = 'tas pr clt net_toa'.split()  # plot global timeseries, including ssp585
 var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+
+
+for var in var_glob_mean:
+    ### Add global mean timeseries
+    fig = plt.figure()
+
+    for na, ru, col in zip(allnams2, allru2, colors2):
+        mem = 'r1'
+        if na == 'ssp585': mem = 'r4'
+
+        fils = glob.glob(filna.format(na, mem, miptab, var))
+
+        kose = xr.open_mfdataset(fils, use_cftime = True)
+        kose = kose.drop_vars('time_bnds')
+
+        coso = kose[var].mean('lon').groupby("time.year").mean()
+        glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+        if ru == 'pi':
+            years = coso.year.data-2256+2015
+        else:
+            years = coso.year.data
+        plt.plot(coso.year.data, glomean, label = ru, color = col)
+
+    plt.grid()
+    plt.title(var)
+    plt.legend()
+    figs_global.append(fig)
+
+sys.exit()
 
 ### Mean state temperature e varianza?
 ### Mean state precipitazione e varianza
