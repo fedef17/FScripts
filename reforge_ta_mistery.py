@@ -116,9 +116,9 @@ for var in allvars:
         coso = resuu[nam][var].mean('lon').groupby("time.year").mean()
         glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
         if var == 'evspsbl':
-            plt.plot(coso.year.data, np.abs(glomean), label = nam, color = col, linewisth = 2)
+            plt.plot(coso.year.data, np.abs(glomean), label = nam, color = col, linewidth = 2)
         else:
-            plt.plot(coso.year.data, glomean, label = nam, color = col, linewisth = 2)
+            plt.plot(coso.year.data, glomean, label = nam, color = col, linewidth = 2)
 
     plt.grid()
     plt.title(var)
