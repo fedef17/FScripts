@@ -24,6 +24,8 @@ taglev['ua'] = '_850hPa'
 
 allexps = os.listdir(bcart)
 
+filerr = open('/nas/BOTTINO/log_day_err.txt', 'w')
+
 for exp in allexps:
     expcart = bcart + exp + '/'
     allmems = os.listdir(expcart)
@@ -35,10 +37,21 @@ for exp in allexps:
 
         daycart = memcart + 'day/'
         r25cart = memcart + 'day_r25/'
+
         ctl.mkdir(r25cart)
+        if len(os.listdir(daycart)) == len(os.listdir(r25cart)):
+            print('Already processed\n')
+            continue
 
         for var in okvars:
             print(var)
             cart_in = daycart + var + '/'
             cart_out = r25cart + var + '/'
-            cd.preprocess_cdo(cart_in, cart_out, sel_levels = oklevs[var], taglev = taglev[var])
+            try:
+                cd.preprocess_cdo(cart_in, cart_out, sel_levels = oklevs[var], taglev = taglev[var], skip_existing = True)
+            except Exception as exp:
+                filerr.write('Error for {} {} {}\n'.format(exp, mem, var))
+                filerr.write(exp)
+                filerr.write('\n')
+
+filerr.close()
