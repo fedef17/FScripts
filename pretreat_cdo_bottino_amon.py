@@ -40,14 +40,15 @@ for exp in allexps:
         r25cart = memcart + 'Amon_r25/'
         ctl.mkdir(r25cart)
 
-        if len(os.listdir(daycart)) == len(os.listdir(r25cart)):
-            print('Already processed\n')
-            continue
 
         for var in os.listdir(daycart):
             print(var)
             cart_in = daycart + var + '/'
             cart_out = r25cart + var + '/'
+            if len(os.listdir(cart_in)) == len(os.listdir(cart_out)):
+                print('Already processed\n')
+                continue
+
             try:
                 cd.preprocess_cdo(cart_in, cart_out, skip_existing = True)
             except Exception as exp:
