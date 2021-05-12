@@ -52,7 +52,7 @@ for exp in allexps:
                 cd.preprocess_cdo(cart_in, cart_out, skip_existing = True)
             except Exception as exp:
                 filerr.write('Error for {} {} {}\n'.format(exp, mem, var))
-                filerr.write(exp)
+                filerr.write(str(exp))
                 filerr.write('\n')
 
 filerr.close()
