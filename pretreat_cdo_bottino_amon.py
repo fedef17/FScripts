@@ -45,9 +45,10 @@ for exp in allexps:
             print(var)
             cart_in = daycart + var + '/'
             cart_out = r25cart + var + '/'
-            if len(os.listdir(cart_in)) == len(os.listdir(cart_out)):
-                print('Already processed\n')
-                continue
+            if os.path.exists(cart_out):
+                if len(os.listdir(cart_in)) == len(os.listdir(cart_out)):
+                    print('Already processed\n')
+                    continue
 
             try:
                 cd.preprocess_cdo(cart_in, cart_out, skip_existing = True)

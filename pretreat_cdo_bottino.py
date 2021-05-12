@@ -48,9 +48,10 @@ for exp in allexps:
             if not os.path.exists(cart_in):
                 print(cart_in + ' does not exist!\n')
                 continue
-            if len(os.listdir(cart_in)) == len(os.listdir(cart_out)):
-                print('Already processed\n')
-                continue
+            if os.path.exists(cart_out):
+                if len(os.listdir(cart_in)) == len(os.listdir(cart_out)):
+                    print('Already processed\n')
+                    continue
 
             try:
                 cd.preprocess_cdo(cart_in, cart_out, sel_levels = oklevs[var], taglev = taglev[var], skip_existing = True)
