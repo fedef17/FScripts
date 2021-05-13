@@ -45,6 +45,7 @@ resdict = dict()
 
 for na, ru, col in zip(allnams, allru, colors):
     filist = glob.glob(filna.format(na))
+    filist.sort()
 
     jli, jspeed, dates = cd.jli_from_files(filist)
 
