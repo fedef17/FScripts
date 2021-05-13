@@ -44,6 +44,7 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 resdict = dict()
 
 for na, ru, col in zip(allnams, allru, colors):
+    print(ru)
     filist = glob.glob(filna.format(na))
     filist.sort()
 
