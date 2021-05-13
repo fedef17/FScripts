@@ -44,7 +44,7 @@ colors = ['steelblue', 'indianred']#, 'forestgreen']
 resdict = dict()
 
 for filone, ru, col in zip(fils, allru, colors):
-    jli, jspeed, dates = cd.jli_from_files(cart + filone)
+    jli, jspeed, dates = cd.jli_from_files(cart + filone, orogfile = '/home/federico/work/Tipes/geopot_vegcover_25.nc')
 
     resdict[(ru, 'jli')] = jli
     resdict[(ru, 'jspeed')] = jspeed
