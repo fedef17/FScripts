@@ -50,5 +50,5 @@ for filone, ru, col in zip(fils, allru, colors):
     resdict[(ru, 'jspeed')] = jspeed
     resdict[(ru, 'dates')] = dates
 
-with open(cart_out + 'res_jli_hosing.p', 'wb') as filox:
+with open(cart + 'res_jli_hosing.p', 'wb') as filox:
     pickle.dump(resdict, filox)
