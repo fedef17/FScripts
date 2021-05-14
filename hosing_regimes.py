@@ -36,105 +36,106 @@ plt.rcParams['axes.axisbelow'] = True
 #cart_in = '/home/fabiano/Research/lavori/WeatherRegimes/tipes_nnetau_proj/'
 cart_in = '/home/fedef/Research/lavori/tipes/'
 
-
-patnames = ['NAO+', 'SBL', 'AR', 'NAO-']
+patnames = dict()
+patnames['DJFM'] = ['NAO+', 'SBL', 'NAO-', 'AR']
+patnames['JJAS'] = ['SBL', 'NAO+', 'NAO-/AL', 'AR']
 
 #for tip in ['refCLUS', 'refEOF', 'refCLUS_dtr_reb']:
 tip = 'refCLUS_dtr_reb'
 
-keall = ['pi', 'ho03', 'c3r5', 'eta']
-colorz = ['steelblue', 'indianred', 'forestgreen', 'orange']
+keall = ['pi', 'ho03', 'c3r5']#, 'eta']
+colorz = ['steelblue', 'indianred', 'forestgreen']#, 'orange']
 # read output
-resu, resu_ref = ctl.load_wrtool(cart_in + 'out_tipes_hosing_DJFM_EAT_4clus_4pcs_allyrs_{}.p'.format(tip))
 
-# calculate frequency in running windows
-# 30-yr windows, distribution of seasonal frequency
-timeseries = dict()
-for ke in resu.keys():
-    timeseries[ke] = xr.DataArray(resu[ke]['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu[ke]['freq_clus_seasonal_years']})
+for seas in ['JJAS', 'DJFM']:
+    resu, resu_ref = ctl.load_wrtool(cart_in + 'out_tipes_hosing_projpi_{}_EAT_4clus_4pcs_allyrs_{}.p'.format(seas, tip))
 
-resu2, resu_ref2 = ctl.load_wrtool(cart_in + 'out_tipes_nnetau_proj_NDJFM_EAT_4clus_4pcs_allyrs_{}.p'.format(tip))
-timeseries['eta'] = xr.DataArray(resu2['eta']['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu2['eta']['freq_clus_seasonal_years']})
+    # calculate frequency in running windows
+    # 30-yr windows, distribution of seasonal frequency
+    timeseries = dict()
+    for ke in resu.keys():
+        timeseries[ke] = xr.DataArray(resu[ke]['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu[ke]['freq_clus_seasonal_years']})
 
-if 'freq_clus_seasonal' not in resu_ref:
-    resu_ref['freq_clus_seasonal'], resu_ref['freq_clus_seasonal_years'] = ctl.calc_seasonal_clus_freq(resu_ref['labels'], resu_ref['dates'], 4)
+    # resu2, resu_ref2 = ctl.load_wrtool(cart_in + 'out_tipes_nnetau_proj_NDJFM_EAT_4clus_4pcs_allyrs_{}.p'.format(tip))
+    # timeseries['eta'] = xr.DataArray(resu2['eta']['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu2['eta']['freq_clus_seasonal_years']})
 
-gigi_obs = xr.DataArray(resu_ref['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu_ref['freq_clus_seasonal_years']})
+    if 'freq_clus_seasonal' not in resu_ref:
+        resu_ref['freq_clus_seasonal'], resu_ref['freq_clus_seasonal_years'] = ctl.calc_seasonal_clus_freq(resu_ref['labels'], resu_ref['dates'], 4)
 
-fig = plt.figure(figsize = (16,12))
-axes = []
-for num, patt in enumerate(patnames):
-    ax = plt.subplot(2, 2, num+1)
+    #gigi_obs = xr.DataArray(resu_ref['freq_clus_seasonal'], dims = ('reg', 'time'), coords = {'reg': [0, 1, 2, 3], 'time': resu_ref['freq_clus_seasonal_years']})
 
-    for ke, col in zip(keall, colorz):
-        timeseries[ke].sel(reg = num).plot(ax = ax, color = col, linewidth = 0.2)
-        rupi = ctl.running_mean(timeseries[ke].sel(reg = num).values, 10)
-        ax.plot(timeseries[ke].time, rupi, color = col, linewidth = 3, label = ke)
+    fig = plt.figure(figsize = (16,12))
+    axes = []
+    for num, patt in enumerate(patnames[seas]):
+        ax = plt.subplot(2, 2, num+1)
 
-    ax.set_title(patt, fontsize = 16)
-    axes.append(ax)
-    ax.grid()
-    if num in [2,3]:
-        ax.set_xlabel('year')
-    else:
-        ax.set_xlabel(None)
-    if num == 1:
-        ax.legend()
-    if num in [0,2]: ax.set_ylabel('Regime frequency')
+        for ke, col in zip(keall, colorz):
+            timeseries[ke].sel(reg = num).plot(ax = ax, color = col, linewidth = 0.2)
+            rupi = ctl.running_mean(timeseries[ke].sel(reg = num).values, 10)
+            ax.plot(timeseries[ke].time, rupi, color = col, linewidth = 3, label = ke)
 
-ctl.adjust_ax_scale(axes)
-fig.savefig(cart_in + 'hosing_freq_timeseries_{}.pdf'.format(tip))
+        ax.set_title(patt, fontsize = 16)
+        axes.append(ax)
+        ax.grid()
+        if num in [2,3]:
+            ax.set_xlabel('year')
+        else:
+            ax.set_xlabel(None)
+        if num == 1:
+            ax.legend()
+        if num in [0,2]: ax.set_ylabel('Regime frequency')
 
-fig = plt.figure(figsize = (16,12))
-axes = []
-for num, patt in enumerate(patnames):
-    ax = plt.subplot(2, 2, num+1)
+    ctl.adjust_ax_scale(axes)
+    fig.savefig(cart_in + 'hosing_freq_timeseries_projpi_{}.pdf'.format(seas))
 
-    dist_pi = timeseries['pi'].sel(reg = num).values
-    dist_ho = timeseries['ho03'].sel(reg = num, time = slice(1860, 1880)).values
-    dist_rec = timeseries['c3r5'].sel(reg = num).values
-    dist_eta = timeseries['eta'].sel(reg = num, time = slice(1860, 1880)).values
-    dist_obs = gigi_obs.sel(reg = num).values
+    fig = plt.figure(figsize = (16,12))
+    axes = []
+    for num, patt in enumerate(patnames[seas]):
+        ax = plt.subplot(2, 2, num+1)
 
-    dist_cose = [dist_pi, dist_ho, dist_rec, dist_eta]
+        dist_pi = timeseries['pi'].sel(reg = num).values
+        dist_ho = timeseries['ho03'].sel(reg = num, time = slice(1860, 1880)).values
+        dist_rec = timeseries['c3r5'].sel(reg = num).values
+        #dist_eta = timeseries['eta'].sel(reg = num, time = slice(1860, 1880)).values
+        #dist_obs = gigi_obs.sel(reg = num).values
 
-    ttests01 = []
-    ttests05 = []
-    for co in dist_cose:
-        ttests01.append(stats.ttest_ind(dist_pi, co, equal_var = False).pvalue < 0.01)
-        ttests05.append(stats.ttest_ind(dist_pi, co, equal_var = False).pvalue < 0.05)
+        dist_cose = [dist_pi, dist_ho, dist_rec]#, dist_eta]
 
-    allpercs = dict()
-    for nu in [10, 25, 50, 75, 90]:
-        allpercs['p{}'.format(nu)] = [np.percentile(cose, nu) for cose in dist_cose]
-    allpercs['mean'] = [np.mean(cose) for cose in dist_cose]
+        ttests01 = []
+        ttests05 = []
+        for co in dist_cose:
+            ttests01.append(stats.ttest_ind(dist_pi, co, equal_var = False).pvalue < 0.01)
+            ttests05.append(stats.ttest_ind(dist_pi, co, equal_var = False).pvalue < 0.05)
 
-    obsperc = dict()
-    for nu in [10, 25, 50, 75, 90]:
-        obsperc['p{}'.format(nu)] = np.percentile(dist_obs, nu)
-    obsperc['mean'] = np.mean(dist_obs)
+        allpercs = dict()
+        for nu in [10, 25, 50, 75, 90]:
+            allpercs['p{}'.format(nu)] = [np.percentile(cose, nu) for cose in dist_cose]
+        allpercs['mean'] = [np.mean(cose) for cose in dist_cose]
 
-    #nomi = ['pi (1850-1999)', 'ho03 (1850-1879)', 'c3r5 (1900-1999)', 'eta (1850-1879)']
+        # obsperc = dict()
+        # for nu in [10, 25, 50, 75, 90]:
+        #     obsperc['p{}'.format(nu)] = np.percentile(dist_obs, nu)
+        # obsperc['mean'] = np.mean(dist_obs)
 
-    positions = [0., 0.7, 1.4, 2.1, 3.2]
-    #colors = ['steelblue', 'indianred', 'steelblue', 'indianred']
-    ctl.boxplot_on_ax(ax, allpercs, keall, colorz, plot_mean = True, plot_ensmeans = False, obsperc = obsperc, obs_color = 'black', obs_name = 'ERA', plot_minmax = False, positions = positions)
+        positions = [0., 0.7, 1.4, 2.1]#, 3.2]
+        #ctl.boxplot_on_ax(ax, allpercs, keall, colorz, plot_mean = True, plot_ensmeans = False, obsperc = obsperc, obs_color = 'black', obs_name = 'ERA', plot_minmax = False, positions = positions)
+        ctl.boxplot_on_ax(ax, allpercs, keall, colorz, plot_mean = True, plot_ensmeans = False, obsperc = None, obs_color = 'black', obs_name = None, plot_minmax = False, positions = positions, wi = 0.4)
 
-    for pos, tte1, tte5 in zip(positions, ttests01, ttests05):
-        if tte1:
-            ax.scatter(pos, 5, color = 'black', marker = '*', s = 50)
-        elif tte5:
-            ax.scatter(pos, 5, color = 'black', marker = '*', s = 50, facecolors='none')
+        for pos, tte1, tte5 in zip(positions, ttests01, ttests05):
+            if tte1:
+                ax.scatter(pos, 0, color = 'black', marker = '*', s = 80)
+            elif tte5:
+                ax.scatter(pos, 0, color = 'black', marker = '*', s = 80, facecolors='none')
 
-    ax.set_title(patt, fontsize = 16)
-    ax.set_xticklabels(keall+['ERA'], fontsize = 14)
-    axes.append(ax)
-    #ax.grid()
+        ax.set_title(patt, fontsize = 16)
+        ax.set_xticklabels(keall, fontsize = 14)
+        axes.append(ax)
+        #ax.grid()
 
-    if num in [0,2]: ax.set_ylabel('Seasonal regime frequency')
+        if num in [0,2]: ax.set_ylabel('Seasonal regime frequency')
 
-ctl.adjust_ax_scale(axes)
-fig.savefig(cart_in + 'hosing_freq_boxplot_{}.pdf'.format(tip))
+    ctl.adjust_ax_scale(axes)
+    fig.savefig(cart_in + 'hosing_freq_boxplot_projpi_{}.pdf'.format(seas))
 
 # plots. with boxplots of variability.
 

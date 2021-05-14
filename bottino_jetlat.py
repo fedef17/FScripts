@@ -41,18 +41,72 @@ allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050'
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
 #############################################################################
-resdict = dict()
+# resdict = dict()
+#
+# for na, ru, col in zip(allnams, allru, colors):
+#     print(ru)
+#     filist = glob.glob(filna.format(na))
+#     filist.sort()
+#
+#     jli, jspeed, dates = cd.jli_from_files(filist)
+#
+#     resdict[(ru, 'jli')] = jli
+#     resdict[(ru, 'jspeed')] = jspeed
+#     resdict[(ru, 'dates')] = dates
+#
+# with open(cart_out + 'res_jli200.p', 'wb') as filox:
+#     pickle.dump(resdict, filox)
 
-for na, ru, col in zip(allnams, allru, colors):
-    print(ru)
-    filist = glob.glob(filna.format(na))
-    filist.sort()
+with open(cart_out + 'res_jli200.p', 'rb') as filox:
+    resdict = pickle.load(filox)
 
-    jli, jspeed, dates = cd.jli_from_files(filist)
+fig = plt.figure(figsize = (24,12))
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
 
-    resdict[(ru, 'jli')] = jli
-    resdict[(ru, 'jspeed')] = jspeed
-    resdict[(ru, 'dates')] = dates
+latsel = np.arange(30, 71, 0.5)
+kos = np.concatenate([resdict[(ru, 'jspeed')] for ru in allru])
+vmin, vmax = (np.min(kos), np.max(kos))
+print(vmin, vmax)
+vsel = np.linspace(vmin, vmax, 100)
 
-with open(cart_out + 'res_jli200.p', 'wb') as filox:
-    pickle.dump(resdict, filox)
+def dopdf(var, xi, bnd_width):
+    pdf = ctl.calc_pdf(var, bnd_width = bnd_width)
+    pdfok = pdf(xi)
+    pdfok /= np.sum(pdfok)
+    return pdfok
+
+for ru, col in zip(allru, colors):
+    jli = resdict[(ru, 'jli')]
+    jspeed = resdict[(ru, 'jspeed')]
+
+    jliserie = ctl.bootstrap(jli, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [latsel, 0.22], n_choice = 50, n_bootstrap = 1000)
+    jspedserie = ctl.bootstrap(jspeed, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [vsel, None], n_choice = 50, n_bootstrap = 1000)
+
+    pdf = ctl.calc_pdf(jli, bnd_width = 0.22)
+    pdfok = pdf(latsel)
+    pdfok /= np.sum(pdfok)
+
+    jlimin = np.percentile(jliserie, 10, axis = 0)
+    jlimax = np.percentile(jliserie, 90, axis = 0)
+    ax1.fill_between(latsel, jlimin, jlimax, color = col, alpha = 0.3)
+    ax1.plot(latsel, pdfok, label = ru, color = col, linewidth = 3)
+
+    pdf = ctl.calc_pdf(jspeed)
+    pdfok = pdf(vsel)
+    pdfok /= np.sum(pdfok)
+
+    jlimin = np.percentile(jspedserie, 10, axis = 0)
+    jlimax = np.percentile(jspedserie, 90, axis = 0)
+    ax2.fill_between(vsel, jlimin, jlimax, color = col, alpha = 0.3)
+    ax2.plot(vsel, pdfok, label = ru, color = col, linewidth = 3)
+
+ax1.grid()
+ax2.grid()
+ax1.set_xlabel('Latitude')
+ax2.set_xlabel('u wind (m/s)')
+ax1.set_title('Jet latitude index')
+ax2.set_title('Jet speed')
+ax1.legend()
+ax2.legend()
+fig.savefig(cart_out + 'jlinspeed_bottino.pdf')
