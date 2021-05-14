@@ -55,9 +55,9 @@ for exp in allexps:
 
             try:
                 cd.preprocess_cdo(cart_in, cart_out, sel_levels = oklevs[var], taglev = taglev[var], skip_existing = True)
-            except Exception as exp:
+            except Exception as exc:
                 filerr.write('Error for {} {} {}\n'.format(exp, mem, var))
-                filerr.write(exp)
+                filerr.write(str(exc))
                 filerr.write('\n')
 
 filerr.close()
