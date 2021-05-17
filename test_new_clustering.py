@@ -25,17 +25,19 @@ import itertools as itt
 #zg = '/data-hobbes/fabiano/OBS/ERA/ERA40+Int_daily_1957-2018_zg500_remap25_meters.nc'
 cart_out = '/home/fabiano/Research/lavori/WeatherRegimes/ERA5_tests/'
 
-zgfil = '/nas/reference/ERA5/daily/zg500/ERA5_zg500_1979-2019_meters.nc'
-ufils = '/nas/reference/ERA5/daily/u/ERA5_u_5lev_*nc'
+# zgfil = '/nas/reference/ERA5/daily/zg500/ERA5_zg500_1979-2019_meters.nc'
+# ufils = '/nas/reference/ERA5/daily/u/ERA5_u_5lev_*nc'
+#
+# ufils_li = glob.glob(ufils)
+# ufils_li.sort()
+#
+# ua, coords, auxi = ctl.read_xr(ufils_li, extract_level_hPa = 850., regrid_to_deg = 2.5)
+# zg, coords_zg, auxi_zg = ctl.read_xr(zgfil, extract_level_hPa = 850., regrid_to_deg = 2.5)
+# zg, dates = ctl.sel_time_range(zg, coords_zg['dates'], year_range = (1979,2018))
+#
+# pickle.dump([ua, zg, coords], open(cart_out + 'zg_e_ua_ERA5.p', 'wb'))
+ua, zg, coords = pickle.load(open(cart_out + 'zg_e_ua_ERA5.p', 'rb'))
 
-ufils_li = glob.glob(ufils)
-ufils_li.sort()
-
-ua, coords, auxi = ctl.read_xr(ufils_li, extract_level_hPa = 850., regrid_to_deg = 2.5)
-zg, coords_zg, auxi_zg = ctl.read_xr(zgfil, extract_level_hPa = 850., regrid_to_deg = 2.5)
-zg, dates = ctl.sel_time_range(zg, coords_zg['dates'], year_range = (1979,2018))
-
-pickle.dump([ua, zg, coords], open(cart_out + 'zg_e_ua_ERA5.p', 'wb'))
 
 ua_climate_mean, ua_dates_climate_mean, _ = ctl.daily_climatology(ua, coords['dates'], window = 20)
 zg_climate_mean, zg_dates_climate_mean, _ = ctl.daily_climatology(zg, coords['dates'], window = 20)
@@ -60,10 +62,10 @@ def butter_lowpass_filter(data, cutoff, fs = 1, order=5):
 
 # Filter requirements.
 # Get the filter coefficients so we can check its frequency response.
-b, a = butter_lowpass(10)
+b, a = butter_lowpass(0.1) # 10 days
 
 # Plot the frequency response.
-w, h = freqz(b, a, worN=8000)
+w, h = signal.freqz(b, a, worN = 1024)#8000)
 plt.subplot(2, 1, 1)
 plt.plot(0.5*fs*w/np.pi, np.abs(h), 'b')
 plt.plot(cutoff, 0.5*np.sqrt(2), 'ko')
