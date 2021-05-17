@@ -7,7 +7,7 @@ import os
 import glob
 
 import matplotlib
-matplotlib.use('Agg') # This is to avoid the code crash if no Xwindow is available
+#matplotlib.use('Agg') # This is to avoid the code crash if no Xwindow is available
 from matplotlib import pyplot as plt
 
 import pickle
@@ -63,6 +63,8 @@ def butter_lowpass_filter(data, cutoff, fs = 1, order=5):
 # Filter requirements.
 # Get the filter coefficients so we can check its frequency response.
 b, a = butter_lowpass(0.1) # 10 days
+fs = 1
+cutoff = 0.1
 
 # Plot the frequency response.
 w, h = signal.freqz(b, a, worN = 1024)#8000)
@@ -79,7 +81,7 @@ plt.grid()
 data = ua[:, 0, 50]
 
 # Filter the data, and plot both the original and filtered signals.
-y = butter_lowpass_filter(data, 10)
+y = butter_lowpass_filter(data, cutoff)
 
 plt.subplot(2, 1, 2)
 plt.plot(np.arange(len(data)), data, 'b-', label='data')
