@@ -57,7 +57,7 @@ fres_std = open(cart_out + 'prima_rad_std.dat', 'w')
 kosetttit = '{:15s}' + len(varstot) * '{:10s}' + '\n'
 kosett = '{:15s}' + len(varstot) * '{:10.4e}' + '\n'
 fres.write(kosetttit.format('model', *varstot))
-fres_std.write(kosetttit.format('model', *vars))
+fres_std.write(kosetttit.format('model', *varstot))
 
 resu = dict()
 resu_std = dict()
@@ -82,7 +82,7 @@ for mod in mods:
 
     resulis = [resu[(mod, var)] for var in varstot]
     fres.write(kosett.format(mod, *resulis))
-    resulis = [resu[(mod, var)] for var in vars]
+    resulis = [resu[(mod, var)] for var in vars] + 3*[np.nan]
     fres_std.write(kosett.format(mod, *resulis))
 
 fres.close()
