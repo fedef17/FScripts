@@ -45,4 +45,19 @@ zg_climate_mean, zg_dates_climate_mean, _ = ctl.daily_climatology(zg, coords['da
 ua_low = ctl.butter_filter(ua, 10)
 ua_low_djfm, dates_djfm = ctl.sel_season(ua_low, coords['dates'], 'DJFM')
 
-results = cd.WRtool_core(var_season, lat, lon, dates_season, area, climate_mean = climate_mean, dates_climate_mean = dates_climate_mean, numpcs = inputs['numpcs'], perc = inputs['perc'], numclus = inputs['numclus'])
+### Test jli.
+figs = []
+jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter')
+figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth w 0.22'))
+jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter', bnd_width = None)
+figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth w auto bnd'))
+jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter_worog')
+figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth no greenland'))
+jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'lanczos')
+figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'lanczos'))
+ctl.plot_pdfpages(cart_out + 'test_jli_filters.pdf', figs)
+
+
+
+
+#results = cd.WRtool_core(var_season, lat, lon, dates_season, area, climate_mean = climate_mean, dates_climate_mean = dates_climate_mean, numpcs = inputs['numpcs'], perc = inputs['perc'], numclus = inputs['numclus'])

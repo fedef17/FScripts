@@ -64,7 +64,7 @@ fig = plt.figure(figsize = (24,12))
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 
-latsel = np.arange(30, 71, 0.5)
+latsel = np.arange(20, 71, 0.5)
 kos = np.concatenate([resdict[(ru, 'jspeed')] for ru in allru])
 vmin, vmax = (np.min(kos), np.max(kos))
 print(vmin, vmax)
