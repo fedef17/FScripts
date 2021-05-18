@@ -45,7 +45,7 @@ cart_out = '/home/users/fedef17/work/prima_rad/'
 ### RLUT
 
 vars = 'clt  hfls  hfss  pr  prsn  rlds  rlus  rlut  rsds  rsdt  rsus  rsut'.split()
-varstot = vars + ['net_toa', 'net_srf', 'in_toa']
+varstot = vars + ['net_toa', 'net_srf', 'in_atm']
 
 mods = os.listdir(cart_in)
 mods.sort()
