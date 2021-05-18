@@ -50,7 +50,7 @@ figs = []
 jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter')
 figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth w 0.22'))
 jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter')
-figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth w auto bnd'), bnd_width = None)
+figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth w auto bnd', bnd_width = None))
 jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'butter_worog')
 figs.append(cd.plot_jli_w_speed(jli, jspeed, jdates, title = 'butterworth no greenland'))
 jli, jspeed, jdates = cd.jetlatindex(ua, coords['lat'], coords['lon'], coords['dates'], filter = 'lanczos')
