@@ -65,14 +65,19 @@ for mod in mods:
     print(mod)
     for var in vars:
         print(var)
+
         fikoj = fil.format(mod, var, var)
-        filok = glob.glob(fikoj)[0]
+        if len(glob.glob(fikoj)) > 0:
+            filok = glob.glob(fikoj)[0]
 
-        kos, coords, auxi = ctl.read_xr(filok)
-        kosme = ctl.global_mean(kos, coords['lat'])
+            kos, coords, auxi = ctl.read_xr(filok)
+            kosme = ctl.global_mean(kos, coords['lat'])
 
-        resu[(mod, var)] = np.mean(kosme)
-        resu_std[(mod, var)] = np.std(kosme)
+            resu[(mod, var)] = np.mean(kosme)
+            resu_std[(mod, var)] = np.std(kosme)
+        else:
+            resu[(mod, var)] = np.nan
+            resu_std[(mod, var)] = np.nan
 
 
     resu[(mod, 'net_toa')] = resu[(mod, 'rsdt')] - resu[(mod, 'rsut')] - resu[(mod, 'rlut')]
