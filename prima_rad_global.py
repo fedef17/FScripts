@@ -54,37 +54,57 @@ fil = cart_in + '{}/r1*/Amon/{}/{}*nc'
 fres = open(cart_out + 'prima_rad_mean.dat', 'w')
 fres_std = open(cart_out + 'prima_rad_std.dat', 'w')
 
-kosetttit = '{:15s}' + len(varstot) * '{:10s}' + '\n'
-kosett = '{:15s}' + len(varstot) * '{:10.4e}' + '\n'
+kosetttit = '{:15s}' + len(varstot) * '{:14s}' + '\n'
+kosett = '{:15s}' + len(varstot) * '{:14.4e}' + '\n'
 fres.write(kosetttit.format('model', *varstot))
 fres_std.write(kosetttit.format('model', *varstot))
 
-resu = dict()
-resu_std = dict()
+# resu = dict()
+# resu_std = dict()
+# for mod in mods:
+#     print(mod)
+#     for var in vars:
+#         print(var)
+#
+#         fikoj = fil.format(mod, var, var)
+#         if len(glob.glob(fikoj)) > 0:
+#             filok = glob.glob(fikoj)[0]
+#
+#             kos, coords, auxi = ctl.read_xr(filok)
+#             kosme = ctl.global_mean(kos, coords['lat'])
+#
+#             resu[(mod, var)] = np.mean(kosme)
+#             resu_std[(mod, var)] = np.std(kosme)
+#         else:
+#             resu[(mod, var)] = np.nan
+#             resu_std[(mod, var)] = np.nan
+#
+#
+#     resu[(mod, 'net_toa')] = resu[(mod, 'rsdt')] - resu[(mod, 'rsut')] - resu[(mod, 'rlut')]
+#     resu[(mod, 'net_srf')] = resu[(mod, 'rsds')] + resu[(mod, 'rlds')] - resu[(mod, 'rsus')] - resu[(mod, 'rlus')] - resu[(mod, 'hfss')] - resu[(mod, 'hfls')]
+#
+#     resu[(mod, 'in_atm')] = resu[(mod, 'net_toa')] - resu[(mod, 'net_srf')]
+#
+#     resulis = [resu[(mod, var)] for var in varstot]
+#     fres.write(kosett.format(mod, *resulis))
+#     resulis = [resu[(mod, var)] for var in vars] + 3*[np.nan]
+#     fres_std.write(kosett.format(mod, *resulis))
+#
+# fres.close()
+# fres_std.close()
+#
+# pickle.dump([resu, resu_std], open(cart_out + 'glomean.p', 'wb'))
+resu, resu_std = pickle.load(open(cart_out + 'glomean.p', 'rb'))
+
 for mod in mods:
-    print(mod)
-    for var in vars:
-        print(var)
-
-        fikoj = fil.format(mod, var, var)
-        if len(glob.glob(fikoj)) > 0:
-            filok = glob.glob(fikoj)[0]
-
-            kos, coords, auxi = ctl.read_xr(filok)
-            kosme = ctl.global_mean(kos, coords['lat'])
-
-            resu[(mod, var)] = np.mean(kosme)
-            resu_std[(mod, var)] = np.std(kosme)
-        else:
-            resu[(mod, var)] = np.nan
-            resu_std[(mod, var)] = np.nan
-
-
-    resu[(mod, 'net_toa')] = resu[(mod, 'rsdt')] - resu[(mod, 'rsut')] - resu[(mod, 'rlut')]
-    resu[(mod, 'net_srf')] = resu[(mod, 'rsds')] + resu[(mod, 'rlds')] - resu[(mod, 'rsus')] - resu[(mod, 'rlus')] - resu[(mod, 'hfss')] - resu[(mod, 'hfls')]
-
-    resu[(mod, 'in_atm')] = resu[(mod, 'net_toa')] - resu[(mod, 'net_srf')]
-
+    if mod == 'CMCC-CM2-HR4':
+        resu[(mod, 'rlut')] = 289.8435
+        resu[(mod, 'net_toa')] = resu[(mod, 'rsdt')] - resu[(mod, 'rsut')] - resu[(mod, 'rlut')]
+        resu[(mod, 'in_atm')] = resu[(mod, 'net_toa')] - resu[(mod, 'net_srf')]
+    elif mod == 'CMCC-CM2-VHR4':
+        resu[(mod, 'rlut')] = 289.6158
+        resu[(mod, 'net_toa')] = resu[(mod, 'rsdt')] - resu[(mod, 'rsut')] - resu[(mod, 'rlut')]
+        resu[(mod, 'in_atm')] = resu[(mod, 'net_toa')] - resu[(mod, 'net_srf')]
     resulis = [resu[(mod, var)] for var in varstot]
     fres.write(kosett.format(mod, *resulis))
     resulis = [resu[(mod, var)] for var in vars] + 3*[np.nan]
@@ -92,5 +112,3 @@ for mod in mods:
 
 fres.close()
 fres_std.close()
-
-pickle.dump([resu, resu_std], open(cart_out + 'glomean.p', 'wb'))
