@@ -73,36 +73,39 @@ figs = []
 lat = coords['lat']
 lon = coords['lon']
 
-res_all = dict()
-
-area = 'NATL'
-numpcs = 5
-numclus = 5
-perc = None
-
-res_all['ua_low_full_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
-
-res_all['ua_low_anom_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
-
-numclus = 4
-res_all['ua_low_full_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
-
-res_all['ua_low_anom_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
-
-
-area = 'EAT'
-numpcs = 4
-numclus = 4
-
-res_all['zg_eddy_full'] = cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
-
-res_all['zg_eddy_anom'] =  cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_eddy, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
-
-res_all['zg_full'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
-
-res_all['zg_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
-
-res_all['zg_zon_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_zon[..., np.newaxis], dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+# res_all = dict()
+#
+# area = 'NATL'
+# numpcs = 5
+# numclus = 5
+# perc = None
+#
+# res_all['ua_low_full_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+#
+# res_all['ua_low_anom_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+#
+# numclus = 4
+# res_all['ua_low_full_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+#
+# res_all['ua_low_anom_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+#
+#
+# area = 'EAT'
+# numpcs = 4
+# numclus = 4
+#
+# res_all['zg_eddy_full'] = cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+#
+# res_all['zg_eddy_anom'] =  cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_eddy, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+#
+# res_all['zg_full'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+#
+# res_all['zg_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+#
+# res_all['zg_zon_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_zon[..., np.newaxis], dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+#
+# pickle.dump(res_all, open(cart_out + 'res_all_regs.p', 'wb'))
+res_all = pickle.load(open(cart_out + 'res_all_regs.p', 'rb'))
 
 figs = []
 for ke in res_all:
@@ -111,9 +114,18 @@ for ke in res_all:
         cbar_range = (-30, 30.)
         cb_label = 'u (m/s)'
     else:
-        cbar_range = (-135, 135.)
+        cbar_range = (-160, 160.)
         cb_label = 'zg (m)'
-    fig = cd.plot_regimes(koze['lat'], koze['lon'], koze['cluspattern'], None, cbar_range = cbar_range, cb_label = cb_label)
-    figs.append(fig)
 
+    fix_subplots_shape = (2, 2)
+    if len(koze['cluspattern']) == 5: fix_subplots_shape = (2, 3)
+
+    patts = koze['cluspattern']
+    if ke == 'zg_full':
+        patts = patts - np.mean(koze['cluspattern_area'])
+    fig = cd.plot_regimes(koze['lat'], koze['lon'], patts, None, cbar_range = cbar_range, cb_label = cb_label, reg_freq = koze['freq_clus'])
+    fig[0].suptitle(ke)
+    figs.append(fig[0])
+
+#figs = np.concatenate(figs)
 ctl.plot_pdfpages(cart_out + 'test_regimes_pattern.pdf', figs)
