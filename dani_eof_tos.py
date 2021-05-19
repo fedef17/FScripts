@@ -61,7 +61,40 @@ ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:12], pino.lat.values, p
 lat = pino.lat.values
 lon = pino.lon.values
 # match
-eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:12], solver_dtr.eofs(eofscaling=2)[:12], latitude = lat)
+#eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:12], solver_dtr.eofs(eofscaling=2)[:12], latitude = lat)
+#filout3 = cart + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
+#ctl.plot_multimap_contour(eof2-solver.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
 
-filout3 = cart + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
-ctl.plot_multimap_contour(eof2-solver.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+#######################################
+
+filexp = '/data-archimede/historical/ecearth/a1tn/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
+cose = glob.glob(filexp)
+
+gigi = xr.open_mfdataset(cose, use_cftime = True)
+# gigi = gigi.drop_vars('latitude')
+# gigi = gigi.drop_vars('longitude')
+
+# only november
+gigi11 = gigi.sel(time = gigi['time.month'] == 11)
+
+solver_exp = ctl.eof_computation(gigi11.tos.values, latitude=gigi.lat.values)
+
+filout = cart_out + 'tos_eofs_atn1_withtrend.pdf'
+ctl.plot_multimap_contour(solver_exp.eofs(eofscaling=2)[:12], gigi.lat.values, gigi.lon.values, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+
+### detrended
+pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(gigi11.lat.values, gigi11.lon.values, gigi11.tos.values, gigi11.time.values, None, deg = 1)
+
+plt.ion()
+plt.figure()
+plt.plot(var_reg)
+solver_exp_dtr = ctl.eof_computation(pinko, latitude=gigi.lat.values)
+
+filout2 = cart_out + 'tos_eofs_atn1_detrended.pdf'
+ctl.plot_multimap_contour(solver_exp_dtr.eofs(eofscaling=2)[:12], gigi.lat.values, gigi.lon.values, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+
+pcs_ref = []
+pcs_ref_dtr = []
+for i in range(12):
+    pcs_ref.append(solver.projectField(solver_exp.eofs(eofscaling=2)[i], neofs=12, eofscaling=0, weighted=True))
+    pcs_ref_dtr.append(solver_dtr.projectField(solver_exp_dtr.eofs(eofscaling=2)[i], neofs=12, eofscaling=0, weighted=True))
