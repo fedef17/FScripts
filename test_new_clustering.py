@@ -111,8 +111,11 @@ figs = []
 for ke in res_all:
     koze = res_all[ke]
     if 'ua' in ke:
-        cbar_range = (-30, 30.)
+        cbar_range = (-15, 15.)
         cb_label = 'u (m/s)'
+    elif ke == 'zg_full':
+        cbar_range = (-250, 250.)
+        cb_label = 'zg (m)'
     else:
         cbar_range = (-160, 160.)
         cb_label = 'zg (m)'
@@ -123,7 +126,7 @@ for ke in res_all:
     patts = koze['cluspattern']
     if ke == 'zg_full':
         patts = patts - np.mean(koze['cluspattern_area'])
-    fig = cd.plot_regimes(koze['lat'], koze['lon'], patts, None, cbar_range = cbar_range, cb_label = cb_label, reg_freq = koze['freq_clus'])
+    fig = cd.plot_regimes(koze['lat'], koze['lon'], patts, None, cbar_range = cbar_range, cb_label = cb_label, reg_freq = koze['freq_clus'], plot_type = 'pcolormesh')
     fig[0].suptitle(ke)
     figs.append(fig[0])
 
