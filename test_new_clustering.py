@@ -80,29 +80,29 @@ numpcs = 5
 numclus = 5
 perc = None
 
-res_all['ua_low_full_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_season, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+res_all['ua_low_full_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
 
-res_all['ua_low_anom_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_season, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+res_all['ua_low_anom_5'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
 
 numclus = 4
-res_all['ua_low_full_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_season, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+res_all['ua_low_full_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
 
-res_all['ua_low_anom_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_season, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+res_all['ua_low_anom_4'] = cd.WRtool_core(ua_low_djfm, lat, lon, dates_djfm, area, climate_mean = ua_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
 
 
 area = 'EAT'
 numpcs = 4
 numclus = 4
 
-res_all['zg_eddy_full'] = cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_season, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+res_all['zg_eddy_full'] = cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
 
-res_all['zg_eddy_anom'] =  cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_season, area, climate_mean = zg_climate_mean_eddy, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+res_all['zg_eddy_anom'] =  cd.WRtool_core(zg_eddy_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_eddy, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
 
-res_all['zg_full'] = cd.WRtool_core(zg_djfm, lat, lon, dates_season, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
+res_all['zg_full'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = False)
 
-res_all['zg_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_season, area, climate_mean = zg_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+res_all['zg_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean, dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
 
-res_all['zg_zon_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_season, area, climate_mean = zg_climate_mean_zon[..., np.newaxis], dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
+res_all['zg_zon_anom'] = cd.WRtool_core(zg_djfm, lat, lon, dates_djfm, area, climate_mean = zg_climate_mean_zon[..., np.newaxis], dates_climate_mean = dates_climate_mean, numpcs = numpcs, perc = perc, numclus = numclus, remove_climate_mean = True)
 
 figs = []
 for ke in res_all:
