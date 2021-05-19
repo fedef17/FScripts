@@ -33,7 +33,9 @@ plt.rcParams['axes.axisbelow'] = True
 cart_out = '/home/fabiano/Research/lavori/dani_eofs_tos/'
 
 #date = [datetime.strptime('{}15'.format(int(da)), '%Y%m%d') for da in tos.time.values]
-pino = xr.load_dataset('/data-archimede/ORAS4/fighetto_opa0.nc', use_cftime = True)
+
+#allcos = []
+pino = xr.load_dataset('/data-archimede/ORAS4/tos_Omon_ORAS4_opa0_195709-201412_r360x180.nc', use_cftime = True)
 pino = pino.drop_vars('latitude')
 pino = pino.drop_vars('longitude')
 
