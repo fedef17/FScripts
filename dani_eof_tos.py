@@ -58,6 +58,8 @@ solver_dtr = ctl.eof_computation(pinko, latitude=pino.lat.values)
 filout2 = cart_out + 'tos_eofs_opa0_detrended.pdf'
 ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
 
+lat = pino.lat.values
+lon = pino.lon.values
 # match
 eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:12], solver_dtr.eofs(eofscaling=2)[:12], latitude = lat)
 
