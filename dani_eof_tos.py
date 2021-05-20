@@ -111,9 +111,11 @@ for nam in expnams:
 
     gicoso = gigi11.tos.values
     gicoso[:, mask] = np.nan
+    print(nam, np.nanmean(gicoso))
+    if np.nanmean(gicoso) < 0.:
+        gicoso = gicoso + 273.15
     gi11tos.append(gicoso)
 
-    print(nam, np.nanmean(gicoso, axis = (1,2)))
 
     ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, pino11.time.values, None, deg = 1)
 
