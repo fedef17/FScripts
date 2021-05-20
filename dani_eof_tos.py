@@ -173,7 +173,16 @@ ctl.plot_multimap_contour(expeofs_dtr, lat, lon, filout2, plot_anomalies=True, c
 expeofs = simatch[:, np.newaxis, np.newaxis] * solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
 expeofs_dtr = simatch_dtr[:, np.newaxis, np.newaxis] * solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
 print('Ok match: ', okmatch)
+rcorrs = [ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)]
+rmss = [ctl.E_rms(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)]
+print('Rcorrs: ', rcorrs)
+print('RMSs: ', rmss)
+
 print('Ok match dtr: ', okmatch_dtr)
+rcorrs_dtr = [ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
+rmss_dtr = [ctl.E_rms(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
+print('Rcorrs: ', rcorrs_dtr)
+print('RMSs: ', rmss_dtr)
 
 # signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)])
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_withtrend.pdf'
@@ -183,6 +192,11 @@ ctl.plot_multimap_contour(expeofs-obseofs, pino.lat.values, pino.lon.values, fil
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_detrended.pdf'
 ctl.plot_multimap_contour(expeofs_dtr-obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
+filout3 = cart_out + 'tos_eofs_expmatch_withtrend.pdf'
+ctl.plot_multimap_contour(expeofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+
+filout3 = cart_out + 'tos_eofs_expmatch_detrended.pdf'
+ctl.plot_multimap_contour(expeofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 ####################################################
 
 fig = plt.figure()
