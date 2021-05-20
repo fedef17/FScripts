@@ -120,6 +120,7 @@ for nam in expnams:
 gi11tos = np.concatenate(gi11tos, axis = 0)
 gi11tos_dtr = np.concatenate(gi11tos_dtr, axis = 0)
 
+pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.nc', 'wb'))
 ############################################################
 
 solver = ctl.eof_computation(pi11tos, latitude=pino.lat.values)
@@ -145,8 +146,9 @@ obseofs_dtr = solver_dtr.eofs(eofscaling=2)[:n_ref]
 
 solver_exp = ctl.eof_computation(gi11tos, latitude=gigi.lat.values)
 
-okmatch = ctl.match_patterns(obseofs, solver_exp.eofs(eofscaling=2)[:n_ref+10])
-expeofs = solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
+okmatch = ctl.match_patterns(obseofs, solver_exp.eofs(eofscaling=2)[:n_ref+10], latitude = lat)
+#expeofs = solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
+expeofs = solver_exp.eofs(eofscaling=2)[:n_ref]
 
 filout = cart_out + 'tos_eofs_exp_withtrend.pdf'
 ctl.plot_multimap_contour(expeofs, lat, lon, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
@@ -154,13 +156,17 @@ ctl.plot_multimap_contour(expeofs, lat, lon, filout, plot_anomalies=True, cbar_r
 ### detrended
 solver_exp_dtr = ctl.eof_computation(gi11tos_dtr, latitude=gigi.lat.values)
 
-okmatch_dtr = ctl.match_patterns(obseofs_dtr, solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10])
-expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
+okmatch_dtr = ctl.match_patterns(obseofs_dtr, solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10], latitude = lat)
+#expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
+expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref]
 
 filout2 = cart_out + 'tos_eofs_exp_detrended.pdf'
 ctl.plot_multimap_contour(expeofs_dtr, lat, lon, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 #### matched diffs
+
+expeofs = solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
+expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
 
 signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)])
 filout3 = cart + 'tos_eofs_diff_obs-exp_withtrend.pdf'
