@@ -57,13 +57,22 @@ gigi = gigi.sel(time = slice('1960-01-01', '2014-12-31'))
 gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
 # common mask
-
 mask_obs = np.isnan(pino11.tos.values[0])
 mask_exp = np.isnan(gigi11.tos.values[0])
 mask = (mask_obs) | (mask_exp)
 
-pi11tos = pino11.tos.values[:, ~mask]
-gi11tos = gigi11.tos.values[:, ~mask]
+#pi11tos = pino11.tos.values[:, ~mask]
+#gi11tos = gigi11.tos.values[:, ~mask]
+
+# ok, qui rileggo tutte le obs e tutti gli exp
+pi11tos = pino11.tos.values
+gi11tos = gigi11.tos.values
+pi11tos[:, mask] = np.nan
+gi11tos[:, mask] = np.nan
+
+# pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, pi11tos, pino11.time.values, None, deg = 1)
+# ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, pi11tos, pino11.time.values, None, deg = 1)
+
 lat = pino.lat.values
 lon = pino.lon.values
 
