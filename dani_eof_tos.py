@@ -173,14 +173,14 @@ ctl.plot_multimap_contour(expeofs_dtr, lat, lon, filout2, plot_anomalies=True, c
 expeofs = simatch[:, np.newaxis, np.newaxis] * solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
 expeofs_dtr = simatch_dtr[:, np.newaxis, np.newaxis] * solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
 print('Ok match: ', okmatch)
-rcorrs = [ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)]
-rmss = [ctl.E_rms(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)]
+rcorrs = [ctl.Rcorr(ob, ex, latitude = lat) for ob,ex in zip(obseofs, expeofs)]
+rmss = [ctl.E_rms(ob, ex, latitude = lat) for ob,ex in zip(obseofs, expeofs)]
 print('Rcorrs: ', rcorrs)
 print('RMSs: ', rmss)
 
 print('Ok match dtr: ', okmatch_dtr)
-rcorrs_dtr = [ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
-rmss_dtr = [ctl.E_rms(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
+rcorrs_dtr = [ctl.Rcorr(ob, ex, latitude = lat) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
+rmss_dtr = [ctl.E_rms(ob, ex, latitude = lat) for ob,ex in zip(obseofs_dtr, expeofs_dtr)]
 print('Rcorrs: ', rcorrs_dtr)
 print('RMSs: ', rmss_dtr)
 
