@@ -40,7 +40,7 @@ pino = pino.drop_vars('latitude')
 pino = pino.drop_vars('longitude')
 
 # only november
-pino = pino.sel(time = slice('01-01-1960', '31-12-2014'))
+pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
 pino11 = pino.sel(time = pino['time.month'] == 11)
 
 filexp = '/data-archimede/historical/ecearth/a1tn/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
@@ -53,7 +53,7 @@ gigi = gigi.rename({'longitude' : 'lon'})
 # gigi = gigi.drop_vars('longitude')
 
 # only november
-gigi = gigi.sel(time = slice('01-01-1960', '31-12-2014'))
+gigi = gigi.sel(time = slice('1960-01-01', '2014-12-31'))
 gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
 # common mask
