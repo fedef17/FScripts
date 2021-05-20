@@ -40,32 +40,8 @@ pino = pino.drop_vars('latitude')
 pino = pino.drop_vars('longitude')
 
 # only november
+pino = pino.sel(time = slice('01-01-1960', '31-12-2014'))
 pino11 = pino.sel(time = pino['time.month'] == 11)
-
-solver = ctl.eof_computation(pino11.tos.values, latitude=pino.lat.values)
-
-filout = cart_out + 'tos_eofs_opa0_withtrend.pdf'
-ctl.plot_multimap_contour(solver.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
-
-### detrended
-pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(pino11.lat.values, pino11.lon.values, pino11.tos.values, pino11.time.values, None, deg = 1)
-
-plt.ion()
-plt.figure()
-plt.plot(var_reg)
-solver_dtr = ctl.eof_computation(pinko, latitude=pino.lat.values)
-
-filout2 = cart_out + 'tos_eofs_opa0_detrended.pdf'
-ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
-
-lat = pino.lat.values
-lon = pino.lon.values
-# match
-#eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:12], solver_dtr.eofs(eofscaling=2)[:12], latitude = lat)
-#filout3 = cart + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
-#ctl.plot_multimap_contour(eof2-solver.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
-
-#######################################
 
 filexp = '/data-archimede/historical/ecearth/a1tn/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
 cose = glob.glob(filexp)
@@ -77,23 +53,60 @@ gigi = gigi.rename({'longitude' : 'lon'})
 # gigi = gigi.drop_vars('longitude')
 
 # only november
+gigi = gigi.sel(time = slice('01-01-1960', '31-12-2014'))
 gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
-solver_exp = ctl.eof_computation(gigi11.tos.values, latitude=gigi.lat.values)
+# common mask
 
-filout = cart_out + 'tos_eofs_atn1_withtrend.pdf'
-ctl.plot_multimap_contour(solver_exp.eofs(eofscaling=2)[:12], gigi.lat.values, gigi.lon.values, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+mask_obs = np.isnan(pino11.tos.values[0])
+mask_exp = np.isnan(gigi11.tos.values[0])
+mask = (mask_obs) | (mask_exp)
+
+pi11tos = pino11.tos.values[~mask[np.newaxis, ...]]
+gi11tos = gigi11.tos.values[~mask[np.newaxis, ...]]
+lat = pino.lat.values
+lon = pino.lon.values
+
+############################################################
+
+solver = ctl.eof_computation(pi11tos, latitude=pino.lat.values)
+
+filout = cart_out + 'tos_eofs_opa0_withtrend.pdf'
+ctl.plot_multimap_contour(solver.eofs(eofscaling=2)[:12], lat, lon, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
 
 ### detrended
-pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(gigi11.lat.values, gigi11.lon.values, gigi11.tos.values, gigi11.time.values, None, deg = 1)
+pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, pi11tos, pino11.time.values, None, deg = 1)
 
 plt.ion()
 plt.figure()
 plt.plot(var_reg)
-solver_exp_dtr = ctl.eof_computation(pinko, latitude=gigi.lat.values)
+solver_dtr = ctl.eof_computation(pinko, latitude=pino.lat.values)
+
+filout2 = cart_out + 'tos_eofs_opa0_detrended.pdf'
+ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:12], lat, lon, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+
+# match
+#eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:12], solver_dtr.eofs(eofscaling=2)[:12], latitude = lat)
+#filout3 = cart + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
+#ctl.plot_multimap_contour(eof2-solver.eofs(eofscaling=2)[:12], pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+
+#######################################
+
+solver_exp = ctl.eof_computation(gi11tos, latitude=gigi.lat.values)
+
+filout = cart_out + 'tos_eofs_atn1_withtrend.pdf'
+ctl.plot_multimap_contour(solver_exp.eofs(eofscaling=2)[:12], lat, lon, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+
+### detrended
+ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gi11tos, gigi11.time.values, None, deg = 1)
+
+plt.ion()
+plt.figure()
+plt.plot(var_reg)
+solver_exp_dtr = ctl.eof_computation(ginko, latitude=gigi.lat.values)
 
 filout2 = cart_out + 'tos_eofs_atn1_detrended.pdf'
-ctl.plot_multimap_contour(solver_exp_dtr.eofs(eofscaling=2)[:12], gigi.lat.values, gigi.lon.values, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
+ctl.plot_multimap_contour(solver_exp_dtr.eofs(eofscaling=2)[:12], lat, lon, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(12)], cb_label='T (K)')
 
 pcs_ref = []
 pcs_ref_dtr = []
