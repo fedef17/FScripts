@@ -121,6 +121,7 @@ gi11tos = np.concatenate(gi11tos, axis = 0)
 gi11tos_dtr = np.concatenate(gi11tos_dtr, axis = 0)
 
 pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.nc', 'wb'))
+# pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr = pickle.load(open(cart_out + 'tos_data.nc', 'rb'))
 ############################################################
 
 solver = ctl.eof_computation(pi11tos, latitude=pino.lat.values)
@@ -136,7 +137,7 @@ ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:n_ref], lat, lon, filou
 
 # match
 #eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:n_ref], solver_dtr.eofs(eofscaling=2)[:n_ref], latitude = lat)
-#filout3 = cart + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
+#filout3 = cart_out + 'tos_eofs_opa0_diff_dtr-wtr.pdf'
 #ctl.plot_multimap_contour(eof2-solver.eofs(eofscaling=2)[:n_ref], pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 #######################################
@@ -169,11 +170,11 @@ expeofs = solver_exp.eofs(eofscaling=2)[:n_ref+10][okmatch]
 expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
 
 signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)])
-filout3 = cart + 'tos_eofs_diff_obs-exp_withtrend.pdf'
+filout3 = cart_out + 'tos_eofs_diff_obs-exp_withtrend.pdf'
 ctl.plot_multimap_contour(expeofs-signs[:, np.newaxis, np.newaxis]*obseofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)])
-filout3 = cart + 'tos_eofs_diff_obs-exp_detrended.pdf'
+filout3 = cart_out + 'tos_eofs_diff_obs-exp_detrended.pdf'
 ctl.plot_multimap_contour(expeofs_dtr-signs[:, np.newaxis, np.newaxis]*obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 ####################################################
