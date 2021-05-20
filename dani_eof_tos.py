@@ -62,8 +62,8 @@ mask_obs = np.isnan(pino11.tos.values[0])
 mask_exp = np.isnan(gigi11.tos.values[0])
 mask = (mask_obs) | (mask_exp)
 
-pi11tos = pino11.tos.values[~mask[np.newaxis, ...]]
-gi11tos = gigi11.tos.values[~mask[np.newaxis, ...]]
+pi11tos = pino11.tos.values[:, ~mask]
+gi11tos = gigi11.tos.values[:, ~mask]
 lat = pino.lat.values
 lon = pino.lon.values
 
