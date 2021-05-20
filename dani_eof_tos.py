@@ -131,13 +131,13 @@ pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_d
 solver = ctl.eof_computation(pi11tos, latitude=pino.lat.values)
 
 filout = cart_out + 'tos_eofs_obs_withtrend.pdf'
-ctl.plot_multimap_contour(solver.eofs(eofscaling=2)[:n_ref], lat, lon, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(solver.eofs(eofscaling=2)[:n_ref], lat, lon, filout, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 ### detrended
 solver_dtr = ctl.eof_computation(pi11tos_dtr, latitude=pino.lat.values)
 
 filout2 = cart_out + 'tos_eofs_obs_detrended.pdf'
-ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:n_ref], lat, lon, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(solver_dtr.eofs(eofscaling=2)[:n_ref], lat, lon, filout2, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 # match
 #eof2 = ctl.match_pc_sets(solver.eofs(eofscaling=2)[:n_ref], solver_dtr.eofs(eofscaling=2)[:n_ref], latitude = lat)
@@ -156,7 +156,7 @@ okmatch, simatch = ctl.match_patterns(obseofs, solver_exp.eofs(eofscaling=2)[:n_
 expeofs = solver_exp.eofs(eofscaling=2)[:n_ref]
 
 filout = cart_out + 'tos_eofs_exp_withtrend.pdf'
-ctl.plot_multimap_contour(expeofs, lat, lon, filout, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs, lat, lon, filout, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 ### detrended
 solver_exp_dtr = ctl.eof_computation(gi11tos_dtr, latitude=gigi.lat.values)
@@ -166,7 +166,7 @@ okmatch_dtr, simatch_dtr = ctl.match_patterns(obseofs_dtr, solver_exp_dtr.eofs(e
 expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref]
 
 filout2 = cart_out + 'tos_eofs_exp_detrended.pdf'
-ctl.plot_multimap_contour(expeofs_dtr, lat, lon, filout2, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs_dtr, lat, lon, filout2, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 #### matched diffs
 
@@ -186,17 +186,17 @@ print('RMSs: ', rmss_dtr)
 
 # signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)])
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_withtrend.pdf'
-ctl.plot_multimap_contour(expeofs-obseofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs-obseofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 # signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)])
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_detrended.pdf'
-ctl.plot_multimap_contour(expeofs_dtr-obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs_dtr-obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 filout3 = cart_out + 'tos_eofs_expmatch_withtrend.pdf'
-ctl.plot_multimap_contour(expeofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 filout3 = cart_out + 'tos_eofs_expmatch_detrended.pdf'
-ctl.plot_multimap_contour(expeofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.6,0.6), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 ####################################################
 
 fig = plt.figure()
