@@ -32,6 +32,7 @@ plt.rcParams['axes.axisbelow'] = True
 #############################################################################
 cart_out = '/home/fabiano/Research/lavori/dani_eofs_tos/'
 
+n_ref = 8
 #date = [datetime.strptime('{}15'.format(int(da)), '%Y%m%d') for da in tos.time.values]
 #allcos = []
 
