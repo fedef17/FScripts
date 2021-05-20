@@ -113,6 +113,8 @@ for nam in expnams:
     gicoso[:, mask] = np.nan
     gi11tos.append(gicoso)
 
+    print(nam, np.nanmean(gicoso, axis = (1,2)))
+
     ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, pino11.time.values, None, deg = 1)
 
     gi11tos_dtr.append(ginko)
@@ -171,11 +173,11 @@ expeofs_dtr = solver_exp_dtr.eofs(eofscaling=2)[:n_ref+10][okmatch_dtr]
 
 signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs, expeofs)])
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_withtrend.pdf'
-ctl.plot_multimap_contour(expeofs-signs[:, np.newaxis, np.newaxis]*obseofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs-signs[:, np.newaxis, np.newaxis]*obseofs, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 signs = np.array([np.sign(ctl.Rcorr(ob, ex, latitude = lat)) for ob,ex in zip(obseofs_dtr, expeofs_dtr)])
 filout3 = cart_out + 'tos_eofs_diff_obs-exp_detrended.pdf'
-ctl.plot_multimap_contour(expeofs_dtr-signs[:, np.newaxis, np.newaxis]*obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-0.2,0.2), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
+ctl.plot_multimap_contour(expeofs_dtr-signs[:, np.newaxis, np.newaxis]*obseofs_dtr, pino.lat.values, pino.lon.values, filout3, plot_anomalies=True, cbar_range=(-1,1), subtitles= ['eof {}'.format(i) for i in range(n_ref)], cb_label='T (K)')
 
 ####################################################
 
