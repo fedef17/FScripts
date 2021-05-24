@@ -275,7 +275,7 @@ for reg in regtip:
         ndriv = len(comb)
         nval = len(scoall)
         #vmi = np.percentile(np.abs(params), 95)
-        vmi = 0.7
+        vmi = 0.6
         ext = [0, nval, 0, ndriv]
 
         gigifig = ax.imshow(params.T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
