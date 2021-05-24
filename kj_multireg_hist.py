@@ -39,7 +39,7 @@ if os.uname()[1] == 'hobbes':
     cart_in = '/home/fabiano/Research/lavori/KJ_regimes/'
 else:
     cart_in = '/home/fedef/Research/lavori/KJ_regimes/'
-    
+
 # leggo metriche
 gigi = pickle.load(open(cart_in + 'metrics/cmip6hist_data_dict.pkl', 'rb'))
 
@@ -86,7 +86,7 @@ allscores = dict()
 
 # faccio cose
 regr_models = dict()
-for reg in regtip[:-1]:
+for reg in regtip:
     print(reg)
     allscores[reg] = []
 
@@ -128,11 +128,13 @@ for reg in regtip[:-1]:
 
         X = np.stack(X)
         if np.any(np.all(np.isnan(X), axis = 0)):
-            print('All nans: ', dridic[dri][co])
+            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.all(np.isnan(X), axis = 0))[0]]
+            print('All nans: ', baubo)
             continue
 
         if np.any(np.sum(np.isnan(X), axis = 0) > 3):
-            print('Too many nans: ', dridic[dri][co])
+            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.sum(np.isnan(X), axis = 0) > 3)[0]]
+            print('Too many nans: ', baubo)
             continue
 
         if np.any(np.isnan(X)):
