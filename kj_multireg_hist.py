@@ -224,10 +224,22 @@ for reg in regtip:
     top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
     print(top_comb)
     X, Y = make_XY(reg, comb)
-    F, pvals = f_regression(X, Y)
-    print(F)
-    print(pvals)
-    print(pvals < 0.05)
+
+    Xgi = sm.add_constant(X)
+    pvals_sm = []
+    for ko in Y.T:
+        est = sm.OLS(ko, Xgi)
+        est2 = est.fit()
+        pvals.append(est2.pvalues)
+
+    pvals_skl = []
+    for ko in Y.T:
+        F, pvals = f_regression(X, ko)
+        pvals_skl.append(ko)
+
+    print(pvals_sm)
+    print(pvals_skl)
+    print(pvals_sm < 0.05)
 
     ctl.printsep()
     scoall = allscores[reg][okymean]
@@ -236,10 +248,21 @@ for reg in regtip:
     top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
     print(top_comb)
     X, Y = make_XY(reg, comb)
-    F, pvals = f_regression(X, Y)
-    print(F)
-    print(pvals)
-    print(pvals < 0.05)
+    Xgi = sm.add_constant(X)
+    pvals_sm = []
+    for ko in Y.T:
+        est = sm.OLS(ko, Xgi)
+        est2 = est.fit()
+        pvals.append(est2.pvalues)
+
+    pvals_skl = []
+    for ko in Y.T:
+        F, pvals = f_regression(X, ko)
+        pvals_skl.append(ko)
+
+    print(pvals_sm)
+    print(pvals_skl)
+    print(pvals_sm < 0.05)
 
     ctl.printsep()
     scoall = allscores[reg][okyregs]
@@ -248,10 +271,21 @@ for reg in regtip:
     top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
     print(top_comb)
     X, Y = make_XY(reg, comb)
-    F, pvals = f_regression(X, Y)
-    print(F)
-    print(pvals)
-    print(pvals < 0.05)
+    Xgi = sm.add_constant(X)
+    pvals_sm = []
+    for ko in Y.T:
+        est = sm.OLS(ko, Xgi)
+        est2 = est.fit()
+        pvals.append(est2.pvalues)
+
+    pvals_skl = []
+    for ko in Y.T:
+        F, pvals = f_regression(X, ko)
+        pvals_skl.append(ko)
+
+    print(pvals_sm)
+    print(pvals_skl)
+    print(pvals_sm < 0.05)
 
     ctl.printsep()
     ctl.printsep()
