@@ -112,54 +112,54 @@ allcombs = list(itt.product(*allinds))
 allscores = dict()
 
 # faccio cose
-regr_models = dict()
-for reg in regtip:
-    print(reg)
-    allscores[reg] = []
-
-    # Construct the dependent variables
-    Y = []
-    for mod in models:
-        Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
-    Y = np.stack(Y)
-    # standardizzo le Y?
-    scaler = StandardScaler().fit(Y)
-    Y = scaler.transform(Y)
-
-    # pesca i drivers, uno per tipo, e fai il model
-    for ii, comb in enumerate(allcombs):
-        print(ii)
-        X = []
-        for mod in models_ok:
-            Xmod = [alldrivs[(dri, dridic[dri][co], mod)] for dri, co in zip(drivs, comb)]
-            X.append(Xmod)
-
-        X = np.stack(X)
-        if np.any(np.all(np.isnan(X), axis = 0)):
-            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.all(np.isnan(X), axis = 0))[0]]
-            print('All nans: ', baubo)
-            continue
-
-        if np.any(np.sum(np.isnan(X), axis = 0) > 3):
-            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.sum(np.isnan(X), axis = 0) > 3)[0]]
-            print('Too many nans: ', baubo)
-            continue
-
-        if np.any(np.isnan(X)):
-            print('Replacing {} Nans in features with MMmean'.format(np.sum(np.isnan(X))))
-            imputer = SimpleImputer()
-            X = imputer.fit_transform(X)
-
-        # STANDARDIZZO LE FEATURES
-        scaler = StandardScaler().fit(X)
-        X = scaler.transform(X)
-
-        model = LinearRegression().fit(X, Y)
-        #allscores[reg].append(model.score(X, Y))
-        allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
-        #print(pi, model.score(X, Y))
-
-pickle.dump(allscores, open(cart_in + 'allscores_7drivs.p', 'wb'))
+# regr_models = dict()
+# for reg in regtip:
+#     print(reg)
+#     allscores[reg] = []
+#
+#     # Construct the dependent variables
+#     Y = []
+#     for mod in models:
+#         Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
+#     Y = np.stack(Y)
+#     # standardizzo le Y?
+#     scaler = StandardScaler().fit(Y)
+#     Y = scaler.transform(Y)
+#
+#     # pesca i drivers, uno per tipo, e fai il model
+#     for ii, comb in enumerate(allcombs):
+#         print(ii)
+#         X = []
+#         for mod in models_ok:
+#             Xmod = [alldrivs[(dri, dridic[dri][co], mod)] for dri, co in zip(drivs, comb)]
+#             X.append(Xmod)
+#
+#         X = np.stack(X)
+#         if np.any(np.all(np.isnan(X), axis = 0)):
+#             baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.all(np.isnan(X), axis = 0))[0]]
+#             print('All nans: ', baubo)
+#             continue
+#
+#         if np.any(np.sum(np.isnan(X), axis = 0) > 3):
+#             baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.sum(np.isnan(X), axis = 0) > 3)[0]]
+#             print('Too many nans: ', baubo)
+#             continue
+#
+#         if np.any(np.isnan(X)):
+#             print('Replacing {} Nans in features with MMmean'.format(np.sum(np.isnan(X))))
+#             imputer = SimpleImputer()
+#             X = imputer.fit_transform(X)
+#
+#         # STANDARDIZZO LE FEATURES
+#         scaler = StandardScaler().fit(X)
+#         X = scaler.transform(X)
+#
+#         model = LinearRegression().fit(X, Y)
+#         #allscores[reg].append(model.score(X, Y))
+#         allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
+#         #print(pi, model.score(X, Y))
+#
+# pickle.dump(allscores, open(cart_in + 'allscores_7drivs.p', 'wb'))
 # fine.
 
 
@@ -231,7 +231,7 @@ for reg in regtip:
     for ko in Y.T:
         est = sm.OLS(ko, Xgi)
         est2 = est.fit()
-        pvals.append(est2.pvalues)
+        pvals_sm.append(est2.pvalues)
 
     pvals_skl = []
     for ko in Y.T:
@@ -254,7 +254,7 @@ for reg in regtip:
     for ko in Y.T:
         est = sm.OLS(ko, Xgi)
         est2 = est.fit()
-        pvals.append(est2.pvalues)
+        pvals_sm.append(est2.pvalues)
 
     pvals_skl = []
     for ko in Y.T:
@@ -277,7 +277,7 @@ for reg in regtip:
     for ko in Y.T:
         est = sm.OLS(ko, Xgi)
         est2 = est.fit()
-        pvals.append(est2.pvalues)
+        pvals_sm.append(est2.pvalues)
 
     pvals_skl = []
     for ko in Y.T:
