@@ -24,6 +24,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import r2_score
 from sklearn.feature_selection import f_regression
+import statsmodels.api as sm
 
 import itertools as itt
 #import pymannkendall as mk
