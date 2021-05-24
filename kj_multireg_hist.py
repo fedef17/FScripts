@@ -164,7 +164,7 @@ for reg in regtip:
         okcombs[reg].append(comb)
         #print(pi, model.score(X, Y))
 
-pickle.dump(allscores, open(cart_in + 'allscores_7drivs.p', 'wb'))
+pickle.dump([okcombs, allscores], open(cart_in + 'allscores_7drivs.p', 'wb'))
 # fine.
 
 
@@ -197,7 +197,7 @@ def make_XY(reg, comb, standard_Y = True):
 
     return X, Y
 
-allscores = pickle.load(open(cart_in + 'allscores_7drivs.p', 'rb'))
+okcombs, allscores = pickle.load(open(cart_in + 'allscores_7drivs.p', 'rb'))
 
 colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
 colo = colo.split()
@@ -274,7 +274,8 @@ for reg in regtip:
 
         ndriv = len(comb)
         nval = len(scoall)
-        vmi = np.percentile(np.abs(params), 95)
+        #vmi = np.percentile(np.abs(params), 95)
+        vmi = 0.7
         ext = [0, nval, 0, ndriv]
 
         gigifig = ax.imshow(params.T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
