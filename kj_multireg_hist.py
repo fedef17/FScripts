@@ -95,7 +95,7 @@ for mod in models_ok:
                 else:
                     kos = float(kos)
             except:
-                print('Not found: ', dri, dridic[dri][co], mod)
+                print('Not found: ', dri, dritip, mod)
                 kos = np.nan
 
             alldrivs[(dri, dritip, mod)] = kos
