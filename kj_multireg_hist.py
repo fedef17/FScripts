@@ -6,7 +6,7 @@ import sys
 import os
 import glob
 from matplotlib import pyplot as plt
-from matplotlib import cm
+from matplotlib import cm, colors
 
 import pickle
 import netCDF4 as nc
@@ -61,11 +61,14 @@ models_ok = [mod.split('_')[0] + '_' + mod.split('_')[-1] for mod in models]
 
 regtip = ['R3', 'U4']
 metrics = dict()
+metrnam = dict()
 #weights = dict()
 metrics['R3'] = [('mean', 'era20c_fidelity'), ('mean', 'stability'), ('mean', 'variance_ratio')] + [(rnam, 'regime_occurrence') for rnam in ['AR', 'NAO-', 'BLK']] + [(rnam, 'regime_persistence') for rnam in ['AR', 'NAO-', 'BLK']]
+metrnam['R3'] = ['fidel20', 'stabil', 'var_ratio'] + ['occ: '+rnam for rnam in ['AR', 'NAO-', 'BLK']] + ['pers: '+rnam for rnam in ['AR', 'NAO-', 'BLK']]
 #weights['R3'] = np.append(np.ones(4), np.ones(6)/3.)
 
 metrics['U4'] = [('mean', 'era20c_fidelity'), ('mean', 'stability'), ('mean', 'variance_ratio')] + [(rnam, 'regime_occurrence') for rnam in ['AR', 'NAO-', 'BLK', 'NAO+']] + [(rnam, 'regime_persistence') for rnam in ['AR', 'NAO-', 'BLK', 'NAO+']]
+metrnam['U4'] = ['fidel20', 'stabil', 'var_ratio'] + ['occ: '+rnam for rnam in ['AR', 'NAO-', 'BLK', 'NAO+']] + ['pers: '+rnam for rnam in ['AR', 'NAO-', 'BLK', 'NAO+']]
 #weights['U4'] = np.append(np.ones(4), np.ones(8)/4.)
 
 # leggo drivers
@@ -102,64 +105,66 @@ for mod in models_ok:
             alldrivs[(dri, dritip, mod)] = kos
 
 # resolutions
-nam, resi = ctl.read_from_txt(cart_in + 'resolutions.txt', n_skip=1, sep = ',')
-namok = [na.strip("'") for na in nam]
-namok = [nam.split('_')[0] + '_' + nam.split('_')[2] for nam in namok]
+# nam, resi = ctl.read_from_txt(cart_in + 'resolutions.txt', n_skip=1, sep = ',')
+# namok = [na.strip("'") for na in nam]
+# namok = [nam.split('_')[0] + '_' + nam.split('_')[2] for nam in namok]
 
 allinds = [np.arange(len(dridic[dri])) for dri in drivs]
 allcombs = list(itt.product(*allinds))
 
+okcombs = dict()
 allscores = dict()
 
-# faccio cose
-# regr_models = dict()
-# for reg in regtip:
-#     print(reg)
-#     allscores[reg] = []
-#
-#     # Construct the dependent variables
-#     Y = []
-#     for mod in models:
-#         Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
-#     Y = np.stack(Y)
-#     # standardizzo le Y?
-#     scaler = StandardScaler().fit(Y)
-#     Y = scaler.transform(Y)
-#
-#     # pesca i drivers, uno per tipo, e fai il model
-#     for ii, comb in enumerate(allcombs):
-#         print(ii)
-#         X = []
-#         for mod in models_ok:
-#             Xmod = [alldrivs[(dri, dridic[dri][co], mod)] for dri, co in zip(drivs, comb)]
-#             X.append(Xmod)
-#
-#         X = np.stack(X)
-#         if np.any(np.all(np.isnan(X), axis = 0)):
-#             baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.all(np.isnan(X), axis = 0))[0]]
-#             print('All nans: ', baubo)
-#             continue
-#
-#         if np.any(np.sum(np.isnan(X), axis = 0) > 3):
-#             baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.sum(np.isnan(X), axis = 0) > 3)[0]]
-#             print('Too many nans: ', baubo)
-#             continue
-#
-#         if np.any(np.isnan(X)):
-#             print('Replacing {} Nans in features with MMmean'.format(np.sum(np.isnan(X))))
-#             imputer = SimpleImputer()
-#             X = imputer.fit_transform(X)
-#
-#         # STANDARDIZZO LE FEATURES
-#         scaler = StandardScaler().fit(X)
-#         X = scaler.transform(X)
-#
-#         model = LinearRegression().fit(X, Y)
-#         #allscores[reg].append(model.score(X, Y))
-#         allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
-#         #print(pi, model.score(X, Y))
-#
-# pickle.dump(allscores, open(cart_in + 'allscores_7drivs.p', 'wb'))
+#faccio cose
+for reg in regtip:
+    print(reg)
+    allscores[reg] = []
+    okcombs[reg] = []
+
+    # Construct the dependent variables
+    Y = []
+    for mod in models:
+        Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
+    Y = np.stack(Y)
+    # standardizzo le Y?
+    scaler = StandardScaler().fit(Y)
+    Y = scaler.transform(Y)
+
+    # pesca i drivers, uno per tipo, e fai il model
+    for ii, comb in enumerate(allcombs):
+        print(ii)
+        X = []
+        for mod in models_ok:
+            Xmod = [alldrivs[(dri, dridic[dri][co], mod)] for dri, co in zip(drivs, comb)]
+            X.append(Xmod)
+
+        X = np.stack(X)
+        if np.any(np.all(np.isnan(X), axis = 0)):
+            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.all(np.isnan(X), axis = 0))[0]]
+            print('All nans: ', baubo)
+            continue
+
+        if np.any(np.sum(np.isnan(X), axis = 0) > 3):
+            baubo = np.array([dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)])[np.where(np.sum(np.isnan(X), axis = 0) > 3)[0]]
+            print('Too many nans: ', baubo)
+            continue
+
+        if np.any(np.isnan(X)):
+            print('Replacing {} Nans in features with MMmean'.format(np.sum(np.isnan(X))))
+            imputer = SimpleImputer()
+            X = imputer.fit_transform(X)
+
+        # STANDARDIZZO LE FEATURES
+        scaler = StandardScaler().fit(X)
+        X = scaler.transform(X)
+
+        model = LinearRegression().fit(X, Y)
+        #allscores[reg].append(model.score(X, Y))
+        allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
+        okcombs[reg].append(comb)
+        #print(pi, model.score(X, Y))
+
+pickle.dump(allscores, open(cart_in + 'allscores_7drivs.p', 'wb'))
 # fine.
 
 
@@ -194,16 +199,23 @@ def make_XY(reg, comb, standard_Y = True):
 
 allscores = pickle.load(open(cart_in + 'allscores_7drivs.p', 'rb'))
 
+colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
+colo = colo.split()
+colo = colo[::-1]
+cmappa = colors.ListedColormap(colo)
+cmappa.set_over('#800026') #662506
+cmappa.set_under('#023858') #542788
 
 for reg in regtip:
     ctl.printsep()
     ctl.printsep()
     print(reg)
+    ire = int(reg[-1])
     allscores[reg] = np.stack(allscores[reg])
     okysing = np.argmax(allscores[reg], axis = 0)
     okyall = np.argmax(np.mean(allscores[reg], axis = 1))
-    okymean = np.argmax(np.mean(allscores[reg][:, :3], axis = 1))
-    okyregs = np.argmax(np.mean(allscores[reg][:, 3:], axis = 1))
+    okymean = np.argmax(np.mean(allscores[reg][:, :ire], axis = 1))
+    okyregs = np.argmax(np.mean(allscores[reg][:, ire:], axis = 1))
 
     print(okysing)
     print(okyall, okymean, okyregs)
@@ -211,82 +223,101 @@ for reg in regtip:
     # print('single pred.')
     # for ii, (met, oky) in enumerate(zip(metrics[reg], okysing)):
     #     ctl.printsep()
-    #     comb = allcombs[oky]
+    #     comb = okcombs[reg][oky]
     #     top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
     #     print(met, allscores[reg][oky][ii])
     #     print(top_comb)
 
     ctl.printsep()
-    ctl.printsep()
+    fig_score, axs = plt.subplots(figsize=(12,8))
 
-    scoall = allscores[reg][okyall]
-    print('all', np.mean(scoall), np.min(scoall), np.max(scoall))
-    comb = allcombs[okyall]
-    top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
-    print(top_comb)
-    X, Y = make_XY(reg, comb)
+    for indcomb, namti, col in zip([okyall, okymean, okyregs], ['all', 'pattmean', 'occpers'], ['indianred', 'forestgreen', 'orange']):
+        scoall = allscores[reg][indcomb]
+        print('all', np.mean(scoall), np.min(scoall), np.max(scoall))
+        comb = okcombs[reg][indcomb]
+        top_comb = [dridic[dri][co] for dri, co in zip(drivs, comb)] #[dri +' '+
+        print(top_comb)
+        X, Y = make_XY(reg, comb)
 
-    Xgi = sm.add_constant(X)
-    pvals_sm = []
-    for ko in Y.T:
-        est = sm.OLS(ko, Xgi)
-        est2 = est.fit()
-        pvals_sm.append(est2.pvalues)
+        Xgi = sm.add_constant(X)
+        pvals = []
+        params = []
+        rsq = []
+        for ko in Y.T:
+            est = sm.OLS(ko, Xgi)
+            est2 = est.fit()
+            pvals.append(est2.pvalues)
+            params.append(est2.params)
+            rsq.append(est2.rsquared)
 
-    pvals_skl = []
-    for ko in Y.T:
-        F, pvals = f_regression(X, ko)
-        pvals_skl.append(ko)
+        pvals = np.stack(pvals)
+        params = np.stack(params)
+        rsq = np.stack(rsq)
+        pvals = pvals[:, 1:]
+        params = params[:, 1:]
 
-    print(pvals_sm)
-    print(pvals_skl)
-    print(pvals_sm < 0.05)
+        skmodel = LinearRegression().fit(X, Y)
+        print('CHECK!!')
+        #print(params)
+        print(np.max(np.abs((params-skmodel.coef_)/params)))
+        print(rsq)
+        print(r2_score(Y, skmodel.predict(X), multioutput='raw_values'))
 
-    ctl.printsep()
-    scoall = allscores[reg][okymean]
-    print('reg_patts', np.mean(scoall), np.min(scoall), np.max(scoall))
-    comb = allcombs[okymean]
-    top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
-    print(top_comb)
-    X, Y = make_XY(reg, comb)
-    Xgi = sm.add_constant(X)
-    pvals_sm = []
-    for ko in Y.T:
-        est = sm.OLS(ko, Xgi)
-        est2 = est.fit()
-        pvals_sm.append(est2.pvalues)
+        # pvals_skl = []
+        # for ko in Y.T:
+        #     F, pvals = f_regression(X, ko)
+        #     pvals_skl.append(ko)
+        #
+        # print(pvals_skl)
 
-    pvals_skl = []
-    for ko in Y.T:
-        F, pvals = f_regression(X, ko)
-        pvals_skl.append(ko)
+        fig, ax = plt.subplots(figsize=(16,12))
 
-    print(pvals_sm)
-    print(pvals_skl)
-    print(pvals_sm < 0.05)
+        ndriv = len(comb)
+        nval = len(scoall)
+        vmi = np.percentile(np.abs(params), 95)
+        ext = [0, nval, 0, ndriv]
 
-    ctl.printsep()
-    scoall = allscores[reg][okyregs]
-    print('regs_occ_pers', np.mean(scoall), np.min(scoall), np.max(scoall))
-    comb = allcombs[okyregs]
-    top_comb = [dri +' '+ dridic[dri][co] for dri, co in zip(drivs, comb)]
-    print(top_comb)
-    X, Y = make_XY(reg, comb)
-    Xgi = sm.add_constant(X)
-    pvals_sm = []
-    for ko in Y.T:
-        est = sm.OLS(ko, Xgi)
-        est2 = est.fit()
-        pvals_sm.append(est2.pvalues)
+        gigifig = ax.imshow(params.T, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
-    pvals_skl = []
-    for ko in Y.T:
-        F, pvals = f_regression(X, ko)
-        pvals_skl.append(ko)
+        pvaok = pvals.T
+        for ix in range(nval):
+            for iy in range(ndriv):
+                if pvaok[iy, ix] < 0.01:
+                    ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
+                elif pvaok[iy, ix] < 0.05:
+                    ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
 
-    print(pvals_sm)
-    print(pvals_skl)
-    print(pvals_sm < 0.05)
+        ax.xaxis.tick_top()
+        ax.set_xticks(0.5+np.arange(len(metrnam[reg])), minor = False)
+        ax.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+        ax.set_yticks(0.5+np.arange(len(top_comb)), minor = False)
+        ax.set_yticklabels(top_comb, va='center', rotation = 30)
 
-    ctl.printsep()
-    ctl.printsep()
+        for co in np.arange(len(metrnam[reg])):
+            ax.axvline(co, color = 'white', linewidth = 0.1)
+        for co in np.arange(len(top_comb)):
+            ax.axhline(co, color = 'white', linewidth = 0.1)
+
+
+        #cax = fig.add_subplot(gs[6, :])
+        cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+        cb = plt.colorbar(gigifig, cax=cax, orientation='horizontal', extend = 'both')
+        cb.ax.tick_params(labelsize=18)
+        cb.set_label('Regression coefficient', fontsize=20)
+        plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+
+        fig.savefig(cart_in + 'Sm_{}_{}_7driv.pdf'.format(reg, namti))
+
+        axs.plot(np.arange(len(rsq)), rsq, label = namti, color = col)
+        axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
+        print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
+        print(reg, namti, np.mean(scoall[:ire]), np.mean(scoall[ire:]))
+        #axs.scatter(np.arange(len(rsq)), rsq, color = col)
+
+        ctl.printsep()
+
+    axs.set_xticks(np.arange(len(rsq)), minor = False)
+    axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+    axs.legend()
+    axs.set_ylabel(r'$R^2$')
+    fig_score.savefig(cart_in + 'Rsquared_{}_7driv.pdf'.format(reg))
