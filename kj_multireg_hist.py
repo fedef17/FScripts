@@ -101,7 +101,7 @@ for mod in models_ok:
             alldrivs[(dri, dritip, mod)] = kos
 
 # resolutions
-nam, resi = ctl.read_from_txt(cart_in + 'drivers/resolutions.txt', n_skip=1, sep = ',')
+nam, resi = ctl.read_from_txt(cart_in + 'resolutions.txt', n_skip=1, sep = ',')
 namok = [na.strip("'") for na in nam]
 namok = [nam.split('_')[0] + '_' + nam.split('_')[2] for nam in namok]
 
