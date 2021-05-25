@@ -155,12 +155,19 @@ for na, ru, col in zip(allnams, allru, colors):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D])
+    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
 
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
 
     kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+
+    # Separate for uas
+    fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
+    kosettt = xr.open_mfdataset(fils, use_cftime = True)
+    kosettt = kosettt.drop_vars('time_bnds')
+    kosettt = kosettt.drop_vars('height')
+    kose = kose.assign(uas = kosettt.uas)
 
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
         if var not in kose:
@@ -247,6 +254,17 @@ for na, ru, col in zip(allnams, allru, colors):
 pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean.pdf', 'wb'))
 
 sys.exit()
+
+###### Plots 2D
+figs_map = []
+for var in var_map_200:
+    for copl in ['mean', 'std', 'p10', 'p90']:
+        mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
+
+        fig = ctl.plot_multimap_contour(mappe, lat, lon, None)
+        figs_map.append(fig)
+
+
 
 ### Mean state temperature e varianza?
 ### Mean state precipitazione e varianza
