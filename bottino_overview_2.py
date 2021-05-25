@@ -200,7 +200,7 @@ for na, ru, col in zip(allnams, allru, colors):
     except Exception as exp:
         print(exp)
         pass
-        
+
     if ru == 'b100':
         ax_greg.legend()
         ax_greg.grid()
@@ -270,7 +270,8 @@ for var in var_map_200:
     for copl in ['mean', 'std', 'p10', 'p90']:
         mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
 
-        mappeseas = [ma.sel('time.season' time = flux_lr['time.season'] == seasok)]
+        #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        mappeseas = [ma.sel(season = seasok).values for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
 
         fig = ctl.plot_multimap_contour(mappeseas, lat, lon, None)
         figs_map.append(fig)
