@@ -195,7 +195,12 @@ for na, ru, col in zip(allnams, allru, colors):
             ax.grid()
 
     # gregory
-    ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+    try:
+        ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+    except Exception as exp:
+        print(exp)
+        pass
+        
     if ru == 'b100':
         ax_greg.legend()
         ax_greg.grid()
@@ -265,7 +270,7 @@ for var in var_map_200:
     for copl in ['mean', 'std', 'p10', 'p90']:
         mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
 
-        mappeseas = [ma.sel('time.season' )]
+        mappeseas = [ma.sel('time.season' time = flux_lr['time.season'] == seasok)]
 
         fig = ctl.plot_multimap_contour(mappeseas, lat, lon, None)
         figs_map.append(fig)
