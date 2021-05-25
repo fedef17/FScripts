@@ -125,7 +125,7 @@ resdict = dict()
 
 ####################################################################################################
 
-miptab = 'Amon'
+miptab = 'Amon_r25'
 allvars_2D = 'clt  pr  psl  rlut  rsdt  rsut  tas  uas'.split()
 allvars_3D = 'ta ua'.split()
 
@@ -155,7 +155,7 @@ for na, ru, col in zip(allnams, allru, colors):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(exp, mem, miptab, var)) for var in allvars_2D])
+    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D])
 
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
@@ -225,7 +225,7 @@ for na, ru, col in zip(allnams, allru, colors):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(exp, mem, miptab, var)) for var in allvars_3D])
+    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
 
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
