@@ -160,7 +160,11 @@ for na, ru, col in zip(allnams, allru, colors):
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
 
-    kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+    try:
+        kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+    except Exception as exp:
+        print(exp)
+        pass
 
     # Separate for uas
     fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
@@ -261,7 +265,9 @@ for var in var_map_200:
     for copl in ['mean', 'std', 'p10', 'p90']:
         mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
 
-        fig = ctl.plot_multimap_contour(mappe, lat, lon, None)
+        mappeseas = [ma.sel('time.season' )]
+
+        fig = ctl.plot_multimap_contour(mappeseas, lat, lon, None)
         figs_map.append(fig)
 
 
