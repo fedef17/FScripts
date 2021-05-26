@@ -138,7 +138,9 @@ for nam in expnams:
 gi11tos = np.concatenate(gi11tos, axis = 0)
 gi11tos_dtr = np.concatenate(gi11tos_dtr, axis = 0)
 
-pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.nc', 'wb'))
+pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.p', 'wb'))
+pickle.dump([obs_states, mod_states], open(cart_out + 'tos_data_xr.p', 'wb'))
+
 # pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr = pickle.load(open(cart_out + 'tos_data.nc', 'rb'))
 ############################################################
 
@@ -239,18 +241,41 @@ fig.savefig(cart_out + 'explained_variance_dtr.pdf')
 solver_dtr
 
 analogs = dict()
+neofs = 10
 
 for opa in range(5):
     for year in range(1960, 2015):
         print(year)
 
         # obs field
-        obsta = obs_states[opa].sel(time = obs_states[opa]['time.year'] == year).squeeze().values
+        obsta = obs_states[opa].tos_dtr.sel(time = obs_states[opa]['time.year'] == year).squeeze().values
+
+        pix = solver_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
+        pix_exp = solver_exp_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
 
         # select 10 anni exps
+        dists = []
+        nomi = []
         for nam in mod_states.keys():
-            slice(year -5, year +5)
+            for year2 in range(year-5, year+5):
+                mosta = mod_states[nam].tos_dtr.sel(time = mod_states[nam]['time.year'] == year2).values
 
+                gix = solver_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
+                gix_exp = solver_exp_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
+
+                dists.append(ctl.distance(pix, gix))
+                dists_exp.append(ctl.distance(pix_exp, gix_exp))
+                nomi.append((nam, year2))
+
+        indok = np.argmin(dists)
+        indok_exp = np.argmin(dists_exp)
+
+        analogs[(opa, year, 'obs_eof')] = nomi[indok]
+        analogs[(opa, year, 'exp_eof')] = nomi[indok_exp]
+
+
+
+sys.exit()
 
 #####################################################################
 
