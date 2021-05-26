@@ -278,6 +278,34 @@ for opa in range(5):
         analogs[(opa, year, 'obs_eof')] = nomi[indok]
         analogs[(opa, year, 'exp_eof')] = nomi[indok_exp]
 
+pickle.dump(analogs, open(cart_out + 'analogs.p', 'wb'))
+
+stron = '{} {} {}\n'
+for opa in range(5):
+    for tip in ['obs_eof', 'exp_eof']:
+        filo = open(cart_out + 'analogs_opa{}_{}.txt'.format(opa, tip), 'w')
+
+        for year in range(1960, 2015):
+            filo.write(stron.format(year, *analogs[(opa, year, tip)]))
+
+        filo.close()
+
+for opa in range(5):
+    figs = []
+
+    for year in range(1960, 2015):
+        nam_ob, yea_ob = analogs[(opa, year, 'obs_eof')]
+        nam_ex, yea_ex = analogs[(opa, year, 'obs_eof')]
+
+        obsta = obs_states[opa].tos.sel(time = obs_states[opa]['time.year'] == year)
+        mosta1 = mod_states[nam_ob].tos.sel(time = mod_states[nam_ob]['time.year'] == year_ob)
+        mosta2 = mod_states[nam_ex].tos.sel(time = mod_states[nam_ex]['time.year'] == year_ex)
+
+        fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), subtitles = ['obs', 'analog_obseof', 'analog_expeof'], figsize = (18,7))
+        figs.append(fig)
+
+    figs = np.concatenate(figs)
+    ctl.plot_pdfpages(cart_out + 'check_opa{}_analogs.pdf'.format(opa))
 
 
 sys.exit()
