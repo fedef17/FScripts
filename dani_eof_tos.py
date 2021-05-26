@@ -244,51 +244,52 @@ fig.savefig(cart_out + 'explained_variance_dtr.pdf')
 # Selezione su spazio obs
 #solver_dtr
 
-analogs = dict()
-neofs = 10
+# analogs = dict()
+# neofs = 10
+#
+# for opa in range(5):
+#     for year in range(1960, 2015):
+#         print(year)
+#
+#         # obs field
+#         obsta = obs_states[opa].tos_dtr.sel(time = obs_states[opa]['time.year'] == year).squeeze().values
+#
+#         pix = solver_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
+#         pix_exp = solver_exp_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
+#
+#         # select 10 anni exps
+#         dists = []
+#         dists_exp = []
+#         nomi = []
+#         for nam in mod_states.keys():
+#             for year2 in range(year-5, year+5):
+#                 mosta = mod_states[nam].tos_dtr.sel(time = mod_states[nam]['time.year'] == year2).values
+#
+#                 gix = solver_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
+#                 gix_exp = solver_exp_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
+#
+#                 dists.append(ctl.distance(pix, gix))
+#                 dists_exp.append(ctl.distance(pix_exp, gix_exp))
+#                 nomi.append((nam, year2))
+#
+#         indok = np.argmin(dists)
+#         indok_exp = np.argmin(dists_exp)
+#
+#         analogs[(opa, year, 'obs_eof')] = nomi[indok]
+#         analogs[(opa, year, 'exp_eof')] = nomi[indok_exp]
 
-for opa in range(5):
-    for year in range(1960, 2015):
-        print(year)
+#pickle.dump(analogs, open(cart_out + 'analogs.p', 'wb'))
+analogs = pickle.load(open(cart_out + 'analogs.p', 'rb'))
 
-        # obs field
-        obsta = obs_states[opa].tos_dtr.sel(time = obs_states[opa]['time.year'] == year).squeeze().values
-
-        pix = solver_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
-        pix_exp = solver_exp_dtr.projectField(obsta, neofs=neofs, eofscaling=0, weighted=True)
-
-        # select 10 anni exps
-        dists = []
-        dists_exp = []
-        nomi = []
-        for nam in mod_states.keys():
-            for year2 in range(year-5, year+5):
-                mosta = mod_states[nam].tos_dtr.sel(time = mod_states[nam]['time.year'] == year2).values
-
-                gix = solver_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
-                gix_exp = solver_exp_dtr.projectField(mosta, neofs=neofs, eofscaling=0, weighted=True)
-
-                dists.append(ctl.distance(pix, gix))
-                dists_exp.append(ctl.distance(pix_exp, gix_exp))
-                nomi.append((nam, year2))
-
-        indok = np.argmin(dists)
-        indok_exp = np.argmin(dists_exp)
-
-        analogs[(opa, year, 'obs_eof')] = nomi[indok]
-        analogs[(opa, year, 'exp_eof')] = nomi[indok_exp]
-
-pickle.dump(analogs, open(cart_out + 'analogs.p', 'wb'))
-
-stron = '{} {} {}\n'
-for opa in range(5):
-    for tip in ['obs_eof', 'exp_eof']:
-        filo = open(cart_out + 'analogs_opa{}_{}.txt'.format(opa, tip), 'w')
-
-        for year in range(1960, 2015):
-            filo.write(stron.format(year, *analogs[(opa, year, tip)]))
-
-        filo.close()
+# stron = '{} {} {}\n'
+# for opa in range(5):
+#     for tip in ['obs_eof', 'exp_eof']:
+#         filo = open(cart_out + 'analogs_opa{}_{}.txt'.format(opa, tip), 'w')
+#
+#         for year in range(1960, 2015):
+#             filo.write(stron.format(year, *analogs[(opa, year, tip)]))
+#
+#         filo.close()
 
 for opa in range(5):
     figs = []
