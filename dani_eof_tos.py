@@ -69,6 +69,8 @@ pi11tos_dtr = []
 gi11tos = []
 gi11tos_dtr = []
 
+obs_states = dict()
+
 for opas in range(5):
     pino = xr.load_dataset('/data-archimede/ORAS4/tos_Omon_ORAS4_opa{}_195709-201412_r360x180.nc'.format(opas), use_cftime = True)
     pino = pino.drop_vars('latitude')
@@ -90,12 +92,18 @@ for opas in range(5):
 
     pi11tos_dtr.append(pinko)
 
+    pinkoarr = xr.DataArray(data=pinko, dims=["time", "lat", "lon"], coords=[pino11.time, pino11.lat,pino11.lon])
+    pino11 = pino11.assign(tos_dtr = pinkoarr)
+    obs_states[opas] = pino11
+
 pi11tos = np.concatenate(pi11tos, axis = 0)
 pi11tos_dtr = np.concatenate(pi11tos_dtr, axis = 0)
 
 expnams = os.listdir('/data-archimede/historical/ecearth/')
 filexp = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
 filexp2 = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_ssp245_*nc'
+
+mod_states = dict()
 
 for nam in expnams:
     cose = glob.glob(filexp.format(nam))
@@ -119,6 +127,11 @@ for nam in expnams:
     gi11tos.append(gicoso)
 
     ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, gigi11.time.values, None, deg = 1)
+
+    ginkoarr = xr.DataArray(data=ginko, dims=["time", "lat", "lon"], coords=[gigi11.time, gigi11.lat,gigi11.lon])
+    gigi11 = gigi11.assign(tos_dtr = ginkoarr)
+
+    mod_states[nam] = gigi11
 
     gi11tos_dtr.append(ginko)
 
@@ -223,11 +236,16 @@ fig.savefig(cart_out + 'explained_variance_dtr.pdf')
 #####################################################################
 
 # Selezione su spazio obs
+solver_dtr
+
+#####################################################################
+
+# Selezione su spazio exp
+solver_exp_dtr
 
 
-
-# pcs_ref = []
-# pcs_ref_dtr = []
-# for i in range(n_ref):
-#     pcs_ref.append(solver.projectField(solver_exp.eofs(eofscaling=2)[i], neofs=n_ref, eofscaling=0, weighted=True))
+pcs_ref = []
+pcs_ref_dtr = []
+for i in range(n_ref):
+    pcs_ref.append(solver.projectField(solver_exp.eofs(eofscaling=2)[i], neofs=n_ref, eofscaling=0, weighted=True))
 #     pcs_ref_dtr.append(solver_dtr.projectField(solver_exp_dtr.eofs(eofscaling=2)[i], neofs=n_ref, eofscaling=0, weighted=True))
