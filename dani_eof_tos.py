@@ -50,6 +50,9 @@ cose = glob.glob(filexp)
 gigi = xr.open_mfdataset(cose, use_cftime = True)
 gigi = gigi.rename({'latitude' : 'lat'})
 gigi = gigi.rename({'longitude' : 'lon'})
+
+lat = pino.lat.values
+lon = pino.lon.values
 # gigi = gigi.drop_vars('latitude')
 # gigi = gigi.drop_vars('longitude')
 
