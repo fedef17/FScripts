@@ -118,8 +118,7 @@ for nam in expnams:
         gicoso = gicoso + 273.15
     gi11tos.append(gicoso)
 
-
-    ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, pino11.time.values, None, deg = 1)
+    ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, gigi11.time.values, None, deg = 1)
 
     gi11tos_dtr.append(ginko)
 
