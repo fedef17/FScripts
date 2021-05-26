@@ -211,16 +211,20 @@ for na, ru, col in zip(allnams, allru, colors):
     if ru != 'pi':
         kose = kose.sel(time = kose['time.year'] >= kose.year.data[-1]-200)
 
-    kose_smean = kose.groupby("time.season").mean()
-    kose_sstd = kose.groupby("time.season").std()
-    kose_p90 = kose.groupby("time.season").percentile(90)
-    kose_p10 = kose.groupby("time.season").percentile(10)
-
     for var in var_map_200:
-        mapmean[(ru, var, 'mean')] = kose_smean
-        mapmean[(ru, var, 'std')] = kose_sstd
-        mapmean[(ru, var, 'p90')] = kose_p90
-        mapmean[(ru, var, 'p10')] = kose_p10
+        kose_sclim = ctl.seasonal_climatology(kose[var])
+        mapmean[(ru, var)] = kose_sclim
+
+    # kose_smean = kose.groupby("time.season").mean()
+    # kose_sstd = kose.groupby("time.season").std()
+    # kose_p90 = kose.groupby("time.season").percentile(90)
+    # kose_p10 = kose.groupby("time.season").percentile(10)
+    #
+    # for var in var_map_200:
+    #     mapmean[(ru, var, 'mean')] = kose_smean
+    #     mapmean[(ru, var, 'std')] = kose_sstd
+    #     mapmean[(ru, var, 'p90')] = kose_p90
+    #     mapmean[(ru, var, 'p10')] = kose_p10
 
     # for var in var_map_200:
     #     print(var)
@@ -232,9 +236,10 @@ for na, ru, col in zip(allnams, allru, colors):
     #     plt.savefig(cart + '{}_seas_{}.pdf'.format(mod, var))
 
 
-ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob)
+ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True, )
 fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
 
+pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
 
 # 3D vars
 for na, ru, col in zip(allnams, allru, colors):
@@ -249,126 +254,53 @@ for na, ru, col in zip(allnams, allru, colors):
     if ru != 'pi':
         kose = kose.sel(time = kose['time.year'] >= kose.year.data[-1]-200)
 
-    kose_smean = kose.groupby("time.season").mean()
-    kose_sstd = kose.groupby("time.season").std()
-    kose_p90 = kose.groupby("time.season").percentile(90)
-    kose_p10 = kose.groupby("time.season").percentile(10)
-
     for var in var_map_200:
-        mapmean[(ru, var, 'mean')] = kose_smean
-        mapmean[(ru, var, 'std')] = kose_sstd
-        mapmean[(ru, var, 'p90')] = kose_p90
-        mapmean[(ru, var, 'p10')] = kose_p10
+        kose_sclim = ctl.seasonal_climatology(kose[var])
+        mapmean[(ru, var)] = kose_sclim
 
-pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean.pdf', 'wb'))
+    # kose_smean = kose.groupby("time.season").mean()
+    # kose_sstd = kose.groupby("time.season").std()
+    # kose_p90 = kose.groupby("time.season").percentile(90)
+    # kose_p10 = kose.groupby("time.season").percentile(10)
+    #
+    # for var in var_map_200:
+    #     mapmean[(ru, var, 'mean')] = kose_smean
+    #     mapmean[(ru, var, 'std')] = kose_sstd
+    #     mapmean[(ru, var, 'p90')] = kose_p90
+    #     mapmean[(ru, var, 'p10')] = kose_p10
 
-sys.exit()
+pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
 
 ###### Plots 2D
 figs_map = []
 for var in var_map_200:
     for copl in ['mean', 'std', 'p10', 'p90']:
-        mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
+        #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
+        mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
 
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-        mappeseas = [ma.sel(season = seasok).values for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
 
-        fig = ctl.plot_multimap_contour(mappeseas, lat, lon, None)
+        fig = ctl.plot_multimap_contour(mappeseas, figsize = (12,12))
         figs_map.append(fig)
 
+fignames = [var+'_'+copl for var in var_map_200 for copl in ['mean', 'std', 'p10', 'p90']]
+ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
 
+figs_map = []
+for var in var_map_200:
+    for copl in ['mean', 'std', 'p10', 'p90']:
+        fig, axs = plt.subplots(4, 4, figsize = (12,12))
+        #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
+        mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
 
-### Mean state temperature e varianza?
-### Mean state precipitazione e varianza
-### Mean state wind e varianza
-var = 'tas'
+        #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
 
-for varnam in ['tas', 'pr', 'uas']:
-    print(varnam)
-    for ru, col in zip(allru, colors):
-        print(ru)
-        filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
-        gigi = xr.open_mfdataset(filist, use_cftime=True)
+        for ma, ax in zip(mappeseas, axs.flatten()):
+            guplo = ma.plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
 
-        var = np.array(gigi[varnam].data)
-        lat = np.array(gigi.lat.data)
-        lon = np.array(gigi.lon.data)
-        dates = np.array(gigi.time.data)
+        figs_map.append(fig)
 
-        varye, datye = ctl.yearly_average(var, dates)
-        glomean = ctl.global_mean(varye, lat)
-        resdict[(ru, varnam, 'glomean')] = glomean
-
-        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-        varok = var[ok200]
-        dateok = dates[ok200]
-
-        resdict[(ru, varnam, 'mean200')], resdict[(ru, varnam, 'std200')] = ctl.seasonal_climatology(varok, dateok, 'year')
-        resdict[(ru, varnam, 'mean200', 'DJFM')], resdict[(ru, varnam, 'std200', 'DJFM')] = ctl.seasonal_climatology(varok, dateok, 'DJFM')
-        resdict[(ru, varnam, 'mean200', 'JJAS')], resdict[(ru, varnam, 'std200', 'JJAS')] = ctl.seasonal_climatology(varok, dateok, 'JJAS')
-
-
-# 3D vars
-for varnam in ['ta', 'ua', 'zg']:
-    print(varnam)
-    for ru, col in zip(allru, colors):
-        print(ru)
-        filist = glob.glob(filna.format(ru, ru[1:], miptab, varnam))
-        gigi = xr.open_mfdataset(filist, use_cftime=True)
-
-        var = np.array(gigi[varnam].data)
-        lat = np.array(gigi.lat.data)
-        lon = np.array(gigi.lon.data)
-        dates = np.array(gigi.time.data)
-
-        varye, datye = ctl.yearly_average(var, dates)
-        glomean = ctl.global_mean(varye, lat)
-        resdict[(ru, varnam, 'glomean')] = glomean
-
-        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-        varok = var[ok200]
-        dateok = dates[ok200]
-
-        resdict[(ru, varnam, 'mean200')], resdict[(ru, varnam, 'std200')] = ctl.seasonal_climatology(varok, dateok, 'year')
-        resdict[(ru, varnam, 'mean200', 'DJFM')], resdict[(ru, varnam, 'std200', 'DJFM')] = ctl.seasonal_climatology(varok, dateok, 'DJFM')
-        resdict[(ru, varnam, 'mean200', 'JJAS')], resdict[(ru, varnam, 'std200', 'JJAS')] = ctl.seasonal_climatology(varok, dateok, 'JJAS')
-
-
-pickle.dump(glomean, open(cart_out + 'mean_climate.p', 'wb'))
-
-
-for varnam in ['tas', 'pr', 'uas']:
-    fiout = cart_out + '{}_mean200.pdf'.format(varnam)
-    varall = [resdict[(ru, varnam, 'mean200')] for ru in allru] + [resdict[(ru, varnam, 'std200')] for ru in allru]
-    ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 3))
-
-    fiout = cart_out + '{}_mean200_rsp025.pdf'.format(varnam)
-    varall = [resdict[(ru, varnam, 'mean200')]-resdict[('b025', varnam, 'mean200')] for ru in allru[1:]] + [resdict[(ru, varnam, 'std200')] for ru in allru[1:]]
-    ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 2))
-
-    fig = plt.figure(figsize = (16,12))
-    for ru, col in zip(allru, colors):
-        plt.plot(years, resdict[(ru, varnam, 'glomean')], color = col, label = ru)
-    plt.legend()
-    fig.savefig(cart_out + '{}_glomean.pdf'.format(varnam))
-
-
-for season in ['DJFM', 'JJAS']:
-    for varnam in ['tas', 'pr', 'uas']:
-        fiout = cart_out + '{}_mean200_{}.pdf'.format(varnam, season)
-        varall = [resdict[(ru, varnam, 'mean200', season)] for ru in allru] + [resdict[(ru, varnam, 'std200', season)] for ru in allru]
-        ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 3))
-
-        fiout = cart_out + '{}_mean200_rsp025_{}.pdf'.format(varnam, season)
-        varall = [resdict[(ru, varnam, 'mean200', season)]-resdict[('b025', varnam, 'mean200', season)] for ru in allru[1:]] + [resdict[(ru, varnam, 'std200', season)] for ru in allru[1:]]
-        ctl.plot_multimap_contour(varall, lat, lon, fiout, plot_anomalies = False, fix_subplots_shape = (2, 2))
-
-
-
-####################################################################################################
-
-allvars_3D = 'ta ua zg'.split()
-lev_map_3D = [85000, 50000]
-
-
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+fignames = [var+'_'+copl for var in var_map_200 for copl in ['mean', 'std', 'p10', 'p90']]
+ctl.plot_pdfpages(cart_out + 'bottino_crossmeans.pdf', figs_map, True, fignames)
