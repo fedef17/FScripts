@@ -41,7 +41,7 @@ pino = pino.drop_vars('latitude')
 pino = pino.drop_vars('longitude')
 
 # only november
-pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
+#pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
 pino11 = pino.sel(time = pino['time.month'] == 11)
 
 filexp = '/data-archimede/historical/ecearth/a1tn/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
@@ -54,7 +54,7 @@ gigi = gigi.rename({'longitude' : 'lon'})
 # gigi = gigi.drop_vars('longitude')
 
 # only november
-gigi = gigi.sel(time = slice('1960-01-01', '2014-12-31'))
+gigi = gigi.sel(time = slice('1955-01-01', '2014-12-31'))
 gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
 # common mask
@@ -75,7 +75,7 @@ for opas in range(5):
     pino = pino.drop_vars('longitude')
 
     # only november
-    pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
+    #pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
     pino11 = pino.sel(time = pino['time.month'] == 11)
 
     lat = pino.lat.values
@@ -95,9 +95,11 @@ pi11tos_dtr = np.concatenate(pi11tos_dtr, axis = 0)
 
 expnams = os.listdir('/data-archimede/historical/ecearth/')
 filexp = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
+filexp2 = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_ssp245_*nc'
 
 for nam in expnams:
     cose = glob.glob(filexp.format(nam))
+    cose += glob.glob(filexp2.format(nam))
 
     gigi = xr.open_mfdataset(cose, use_cftime = True)
     gigi = gigi.rename({'latitude' : 'lat'})
@@ -106,7 +108,7 @@ for nam in expnams:
     # gigi = gigi.drop_vars('longitude')
 
     # only november
-    gigi = gigi.sel(time = slice('1960-01-01', '2014-12-31'))
+    gigi = gigi.sel(time = slice('1955-01-01', '2019-12-31'))
     gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
     gicoso = gigi11.tos.values
@@ -217,6 +219,11 @@ fig.savefig(cart_out + 'explained_variance_dtr.pdf')
 # np.argwhere(np.cumsum(solver_exp_dtr.varianceFraction()) > 0.5)
 # np.argwhere(np.cumsum(solver_exp_dtr.varianceFraction()) > 0.5)[0][0]
 # np.argwhere(np.cumsum(solver_dtr.varianceFraction()) > 0.5)[0][0]
+
+
+#####################################################################
+
+# Selezione su spazio obs
 
 
 
