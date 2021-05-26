@@ -299,8 +299,8 @@ for opa in range(5):
         nam_ex, yea_ex = analogs[(opa, year, 'obs_eof')]
 
         obsta = obs_states[opa].tos.sel(time = obs_states[opa]['time.year'] == year)
-        mosta1 = mod_states[nam_ob].tos.sel(time = mod_states[nam_ob]['time.year'] == year_ob)
-        mosta2 = mod_states[nam_ex].tos.sel(time = mod_states[nam_ex]['time.year'] == year_ex)
+        mosta1 = mod_states[nam_ob].tos.sel(time = mod_states[nam_ob]['time.year'] == yea_ob)
+        mosta2 = mod_states[nam_ex].tos.sel(time = mod_states[nam_ex]['time.year'] == yea_ex)
 
         fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), subtitles = ['obs', 'analog_obseof', 'analog_expeof'], figsize = (18,7))
         figs.append(fig)
