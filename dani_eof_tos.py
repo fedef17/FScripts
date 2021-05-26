@@ -238,6 +238,20 @@ fig.savefig(cart_out + 'explained_variance_dtr.pdf')
 # Selezione su spazio obs
 solver_dtr
 
+analogs = dict()
+
+for opa in range(5):
+    for year in range(1960, 2015):
+        print(year)
+
+        # obs field
+        obsta = obs_states[opa].sel(time = obs_states[opa]['time.year'] == year).squeeze().values
+
+        # select 10 anni exps
+        for nam in mod_states.keys():
+            slice(year -5, year +5)
+
+
 #####################################################################
 
 # Selezione su spazio exp

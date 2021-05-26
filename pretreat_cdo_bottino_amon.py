@@ -27,7 +27,8 @@ filerr = open('/nas/BOTTINO/log_Amon_err.txt', 'w')
 
 allexps = os.listdir(bcart)
 
-for exp in allexps:
+#for exp in allexps:
+for exp in ['piControl']:
     expcart = bcart + exp + '/'
     allmems = os.listdir(expcart)
     print(exp)
@@ -41,7 +42,8 @@ for exp in allexps:
         ctl.mkdir(r25cart)
 
 
-        for var in os.listdir(daycart):
+        #for var in os.listdir(daycart):
+        for var in ['clt', 'rsut']:
             print(var)
             cart_in = daycart + var + '/'
             cart_out = r25cart + var + '/'
