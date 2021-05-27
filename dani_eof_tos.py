@@ -291,22 +291,41 @@ analogs = pickle.load(open(cart_out + 'analogs.p', 'rb'))
 #
 #         filo.close()
 
-for opa in range(5):
-    figs = []
 
-    for year in range(1960, 2015):
-        nam_ob, yea_ob = analogs[(opa, year, 'obs_eof')]
-        nam_ex, yea_ex = analogs[(opa, year, 'obs_eof')]
+allmems = np.arange(5)
+pio = xr.DataArray(dims = ['member'], coords = {'member': allmems}, name = 'member')
+obs_stat = xr.concat([obs_states[opa] for opa in range(5), pio)
+obsme = obs_stat.mean(['member', 'time'])
 
-        obsta = obs_states[opa].tos.sel(time = obs_states[opa]['time.year'] == year).squeeze()
-        mosta1 = mod_states[nam_ob].tos.sel(time = mod_states[nam_ob]['time.year'] == yea_ob).squeeze()
-        mosta2 = mod_states[nam_ex].tos.sel(time = mod_states[nam_ex]['time.year'] == yea_ex).squeeze()
+allmems = list(mod_states.keys())
+pio = xr.DataArray(dims = ['member'], coords = {'member': allmems}, name = 'member')
+mod_stat = xr.concat([mod_states[mem] for mem in allmems], pio)
+modme = mod_stat.mean(['member', 'time'])
 
-        fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), subtitles = ['obs', 'analog_obseof', 'analog_expeof'], figsize = (18,7))
-        figs.append(fig)
+for var in ['tos', 'tos_dtr']:
+    for opa in range(5):
+        figs = []
 
-    figs = np.concatenate(figs)
-    ctl.plot_pdfpages(cart_out + 'check_opa{}_analogs.pdf'.format(opa))
+        # obsmean = obs_states[opa].tos.mean('time')
+        # expmean = mod_states[opa].tos
+
+        for year in range(1960, 2015):
+            nam_ob, yea_ob = analogs[(opa, year, 'obs_eof')]
+            nam_ex, yea_ex = analogs[(opa, year, 'obs_eof')]
+
+            obsta = obs_stat[var].sel(member = opa, time = obs_stat['time.year'] == year).squeeze() - obsme[var]
+            mosta1 = mod_stat[var].sel(member = nam_ob, time = mod_stat['time.year'] == yea_ob).squeeze() - modme[var]
+            mosta2 = mod_states[var].sel(member = nam_ex, time = mod_stat['time.year'] == yea_ex).squeeze() - modme[var]
+
+            # obsta = obs_states[opa][var].sel(time = obs_states[opa]['time.year'] == year).squeeze()
+            # mosta1 = mod_states[nam_ob][var].sel(time = mod_states[nam_ob]['time.year'] == yea_ob).squeeze()
+            # mosta2 = mod_states[nam_ex][var].sel(time = mod_states[nam_ex]['time.year'] == yea_ex).squeeze()
+
+            fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), title = str(year), subtitles = ['obs', 'aobs: {} {}'.format(nam_ob, yea_ob), 'aexp: {} {}'.format(nam_ex, yea_ex)], figsize = (18,7))
+            figs.append(fig)
+
+        figs = np.concatenate(figs)
+        ctl.plot_pdfpages(cart_out + '{}_check_opa{}_analogs.pdf'.format(var, opa))
 
 
 sys.exit()
