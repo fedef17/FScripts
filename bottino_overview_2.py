@@ -173,6 +173,8 @@ for na, ru, col in zip(allnams, allru, colors):
     kosettt = kosettt.drop_vars('height')
     kose = kose.assign(uas = kosettt.uas)
 
+    sys.exit()
+
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
         if var not in kose:
             if ru == 'pi':

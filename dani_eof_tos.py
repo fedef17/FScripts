@@ -305,6 +305,9 @@ for mem in allmems: mod_states[mem]['time'] = mod_states[allmems[-1]].time
 mod_stat = xr.concat([mod_states[mem] for mem in allmems], pio)
 modme = mod_stat.mean(['member', 'time'])
 
+modme = modme.compute()
+obsme = obsme.compute()
+
 for var in ['tos', 'tos_dtr']:
     for opa in range(5):
         figs = []
