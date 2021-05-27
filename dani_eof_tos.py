@@ -67,82 +67,83 @@ mask = (mask_obs) | (mask_exp)
 
 
 # ok, qui rileggo tutte le obs e tutti gli exp
-# pi11tos = []
-# pi11tos_dtr = []
-# gi11tos = []
-# gi11tos_dtr = []
-#
-# obs_states = dict()
-#
-# for opas in range(5):
-#     pino = xr.load_dataset('/data-archimede/ORAS4/tos_Omon_ORAS4_opa{}_195709-201412_r360x180.nc'.format(opas), use_cftime = True)
-#     pino = pino.drop_vars('latitude')
-#     pino = pino.drop_vars('longitude')
-#
-#     # only november
-#     #pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
-#     pino11 = pino.sel(time = pino['time.month'] == 11)
-#
-#     lat = pino.lat.values
-#     lon = pino.lon.values
-#
-#     picoso = pino11.tos.values
-#     picoso[:, mask] = np.nan
-#
-#     pi11tos.append(picoso)
-#
-#     pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, picoso, pino11.time.values, None, deg = 1)
-#
-#     pi11tos_dtr.append(pinko)
-#
-#     pinkoarr = xr.DataArray(data=pinko, dims=["time", "lat", "lon"], coords=[pino11.time, pino11.lat,pino11.lon])
-#     pino11 = pino11.assign(tos_dtr = pinkoarr)
-#     obs_states[opas] = pino11
-#
-# pi11tos = np.concatenate(pi11tos, axis = 0)
-# pi11tos_dtr = np.concatenate(pi11tos_dtr, axis = 0)
-#
-# expnams = os.listdir('/data-archimede/historical/ecearth/')
-# filexp = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
-# filexp2 = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_ssp245_*nc'
-#
-# mod_states = dict()
-#
-# for nam in expnams:
-#     cose = glob.glob(filexp.format(nam))
-#     cose += glob.glob(filexp2.format(nam))
-#
-#     gigi = xr.open_mfdataset(cose, use_cftime = True)
-#     gigi = gigi.rename({'latitude' : 'lat'})
-#     gigi = gigi.rename({'longitude' : 'lon'})
-#     # gigi = gigi.drop_vars('latitude')
-#     # gigi = gigi.drop_vars('longitude')
-#
-#     # only november
-#     gigi = gigi.sel(time = slice('1955-01-01', '2019-12-31'))
-#     gigi11 = gigi.sel(time = gigi['time.month'] == 11)
-#
-#     gicoso = gigi11.tos.values
-#     gicoso[:, mask] = np.nan
-#     print(nam, np.nanmean(gicoso))
-#     if np.nanmean(gicoso) < 0.:
-#         gicoso = gicoso + 273.15
-#     gi11tos.append(gicoso)
-#
-#     ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, gigi11.time.values, None, deg = 1)
-#
-#     ginkoarr = xr.DataArray(data=ginko, dims=["time", "lat", "lon"], coords=[gigi11.time, gigi11.lat,gigi11.lon])
-#     gigi11 = gigi11.assign(tos_dtr = ginkoarr)
-#
-#     mod_states[nam] = gigi11
-#
-#     gi11tos_dtr.append(ginko)
-#
-# gi11tos = np.concatenate(gi11tos, axis = 0)
-# gi11tos_dtr = np.concatenate(gi11tos_dtr, axis = 0)
+pi11tos = []
+pi11tos_dtr = []
+gi11tos = []
+gi11tos_dtr = []
 
-# pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.p', 'wb'))
-# pickle.dump([obs_states, mod_states], open(cart_out + 'tos_data_xr.p', 'wb'))
+obs_states = dict()
+
+for opas in range(5):
+    pino = xr.load_dataset('/data-archimede/ORAS4/tos_Omon_ORAS4_opa{}_195709-201412_r360x180.nc'.format(opas), use_cftime = True)
+    pino = pino.drop_vars('latitude')
+    pino = pino.drop_vars('longitude')
+
+    # only november
+    #pino = pino.sel(time = slice('1960-01-01', '2014-12-31'))
+    pino11 = pino.sel(time = pino['time.month'] == 11)
+
+    lat = pino.lat.values
+    lon = pino.lon.values
+
+    picoso = pino11.tos.values
+    picoso[:, mask] = np.nan
+
+    pi11tos.append(picoso)
+
+    pinko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, picoso, pino11.time.values, None, deg = 1)
+
+    pi11tos_dtr.append(pinko)
+
+    pinkoarr = xr.DataArray(data=pinko, dims=["time", "lat", "lon"], coords=[pino11.time, pino11.lat,pino11.lon])
+    pino11 = pino11.assign(tos_dtr = pinkoarr)
+    obs_states[opas] = pino11
+
+pi11tos = np.concatenate(pi11tos, axis = 0)
+pi11tos_dtr = np.concatenate(pi11tos_dtr, axis = 0)
+
+expnams = os.listdir('/data-archimede/historical/ecearth/')
+filexp = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_hist*nc'
+filexp2 = '/data-archimede/historical/ecearth/{}/tos/r360x180/tos_Omon_EC-Earth3_ssp245_*nc'
+
+mod_states = dict()
+
+for nam in expnams:
+    cose = glob.glob(filexp.format(nam))
+    cose += glob.glob(filexp2.format(nam))
+
+    gigi = xr.open_mfdataset(cose, use_cftime = True)
+    gigi = gigi.rename({'latitude' : 'lat'})
+    gigi = gigi.rename({'longitude' : 'lon'})
+    # gigi = gigi.drop_vars('latitude')
+    # gigi = gigi.drop_vars('longitude')
+
+    # only november
+    gigi = gigi.sel(time = slice('1955-01-01', '2019-12-31'))
+    gigi11 = gigi.sel(time = gigi['time.month'] == 11)
+
+    if np.nanmean(gigi11) < 0.:
+        gigi11 = gigi11 + 273.15
+        
+    gicoso = gigi11.tos.values
+    gicoso[:, mask] = np.nan
+    print(nam, np.nanmean(gicoso))
+    gi11tos.append(gicoso)
+
+    ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, gigi11.time.values, None, deg = 1)
+
+    ginkoarr = xr.DataArray(data=ginko, dims=["time", "lat", "lon"], coords=[gigi11.time, gigi11.lat,gigi11.lon])
+    gigi11 = gigi11.assign(tos_dtr = ginkoarr)
+
+    mod_states[nam] = gigi11
+
+    gi11tos_dtr.append(ginko)
+
+gi11tos = np.concatenate(gi11tos, axis = 0)
+gi11tos_dtr = np.concatenate(gi11tos_dtr, axis = 0)
+
+pickle.dump([pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr], open(cart_out + 'tos_data.p', 'wb'))
+pickle.dump([obs_states, mod_states], open(cart_out + 'tos_data_xr.p', 'wb'))
 
 pi11tos, pi11tos_dtr, gi11tos, gi11tos_dtr = pickle.load(open(cart_out + 'tos_data.nc', 'rb'))
 obs_states, mod_states = pickle.load(open(cart_out + 'tos_data_xr.p', 'rb'))
