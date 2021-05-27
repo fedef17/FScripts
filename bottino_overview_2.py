@@ -184,8 +184,8 @@ for na, ru, col in zip(allnams2, allru2, colors2):
             continue
 
         cosoye = kose[var].groupby("time.year").mean().compute()
-
         yeamean[(ru, var)] = cosoye
+
         coso = cosoye.mean('lon')
         glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
         if ru == 'pi':
@@ -247,10 +247,10 @@ for na, ru, col in zip(allnams2, allru2, colors2):
 ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True, )
 fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
 
-pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
 
 # 3D vars
-for na, ru, col in zip(allnams, allru, colors):
+for na, ru, col in zip(allnams2, allru2, colors2):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
@@ -259,10 +259,17 @@ for na, ru, col in zip(allnams, allru, colors):
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
 
+    for var in allvars_3D:
+        cosoye = kose[var].groupby("time.year").mean().compute()
+        yeamean[(ru, var)] = cosoye
+
+    if ru == 'ssp585':
+        continue
+
     if ru != 'pi':
         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
 
-    for var in var_map_200:
+    for var in allvars_3D:
         kose_sclim = ctl.seasonal_climatology(kose[var])
         mapmean[(ru, var)] = kose_sclim
 
@@ -277,7 +284,7 @@ for na, ru, col in zip(allnams, allru, colors):
     #     mapmean[(ru, var, 'p90')] = kose_p90
     #     mapmean[(ru, var, 'p10')] = kose_p10
 
-pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
+pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
 
 allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 ###### Plots 2D
