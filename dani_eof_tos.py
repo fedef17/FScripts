@@ -318,7 +318,7 @@ for var in ['tos', 'tos_dtr']:
 
             obsta = obs_stat[var].sel(member = opa, time = obs_stat['time.year'] == year).squeeze() - obsme[var]
             mosta1 = mod_stat[var].sel(member = nam_ob, time = mod_stat['time.year'] == yea_ob).squeeze() - modme[var]
-            mosta2 = mod_states[var].sel(member = nam_ex, time = mod_stat['time.year'] == yea_ex).squeeze() - modme[var]
+            mosta2 = mod_stat[var].sel(member = nam_ex, time = mod_stat['time.year'] == yea_ex).squeeze() - modme[var]
 
             # obsta = obs_states[opa][var].sel(time = obs_states[opa]['time.year'] == year).squeeze()
             # mosta1 = mod_states[nam_ob][var].sel(time = mod_states[nam_ob]['time.year'] == yea_ob).squeeze()
