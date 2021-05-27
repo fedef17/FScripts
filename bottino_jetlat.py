@@ -33,80 +33,98 @@ plt.rcParams['axes.axisbelow'] = True
 
 cart_out = '/home/fabiano/Research/lavori/BOTTINO/analisi/'
 
-filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/r1i1p1f1/day_r25/ua/ua*nc'
+filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}/day_r25/ua/ua*nc'
 
 allru = ['pi', 'b025', 'b050', 'b100']
 allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
 
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
-#############################################################################
-# resdict = dict()
-#
-# for na, ru, col in zip(allnams, allru, colors):
-#     print(ru)
-#     filist = glob.glob(filna.format(na))
-#     filist.sort()
-#
-#     jli, jspeed, dates = cd.jli_from_files(filist)
-#
-#     resdict[(ru, 'jli')] = jli
-#     resdict[(ru, 'jspeed')] = jspeed
-#     resdict[(ru, 'dates')] = dates
-#
-# with open(cart_out + 'res_jli200.p', 'wb') as filox:
-#     pickle.dump(resdict, filox)
+allru2 = allru + ['c1950']
+allnams2 = allnams + ['control-1950']
+colors2 = colors + ['steelblue']
 
-with open(cart_out + 'res_jli200.p', 'rb') as filox:
+#############################################################################
+areasel = dict()
+areasel['NATL'] = [-60., 0., 20., 70.]
+areasel['NPAC'] = [150., 230., 20., 70.]
+areasel['SPAC'] = [180., 260., -70., -20.]
+areasel['SATL'] = [-45., 10., -70., -20.]
+areasel['SIND'] = [50., 110., -70., -20.]
+
+resdict = dict()
+
+for na, ru, col in zip(allnams2, allru2, colors2):
+    print(ru)
+    mem = 'r1i1p1f1'
+    if ru == 'c1950':
+        mem = 'r1i1p2f1'
+
+    filist = glob.glob(filna.format(na, mem))
+    filist.sort()
+
+    for area in areasel.keys():
+        jli, jspeed, dates = cd.jli_from_files(filist, area = areasel[area])
+
+        resdict[(ru, 'jli', area)] = jli
+        resdict[(ru, 'jspeed', area)] = jspeed
+        resdict[(ru, 'dates')] = dates
+
+with open(cart_out + 'res_jli200_v2.p', 'wb') as filox:
+    pickle.dump(resdict, filox)
+
+with open(cart_out + 'res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
 
-fig = plt.figure(figsize = (24,12))
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
+for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]):
+    for area in areasel.keys():
+        fig = plt.figure(figsize = (24,12))
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122)
 
-latsel = np.arange(20, 71, 0.5)
-kos = np.concatenate([resdict[(ru, 'jspeed')] for ru in allru])
-vmin, vmax = (np.min(kos), np.max(kos))
-print(vmin, vmax)
-vsel = np.linspace(vmin, vmax, 100)
+        latsel = np.arange(areasel[area][-2], areasel[area][-1]+0.1, 0.5)
+        kos = np.concatenate([resdict[(ru, 'jspeed', area)] for ru in aruok])
+        vmin, vmax = (np.min(kos), np.max(kos))
+        print(vmin, vmax)
+        vsel = np.linspace(vmin, vmax, 100)
 
-def dopdf(var, xi, bnd_width):
-    pdf = ctl.calc_pdf(var, bnd_width = bnd_width)
-    pdfok = pdf(xi)
-    pdfok /= np.sum(pdfok)
-    return pdfok
+        def dopdf(var, xi, bnd_width):
+            pdf = ctl.calc_pdf(var, bnd_width = bnd_width)
+            pdfok = pdf(xi)
+            pdfok /= np.sum(pdfok)
+            return pdfok
 
-for ru, col in zip(allru, colors):
-    jli = resdict[(ru, 'jli')]
-    jspeed = resdict[(ru, 'jspeed')]
+        for ru, col in zip(aruok, colok):
+            jli = resdict[(ru, 'jli', area)]
+            jspeed = resdict[(ru, 'jspeed', area)]
 
-    jliserie = ctl.bootstrap(jli, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [latsel, 0.22], n_choice = 50, n_bootstrap = 1000)
-    jspedserie = ctl.bootstrap(jspeed, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [vsel, None], n_choice = 50, n_bootstrap = 1000)
+            jliserie = ctl.bootstrap(jli, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [latsel, 0.22], n_choice = 50, n_bootstrap = 1000)
+            jspedserie = ctl.bootstrap(jspeed, resdict[(ru, 'dates')], None, apply_func = dopdf, func_args = [vsel, None], n_choice = 50, n_bootstrap = 1000)
 
-    pdf = ctl.calc_pdf(jli, bnd_width = 0.22)
-    pdfok = pdf(latsel)
-    pdfok /= np.sum(pdfok)
+            pdf = ctl.calc_pdf(jli, bnd_width = 0.22)
+            pdfok = pdf(latsel)
+            pdfok /= np.sum(pdfok)
 
-    jlimin = np.percentile(jliserie, 10, axis = 0)
-    jlimax = np.percentile(jliserie, 90, axis = 0)
-    ax1.fill_between(latsel, jlimin, jlimax, color = col, alpha = 0.3)
-    ax1.plot(latsel, pdfok, label = ru, color = col, linewidth = 3)
+            jlimin = np.percentile(jliserie, 10, axis = 0)
+            jlimax = np.percentile(jliserie, 90, axis = 0)
+            ax1.fill_between(latsel, jlimin, jlimax, color = col, alpha = 0.3)
+            ax1.plot(latsel, pdfok, label = ru, color = col, linewidth = 3)
 
-    pdf = ctl.calc_pdf(jspeed)
-    pdfok = pdf(vsel)
-    pdfok /= np.sum(pdfok)
+            pdf = ctl.calc_pdf(jspeed)
+            pdfok = pdf(vsel)
+            pdfok /= np.sum(pdfok)
 
-    jlimin = np.percentile(jspedserie, 10, axis = 0)
-    jlimax = np.percentile(jspedserie, 90, axis = 0)
-    ax2.fill_between(vsel, jlimin, jlimax, color = col, alpha = 0.3)
-    ax2.plot(vsel, pdfok, label = ru, color = col, linewidth = 3)
+            jlimin = np.percentile(jspedserie, 10, axis = 0)
+            jlimax = np.percentile(jspedserie, 90, axis = 0)
+            ax2.fill_between(vsel, jlimin, jlimax, color = col, alpha = 0.3)
+            ax2.plot(vsel, pdfok, label = ru, color = col, linewidth = 3)
 
-ax1.grid()
-ax2.grid()
-ax1.set_xlabel('Latitude')
-ax2.set_xlabel('u wind (m/s)')
-ax1.set_title('Jet latitude index')
-ax2.set_title('Jet speed')
-ax1.legend()
-ax2.legend()
-fig.savefig(cart_out + 'jlinspeed_bottino.pdf')
+        ax1.grid()
+        ax2.grid()
+        ax1.set_xlabel('Latitude')
+        ax2.set_xlabel('u wind (m/s)')
+        ax1.set_title('Jet latitude index')
+        ax2.set_title('Jet speed')
+        ax1.legend()
+        ax2.legend()
+        fig.savefig(cart_out + 'jlinspeed_bottino_{}{}.pdf'.format(area, tip))

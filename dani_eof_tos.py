@@ -321,7 +321,7 @@ for var in ['tos', 'tos_dtr']:
 
         for year in range(1960, 2015):
             nam_ob, yea_ob = analogs[(opa, year, 'obs_eof')]
-            nam_ex, yea_ex = analogs[(opa, year, 'obs_eof')]
+            nam_ex, yea_ex = analogs[(opa, year, 'exp_eof')]
 
             obsta = obs_stat[var].sel(member = opa, time = obs_stat['time.year'] == year).squeeze() - obsme[var]
             mosta1 = mod_stat[var].sel(member = nam_ob, time = mod_stat['time.year'] == yea_ob).squeeze() - modme[var]
@@ -331,7 +331,7 @@ for var in ['tos', 'tos_dtr']:
             # mosta1 = mod_states[nam_ob][var].sel(time = mod_states[nam_ob]['time.year'] == yea_ob).squeeze()
             # mosta2 = mod_states[nam_ex][var].sel(time = mod_states[nam_ex]['time.year'] == yea_ex).squeeze()
 
-            fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), title = str(year), subtitles = ['obs', 'aobs: {} {}'.format(nam_ob, yea_ob), 'aexp: {} {}'.format(nam_ex, yea_ex)], figsize = (18,7))
+            fig = ctl.plot_multimap_contour([obsta, mosta1, mosta2], fix_subplots_shape = (1,3), title = str(year), subtitles = ['obs', 'aobs: {} {}'.format(nam_ob, yea_ob), 'aexp: {} {}'.format(nam_ex, yea_ex)], figsize = (18,7), cbar_range = (-3, 3), cb_label = var + ' anomaly (K)')
             figs.append(fig)
 
         figs = np.concatenate(figs)
