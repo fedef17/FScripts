@@ -305,6 +305,7 @@ for mem in allmems: mod_states[mem]['time'] = mod_states[allmems[-1]].time
 mod_stat = xr.concat([mod_states[mem] for mem in allmems], pio)
 modme = mod_stat.mean(['member', 'time'])
 
+### THESE ARE FUNDAMENTAL!! terribly inefficient without (recomputes for every plot)
 modme = modme.compute()
 obsme = obsme.compute()
 
@@ -331,7 +332,7 @@ for var in ['tos', 'tos_dtr']:
             figs.append(fig)
 
         figs = np.concatenate(figs)
-        ctl.plot_pdfpages(cart_out + '{}_check_opa{}_analogs.pdf'.format(var, opa))
+        ctl.plot_pdfpages(cart_out + '{}_check_opa{}_analogs.pdf'.format(var, opa), figs)
 
 
 sys.exit()

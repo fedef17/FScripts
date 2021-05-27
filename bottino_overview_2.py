@@ -12,6 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
+import tunlib as tl
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
@@ -150,8 +151,8 @@ for var in var_glob_mean:
 
 fig_greg, ax_greg = plt.subplots(figsize = (12,8))
 
-#for na, ru, col in zip(allnams2, allru2, colors2):
-for na, ru, col in zip(allnams, allru, colors):
+#for na, ru, col in zip(allnams, allru, colors):
+for na, ru, col in zip(allnams2, allru2, colors2):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
@@ -162,8 +163,8 @@ for na, ru, col in zip(allnams, allru, colors):
 
     try:
         kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-    except Exception as exp:
-        print(exp)
+    except Exception as exc:
+        print(exc)
         pass
 
     # Separate for uas
@@ -172,8 +173,6 @@ for na, ru, col in zip(allnams, allru, colors):
     kosettt = kosettt.drop_vars('time_bnds')
     kosettt = kosettt.drop_vars('height')
     kose = kose.assign(uas = kosettt.uas)
-
-    sys.exit()
 
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
         if var not in kose:
@@ -198,9 +197,10 @@ for na, ru, col in zip(allnams, allru, colors):
 
     # gregory
     try:
-        ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-    except Exception as exp:
-        print(exp)
+        #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+        tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+    except Exception as exc:
+        print(exc)
         pass
 
     if ru == 'b100':
@@ -273,10 +273,11 @@ for na, ru, col in zip(allnams, allru, colors):
 
 pickle.dump([glomeans, pimean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
 
+allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 ###### Plots 2D
 figs_map = []
 for var in var_map_200:
-    for copl in ['mean', 'std', 'p10', 'p90']:
+    for copl in allcopls:
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
         mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
 
@@ -286,12 +287,12 @@ for var in var_map_200:
         fig = ctl.plot_multimap_contour(mappeseas, figsize = (12,12))
         figs_map.append(fig)
 
-fignames = [var+'_'+copl for var in var_map_200 for copl in ['mean', 'std', 'p10', 'p90']]
+fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
 
 figs_map = []
 for var in var_map_200:
-    for copl in ['mean', 'std', 'p10', 'p90']:
+    for copl in allcopls:
         fig, axs = plt.subplots(4, 4, figsize = (12,12))
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
         mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
@@ -304,5 +305,5 @@ for var in var_map_200:
 
         figs_map.append(fig)
 
-fignames = [var+'_'+copl for var in var_map_200 for copl in ['mean', 'std', 'p10', 'p90']]
+fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_crossmeans.pdf', figs_map, True, fignames)
