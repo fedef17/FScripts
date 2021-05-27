@@ -122,12 +122,13 @@ for nam in expnams:
     gigi = gigi.sel(time = slice('1955-01-01', '2019-12-31'))
     gigi11 = gigi.sel(time = gigi['time.month'] == 11)
 
-    if np.nanmean(gigi11) < 0.:
-        gigi11 = gigi11 + 273.15
-        
+    if np.nanmean(gigi11['tos']) < 0.:
+        print(nam, np.nanmean(gigi11['tos']))
+        gigi11['tos'] = gigi11['tos'] + 273.15
+        gigi11 = gigi11.compute()
+
     gicoso = gigi11.tos.values
     gicoso[:, mask] = np.nan
-    print(nam, np.nanmean(gicoso))
     gi11tos.append(gicoso)
 
     ginko, coeffs, var_reg, dats = ctl.remove_global_polytrend(lat, lon, gicoso, gigi11.time.values, None, deg = 1)
