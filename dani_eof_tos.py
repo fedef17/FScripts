@@ -299,6 +299,9 @@ obsme = obs_stat.mean(['member', 'time'])
 
 allmems = list(mod_states.keys())
 pio = xr.DataArray(dims = ['member'], coords = {'member': allmems}, name = 'member')
+
+# force same calendar
+for mem in allmems: mod_states[mem]['time'] = mod_states[allmems[-1]].time
 mod_stat = xr.concat([mod_states[mem] for mem in allmems], pio)
 modme = mod_stat.mean(['member', 'time'])
 
