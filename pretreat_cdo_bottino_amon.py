@@ -27,8 +27,8 @@ filerr = open('/nas/BOTTINO/log_Amon_err.txt', 'w')
 
 allexps = os.listdir(bcart)
 
-#for exp in allexps:
-for exp in ['piControl']:
+#for exp in ['piControl']:
+for exp in allexps:
     expcart = bcart + exp + '/'
     allmems = os.listdir(expcart)
     print(exp)
@@ -37,13 +37,14 @@ for exp in ['piControl']:
         memcart = expcart + mem + '/'
         print(mem)
 
-        daycart = memcart + 'Amon/'
-        r25cart = memcart + 'Amon_r25/'
+        # daycart = memcart + 'Amon/'
+        # r25cart = memcart + 'Amon_r25/'
+        daycart = memcart + 'SImon/'
+        r25cart = memcart + 'SImon_r1/'
         ctl.mkdir(r25cart)
 
-
-        #for var in os.listdir(daycart):
-        for var in ['clt', 'rsut']:
+        #for var in ['clt', 'rsut']:
+        for var in os.listdir(daycart):
             print(var)
             cart_in = daycart + var + '/'
             cart_out = r25cart + var + '/'
@@ -53,7 +54,8 @@ for exp in ['piControl']:
                     continue
 
             try:
-                cd.preprocess_cdo(cart_in, cart_out, skip_existing = True)
+                #cd.preprocess_cdo(cart_in, cart_out, skip_existing = True)
+                cd.preprocess_cdo(cart_in, cart_out, skip_existing = True, grid = 'r360x180', gridtag = '1')
             except Exception as exc:
                 filerr.write('Error for {} {} {}\n'.format(exp, mem, var))
                 filerr.write(str(exc))

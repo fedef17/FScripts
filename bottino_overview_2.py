@@ -141,6 +141,7 @@ figs_glob = []
 axs_glob = []
 pimean = dict()
 glomeans = dict()
+yeamean = dict()
 mapmean = dict()
 
 for var in var_glob_mean:
@@ -153,6 +154,7 @@ fig_greg, ax_greg = plt.subplots(figsize = (12,8))
 
 #for na, ru, col in zip(allnams, allru, colors):
 for na, ru, col in zip(allnams2, allru2, colors2):
+    print(ru)
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
@@ -169,10 +171,11 @@ for na, ru, col in zip(allnams2, allru2, colors2):
 
     # Separate for uas
     fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
-    kosettt = xr.open_mfdataset(fils, use_cftime = True)
-    kosettt = kosettt.drop_vars('time_bnds')
-    kosettt = kosettt.drop_vars('height')
-    kose = kose.assign(uas = kosettt.uas)
+    if len(fils) > 0:
+        kosettt = xr.open_mfdataset(fils, use_cftime = True)
+        kosettt = kosettt.drop_vars('time_bnds')
+        kosettt = kosettt.drop_vars('height')
+        kose = kose.assign(uas = kosettt.uas)
 
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
         if var not in kose:
@@ -180,7 +183,10 @@ for na, ru, col in zip(allnams2, allru2, colors2):
                 pimean[var] = 0.
             continue
 
-        coso = kose[var].mean('lon').groupby("time.year").mean()
+        cosoye = kose[var].groupby("time.year").mean().compute()
+
+        yeamean[(ru, var)] = cosoye
+        coso = cosoye.mean('lon')
         glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
         if ru == 'pi':
             years = coso.year.data-2256+2015
