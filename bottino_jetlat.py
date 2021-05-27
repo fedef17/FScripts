@@ -77,10 +77,21 @@ with open(cart_out + 'res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
 
 for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]):
+    figN, axN = plt.subplots(1,2,figsize = (24,12))
+    figS, axS = plt.subplots(1,3,figsize = (24,8))
+    iS = 0
+    iN = 0
     for area in areasel.keys():
         fig = plt.figure(figsize = (24,12))
         ax1 = fig.add_subplot(121)
         ax2 = fig.add_subplot(122)
+
+        if 'N' in area:
+            axlu = axN[iN]
+            iN += 1
+        else:
+            axlu = axS[iS]
+            iS += 1
 
         latsel = np.arange(areasel[area][-2], areasel[area][-1]+0.1, 0.5)
         kos = np.concatenate([resdict[(ru, 'jspeed', area)] for ru in aruok])
@@ -110,6 +121,9 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
             ax1.fill_between(latsel, jlimin, jlimax, color = col, alpha = 0.3)
             ax1.plot(latsel, pdfok, label = ru, color = col, linewidth = 3)
 
+            axlu.fill_between(latsel, jlimin, jlimax, color = col, alpha = 0.3)
+            axlu.plot(latsel, pdfok, label = ru, color = col, linewidth = 3)
+
             pdf = ctl.calc_pdf(jspeed)
             pdfok = pdf(vsel)
             pdfok /= np.sum(pdfok)
@@ -118,6 +132,11 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
             jlimax = np.percentile(jspedserie, 90, axis = 0)
             ax2.fill_between(vsel, jlimin, jlimax, color = col, alpha = 0.3)
             ax2.plot(vsel, pdfok, label = ru, color = col, linewidth = 3)
+
+        axlu.grid()
+        axlu.set_xlabel('Latitude')
+        axlu.set_title(area)
+        axlu.legend()
 
         ax1.grid()
         ax2.grid()
@@ -128,3 +147,5 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
         ax1.legend()
         ax2.legend()
         fig.savefig(cart_out + 'jlinspeed_bottino_{}{}.pdf'.format(area, tip))
+
+    figN.savefig(cart_out + 'jlibott_allareas{}.pdf'.format(tip))

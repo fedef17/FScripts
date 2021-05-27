@@ -290,6 +290,8 @@ for na, ru, col in zip(allnams2, allru2, colors2):
 
 pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
 
+glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
+
 allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 ###### Plots 2D
 figs_map = []
