@@ -294,7 +294,7 @@ analogs = pickle.load(open(cart_out + 'analogs.p', 'rb'))
 
 allmems = np.arange(5)
 pio = xr.DataArray(dims = ['member'], coords = {'member': allmems}, name = 'member')
-obs_stat = xr.concat([obs_states[opa] for opa in range(5), pio)
+obs_stat = xr.concat([obs_states[opa] for opa in range(5)], pio)
 obsme = obs_stat.mean(['member', 'time'])
 
 allmems = list(mod_states.keys())
