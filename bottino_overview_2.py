@@ -178,6 +178,7 @@ for na, ru, col in zip(allnams2, allru2, colors2):
         kose = kose.assign(uas = kosettt.uas)
 
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
+        print(var)
         if var not in kose:
             if ru == 'pi':
                 pimean[var] = 0.
@@ -220,6 +221,7 @@ for na, ru, col in zip(allnams2, allru2, colors2):
         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
 
     for var in var_map_200:
+        print(var)
         kose_sclim = ctl.seasonal_climatology(kose[var])
         mapmean[(ru, var)] = kose_sclim
 
@@ -260,6 +262,7 @@ for na, ru, col in zip(allnams2, allru2, colors2):
     kose = kose.drop_vars('time_bnds')
 
     for var in allvars_3D:
+        print(var)
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
@@ -270,6 +273,7 @@ for na, ru, col in zip(allnams2, allru2, colors2):
         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
 
     for var in allvars_3D:
+        print(var)
         kose_sclim = ctl.seasonal_climatology(kose[var])
         mapmean[(ru, var)] = kose_sclim
 

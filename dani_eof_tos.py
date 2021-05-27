@@ -125,7 +125,7 @@ for nam in expnams:
     if np.nanmean(gigi11['tos']) < 0.:
         print(nam, np.nanmean(gigi11['tos']))
         gigi11['tos'] = gigi11['tos'] + 273.15
-        gigi11 = gigi11.compute()
+        #gigi11 = gigi11.compute()
 
     gicoso = gigi11.tos.values
     gicoso[:, mask] = np.nan
@@ -304,6 +304,7 @@ pio = xr.DataArray(allmems, dims = ['member'], coords = {'member': allmems}, nam
 
 # force same calendar
 for mem in allmems: mod_states[mem]['time'] = mod_states[allmems[-1]].time
+#mod_stat = xr.concat([mod_states[mem].compute() for mem in allmems], pio)
 mod_stat = xr.concat([mod_states[mem] for mem in allmems], pio)
 modme = mod_stat.mean(['member', 'time'])
 
