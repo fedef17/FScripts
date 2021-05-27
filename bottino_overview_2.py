@@ -209,7 +209,7 @@ for na, ru, col in zip(allnams, allru, colors):
         continue
 
     if ru != 'pi':
-        kose = kose.sel(time = kose['time.year'] >= kose.year.data[-1]-200)
+        kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
 
     for var in var_map_200:
         kose_sclim = ctl.seasonal_climatology(kose[var])
@@ -252,7 +252,7 @@ for na, ru, col in zip(allnams, allru, colors):
     kose = kose.drop_vars('time_bnds')
 
     if ru != 'pi':
-        kose = kose.sel(time = kose['time.year'] >= kose.year.data[-1]-200)
+        kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
 
     for var in var_map_200:
         kose_sclim = ctl.seasonal_climatology(kose[var])
