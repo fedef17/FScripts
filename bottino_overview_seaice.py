@@ -48,7 +48,7 @@ areacelfi = '/nas/BOTTINO/areas.nc'
 acel = xr.open_dataset(areacelfi)
 areaT = np.array(acel['O1t0.srf'].data)
 
-miptab = 'SImon_r25'
+miptab = 'SImon_r1'
 varnam = 'siconc'
 
 resdict = dict()
