@@ -323,7 +323,7 @@ for var in allvars_3D:
         for ma, ax in zip(mappeseas, axs.flatten()):
             guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
 
-        figs_map.append()
+        figs_map.append(fig)
 
 figs_map = np.concatenate(figs_map)
 fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
