@@ -149,4 +149,5 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
         ax2.legend()
         fig.savefig(cart_out + 'jlinspeed_bottino_{}{}.pdf'.format(area, tip))
 
-    figN.savefig(cart_out + 'jlibott_allareas{}.pdf'.format(tip))
+    figN.savefig(cart_out + 'jlibott_allareas_N{}.pdf'.format(tip))
+    figS.savefig(cart_out + 'jlibott_allareas_S{}.pdf'.format(tip))
