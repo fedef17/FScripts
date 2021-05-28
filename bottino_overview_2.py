@@ -311,7 +311,7 @@ fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
 
 figs_map = []
-for var in var_map_200:
+for var in allvars_3D:
     for copl in allcopls:
         fig, axs = plt.subplots(4, 4, figsize = (12,12))
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
