@@ -325,6 +325,5 @@ for var in allvars_3D:
 
         figs_map.append(fig)
 
-figs_map = np.concatenate(figs_map)
 fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_crossmeans.pdf', figs_map, True, fignames)
