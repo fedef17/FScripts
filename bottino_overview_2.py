@@ -12,7 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
-import tunlib as tl
+#import tunlib as tl
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
@@ -32,7 +32,11 @@ plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
 
-cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
+if os.uname()[1] == 'hobbes':
+    cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
+elif os.uname()[1] == 'xaru':
+    cart_out = '/home/fedef/Research/lavori/BOTTINO/seasmean/'
+
 ctl.mkdir(cart_out)
 
 filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
@@ -218,10 +222,18 @@ for var in var_map_200:
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
         mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
 
+        plot_anoms = [False if ru == 'pi' else True for se in range(4) for ru in allru]
+        cmaps = ['viridis' if ru == 'pi' else 'RdBu_r' for se in range(4) for ru in allru]
+
+        cbr0 = ctl.get_cbar_range(mappe[0].values, False, (2,98))
+        cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[1:]], True, (2,98))
+        cbar_range = [cbr0 if ru == 'pi' else cbr1 for se in range(4) for ru in allru]
+
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
         mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        fig = ctl.plot_multimap_contour(mappeseas, figsize = (12,12))
+        fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl)
         figs_map.append(fig)
 
 figs_map = np.concatenate(figs_map)
@@ -231,7 +243,7 @@ ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
 figs_map = []
 for var in allvars_3D:
     for copl in allcopls:
-        fig, axs = plt.subplots(4, 4, figsize = (12,12))
+        fig, axs = plt.subplots(4, 4, figsize = (20,12))
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
         mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
 
@@ -240,6 +252,7 @@ for var in allvars_3D:
 
         for ma, ax in zip(mappeseas, axs.flatten()):
             guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
+            guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
 
         figs_map.append(fig)
 
