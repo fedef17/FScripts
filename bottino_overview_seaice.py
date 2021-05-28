@@ -48,7 +48,8 @@ areacelfi = '/nas/BOTTINO/areas.nc'
 acel = xr.open_dataset(areacelfi)
 areaT = np.array(acel['O1t0.srf'].data)
 
-miptab = 'SImon_r1'
+#miptab = 'SImon_r1'
+miptab = 'SImon'
 varnam = 'siconc'
 
 resdict = dict()
@@ -109,6 +110,7 @@ axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
 axs[1,1].legend()
 fig.savefig(cart_out + 'bottseaice_r25.pdf')
 
+miptab = 'SImon_r1'
 var_map_200 = ['siconc', 'sithick']
 
 mapmean = dict()
