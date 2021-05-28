@@ -106,11 +106,12 @@ axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
 axs[1,1].legend()
 fig.savefig(cart_out + 'bottseaice_r25.pdf')
 
+var_map_200 = ['siconc', 'sithick']
 
 mapmean = dict()
 for na, ru, col in zip(allnams, allru, colors):
     mem = 'r1'
-    filist = np.concatenate([glob.glob(filna.format(na, mem, miptab, varnam) for varnam in var_map_200])
+    filist = np.concatenate([glob.glob(filna.format(na, mem, miptab, varnam)) for varnam in var_map_200])
     gigi = xr.open_mfdataset(filist, use_cftime=True)
 
     if ru != 'pi':
