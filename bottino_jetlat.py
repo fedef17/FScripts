@@ -47,8 +47,9 @@ colors2 = colors + ['steelblue']
 #############################################################################
 areasel = dict()
 areasel['NATL'] = [-60., 0., 20., 70.]
-areasel['NPAC'] = [150., 230., 20., 70.]
-areasel['SPAC'] = [180., 260., -70., -20.]
+areasel['NEPAC'] = [200., 240., 20., 65.]
+areasel['NCPAC'] = [150., 200., 20., 65.]
+areasel['SPAC'] = [180., 240., -70., -20.]
 areasel['SATL'] = [-45., 10., -70., -20.]
 areasel['SIND'] = [50., 110., -70., -20.]
 
@@ -77,7 +78,7 @@ with open(cart_out + 'res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
 
 for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]):
-    figN, axN = plt.subplots(1,2,figsize = (24,12))
+    figN, axN = plt.subplots(1,3,figsize = (24,8))
     figS, axS = plt.subplots(1,3,figsize = (24,8))
     iS = 0
     iN = 0
@@ -86,7 +87,7 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
         ax1 = fig.add_subplot(121)
         ax2 = fig.add_subplot(122)
 
-        if 'N' in area:
+        if area[0] == 'N':
             axlu = axN[iN]
             iN += 1
         else:
