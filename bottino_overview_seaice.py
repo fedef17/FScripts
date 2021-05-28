@@ -61,7 +61,12 @@ for na, ru, col in zip(allnams + ['ssp585'], allru + ['ssp585'], colors + ['indi
     filist = glob.glob(filna.format(na, mem, miptab, varnam))
     gigi = xr.open_mfdataset(filist, use_cftime=True)
 
-    lat = np.array(gigi.latitude.data)
+    try:
+        lat = np.array(gigi.lat.data)
+    except:
+        print('lat name is latitude')
+        lat = np.array(gigi.latitude.data)
+
     seaice = np.array(gigi.siconc.data)
     #okslat = lat > 40.
     for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
@@ -81,8 +86,6 @@ for na, ru, col in zip(allnams + ['ssp585'], allru + ['ssp585'], colors + ['indi
 
         axs[ii,0].plot_date(dates[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
         axs[ii,1].plot_date(dates[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
-
-    if ru == 'ssp585': continue
 
     # if ru == 'ssp585':
     #     continue
