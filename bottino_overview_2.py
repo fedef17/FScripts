@@ -137,158 +137,158 @@ allnams2 = allnams + ['ssp585']
 allru2 = allru + ['ssp585']
 colors2 = colors + ['indianred']
 
-figs_glob = []
-axs_glob = []
-pimean = dict()
-glomeans = dict()
-yeamean = dict()
-mapmean = dict()
-
-for var in var_glob_mean:
-    fig, ax = plt.subplots(figsize = (12,8))
-    axs_glob.append(ax)
-    figs_glob.append(fig)
-    ax.set_title(var)
-
-fig_greg, ax_greg = plt.subplots(figsize = (12,8))
-
-#for na, ru, col in zip(allnams, allru, colors):
-for na, ru, col in zip(allnams2, allru2, colors2):
-    print(ru)
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
-
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    try:
-        kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-    except Exception as exc:
-        print(exc)
-        pass
-
-    # Separate for uas
-    fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
-    if len(fils) > 0:
-        kosettt = xr.open_mfdataset(fils, use_cftime = True)
-        kosettt = kosettt.drop_vars('time_bnds')
-        kosettt = kosettt.drop_vars('height')
-        kose = kose.assign(uas = kosettt.uas)
-
-    for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
-        print(var)
-        if var not in kose:
-            if ru == 'pi':
-                pimean[var] = 0.
-            continue
-
-        cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
-
-        coso = cosoye.mean('lon')
-        glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-        if ru == 'pi':
-            years = coso.year.data-2256+2015
-            pimean[var] = np.mean(glomean)
-        else:
-            years = coso.year.data
-
-        glomeans[(ru, var)] = (years, glomean)
-        ax.plot(years, glomean-pimean[var], label = ru, color = col)
-
-        if ru == 'b100':
-            ax.legend()
-            ax.grid()
-
-    # gregory
-    try:
-        #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-        tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
-    except Exception as exc:
-        print(exc)
-        pass
-
-    if ru == 'b100':
-        ax_greg.legend()
-        ax_greg.grid()
-
-    if ru == 'ssp585':
-        continue
-
-    if ru != 'pi':
-        kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
-
-    for var in var_map_200:
-        print(var)
-        kose_sclim = ctl.seasonal_climatology(kose[var])
-        mapmean[(ru, var)] = kose_sclim
-
-    # kose_smean = kose.groupby("time.season").mean()
-    # kose_sstd = kose.groupby("time.season").std()
-    # kose_p90 = kose.groupby("time.season").percentile(90)
-    # kose_p10 = kose.groupby("time.season").percentile(10)
-    #
-    # for var in var_map_200:
-    #     mapmean[(ru, var, 'mean')] = kose_smean
-    #     mapmean[(ru, var, 'std')] = kose_sstd
-    #     mapmean[(ru, var, 'p90')] = kose_p90
-    #     mapmean[(ru, var, 'p10')] = kose_p10
-
-    # for var in var_map_200:
-    #     print(var)
-    #     vmax = np.nanpercentile(flux_season[var], 98)
-    #     fig = plt.figure()
-    #     guplo = flux_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
-    #     guplo.map(lambda: plt.gca().coastlines())
-    #     plt.title(var)
-    #     plt.savefig(cart + '{}_seas_{}.pdf'.format(mod, var))
-
-
-ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True, )
-fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
-
-pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
-
-# 3D vars
-for na, ru, col in zip(allnams2, allru2, colors2):
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
-
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    for var in allvars_3D:
-        print(var)
-        cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
-
-    if ru == 'ssp585':
-        continue
-
-    if ru != 'pi':
-        kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
-
-    for var in allvars_3D:
-        print(var)
-        kose_sclim = ctl.seasonal_climatology(kose[var])
-        mapmean[(ru, var)] = kose_sclim
-
-    # kose_smean = kose.groupby("time.season").mean()
-    # kose_sstd = kose.groupby("time.season").std()
-    # kose_p90 = kose.groupby("time.season").percentile(90)
-    # kose_p10 = kose.groupby("time.season").percentile(10)
-    #
-    # for var in var_map_200:
-    #     mapmean[(ru, var, 'mean')] = kose_smean
-    #     mapmean[(ru, var, 'std')] = kose_sstd
-    #     mapmean[(ru, var, 'p90')] = kose_p90
-    #     mapmean[(ru, var, 'p10')] = kose_p10
-
-pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
+# figs_glob = []
+# axs_glob = []
+# pimean = dict()
+# glomeans = dict()
+# yeamean = dict()
+# mapmean = dict()
+#
+# for var in var_glob_mean:
+#     fig, ax = plt.subplots(figsize = (12,8))
+#     axs_glob.append(ax)
+#     figs_glob.append(fig)
+#     ax.set_title(var)
+#
+# fig_greg, ax_greg = plt.subplots(figsize = (12,8))
+#
+# #for na, ru, col in zip(allnams, allru, colors):
+# for na, ru, col in zip(allnams2, allru2, colors2):
+#     print(ru)
+#     mem = 'r1'
+#     if na == 'ssp585': mem = 'r4'
+#
+#     fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     try:
+#         kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+#     except Exception as exc:
+#         print(exc)
+#         pass
+#
+#     # Separate for uas
+#     fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
+#     if len(fils) > 0:
+#         kosettt = xr.open_mfdataset(fils, use_cftime = True)
+#         kosettt = kosettt.drop_vars('time_bnds')
+#         kosettt = kosettt.drop_vars('height')
+#         kose = kose.assign(uas = kosettt.uas)
+#
+#     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
+#         print(var)
+#         if var not in kose:
+#             if ru == 'pi':
+#                 pimean[var] = 0.
+#             continue
+#
+#         cosoye = kose[var].groupby("time.year").mean().compute()
+#         yeamean[(ru, var)] = cosoye
+#
+#         coso = cosoye.mean('lon')
+#         glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+#         if ru == 'pi':
+#             years = coso.year.data-2256+2015
+#             pimean[var] = np.mean(glomean)
+#         else:
+#             years = coso.year.data
+#
+#         glomeans[(ru, var)] = (years, glomean)
+#         ax.plot(years, glomean-pimean[var], label = ru, color = col)
+#
+#         if ru == 'b100':
+#             ax.legend()
+#             ax.grid()
+#
+#     # gregory
+#     try:
+#         #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+#         tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+#     except Exception as exc:
+#         print(exc)
+#         pass
+#
+#     if ru == 'b100':
+#         ax_greg.legend()
+#         ax_greg.grid()
+#
+#     if ru == 'ssp585':
+#         continue
+#
+#     if ru != 'pi':
+#         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
+#
+#     for var in var_map_200:
+#         print(var)
+#         kose_sclim = ctl.seasonal_climatology(kose[var])
+#         mapmean[(ru, var)] = kose_sclim
+#
+#     # kose_smean = kose.groupby("time.season").mean()
+#     # kose_sstd = kose.groupby("time.season").std()
+#     # kose_p90 = kose.groupby("time.season").percentile(90)
+#     # kose_p10 = kose.groupby("time.season").percentile(10)
+#     #
+#     # for var in var_map_200:
+#     #     mapmean[(ru, var, 'mean')] = kose_smean
+#     #     mapmean[(ru, var, 'std')] = kose_sstd
+#     #     mapmean[(ru, var, 'p90')] = kose_p90
+#     #     mapmean[(ru, var, 'p10')] = kose_p10
+#
+#     # for var in var_map_200:
+#     #     print(var)
+#     #     vmax = np.nanpercentile(flux_season[var], 98)
+#     #     fig = plt.figure()
+#     #     guplo = flux_season[var].plot.contourf(col = 'season', col_wrap = 2, levels = 11, vmax = vmax, transform = proj, figsize = (16,12), subplot_kws = {"projection": proj})
+#     #     guplo.map(lambda: plt.gca().coastlines())
+#     #     plt.title(var)
+#     #     plt.savefig(cart + '{}_seas_{}.pdf'.format(mod, var))
+#
+#
+# ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True, )
+# fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
+#
+# pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+#
+# # 3D vars
+# for na, ru, col in zip(allnams2, allru2, colors2):
+#     mem = 'r1'
+#     if na == 'ssp585': mem = 'r4'
+#
+#     fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     for var in allvars_3D:
+#         print(var)
+#         cosoye = kose[var].groupby("time.year").mean().compute()
+#         yeamean[(ru, var)] = cosoye
+#
+#     if ru == 'ssp585':
+#         continue
+#
+#     if ru != 'pi':
+#         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
+#
+#     for var in allvars_3D:
+#         print(var)
+#         kose_sclim = ctl.seasonal_climatology(kose[var])
+#         mapmean[(ru, var)] = kose_sclim
+#
+#     # kose_smean = kose.groupby("time.season").mean()
+#     # kose_sstd = kose.groupby("time.season").std()
+#     # kose_p90 = kose.groupby("time.season").percentile(90)
+#     # kose_p10 = kose.groupby("time.season").percentile(10)
+#     #
+#     # for var in var_map_200:
+#     #     mapmean[(ru, var, 'mean')] = kose_smean
+#     #     mapmean[(ru, var, 'std')] = kose_sstd
+#     #     mapmean[(ru, var, 'p90')] = kose_p90
+#     #     mapmean[(ru, var, 'p10')] = kose_p10
+#
+# pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean.p', 'wb'))
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
@@ -306,6 +306,7 @@ for var in var_map_200:
         fig = ctl.plot_multimap_contour(mappeseas, figsize = (12,12))
         figs_map.append(fig)
 
+figs_map = np.concatenate(figs_map)
 fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
 
@@ -322,7 +323,8 @@ for var in var_map_200:
         for ma, ax in zip(mappeseas, axs.flatten()):
             guplo = ma.plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
 
-        figs_map.append(fig)
+        figs_map.append()
 
+figs_map = np.concatenate(figs_map)
 fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
 ctl.plot_pdfpages(cart_out + 'bottino_crossmeans.pdf', figs_map, True, fignames)
