@@ -64,12 +64,18 @@ for na, ru, col in zip(allnams2, allru2, colors2):
     filist = glob.glob(filna.format(na, mem))
     filist.sort()
 
-    for area in areasel.keys():
-        jli, jspeed, dates = cd.jli_from_files(filist, area = areasel[area])
+    # for area in areasel.keys():
+    #     jli, jspeed, dates = cd.jli_from_files(filist, area = areasel[area])
+    #
+    #     resdict[(ru, 'jli', area)] = jli
+    #     resdict[(ru, 'jspeed', area)] = jspeed
+    #     resdict[(ru, 'dates')] = dates
+    jli, jspeed, dates = cd.jli_from_files(filist, allareadict = areasel)
 
-        resdict[(ru, 'jli', area)] = jli
-        resdict[(ru, 'jspeed', area)] = jspeed
-        resdict[(ru, 'dates')] = dates
+    for area in areasel.keys():
+        resdict[(ru, 'jli', area)] = jli[area]
+        resdict[(ru, 'jspeed', area)] = jspeed[area]
+    resdict[(ru, 'dates')] = dates
 
 with open(cart_out + 'res_jli200_v2.p', 'wb') as filox:
     pickle.dump(resdict, filox)
