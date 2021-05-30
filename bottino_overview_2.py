@@ -228,7 +228,7 @@ for ru in allru:
     mapmean[(ru, 'pr_perc')] = zup
     zupme = mapmean[('pi', 'pr')]['seamean']
     for copl in allcopls:
-        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme[:, np.newaxis, np.newaxis])/zupme[:, np.newaxis, np.newaxis]
+        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
 
 var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
