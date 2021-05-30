@@ -55,32 +55,32 @@ areasel['SIND'] = [50., 110., -70., -20.]
 
 allseas = ['DJF', 'MAM', 'JJA', 'SON']
 
-resdict = dict()
-for na, ru, col in zip(allnams2, allru2, colors2):
-    print(ru)
-    mem = 'r1i1p1f1'
-    if ru == 'c1950':
-        mem = 'r1i1p2f1'
-
-    filist = glob.glob(filna.format(na, mem))
-    filist.sort()
-
-    # for area in areasel.keys():
-    #     jli, jspeed, dates = cd.jli_from_files(filist, area = areasel[area])
-    #
-    #     resdict[(ru, 'jli', area)] = jli
-    #     resdict[(ru, 'jspeed', area)] = jspeed
-    #     resdict[(ru, 'dates')] = dates
-    for season in allseas:
-        jli, jspeed, dates = cd.jli_from_files(filist, allareadict = areasel, season = season)
-
-        for area in areasel.keys():
-            resdict[(ru, 'jli', area, season)] = jli[area]
-            resdict[(ru, 'jspeed', area, season)] = jspeed[area]
-        resdict[(ru, 'dates', season)] = dates
-
-with open(cart_out + 'res_jli200_v2.p', 'wb') as filox:
-    pickle.dump(resdict, filox)
+# resdict = dict()
+# for na, ru, col in zip(allnams2, allru2, colors2):
+#     print(ru)
+#     mem = 'r1i1p1f1'
+#     if ru == 'c1950':
+#         mem = 'r1i1p2f1'
+#
+#     filist = glob.glob(filna.format(na, mem))
+#     filist.sort()
+#
+#     # for area in areasel.keys():
+#     #     jli, jspeed, dates = cd.jli_from_files(filist, area = areasel[area])
+#     #
+#     #     resdict[(ru, 'jli', area)] = jli
+#     #     resdict[(ru, 'jspeed', area)] = jspeed
+#     #     resdict[(ru, 'dates')] = dates
+#     for season in allseas:
+#         jli, jspeed, dates = cd.jli_from_files(filist, allareadict = areasel, season = season)
+#
+#         for area in areasel.keys():
+#             resdict[(ru, 'jli', area, season)] = jli[area]
+#             resdict[(ru, 'jspeed', area, season)] = jspeed[area]
+#         resdict[(ru, 'dates', season)] = dates
+#
+# with open(cart_out + 'res_jli200_v2.p', 'wb') as filox:
+#     pickle.dump(resdict, filox)
 
 with open(cart_out + 'res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
@@ -146,10 +146,11 @@ for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]
                 ax2.fill_between(vsel, jlimin, jlimax, color = col, alpha = 0.2)
                 ax2.plot(vsel, pdfok, label = ru, color = col, linewidth = 3)
 
-        axlu.grid()
-        axlu.set_xlabel('Latitude')
-        axlu.set_title(area)
-        axlu.legend()
+        if axlu is not None:
+            axlu.grid()
+            axlu.set_xlabel('Latitude')
+            axlu.set_title(area)
+            axlu.legend()
 
         ax1.grid()
         ax2.grid()

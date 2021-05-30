@@ -231,10 +231,11 @@ for var in var_map_200:
 
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
         mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+
         subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl)
-        figs_map.append(fig)
+    , subt    fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12, subtitles), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl)
+        figs_map.appesubt
 
 figs_map = np.concatenate(figs_map)
 fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
@@ -249,10 +250,12 @@ for var in allvars_3D:
 
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
         mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        for ma, ax in zip(mappeseas, axs.flatten()):
+        for ma, ax, subt in zip(mappeseas, axs.flatten(), subtitles):
             guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
-            guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
+            #guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
+            ax.set_title(subt)
 
         figs_map.append(fig)
 
