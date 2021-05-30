@@ -224,11 +224,11 @@ for ru in allru:
     for copl in allcopls:
         mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme[:, np.newaxis, np.newaxis]
 
-    zup = mapmean[(ru, 'pr')]
-    mapmean[(ru, 'pr_perc')] = zup
-    zupme = mapmean[('pi', 'pr')]['seamean']
-    for copl in allcopls:
-        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
+    # zup = mapmean[(ru, 'pr')]
+    # mapmean[(ru, 'pr_perc')] = zup
+    # zupme = mapmean[('pi', 'pr')]['seamean']
+    # for copl in allcopls:
+    #     mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
 
 var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
@@ -236,7 +236,13 @@ figs_map = []
 for var in var_map_200:
     for copl in allcopls:
         #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
-        mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
+        if var == 'pr_perc':
+            zupme = mapmean[('pi', 'pr')]['seamean']
+            mappe = [mapmean[('pi', 'pr')][copl]] + [(mapmean[(ru, 'pr')][copl]-zupme)/zupme for ru in allru[1:]]
+            mapcont = [None if ru == 'pi' else mapmean[('pi', 'pr')][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+        else:
+            mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
+            mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
         plot_anoms = [False if ru == 'pi' else True for se in range(4) for ru in allru]
         cmaps = ['viridis' if ru == 'pi' else 'RdBu_r' for se in range(4) for ru in allru]
@@ -247,7 +253,6 @@ for var in var_map_200:
 
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
         mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-        mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
         subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 

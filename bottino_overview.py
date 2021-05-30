@@ -87,15 +87,17 @@ for na, ru, col in zip(allnams, allru, colors):
         ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
         varok = var[ok200]
         dateok = dates[ok200]
+        yeaok = [da.year for da in dates[ok200]]
     else:
         varok = var
+        yeaok = [da.year-2256+2015 for da in dates]
         dateok = dates
 
     resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
     resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
 
-    ax1.plot_date(dates[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
-    ax2.plot_date(dates[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
+    ax1.plot(yeaok[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
+    ax2.plot(yeaok[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
 
 ax1.set_title('March')
 ax2.set_title('September')
@@ -104,6 +106,7 @@ ax2.set_ylabel(r'Sea ice extent (m$^2$)')
 ax2.legend()
 fig.savefig(cart_out + 'bottseaice.pdf')
 
+sys.exit()
 #pinuc = xclim.indices.sea_ice_area(gigi, acel.data)
 
 #To describe the stratospheric polar vortex (SPV), we follow Wu et al. (2019) and compute the average zonal wind velocity over 60–75 ◦ N but at 20 hPa instead of 10 hPa.

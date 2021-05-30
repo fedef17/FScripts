@@ -108,7 +108,7 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 # axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
 # axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
 # axs[1,1].legend()
-# fig.savefig(cart_out + 'bottseaice_r25.pdf')
+# fig.savefig(cart_out + 'bottseaice_r1.pdf')
 #
 # miptab = 'SImon_r1'
 # var_map_200 = ['siconc', 'sithick']
