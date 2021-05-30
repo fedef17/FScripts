@@ -220,13 +220,13 @@ allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 for ru in allru:
     zup = mapmean[(ru, 'tas')]
     mapmean[(ru, 'tas_patt')] = zup
-    zupme = ctl.global_mean(zup['seas_mean'])
+    zupme = ctl.global_mean(zup['seamean'])
     for copl in allcopls:
         mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme
 
     zup = mapmean[(ru, 'pr')]
     mapmean[(ru, 'pr_perc')] = zup
-    zupme = mapmean[('pi', 'pr')]['seas_mean']
+    zupme = mapmean[('pi', 'pr')]['seamean']
     for copl in allcopls:
         mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
 
