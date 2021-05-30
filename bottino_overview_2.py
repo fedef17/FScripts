@@ -222,13 +222,13 @@ for ru in allru:
     mapmean[(ru, 'tas_patt')] = zup
     zupme = ctl.global_mean(zup['seamean'])
     for copl in allcopls:
-        mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme
+        mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme[:, np.newaxis, np.newaxis]
 
     zup = mapmean[(ru, 'pr')]
     mapmean[(ru, 'pr_perc')] = zup
     zupme = mapmean[('pi', 'pr')]['seamean']
     for copl in allcopls:
-        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
+        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme[:, np.newaxis, np.newaxis])/zupme[:, np.newaxis, np.newaxis]
 
 var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
