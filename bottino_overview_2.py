@@ -262,7 +262,7 @@ for var in allvars_3D:
                 pass
 
             if 'pi' not in subt:
-                seasok = subt.split('-').strip()[1]
+                seasok = subt.split('-')[1].strip()
                 guplo2 = mapmean[('pi', var)][copl].sel(season = seasok).mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
             #guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
             ax.set_title(subt)
