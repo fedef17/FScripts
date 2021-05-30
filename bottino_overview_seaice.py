@@ -137,19 +137,21 @@ allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 figs_map = []
 for var in var_map_200:
     for copl in allcopls:
-        for pol in ['Npolar', 'Spolar']:
-            #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
-            #mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
-            mappe = [mapmean[(ru, var)][copl] for ru in allru]
-            # for ma in mappe:
-            #     ma[ma == 0.] = np.nan
+        #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
+        #mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
+        mappe = [mapmean[(ru, var)][copl] for ru in allru]
+        # for ma in mappe:
+        #     ma[ma == 0.] = np.nan
 
-            #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-            mappeseas = [ma.sel(season = seasok) for seasok in ['Mar', 'Sep'] for ma in mappe]
-            mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
-            subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
+        #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        mappeseas = [ma.sel(season = seasok) for seasok in ['Mar', 'Sep'] for ma in mappe]
+        mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
+        subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
 
-            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = pol, cmap = 'Blues_r')
+        #for pol in ['Npolar', 'Spolar']:
+        for clat in [90, -90]:
+            print(var, copl, clat)
+            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = pol, cmap = 'Blues_r', central_lat_lon = (clat, 0), bounding_lat = 30 * np.sign(clat))
 
             figs_map.append(fig)
 

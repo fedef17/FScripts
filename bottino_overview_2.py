@@ -53,8 +53,8 @@ allvars_2D = 'clt  pr  psl  rlut  rsdt  rsut  tas  uas'.split()
 allvars_3D = 'ta ua'.split()
 
 var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
-var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
+var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585']
 allru2 = allru + ['ssp585']
 colors2 = colors + ['indianred']
@@ -214,7 +214,23 @@ colors2 = colors + ['indianred']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
+var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+
 allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
+for ru in allru:
+    zup = mapmean[(ru, 'tas')]
+    mapmean[(ru, 'tas_patt')] = zup
+    zupme = ctl.global_mean(zup['seas_mean'])
+    for copl in allcopls:
+        mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme
+
+    zup = mapmean[(ru, 'pr')]
+    mapmean[(ru, 'pr_perc')] = zup
+    zupme = mapmean[('pi', 'pr')]['seas_mean']
+    for copl in allcopls:
+        mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
+
+var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
 figs_map = []
 for var in var_map_200:
@@ -263,7 +279,7 @@ for var in allvars_3D:
 
             if 'pi' not in subt:
                 seasok = subt.split('-')[1].strip()
-                guplo2 = mapmean[('pi', var)][copl].sel(season = seasok).mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
+                guplo2 = mapmean[('pi', var)][copl].sel(season = seasok).mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)#vmax = )
             #guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
             ax.set_title(subt)
 
