@@ -148,10 +148,15 @@ for var in var_map_200:
         mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
         subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
 
+        cba = None
+        cma = 'viridis'
+        if var == 'siconc':
+            cba = (0,1)
+            cma = 'Blues_r'
         #for pol in ['Npolar', 'Spolar']:
         for clat in [90, -90]:
             print(var, copl, clat)
-            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = 'nearside', cmap = 'Blues_r', central_lat_lon = (clat, 0), bounding_lat = 30 * np.sign(clat))
+            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,12), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = 'nearside', cmap = cma, cbar_range = cba, central_lat_lon = (clat, 0), bounding_lat = 40 * np.sign(clat), fix_subplots_shape = (2,4))
 
             figs_map.append(fig)
 
