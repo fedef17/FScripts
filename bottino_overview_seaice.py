@@ -151,7 +151,7 @@ for var in var_map_200:
         #for pol in ['Npolar', 'Spolar']:
         for clat in [90, -90]:
             print(var, copl, clat)
-            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = pol, cmap = 'Blues_r', central_lat_lon = (clat, 0), bounding_lat = 30 * np.sign(clat))
+            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = 'nearside', cmap = 'Blues_r', central_lat_lon = (clat, 0), bounding_lat = 30 * np.sign(clat))
 
             figs_map.append(fig)
 
