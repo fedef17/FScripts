@@ -86,6 +86,7 @@ with open(cart_out + 'res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
 
 for tip, aruok, colok in zip(['', '_wc1950'], [allru, allru2], [colors, colors2]):
+    figs = []
     figN, axN = plt.subplots(1,3,figsize = (24,8))
     figS, axS = plt.subplots(1,3,figsize = (24,8))
     iS = 0
