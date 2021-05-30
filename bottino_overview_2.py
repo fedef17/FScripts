@@ -24,10 +24,10 @@ import xclim
 
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
-titlefont = 24
+titlefont = 22
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 28
-plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 15
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
@@ -231,10 +231,11 @@ for var in var_map_200:
 
         #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
         mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+        mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
         subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl)
+        fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False)
         figs_map.append(fig)
 
 figs_map = np.concatenate(figs_map)
@@ -254,8 +255,25 @@ for var in allvars_3D:
 
         for ma, ax, subt in zip(mappeseas, axs.flatten(), subtitles):
             guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
+            try:
+                guplo.colorbar.set_label('')
+            except Exception as exc:
+                print(exc)
+                pass
+
+            if 'pi' not in subt:
+                seasok = subt.split('-').strip()[1]
+                guplo2 = mapmean[('pi', var)][copl].sel(season = seasok).mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
             #guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
             ax.set_title(subt)
+
+        for i in range(4):
+            for j in range(4):
+                if j > 0:
+                    ax.set_ylabel('')
+
+        fig.suptitle(var+' - '+copl)
+        plt.tight_layout()
 
         figs_map.append(fig)
 
