@@ -147,7 +147,7 @@ for var in var_map_200:
             mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
             subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['Mar', 'Sep'] for ru in allru]
 
-            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomales = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = pol)
+            fig = ctl.plot_multimap_contour(mappeseas, figsize = (24,8), plot_anomalies = False, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False, visualization = pol)
 
             figs_map.append(fig)
 
