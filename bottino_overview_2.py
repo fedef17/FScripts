@@ -12,7 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
-#import tunlib as tl
+from tunlib import gregplot_on_ax
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
@@ -127,7 +127,7 @@ axs_glob = []
 #     # gregory
 #     try:
 #         #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-#         tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+#         gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
 #     except Exception as exc:
 #         print(exc)
 #         pass
@@ -244,7 +244,7 @@ for na, ru, col in zip(allnams2, allru2, colors2):
     # gregory
     try:
         #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-        tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+        gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
     except Exception as exc:
         print(exc)
         pass
