@@ -84,17 +84,13 @@ for na, ru, col in zip(allnams, allru, colors):
     resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
 
     if ru != 'pi':
-        ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-        varok = var[ok200]
-        dateok = dates[ok200]
-        yeaok = [da.year for da in dates[ok200]]
+        yeaok = np.array([da.year for da in dates])
     else:
-        varok = var
-        yeaok = [da.year-2256+2015 for da in dates]
-        dateok = dates
+        yeaok = np.array([da.year-2256+2015 for da in dates])
 
-    resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
-    resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
+    #
+    # resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
+    # resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
 
     ax1.plot(yeaok[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
     ax2.plot(yeaok[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
