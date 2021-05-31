@@ -214,6 +214,56 @@ colors2 = colors + ['indianred']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
+for var in var_glob_mean:
+    fig, ax = plt.subplots(figsize = (12,8))
+    axs_glob.append(ax)
+    figs_glob.append(fig)
+    ax.set_title(var)
+
+fig_greg, ax_greg = plt.subplots(figsize = (12,8))
+
+#for na, ru, col in zip(allnams, allru, colors):
+for na, ru, col in zip(allnams2, allru2, colors2):
+    print(ru)
+
+    for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
+        print(var)
+        if (ru, var) not in glomeans.keys():
+            print('NOT found')
+            continue
+
+        cosoye = yeamean[(ru, var)]
+        years, glomean = glomeans[(ru, var)]
+
+        ax.plot(years, glomean-pimean[var], label = ru, color = col)
+
+        if ru == 'b100':
+            ax.legend()
+            ax.grid()
+
+    # gregory
+    try:
+        #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+        tl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+    except Exception as exc:
+        print(exc)
+        pass
+
+    if ru == 'b100':
+        ax_greg.legend()
+        ax_greg.grid()
+
+ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True, )
+
+ax_greg.set_xlabel('Global mean tas (K)')
+ax_greg.set_ylabel('Global net incoming TOA flux (W/m2)')
+fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
+
+ax_greg.set_xlim((-0.5, 0.5))
+ax_greg.set_ylim((-0.5, 0.5))
+fig_greg.savefig(cart_out + 'bottino_gregory_pizoom.pdf')
+
+
 var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
 allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
@@ -229,6 +279,9 @@ for ru in allru:
     # zupme = mapmean[('pi', 'pr')]['seamean']
     # for copl in allcopls:
     #     mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
+
+print('CHECK! -> ', mapmean[(ru, 'tas')] is mapmean[(ru, 'tas_patt')])
+sys.exit()
 
 var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
