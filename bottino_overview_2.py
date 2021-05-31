@@ -59,8 +59,8 @@ allnams2 = allnams + ['ssp585']
 allru2 = allru + ['ssp585']
 colors2 = colors + ['indianred']
 
-# figs_glob = []
-# axs_glob = []
+figs_glob = []
+axs_glob = []
 # pimean = dict()
 # glomeans = dict()
 # yeamean = dict()
