@@ -280,7 +280,7 @@ for ru in allru:
     # for copl in allcopls:
     #     mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
 
-print('CHECK! -> ', mapmean[(ru, 'tas')] is mapmean[(ru, 'tas_patt')])
+print('CHECK! -> ', mapmean[(ru, 'tas')] is mapmean[(ru, 'tas_patt')], mapmean[(ru, 'tas')][copl] is mapmean[(ru, 'tas_patt')][copl])
 sys.exit()
 
 var_map_200 += ['tas_patt', 'pr_perc']
