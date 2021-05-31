@@ -269,7 +269,7 @@ var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, l
 allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
 for ru in allru:
     zup = mapmean[(ru, 'tas')]
-    mapmean[(ru, 'tas_patt')] = zup
+    mapmean[(ru, 'tas_patt')] = zup.copy(deep = True) # it's back!
     zupme = ctl.global_mean(zup['seamean'])
     for copl in allcopls:
         mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme[:, np.newaxis, np.newaxis]
@@ -281,7 +281,6 @@ for ru in allru:
     #     mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
 
 print('CHECK! -> ', mapmean[(ru, 'tas')] is mapmean[(ru, 'tas_patt')], mapmean[(ru, 'tas')][copl] is mapmean[(ru, 'tas_patt')][copl])
-sys.exit()
 
 var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
