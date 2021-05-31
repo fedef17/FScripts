@@ -44,71 +44,85 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 #############################################################################
 ## SEA ICE
-# areacelfi = '/nas/BOTTINO/areas.nc'
-# acel = xr.open_dataset(areacelfi)
-# areaT = np.array(acel['O1t0.srf'].data)
-#
-# #miptab = 'SImon_r1'
-# miptab = 'SImon'
-# varnam = 'siconc'
-#
-# resdict = dict()
-#
-# fig, axs = plt.subplots(2,2,figsize = (12,12))
-#
-# for na, ru, col in zip(allnams + ['ssp585'], allru + ['ssp585'], colors + ['indianred']):
-#     mem = 'r1'
-#     if na == 'ssp585': mem = 'r4'
-#     filist = glob.glob(filna.format(na, mem, miptab, varnam))
-#     gigi = xr.open_mfdataset(filist, use_cftime=True)
-#
-#     try:
-#         lat = np.array(gigi.lat.data)
-#     except:
-#         print('lat name is latitude')
-#         lat = np.array(gigi.latitude.data)
-#
-#     seaice = np.array(gigi.siconc.data)
-#     #okslat = lat > 40.
-#     for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
-#         areaok = areaT[okslat]
-#         oksi = seaice[:, okslat]
-#         oksi[oksi < 15.] = 0.
-#         oksi[oksi > 15.] = 1.
-#         oksiarea = oksi*areaok[np.newaxis, :]
-#         seaicearea = np.nansum(oksiarea, axis = 1)
-#
-#         dates = np.array(gigi.time.data)
-#         okmarch = np.array([da.month == 3 for da in dates])
-#         oksept = np.array([da.month == 9 for da in dates])
-#
-#         resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
-#         resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
-#
-#         axs[ii,0].plot_date(dates[okmarch], seaicearea[okmarch], linestyle='solid', marker = 'None', color = col, label = ru)
-#         axs[ii,1].plot_date(dates[oksept], seaicearea[oksept], linestyle='solid', marker = 'None', color = col, label = ru)
-#
-#     # if ru == 'ssp585':
-#     #     continue
-#     #
-#     # if ru != 'pi':
-#     #     ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-#     #     varok = var[ok200]
-#     #     dateok = dates[ok200]
-#     # else:
-#     #     varok = var
-#     #     dateok = dates
-#     #
-#     # resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
-#     # resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
-#
-#
-# axs[0,0].set_title('March')
-# axs[0,1].set_title('September')
-# axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
-# axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
-# axs[1,1].legend()
-# fig.savefig(cart_out + 'bottseaice_r1.pdf')
+areacelfi = '/nas/BOTTINO/areas.nc'
+acel = xr.open_dataset(areacelfi)
+areaT = np.array(acel['O1t0.srf'].data)
+
+#miptab = 'SImon_r1'
+miptab = 'SImon'
+varnam = 'siconc'
+
+resdict = dict()
+
+fig, axs = plt.subplots(2,2,figsize = (12,12))
+
+for na, ru, col in zip(allnams + ['ssp585'], allru + ['ssp585'], colors + ['indianred']):
+    mem = 'r1'
+    if na == 'ssp585': mem = 'r4'
+    filist = glob.glob(filna.format(na, mem, miptab, varnam))
+    gigi = xr.open_mfdataset(filist, use_cftime=True)
+
+    try:
+        lat = np.array(gigi.lat.data)
+    except:
+        print('lat name is latitude')
+        lat = np.array(gigi.latitude.data)
+
+    seaice = np.array(gigi.siconc.data)
+    #okslat = lat > 40.
+    for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
+        areaok = areaT[okslat]
+        oksi = seaice[:, okslat]
+        oksi[oksi < 15.] = 0.
+        oksi[oksi > 15.] = 1.
+        oksiarea = oksi*areaok[np.newaxis, :]
+        seaicearea = np.nansum(oksiarea, axis = 1)
+
+        dates = np.array(gigi.time.data)
+        okmarch = np.array([da.month == 3 for da in dates])
+        oksept = np.array([da.month == 9 for da in dates])
+
+        resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
+        resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
+
+        if ru != 'pi':
+            yeaok = np.array([da.year for da in dates])
+        else:
+            yeaok = np.array([da.year-2256+2015 for da in dates])
+
+        sima10 = ctl.running_mean(seaicearea[okmarch], 10)
+        sise10 = ctl.running_mean(seaicearea[oksept], 10)
+
+        axs[ii,0].plot(yeaok[okmarch], sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+        axs[ii,1].plot(yeaok[oksept], sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+
+        axs[ii,0].plot(yeaok[okmarch], seaicearea[okmarch], linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+        axs[ii,1].plot(yeaok[oksept], seaicearea[oksept], linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+
+    # if ru == 'ssp585':
+    #     continue
+    #
+    # if ru != 'pi':
+    #     ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
+    #     varok = var[ok200]
+    #     dateok = dates[ok200]
+    # else:
+    #     varok = var
+    #     dateok = dates
+    #
+    # resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
+    # resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
+
+
+axs[0,0].set_title('March')
+axs[0,1].set_title('September')
+axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
+axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
+axs[1,1].legend()
+fig.savefig(cart_out + 'bottseaice.pdf')
+
+sys.exit()
+
 #
 # miptab = 'SImon_r1'
 # var_map_200 = ['siconc', 'sithick']
