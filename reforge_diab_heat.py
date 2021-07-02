@@ -74,9 +74,9 @@ cp = 1000.
 dTdt_lr = np.gradient(flux_lr['ta'].values, axis = 0)/86400.
 ugrad_lr = flux_lr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_lr['ta'].values, axis = -1)
 vgrad_lr = flux_lr['va']*1/Re*np.gradient(flux_lr['ta'].values, axis = -2)
-ugrad_lr = flux_lr['wap'] * (ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_lr['ta'].values, plevels, axis = 1))
+vertgr_lr = flux_lr['wap'] * (ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_lr['ta'].values, plevels, axis = 1))
 
-Q_lr = 86400.*(dTdt_lr + ugrad_lr + vgrad_lr - ugrad_lr)
+Q_lr = 86400.*(dTdt_lr + ugrad_lr + vgrad_lr - vertgr_lr)
 
 dTdt_hr = np.gradient(flux_hr['ta'].values, axis = 0)/86400.
 ugrad_hr = flux_hr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_hr['ta'].values, axis = -1)
