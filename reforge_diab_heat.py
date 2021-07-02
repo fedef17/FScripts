@@ -88,17 +88,17 @@ Q_hr = dTdt_hr + ugrad_hr + vgrad_hr - vertgr_hr
 Q_diff = Q_hr-Q_lr
 
 fig = plt.figure()
-pino = Q_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = Q_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Diab. heating (K/day)')
 fig.savefig(cart + 'diabheat_2mo_511orog255-ctrl255.pdf')
 
 fig = plt.figure()
-pino = Q_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = Q_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Diab. heating (K/day)')
 fig.savefig(cart + 'diabheat_2mo_511orog255.pdf')
 
 fig = plt.figure()
-pino = Q_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = Q_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Diab. heating (K/day)')
 fig.savefig(cart + 'diabheat_2mo_ctrl255.pdf')
 
@@ -129,17 +129,17 @@ vertgr_hr = Q_lr*0. + vertgr_hr
 
 fig = plt.figure()
 vertgr_diff = vertgr_hr - vertgr_lr
-pino = vertgr_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = vertgr_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Tot heating (K/day)')
 fig.savefig(cart + 'vertgr_2mo_511orog255-ctrl255.pdf')
 
 fig = plt.figure()
-pino = vertgr_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = vertgr_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Tot heating (K/day)')
 fig.savefig(cart + 'vertgr_2mo_511orog255.pdf')
 
 fig = plt.figure()
-pino = vertgr_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino = vertgr_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
 pino.colorbar.set_label('Tot heating (K/day)')
 fig.savefig(cart + 'vertgr_2mo_ctrl255.pdf')
 
