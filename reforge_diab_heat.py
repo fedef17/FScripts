@@ -103,6 +103,9 @@ pino.colorbar.set_label('Diab. heating (K/day)')
 fig.savefig(cart + 'diabheat_2mo_ctrl255.pdf')
 
 ## Just the temperature trends
+dTdt_lr = Q_lr*0. + dTdt_lr
+dTdt_hr = Q_lr*0. + dTdt_hr
+
 fig = plt.figure()
 dTdt_diff = dTdt_hr - dTdt_lr
 pino = dTdt_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
