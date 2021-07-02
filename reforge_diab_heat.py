@@ -71,19 +71,19 @@ Re = 6371.e3 # Mean Earth radius. Correction for altitude level would mean about
 ka = 0.286
 cp = 1000.
 
-dTdt_lr = np.gradient(flux_lr['ta'].values, axis = 0)
+dTdt_lr = np.gradient(flux_lr['ta'].values, axis = 0)/86400.
 ugrad_lr = flux_lr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_lr['ta'].values, axis = -1)
 vgrad_lr = flux_lr['va']*1/Re*np.gradient(flux_lr['ta'].values, axis = -2)
-vertgr_lr = flux_lr['wap'] * (ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_lr['ta'].values, plevels, axis = 1))
+ugrad_lr = flux_lr['wap'] * (ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_lr['ta'].values, plevels, axis = 1))
 
-Q_lr = dTdt_lr + ugrad_lr + vgrad_lr - vertgr_lr
+Q_lr = 86400.*(dTdt_lr + ugrad_lr + vgrad_lr - ugrad_lr)
 
-dTdt_hr = np.gradient(flux_hr['ta'].values, axis = 0)
+dTdt_hr = np.gradient(flux_hr['ta'].values, axis = 0)/86400.
 ugrad_hr = flux_hr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_hr['ta'].values, axis = -1)
 vgrad_hr = flux_hr['va']*1/Re*np.gradient(flux_hr['ta'].values, axis = -2)
 vertgr_hr = flux_hr['wap'] * (ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_hr['ta'].values, plevels, axis = 1))
 
-Q_hr = dTdt_hr + ugrad_hr + vgrad_hr - vertgr_hr
+Q_hr = 86400.*(dTdt_hr + ugrad_hr + vgrad_hr - vertgr_hr)
 
 Q_diff = Q_hr-Q_lr
 
@@ -122,3 +122,64 @@ pino = dTdt_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).me
 pino.colorbar.set_label('Tot heating (K/day)')
 fig.savefig(cart + 'Temptend_2mo_ctrl255.pdf')
 #.plot(y = 'plev', col = 'time', col_wrap = 6, ylim = (1.e5, 1.e3), yscale = 'log')
+
+## Just the temperature trends
+vertgr_lr = Q_lr*0. + vertgr_lr
+vertgr_hr = Q_lr*0. + vertgr_hr
+
+fig = plt.figure()
+vertgr_diff = vertgr_hr - vertgr_lr
+pino = vertgr_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vertgr_2mo_511orog255-ctrl255.pdf')
+
+fig = plt.figure()
+pino = vertgr_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vertgr_2mo_511orog255.pdf')
+
+fig = plt.figure()
+pino = vertgr_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vertgr_2mo_ctrl255.pdf')
+
+## Just the temperature trends
+ugrad_lr = Q_lr*0. + ugrad_lr
+ugrad_hr = Q_lr*0. + ugrad_hr
+
+fig = plt.figure()
+ugrad_diff = ugrad_hr - ugrad_lr
+pino = ugrad_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'ugrad_2mo_511orog255-ctrl255.pdf')
+
+fig = plt.figure()
+pino = ugrad_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'ugrad_2mo_511orog255.pdf')
+
+fig = plt.figure()
+pino = ugrad_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'ugrad_2mo_ctrl255.pdf')
+
+
+## Just the temperature trends
+vgrad_lr = Q_lr*0. + vgrad_lr
+vgrad_hr = Q_lr*0. + vgrad_hr
+
+fig = plt.figure()
+vgrad_diff = vgrad_hr - vgrad_lr
+pino = vgrad_diff.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vgrad_2mo_511orog255-ctrl255.pdf')
+
+fig = plt.figure()
+pino = vgrad_hr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vgrad_2mo_511orog255.pdf')
+
+fig = plt.figure()
+pino = vgrad_lr.sel(time = slice('19990101','19990201'), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+pino.colorbar.set_label('Tot heating (K/day)')
+fig.savefig(cart + 'vgrad_2mo_ctrl255.pdf')
