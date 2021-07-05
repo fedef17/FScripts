@@ -38,6 +38,8 @@ plt.rcParams['axes.axisbelow'] = True
 # allru = ['pi', 'ho03']#, 'c3r5']
 # colors = ['steelblue', 'indianred']#, 'forestgreen']
 
+cart_out = '/home/fabiano/work/lavori/hosing/'
+
 cart = '/home/bellomo/work/ec_hosing/ho03/day/r2/'
 filone = 'ua_day_ho03b_1850-1899.nc'
 
@@ -48,6 +50,8 @@ resdict[(ru, 'jli')] = jli
 resdict[(ru, 'jspeed')] = jspeed
 resdict[(ru, 'dates')] = dates
 
+with open(cart_out + 'res_jli_hosing2.p', 'wb') as filox:
+    pickle.dump(resdict, filox)
 #
 
 # #############################################################################
