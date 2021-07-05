@@ -35,8 +35,20 @@ plt.rcParams['axes.axisbelow'] = True
 #
 # fils = ['uaday_cntrl_1850-1999_850hPa_remap25.nc', 'uaday_ho03_1850-1899_850hPa_remap25.nc']#, 'uaday_c3r5_1900-1999_850hPa_remap25.nc']
 #
-allru = ['pi', 'ho03']#, 'c3r5']
-colors = ['steelblue', 'indianred']#, 'forestgreen']
+# allru = ['pi', 'ho03']#, 'c3r5']
+# colors = ['steelblue', 'indianred']#, 'forestgreen']
+
+cart = '/home/bellomo/work/ec_hosing/ho03/day/r2/'
+filone = 'ua_day_ho03b_1850-1899.nc'
+
+resdict = dict()
+jli, jspeed, dates = cd.jli_from_files(cart + filone, orogfile = '/home/federico/work/Tipes/geopot_vegcover_25.nc')
+ru = 'ho03b'
+resdict[(ru, 'jli')] = jli
+resdict[(ru, 'jspeed')] = jspeed
+resdict[(ru, 'dates')] = dates
+
+#
 
 # #############################################################################
 # resdict = dict()
@@ -50,6 +62,8 @@ colors = ['steelblue', 'indianred']#, 'forestgreen']
 #
 # with open(cart + 'res_jli_hosing.p', 'wb') as filox:
 #     pickle.dump(resdict, filox)
+
+sys.exit()
 
 cart_out = '/home/fedef/Research/lavori/tipes/'
 with open(cart_out + 'res_jli_hosing.p', 'rb') as filox:
