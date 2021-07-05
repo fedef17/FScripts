@@ -40,8 +40,8 @@ from importlib import reload
 
 #######################################################
 
-cart = '/home/federico/work/reforge/diab_heat/'
-ctl.mkdir(cart)
+cartgen = '/home/federico/work/reforge/diab_heat/'
+ctl.mkdir(cartgen)
 
 plevels = np.array([100000, 85000, 70000, 50000, 25000, 10000, 5000, 1000])
 
@@ -91,114 +91,118 @@ Q_diff = Q_hr-Q_lr
 
 finda = '19990301'
 
-fig = plt.figure()
-pino = Q_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Diab. heating (K/day)')
-fig.suptitle('511orog255 - ctrl255')
-fig.savefig(cart + 'diabheat_2mo_511orog255-ctrl255.pdf')
+for finda, tag in zip(['19990111', '19990201', '19990301', '19990401'], ['10d', '1mo', '2mo', '3mo']):
+    cart = cartgen + tag + '/'
+    ctl.mkdir(cart)
 
-fig = plt.figure()
-pino = Q_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Diab. heating (K/day)')
-fig.suptitle('511orog255')
-fig.savefig(cart + 'diabheat_2mo_511orog255.pdf')
+    fig = plt.figure()
+    pino = Q_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Diab. heating (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'diabheat_2mo_511orog255-ctrl255.pdf')
 
-fig = plt.figure()
-pino = Q_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Diab. heating (K/day)')
-fig.suptitle('ctrl255')
-fig.savefig(cart + 'diabheat_2mo_ctrl255.pdf')
+    fig = plt.figure()
+    pino = Q_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Diab. heating (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'diabheat_2mo_511orog255.pdf')
 
-## Just the temperature trends
-dTdt_lr = Q_lr*0. + dTdt_lr
-dTdt_hr = Q_lr*0. + dTdt_hr
+    fig = plt.figure()
+    pino = Q_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Diab. heating (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'diabheat_2mo_ctrl255.pdf')
 
-fig = plt.figure()
-dTdt_diff = dTdt_hr - dTdt_lr
-pino = dTdt_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Tot heating (K/day)')
-fig.suptitle('511orog255 - ctrl255')
-fig.savefig(cart + 'Temptend_2mo_511orog255-ctrl255.pdf')
+    ## Just the temperature trends
+    dTdt_lr = Q_lr*0. + dTdt_lr
+    dTdt_hr = Q_lr*0. + dTdt_hr
 
-fig = plt.figure()
-pino = dTdt_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Tot heating (K/day)')
-fig.suptitle('511orog255')
-fig.savefig(cart + 'Temptend_2mo_511orog255.pdf')
+    fig = plt.figure()
+    dTdt_diff = dTdt_hr - dTdt_lr
+    pino = dTdt_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Tot heating (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'Temptend_2mo_511orog255-ctrl255.pdf')
 
-fig = plt.figure()
-pino = dTdt_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Tot heating (K/day)')
-fig.suptitle('ctrl255')
-fig.savefig(cart + 'Temptend_2mo_ctrl255.pdf')
-#.plot(y = 'plev', col = 'time', col_wrap = 6, ylim = (1.e5, 1.e3), yscale = 'log')
+    fig = plt.figure()
+    pino = dTdt_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Tot heating (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'Temptend_2mo_511orog255.pdf')
 
-## Just the temperature trends
-vertgr_lr = Q_lr*0. + vertgr_lr
-vertgr_hr = Q_lr*0. + vertgr_hr
+    fig = plt.figure()
+    pino = dTdt_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Tot heating (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'Temptend_2mo_ctrl255.pdf')
+    #.plot(y = 'plev', col = 'time', col_wrap = 6, ylim = (1.e5, 1.e3), yscale = 'log')
 
-fig = plt.figure()
-vertgr_diff = vertgr_hr - vertgr_lr
-pino = vertgr_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
-fig.suptitle('511orog255 - ctrl255')
-fig.savefig(cart + 'vertgr_2mo_511orog255-ctrl255.pdf')
+    ## Just the temperature trends
+    vertgr_lr = Q_lr*0. + vertgr_lr
+    vertgr_hr = Q_lr*0. + vertgr_hr
 
-fig = plt.figure()
-pino = vertgr_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
-fig.suptitle('511orog255')
-fig.savefig(cart + 'vertgr_2mo_511orog255.pdf')
+    fig = plt.figure()
+    vertgr_diff = vertgr_hr - vertgr_lr
+    pino = vertgr_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'vertgr_2mo_511orog255-ctrl255.pdf')
 
-fig = plt.figure()
-pino = vertgr_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
-pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
-fig.suptitle('ctrl255')
-fig.savefig(cart + 'vertgr_2mo_ctrl255.pdf')
+    fig = plt.figure()
+    pino = vertgr_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'vertgr_2mo_511orog255.pdf')
 
-## Just the temperature trends
-ugrad_lr = Q_lr*0. + ugrad_lr
-ugrad_hr = Q_lr*0. + ugrad_hr
+    fig = plt.figure()
+    pino = vertgr_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'vertgr_2mo_ctrl255.pdf')
 
-fig = plt.figure()
-ugrad_diff = ugrad_hr - ugrad_lr
-pino = ugrad_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Zonal advection (K/day)')
-fig.suptitle('511orog255 - ctrl255')
-fig.savefig(cart + 'ugrad_2mo_511orog255-ctrl255.pdf')
+    ## Just the temperature trends
+    ugrad_lr = Q_lr*0. + ugrad_lr
+    ugrad_hr = Q_lr*0. + ugrad_hr
 
-fig = plt.figure()
-pino = ugrad_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Zonal advection (K/day)')
-fig.suptitle('511orog255')
-fig.savefig(cart + 'ugrad_2mo_511orog255.pdf')
+    fig = plt.figure()
+    ugrad_diff = ugrad_hr - ugrad_lr
+    pino = ugrad_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Zonal advection (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'ugrad_2mo_511orog255-ctrl255.pdf')
 
-fig = plt.figure()
-pino = ugrad_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Zonal advection (K/day)')
-fig.suptitle('ctrl255')
-fig.savefig(cart + 'ugrad_2mo_ctrl255.pdf')
+    fig = plt.figure()
+    pino = ugrad_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Zonal advection (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'ugrad_2mo_511orog255.pdf')
+
+    fig = plt.figure()
+    pino = ugrad_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Zonal advection (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'ugrad_2mo_ctrl255.pdf')
 
 
-## Just the temperature trends
-vgrad_lr = Q_lr*0. + vgrad_lr
-vgrad_hr = Q_lr*0. + vgrad_hr
+    ## Just the temperature trends
+    vgrad_lr = Q_lr*0. + vgrad_lr
+    vgrad_hr = Q_lr*0. + vgrad_hr
 
-fig = plt.figure()
-vgrad_diff = vgrad_hr - vgrad_lr
-pino = vgrad_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Merid. advection (K/day)')
-fig.suptitle('511orog255 - ctrl255')
-fig.savefig(cart + 'vgrad_2mo_511orog255-ctrl255.pdf')
+    fig = plt.figure()
+    vgrad_diff = vgrad_hr - vgrad_lr
+    pino = vgrad_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Merid. advection (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'vgrad_2mo_511orog255-ctrl255.pdf')
 
-fig = plt.figure()
-pino = vgrad_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Merid. advection (K/day)')
-fig.suptitle('511orog255')
-fig.savefig(cart + 'vgrad_2mo_511orog255.pdf')
+    fig = plt.figure()
+    pino = vgrad_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Merid. advection (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'vgrad_2mo_511orog255.pdf')
 
-fig = plt.figure()
-pino = vgrad_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
-pino.colorbar.set_label('Merid. advection (K/day)')
-fig.suptitle('ctrl255')
-fig.savefig(cart + 'vgrad_2mo_ctrl255.pdf')
+    fig = plt.figure()
+    pino = vgrad_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 0.25)
+    pino.colorbar.set_label('Merid. advection (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'vgrad_2mo_ctrl255.pdf')
