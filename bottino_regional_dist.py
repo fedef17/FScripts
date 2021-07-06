@@ -66,6 +66,8 @@ areas_big = [(-180, 180, 30, 60), (-180, 180, -30, 30), (-180, 180, -60, -30), (
 areas_land_sect = np.concatenate([[(-20, 60, l1, l2), (60, 180, l1, l2), (-180, -20, l1, l2)] for l1, l2 in [(60, 80), (40, 60), (20, 40), (-20, 20), (-40, -20), (-60, -40), (-80, -60)]])
 areas_ls_names = 'NEuro Sib Can Euro CAsia NAme NAfr SAsia CNAme CAfr Indo CSAme SAfr Aus SAme Soce1 Soce2 Pata'.split()
 
+areas_land_sect = list(areas_land_sect)
+
 #area_reg = ['Med', 'Eu']
 
 areadist = dict()
@@ -83,7 +85,7 @@ for na, ru, col in zip(allnams, allru, colors):
 
         for pio, gipio in zip(['mon', 'sea'], [800, 200]):
             for seas in seasons:
-                if pio is 'sea' and seas is 'year': continue
+                if pio == 'sea' and seas == 'year': continue
                 var_sea, dates_sea = ctl.sel_season(var, coords['dates'], seas, cut = True)
 
                 if pio == 'sea':
@@ -119,7 +121,7 @@ areadist = pickle.load(open(cart_out + 'bottino_monsea_areadist.p', 'rb'))
 for varna in allvars_2D:
     for seas in seasons:
         for pio, gipio in zip(['mon', 'sea'], [800, 200]):
-            if pio is 'sea' and seas is 'year': continue
+            if pio == 'sea' and seas == 'year': continue
             fig, axs = plt.subplots(2, 3, figsize = (16,8))
             for ia, anam in enumerate(areas_big_names[:3]):
                 for ic, cos in enumerate(['oce', 'land']):
@@ -158,7 +160,7 @@ for varna in allvars_2D:
 for varna in allvars_2D:
     for seas in seasons:
         for pio, gipio in zip(['mon', 'sea'], [800, 200]):
-            if pio is 'sea' and seas is 'year': continue
+            if pio == 'sea' and seas == 'year': continue
 
             fig, axs = plt.subplots(3, 6, figsize = (24,12))
             for ia, anam in enumerate(areas_ls_names[:3]):
