@@ -12,7 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
-from tunlib import gregplot_on_ax
+#from tunlib import gregplot_on_ax
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
