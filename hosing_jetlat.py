@@ -35,23 +35,26 @@ plt.rcParams['axes.axisbelow'] = True
 #
 # fils = ['uaday_cntrl_1850-1999_850hPa_remap25.nc', 'uaday_ho03_1850-1899_850hPa_remap25.nc']#, 'uaday_c3r5_1900-1999_850hPa_remap25.nc']
 #
-# allru = ['pi', 'ho03']#, 'c3r5']
-# colors = ['steelblue', 'indianred']#, 'forestgreen']
+allru = ['pi', 'ho03', 'ho03b']#, 'c3r5']
+colors = ['steelblue', 'indianred', 'orange']#, 'forestgreen']
 
-cart_out = '/home/fabiano/work/lavori/hosing/'
+# cart_out = '/home/fabiano/work/lavori/hosing/'
+#
+# cart = '/home/bellomo/work/ec_hosing/ho03/day/r2/'
+# filone = 'ua_day_ho03b_1850-1899.nc'
+#
+# resdict = dict()
+# jli, jspeed, dates = cd.jli_from_files(cart + filone, orogfile = '/home/federico/work/Tipes/geopot_vegcover_25.nc')
+# ru = 'ho03b'
+# resdict[(ru, 'jli')] = jli
+# resdict[(ru, 'jspeed')] = jspeed
+# resdict[(ru, 'dates')] = dates
+#
+# with open(cart_out + 'res_jli_hosing2.p', 'wb') as filox:
+#     pickle.dump(resdict, filox)
+#
+# sys.exit()
 
-cart = '/home/bellomo/work/ec_hosing/ho03/day/r2/'
-filone = 'ua_day_ho03b_1850-1899.nc'
-
-resdict = dict()
-jli, jspeed, dates = cd.jli_from_files(cart + filone, orogfile = '/home/federico/work/Tipes/geopot_vegcover_25.nc')
-ru = 'ho03b'
-resdict[(ru, 'jli')] = jli
-resdict[(ru, 'jspeed')] = jspeed
-resdict[(ru, 'dates')] = dates
-
-with open(cart_out + 'res_jli_hosing2.p', 'wb') as filox:
-    pickle.dump(resdict, filox)
 #
 
 # #############################################################################
@@ -67,17 +70,20 @@ with open(cart_out + 'res_jli_hosing2.p', 'wb') as filox:
 # with open(cart + 'res_jli_hosing.p', 'wb') as filox:
 #     pickle.dump(resdict, filox)
 
-sys.exit()
-
 cart_out = '/home/fedef/Research/lavori/tipes/'
 with open(cart_out + 'res_jli_hosing.p', 'rb') as filox:
     resdict = pickle.load(filox)
+
+with open(cart_out + 'res_jli_hosing2.p', 'rb') as filox:
+    resdict2 = pickle.load(filox)
+
+resdict.update(resdict2)
 
 fig = plt.figure(figsize = (24,12))
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
 
-latsel = np.arange(30, 71, 0.5)
+latsel = np.arange(20, 71, 0.5)
 kos = np.concatenate([resdict[(ru, 'jspeed')] for ru in allru])
 vmin, vmax = (np.min(kos), np.max(kos))
 print(vmin, vmax)
@@ -128,4 +134,4 @@ ax1.set_title('Jet latitude index')
 ax2.set_title('Jet speed')
 ax1.legend()
 ax2.legend()
-fig.savefig(cart_out + 'jlinspeed_hosing.pdf')
+fig.savefig(cart_out + 'jlinspeed_hosing2.pdf')
