@@ -134,9 +134,6 @@ for varna in allvars_2D:
                         else:
                             gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
 
-                        if pio == 'sea':
-                            gigi = gigi.reshape(-1, 4).mean(axis = 1)
-
                         rugi.append(gigi)
 
                     rucaz = np.concatenate(rugi)
