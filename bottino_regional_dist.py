@@ -161,7 +161,7 @@ for varna in allvars_2D:
             if pio == 'mon' and seas == 'year': continue
 
             fig, axs = plt.subplots(3, 6, figsize = (24,12))
-            for ia, anam in enumerate(areas_ls_names[:3]):
+            for ia, anam in enumerate(areas_ls_names[:-3]):
                 ax = axs.flatten()[ia]
                 rugi = []
                 for na, ru, col in zip(allnams, allru, colors):
@@ -188,4 +188,4 @@ for varna in allvars_2D:
             fig.suptitle('{} - {}'.format(varna, seas))
             ctl.custom_legend(fig, colors, allru, ncol = 4, add_space_below = 0.06)
 
-            fig.savefig(cart_out + '{}_{}_{}dist.pdf'.format(varna, seas, pio))
+            fig.savefig(cart_out + 'smalreg_{}_{}_{}dist.pdf'.format(varna, seas, pio))
