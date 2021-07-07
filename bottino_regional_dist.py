@@ -60,7 +60,7 @@ allvars_2D = 'pr tas'.split()
 
 seasons = ['DJFM', 'JJAS', 'year']
 
-areas_big_names = ['Tro', 'NML', 'SML', 'NP', 'SP']
+areas_big_names = ['NML', 'Tro', 'SML', 'NP', 'SP']
 areas_big = [(-180, 180, 30, 60), (-180, 180, -30, 30), (-180, 180, -60, -30), (-180, 180, 60, 90), (-180, 180, -90, -60)]
 
 areas_land_sect = np.concatenate([[(-20, 60, l1, l2), (60, 180, l1, l2), (-180, -20, l1, l2)] for l1, l2 in [(60, 80), (40, 60), (20, 40), (-20, 20), (-40, -20), (-60, -40)]])
