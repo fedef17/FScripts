@@ -70,49 +70,49 @@ areas_land_sect = list(areas_land_sect)
 
 #area_reg = ['Med', 'Eu']
 
-areadist = dict()
-
-for na, ru, col in zip(allnams, allru, colors):
-#for na, ru, col in zip(allnams2, allru2, colors2):
-    print(ru)
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
-
-    for varna in allvars_2D:
-        fils = glob.glob(filna.format(na, mem, miptab, varna))
-
-        var, coords, _ = ctl.read_xr(fils, select_var = varna)
-
-        for pio, gipio in zip(['mon', 'sea'], [800, 200]):
-            for seas in seasons:
-                if pio == 'mon' and seas == 'year': continue
-
-                if pio == 'mon':
-                    var_sea, dates_sea = ctl.sel_season(var, coords['dates'], seas, cut = True)
-                elif pio == 'sea':
-                    var_sea, dates_sea = ctl.seasonal_set(var, coords['dates'], seas, cut = True, seasonal_average = True)
-
-                for area, anam in zip(areas_big+areas_land_sect, areas_big_names+areas_ls_names):
-                    var_area, lat_area, lon_area = ctl.sel_area(coords['lat'], coords['lon'], var_sea, area)
-
-                    omask_area, _, _ = ctl.sel_area(coords['lat'], coords['lon'], oce_mask, area)
-
-                    for cos, ver in zip(['oce', 'land'], [1, 0]):
-                        okpo = omask_area == ver
-
-                        var_ok = var_area[:, okpo]
-                        ## area average
-
-                        var_integ = np.mean(var_ok, axis = 1)
-
-                        areadist[(varna, pio, seas, anam, cos, ru)] = var_integ
-
-                        #### Some measure of the spatial variability. Trying this: consider the relative seasonal shift from the climatology. Relative in terms of what? osjoajoa. NO. Two possibilities:
-                        # 1 - Do this on smaller boxes, but always for area-averaged anomalies.
-                        # 2 - Do this on a map, measuring a ratio of the pdfs extremes (eg p90-p10), or a stat test of the shift of the pdf wrt pi.
-
-
-pickle.dump(areadist, open(cart_out + 'bottino_monsea_areadist.p', 'wb'))
+# areadist = dict()
+#
+# for na, ru, col in zip(allnams, allru, colors):
+# #for na, ru, col in zip(allnams2, allru2, colors2):
+#     print(ru)
+#     mem = 'r1'
+#     if na == 'ssp585': mem = 'r4'
+#
+#     for varna in allvars_2D:
+#         fils = glob.glob(filna.format(na, mem, miptab, varna))
+#
+#         var, coords, _ = ctl.read_xr(fils, select_var = varna)
+#
+#         for pio, gipio in zip(['mon', 'sea'], [800, 200]):
+#             for seas in seasons:
+#                 if pio == 'mon' and seas == 'year': continue
+#
+#                 if pio == 'mon':
+#                     var_sea, dates_sea = ctl.sel_season(var, coords['dates'], seas, cut = True)
+#                 elif pio == 'sea':
+#                     var_sea, dates_sea = ctl.seasonal_set(var, coords['dates'], seas, cut = True, seasonal_average = True)
+#
+#                 for area, anam in zip(areas_big+areas_land_sect, areas_big_names+areas_ls_names):
+#                     var_area, lat_area, lon_area = ctl.sel_area(coords['lat'], coords['lon'], var_sea, area)
+#
+#                     omask_area, _, _ = ctl.sel_area(coords['lat'], coords['lon'], oce_mask, area)
+#
+#                     for cos, ver in zip(['oce', 'land'], [1, 0]):
+#                         okpo = omask_area == ver
+#
+#                         var_ok = var_area[:, okpo]
+#                         ## area average
+#
+#                         var_integ = np.mean(var_ok, axis = 1)
+#
+#                         areadist[(varna, pio, seas, anam, cos, ru)] = var_integ
+#
+#                         #### Some measure of the spatial variability. Trying this: consider the relative seasonal shift from the climatology. Relative in terms of what? osjoajoa. NO. Two possibilities:
+#                         # 1 - Do this on smaller boxes, but always for area-averaged anomalies.
+#                         # 2 - Do this on a map, measuring a ratio of the pdfs extremes (eg p90-p10), or a stat test of the shift of the pdf wrt pi.
+#
+#
+# pickle.dump(areadist, open(cart_out + 'bottino_monsea_areadist.p', 'wb'))
 
 areadist = pickle.load(open(cart_out + 'bottino_monsea_areadist.p', 'rb'))
 
@@ -130,9 +130,9 @@ for varna in allvars_2D:
                     rugi = []
                     for na, ru, col in zip(allnams, allru, colors):
                         if ru == 'pi':
-                            gigi = areadist[(varna, seas, anam, cos, ru)]-np.mean(areadist[(varna, seas, anam, cos, ru)])
+                            gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
                         else:
-                            gigi = areadist[(varna, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, seas, anam, cos, ru)][-gipio:])
+                            gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
 
                         if pio == 'sea':
                             gigi = gigi.reshape(-1, 4).mean(axis = 1)
@@ -169,9 +169,9 @@ for varna in allvars_2D:
                 rugi = []
                 for na, ru, col in zip(allnams, allru, colors):
                     if ru == 'pi':
-                        gigi = areadist[(varna, seas, anam, cos, ru)]-np.mean(areadist[(varna, seas, anam, cos, ru)])
+                        gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
                     else:
-                        gigi = areadist[(varna, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, seas, anam, cos, ru)][-gipio:])
+                        gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
 
                     rugi.append(gigi)
 
