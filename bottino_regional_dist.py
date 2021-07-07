@@ -160,8 +160,8 @@ for varna in allvars_2D:
         for pio, gipio in zip(['mon', 'sea'], [800, 200]):
             if pio == 'mon' and seas == 'year': continue
 
-            fig, axs = plt.subplots(3, 6, figsize = (24,12))
-            for ia, anam in enumerate(areas_ls_names):
+            fig, axs = plt.subplots(3, 5, figsize = (24,12))
+            for ia, anam in enumerate(areas_ls_names[:-3]):
                 ax = axs.T.flatten()[ia]
                 rugi = []
                 for na, ru, col in zip(allnams, allru, colors):
