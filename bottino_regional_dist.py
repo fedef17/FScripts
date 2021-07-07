@@ -63,7 +63,7 @@ seasons = ['DJFM', 'JJAS', 'year']
 areas_big_names = ['Tro', 'NML', 'SML', 'NP', 'SP']
 areas_big = [(-180, 180, 30, 60), (-180, 180, -30, 30), (-180, 180, -60, -30), (-180, 180, 60, 90), (-180, 180, -90, -60)]
 
-areas_land_sect = np.concatenate([[(-20, 60, l1, l2), (60, 180, l1, l2), (-180, -20, l1, l2)] for l1, l2 in [(60, 80), (40, 60), (20, 40), (-20, 20), (-40, -20), (-60, -40), (-80, -60)]])
+areas_land_sect = np.concatenate([[(-20, 60, l1, l2), (60, 180, l1, l2), (-180, -20, l1, l2)] for l1, l2 in [(60, 80), (40, 60), (20, 40), (-20, 20), (-40, -20), (-60, -40)]])
 areas_ls_names = 'NEuro Sib Can Euro CAsia NAme NAfr SAsia CNAme CAfr Indo CSAme SAfr Aus SAme Soce1 Soce2 Pata'.split()
 
 areas_land_sect = list(areas_land_sect)
@@ -161,8 +161,8 @@ for varna in allvars_2D:
             if pio == 'mon' and seas == 'year': continue
 
             fig, axs = plt.subplots(3, 6, figsize = (24,12))
-            for ia, anam in enumerate(areas_ls_names[:-3]):
-                ax = axs.flatten()[ia]
+            for ia, anam in enumerate(areas_ls_names):
+                ax = axs.T.flatten()[ia]
                 rugi = []
                 for na, ru, col in zip(allnams, allru, colors):
                     if ru == 'pi':
