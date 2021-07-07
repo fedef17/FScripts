@@ -118,28 +118,76 @@ areadist = pickle.load(open(cart_out + 'bottino_monsea_areadist.p', 'rb'))
 
 #### FIGURONA
 ## Excluding poles (no sense in land/oce over pole)
+for typet in ['rel', 'abs']:
+    for varna in allvars_2D:
+        for seas in seasons:
+            for pio, gipio in zip(['mon', 'sea'], [800, 200]):
+                if pio == 'mon' and seas == 'year': continue
+                fig, axs = plt.subplots(2, 3, figsize = (16,8))
+                for ia, anam in enumerate(areas_big_names[:3]):
+                    for ic, cos in enumerate(['oce', 'land']):
+                        ax = axs[ic, ia]
+                        rugi = []
+                        for na, ru, col in zip(allnams, allru, colors):
+                            if typet == 'rel':
+                                if ru == 'pi':
+                                    gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
+                                else:
+                                    gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
+                            elif typet == 'abs':
+                                if ru == 'pi':
+                                    gigi = areadist[(varna, pio, seas, anam, cos, ru)]
+                                else:
+                                    gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]
 
-for varna in allvars_2D:
-    for seas in seasons:
-        for pio, gipio in zip(['mon', 'sea'], [800, 200]):
-            if pio == 'mon' and seas == 'year': continue
-            fig, axs = plt.subplots(2, 3, figsize = (16,8))
-            for ia, anam in enumerate(areas_big_names[:3]):
-                for ic, cos in enumerate(['oce', 'land']):
-                    ax = axs[ic, ia]
+                            rugi.append(gigi)
+
+                        rucaz = np.concatenate(rugi)
+                        rumin, rumax = (np.min(rucaz), np.max(rucaz))
+
+                        ruvec = np.linspace(rumin-0.2*abs(rumin), rumax+0.2*abs(rumax), 100)
+                        for ru, gi, col in zip(allru, rugi, colors):
+                            pdf = ctl.calc_pdf(gi)
+                            pdfvec = pdf(ruvec)
+                            pdfvec = pdfvec/np.sum(pdfvec)
+                            ax.plot(ruvec, pdfvec, color = col)
+
+                        ax.grid()
+                        ax.set_title('{} - {}'.format(anam, cos))
+
+                fig.suptitle('{} - {}'.format(varna, seas))
+                ctl.custom_legend(fig, colors, allru, ncol = 4, add_space_below = 0.06)
+
+                fig.savefig(cart_out + '{}_{}_{}dist_{}.pdf'.format(varna, seas, pio, typet))
+
+    #### Now with smaller regions
+    for varna in allvars_2D:
+        for seas in seasons:
+            for pio, gipio in zip(['mon', 'sea'], [800, 200]):
+                if pio == 'mon' and seas == 'year': continue
+
+                fig, axs = plt.subplots(3, 5, figsize = (24,12))
+                for ia, anam in enumerate(areas_ls_names[:-3]):
+                    ax = axs.T.flatten()[ia]
                     rugi = []
                     for na, ru, col in zip(allnams, allru, colors):
-                        if ru == 'pi':
-                            gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
-                        else:
-                            gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
+                        if typet == 'rel':
+                            if ru == 'pi':
+                                gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
+                            else:
+                                gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
+                        elif typet == 'abs':
+                            if ru == 'pi':
+                                gigi = areadist[(varna, pio, seas, anam, cos, ru)]
+                            else:
+                                gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]
 
                         rugi.append(gigi)
 
                     rucaz = np.concatenate(rugi)
                     rumin, rumax = (np.min(rucaz), np.max(rucaz))
 
-                    ruvec = np.linspace(rumin-0.1*abs(rumin), rumax+0.1*abs(rumax), 100)
+                    ruvec = np.linspace(rumin-0.2*abs(rumin), rumax+0.2*abs(rumax), 100)
                     for ru, gi, col in zip(allru, rugi, colors):
                         pdf = ctl.calc_pdf(gi)
                         pdfvec = pdf(ruvec)
@@ -149,43 +197,7 @@ for varna in allvars_2D:
                     ax.grid()
                     ax.set_title('{} - {}'.format(anam, cos))
 
-            fig.suptitle('{} - {}'.format(varna, seas))
-            ctl.custom_legend(fig, colors, allru, ncol = 4, add_space_below = 0.06)
+                fig.suptitle('{} - {}'.format(varna, seas))
+                ctl.custom_legend(fig, colors, allru, ncol = 4, add_space_below = 0.06)
 
-            fig.savefig(cart_out + '{}_{}_{}dist.pdf'.format(varna, seas, pio))
-
-#### Now with smaller regions
-for varna in allvars_2D:
-    for seas in seasons:
-        for pio, gipio in zip(['mon', 'sea'], [800, 200]):
-            if pio == 'mon' and seas == 'year': continue
-
-            fig, axs = plt.subplots(3, 5, figsize = (24,12))
-            for ia, anam in enumerate(areas_ls_names[:-3]):
-                ax = axs.T.flatten()[ia]
-                rugi = []
-                for na, ru, col in zip(allnams, allru, colors):
-                    if ru == 'pi':
-                        gigi = areadist[(varna, pio, seas, anam, cos, ru)]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)])
-                    else:
-                        gigi = areadist[(varna, pio, seas, anam, cos, ru)][-gipio:]-np.mean(areadist[(varna, pio, seas, anam, cos, ru)][-gipio:])
-
-                    rugi.append(gigi)
-
-                rucaz = np.concatenate(rugi)
-                rumin, rumax = (np.min(rucaz), np.max(rucaz))
-
-                ruvec = np.linspace(rumin-0.1*abs(rumin), rumax+0.1*abs(rumax), 100)
-                for ru, gi, col in zip(allru, rugi, colors):
-                    pdf = ctl.calc_pdf(gi)
-                    pdfvec = pdf(ruvec)
-                    pdfvec = pdfvec/np.sum(pdfvec)
-                    ax.plot(ruvec, pdfvec, color = col)
-
-                ax.grid()
-                ax.set_title('{} - {}'.format(anam, cos))
-
-            fig.suptitle('{} - {}'.format(varna, seas))
-            ctl.custom_legend(fig, colors, allru, ncol = 4, add_space_below = 0.06)
-
-            fig.savefig(cart_out + 'smalreg_{}_{}_{}dist.pdf'.format(varna, seas, pio))
+                fig.savefig(cart_out + 'smalreg_{}_{}_{}dist_{}.pdf'.format(varna, seas, pio, typet))
