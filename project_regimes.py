@@ -29,7 +29,17 @@ for area in ['EAT', 'PNA', 'NML']:
         resu, resu_ref = ctl.load_wrtool(cart+fil.format(season, area)) # carico i regimi del wrtool
         gigi = resu['ERA5']
 
-
+        # conto i giorni
+        if season == 'DJF':
+            nye = 33 # from 1979 to 2012
+            lensea = 90
+            add = 9+31
+            skip = 59
+        elif season == 'JJA':
+            nye = 34
+            lensea = 92
+            add = 0
+            skip = 0
 
         for ke in ['labels', 'dist_centroid', 'pcs', 'dates']:
             cose = []
@@ -39,6 +49,8 @@ for area in ['EAT', 'PNA', 'NML']:
                 cose.append([co]*4) # moltiplico per 4 per avere lo stesso numero dei dati 6hr (qui stiamo approssimando ma credo cambi veramente poco)
 
             gigi[ke] = np.concatenate(cose, axis = 0)
+
+        print(gigi['dates'][0], gigi['dates'][-1])
 
         koze_ref = dict()
         # salvo un po' di cose generali dei clusters
