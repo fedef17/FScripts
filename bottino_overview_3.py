@@ -12,7 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
-from tunlib import gregplot_on_ax
+#from tunlib import gregplot_on_ax
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
@@ -61,148 +61,182 @@ colors2 = colors + ['indianred']
 
 figs_glob = []
 axs_glob = []
-pimean = dict()
-glomeans = dict()
-yeamean = dict()
-mapmean = dict()
+# pimean = dict()
+# glomeans = dict()
+# yeamean = dict()
+# mapmean = dict()
+#
+# for na, ru, col in zip(allnams, allru, colors):
+# #for na, ru, col in zip(allnams2, allru2, colors2):
+#     print(ru)
+#     mem = 'r1'
+#     if na == 'ssp585': mem = 'r4'
+#
+#     fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     # Separate for uas
+#     fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
+#     if len(fils) > 0:
+#         kosettt = xr.open_mfdataset(fils, use_cftime = True)
+#         kosettt = kosettt.drop_vars('time_bnds')
+#         kosettt = kosettt.drop_vars('height')
+#         kose = kose.assign(uas = kosettt.uas)
+#
+#     for var in allvars_2D:
+#         print(var)
+#         if var not in kose:
+#             continue
+#
+#         cosoye = kose[var].groupby("time.year").mean().compute()
+#         yeamean[(ru, var)] = cosoye
+#
+#
+# # 3D vars
+# for na, ru, col in zip(allnams, allru, colors):
+#     mem = 'r1'
+#     if na == 'ssp585': mem = 'r4'
+#
+#     fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     for var in allvars_3D:
+#         print(var)
+#         cosoye = kose[var].groupby("time.year").mean().compute()
+#         yeamean[(ru, var)] = cosoye
+#
+#
+# pickle.dump(yeamean, open(cart_out + 'bottino_yeamean_fullres.p', 'wb'))
+#
+# sys.exit()
 
-for na, ru, col in zip(allnams, allru, colors):
-#for na, ru, col in zip(allnams2, allru2, colors2):
-    print(ru)
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
+#yeamean = pickle.load(open(cart_out + 'bottino_yeamean_fullres.p', 'rb'))
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+cart_out_seas = cart_out + '../seasmean/'
+glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out_seas + 'bottino_seasmean.p', 'rb'))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
+var_map_200 = 'tas pr rlut clt'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
-    # Separate for uas
-    fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
-    if len(fils) > 0:
-        kosettt = xr.open_mfdataset(fils, use_cftime = True)
-        kosettt = kosettt.drop_vars('time_bnds')
-        kosettt = kosettt.drop_vars('height')
-        kose = kose.assign(uas = kosettt.uas)
-
-    for var in allvars_2D:
-        print(var)
-        if var not in kose:
-            continue
-
-        cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
-
-
-# 3D vars
-for na, ru, col in zip(allnams, allru, colors):
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
-
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    for var in allvars_3D:
-        print(var)
-        cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
-
-
-pickle.dump(yeamean, open(cart_out + 'bottino_yeamean_fullres.p', 'wb'))
-
-sys.exit()
-
-yeamean = pickle.load(open(cart_out + 'bottino_yeamean_fullres.p', 'rb'))
-
-glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
-
-var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
-
-allcopls = ['seamean', 'seastd', 'seap10', 'seap90']
-for ru in allru:
-    zup = mapmean[(ru, 'tas')]
-    mapmean[(ru, 'tas_patt')] = zup.copy(deep = True) # it's back!
-    zupme = ctl.global_mean(zup['seamean'])
-    for copl in allcopls:
-        mapmean[(ru, 'tas_patt')][copl] = zup[copl]-zupme[:, np.newaxis, np.newaxis]
-
-    # zup = mapmean[(ru, 'pr')]
-    # mapmean[(ru, 'pr_perc')] = zup
-    # zupme = mapmean[('pi', 'pr')]['seamean']
-    # for copl in allcopls:
-    #     mapmean[(ru, 'pr_perc')][copl] = (zup[copl]-zupme)/zupme
-
-print('CHECK! -> ', mapmean[(ru, 'tas')] is mapmean[(ru, 'tas_patt')], mapmean[(ru, 'tas')][copl] is mapmean[(ru, 'tas_patt')][copl])
-
-var_map_200 += ['tas_patt', 'pr_perc']
 ###### Plots 2D
 figs_map = []
-for var in var_map_200:
-    for copl in allcopls:
-        #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
-        if var == 'pr_perc':
-            zupme = mapmean[('pi', 'pr')]['seamean']
-            mappe = [mapmean[('pi', 'pr')][copl]] + [(mapmean[(ru, 'pr')][copl]-zupme)/zupme for ru in allru[1:]]
-            mapcont = [None if ru == 'pi' else mapmean[('pi', 'pr')][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
-        else:
-            mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
-            mapcont = [None if ru == 'pi' else mapmean[('pi', var)][copl].sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+for var in var_map_200 + allvars_3D:
+    # Mean pattern
+    mappe = []
+    pimean = yeamean[('pi', var)].mean('year')
 
-        plot_anoms = [False if ru == 'pi' else True for se in range(4) for ru in allru]
-        cmaps = ['viridis' if ru == 'pi' else 'RdBu_r' for se in range(4) for ru in allru]
+    subtitles = []
+    for ru in allru[1:]:
+        pinko = yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year') - pimean
+        mappe.append(pinko)
+        subtitles.append(ru + ' - tr')
 
-        cbr0 = ctl.get_cbar_range(mappe[0].values, False, (2,98))
-        cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[1:]], True, (2,98))
-        cbar_range = [cbr0 if ru == 'pi' else cbr1 for se in range(4) for ru in allru]
+    for ru in allru[1:]:
+        yelast = yeamean[(ru, var)].year.values[-1]
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year')
+        mappe.append(pinko)
+        subtitles.append(ru + ' - eq')
 
-        #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-        mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
+    cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
+    cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[3:]], True, (2,98))
+    cbar_range = 3*[cbr0] + 3*[cbr1]
 
-        subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+    # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        fig = ctl.plot_multimap_contour(mappeseas, figsize = (20,12), cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True, subtitles = subtitles, title = var+' - '+copl, add_contour_field = mapcont, add_contour_plot_anomalies = False)
-        figs_map.append(fig)
-
-figs_map = np.concatenate(figs_map)
-fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
-ctl.plot_pdfpages(cart_out + 'bottino_mapmeans.pdf', figs_map, True, fignames)
-
-figs_map = []
-for var in allvars_3D:
-    for copl in allcopls:
-        fig, axs = plt.subplots(4, 4, figsize = (20,12))
-        #mappe = [mapmean[('pi', var, copl)]] + [mapmean[(ru, var, copl)]-mapmean[('pi', var, copl)] for ru in allru[1:]]
-        mappe = [mapmean[('pi', var)][copl]] + [mapmean[(ru, var)][copl]-mapmean[('pi', var)][copl] for ru in allru[1:]]
-
-        #mappeseas = [ma.sel(time = ma['time.season'] == seasok). for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-        mappeseas = [ma.sel(season = seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ma in mappe]
-        subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
-
-        for ma, ax, subt in zip(mappeseas, axs.flatten(), subtitles):
-            guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log')#vmax = )
+    if var in var_map_200:
+        fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
+        figs_map.append(fig[0])
+    else:
+        # 3D vars
+        fig, axs = plt.subplots(2, 3, figsize = (12,8))
+        for ma, ax, subt in zip(mappe, axs.flatten(), subtitles):
+            if 'tr' in subt:
+                vma = 10
+            else:
+                vma = 5
+            guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
             try:
                 guplo.colorbar.set_label('')
             except Exception as exc:
                 print(exc)
                 pass
 
-            if 'pi' not in subt:
-                seasok = subt.split('-')[1].strip()
-                guplo2 = mapmean[('pi', var)][copl].sel(season = seasok).mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)#vmax = )
-            #guplo.set_titles(template='{value}', maxchar = 13, fontsize = 12)
-            ax.set_title(subt)
+            guplo2 = pimean.mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)
 
-        for i in range(4):
-            for j in range(4):
+        for i in range(2):
+            for j in range(3):
                 if j > 0:
-                    ax.set_ylabel('')
-
-        fig.suptitle(var+' - '+copl)
-        plt.tight_layout()
+                    axs[i,j].set_ylabel('')
+                if i == 0:
+                    axs[i,j].set_xlabel('')
 
         figs_map.append(fig)
 
-fignames = [var+'_'+copl for var in var_map_200 for copl in allcopls]
-ctl.plot_pdfpages(cart_out + 'bottino_crossmeans.pdf', figs_map, True, fignames)
+#figs_map = np.concatenate(figs_map)
+fignames = [var for var in var_map_200+allvars_3D]
+ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
+
+BAUUUUUUUUUUUUUUUUUUUUUU
+#### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
+# Other possibility is to plot the two contributions separated but in terms of ratio to the global warming. Ok doing this as well.
+
+###### Plots 2D
+figs_map = []
+for var in var_map_200 + allvars_3D:
+    # Mean pattern
+    mappe = []
+    pimean = yeamean[('pi', var)].mean('year')
+
+    subtitles = []
+    for ru in allru[1:]:
+        pinko = yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year') - pimean
+        mappe.append(pinko)
+        subtitles.append(ru + ' - tr')
+
+    for ru in allru[1:]:
+        yelast = yeamean[(ru, var)].year.values[-1]
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year')
+        mappe.append(pinko)
+        subtitles.append(ru + ' - eq')
+
+    cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
+    cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[3:]], True, (2,98))
+    cbar_range = 3*[cbr0] + 3*[cbr1]
+
+    # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+
+    if var in var_map_200:
+        fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
+        figs_map.append(fig[0])
+    else:
+        # 3D vars
+        fig, axs = plt.subplots(2, 3, figsize = (12,8))
+        for ma, ax, subt in zip(mappe, axs.flatten(), subtitles):
+            if 'tr' in subt:
+                vma = 10
+            else:
+                vma = 5
+            guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
+            try:
+                guplo.colorbar.set_label('')
+            except Exception as exc:
+                print(exc)
+                pass
+
+            guplo2 = pimean.mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)
+
+        for i in range(2):
+            for j in range(3):
+                if j > 0:
+                    axs[i,j].set_ylabel('')
+                if i == 0:
+                    axs[i,j].set_xlabel('')
+
+        figs_map.append(fig)
+
+#figs_map = np.concatenate(figs_map)
+fignames = [var for var in var_map_200+allvars_3D]
+ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
