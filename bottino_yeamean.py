@@ -61,10 +61,9 @@ colors2 = colors + ['indianred']
 
 figs_glob = []
 axs_glob = []
-pimean = dict()
-glomeans = dict()
+
 yeamean = dict()
-mapmean = dict()
+seamean = dict()
 
 for na, ru, col in zip(allnams, allru, colors):
 #for na, ru, col in zip(allnams2, allru2, colors2):
@@ -93,6 +92,9 @@ for na, ru, col in zip(allnams, allru, colors):
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
+        kose_sclim = ctl.seasonal_climatology(kose[var], allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var)] = kose_sclim
+
 
 # 3D vars
 for na, ru, col in zip(allnams, allru, colors):
@@ -109,5 +111,8 @@ for na, ru, col in zip(allnams, allru, colors):
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
+        kose_sclim = ctl.seasonal_climatology(kose[var], allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var)] = kose_sclim
 
-pickle.dump(yeamean, open(cart_out + 'bottino_yeamean.p', 'wb'))
+
+pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean.p', 'wb'))

@@ -179,27 +179,36 @@ for var in var_map_200 + allvars_3D:
 fignames = [var for var in var_map_200+allvars_3D]
 ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
 
-BAUUUUUUUUUUUUUUUUUUUUUU
+
 #### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
-# Other possibility is to plot the two contributions separated but in terms of ratio to the global warming. Ok doing this as well.
+# Other possibility is to plot the two contributions separated but in terms of ratio to the global warming. Ok doing this. AAA ok.
 
 ###### Plots 2D
 figs_map = []
 for var in var_map_200 + allvars_3D:
     # Mean pattern
     mappe = []
+    mappediv = []
     pimean = yeamean[('pi', var)].mean('year')
 
-    subtitles = []
+    totchan = []
     for ru in allru[1:]:
+        yelast = yeamean[(ru, var)].year.values[-1]
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - pimean
+        totchan.append(pinko)
+
+    subtitles = []
+    for ru, totc in zip(allru[1:], totchan):
         pinko = yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year') - pimean
         mappe.append(pinko)
+        mappediv.append(pinko/totc)
         subtitles.append(ru + ' - tr')
 
-    for ru in allru[1:]:
+    for ru, totc in zip(allru[1:], totchan):
         yelast = yeamean[(ru, var)].year.values[-1]
         pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year')
         mappe.append(pinko)
+        mappediv.append(pinko/totc)
         subtitles.append(ru + ' - eq')
 
     cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
@@ -208,18 +217,30 @@ for var in var_map_200 + allvars_3D:
 
     # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-    if var in var_map_200:
-        fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
+    if var == 'tas':
+        fig = ctl.plot_multimap_contour(mappediv, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = False, cbar_range = [0,1], cmap = 'viridis')
         figs_map.append(fig[0])
+    elif var in var_map_200:
+        # zonal mean
+        fig, axs = plt.subplots(1, 3, figsize = (20,8))
+        for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru, totchan)):
+            ma = mappe[i]
+            guplo = ma.mean('lon').plot(x = 'lat', ax = ax, label = 'transient', color = 'orange')
+            ma2 = mappe[i+3]
+            guplo = ma2.mean('lon').plot(x = 'lat', ax = ax, label = 'stabilization', color = 'blue')
+            guplo = totc.mean('lon').plot(x = 'lat', ax = ax, label = 'stabilization', color = 'black')
+
+        figs_map.append(fig)
     else:
         # 3D vars
         fig, axs = plt.subplots(2, 3, figsize = (12,8))
-        for ma, ax, subt in zip(mappe, axs.flatten(), subtitles):
-            if 'tr' in subt:
-                vma = 10
-            else:
-                vma = 5
-            guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
+        for ma, ax, subt, totc in zip(mappe, axs.flatten(), subtitles, 2*totchan):
+            vma = 1
+            # if 'tr' in subt:
+            #     vma = 10
+            # else:
+            #     vma = 5
+            guplo = (ma.mean('lon')/totc.mean('lon')).plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
             try:
                 guplo.colorbar.set_label('')
             except Exception as exc:
@@ -239,4 +260,4 @@ for var in var_map_200 + allvars_3D:
 
 #figs_map = np.concatenate(figs_map)
 fignames = [var for var in var_map_200+allvars_3D]
-ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
+ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
