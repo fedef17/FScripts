@@ -114,12 +114,12 @@ axs_glob = []
 #
 # sys.exit()
 
-#yeamean = pickle.load(open(cart_out + 'bottino_yeamean_fullres.p', 'rb'))
+yeamean, seamean = pickle.load(open(cart_out + 'bottino_yeamean.p', 'rb'))
 
-cart_out_seas = cart_out + '../seasmean/'
-glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out_seas + 'bottino_seasmean.p', 'rb'))
+#cart_out_seas = cart_out + '../seasmean/'
+#glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out_seas + 'bottino_seasmean.p', 'rb'))
 
-var_map_200 = 'tas pr rlut clt'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+#var_map_200 = 'tas pr rlut clt'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
 ###### Plots 2D
 figs_map = []
@@ -130,13 +130,15 @@ for var in var_map_200 + allvars_3D:
 
     subtitles = []
     for ru in allru[1:]:
-        pinko = yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year') - pimean
+        yefirst = yeamean[(ru, var)].year.values[0]
+        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimea
         mappe.append(pinko)
         subtitles.append(ru + ' - tr')
 
     for ru in allru[1:]:
+        yefirst = yeamean[(ru, var)].year.values[0]
         yelast = yeamean[(ru, var)].year.values[-1]
-        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year')
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
         mappe.append(pinko)
         subtitles.append(ru + ' - eq')
 
@@ -199,14 +201,16 @@ for var in var_map_200 + allvars_3D:
 
     subtitles = []
     for ru, totc in zip(allru[1:], totchan):
-        pinko = yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year') - pimean
+        yefirst = yeamean[(ru, var)].year.values[0]
+        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
         mappe.append(pinko)
         mappediv.append(pinko/totc)
         subtitles.append(ru + ' - tr')
 
     for ru, totc in zip(allru[1:], totchan):
+        yefirst = yeamean[(ru, var)].year.values[0]
         yelast = yeamean[(ru, var)].year.values[-1]
-        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(2100, 2150)).mean('year')
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
         mappe.append(pinko)
         mappediv.append(pinko/totc)
         subtitles.append(ru + ' - eq')
@@ -217,18 +221,26 @@ for var in var_map_200 + allvars_3D:
 
     # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-    if var == 'tas':
-        fig = ctl.plot_multimap_contour(mappediv, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = False, cbar_range = [0,1], cmap = 'viridis')
+    #if var == 'tas':
+    if var in var_map_200:
+        if var == 'tas':
+            cbran = [0.4, 1.0]
+        else:
+            cbran = None
+        fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
         figs_map.append(fig[0])
-    elif var in var_map_200:
+    #elif var in var_map_200:
         # zonal mean
-        fig, axs = plt.subplots(1, 3, figsize = (20,8))
-        for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru, totchan)):
-            ma = mappe[i]
+        fig, axs = plt.subplots(1, 3, figsize = (24,8))
+        for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru[1:], totchan)):
+            ma = mappe[iii]
             guplo = ma.mean('lon').plot(x = 'lat', ax = ax, label = 'transient', color = 'orange')
-            ma2 = mappe[i+3]
+            ma2 = mappe[iii+3]
             guplo = ma2.mean('lon').plot(x = 'lat', ax = ax, label = 'stabilization', color = 'blue')
-            guplo = totc.mean('lon').plot(x = 'lat', ax = ax, label = 'stabilization', color = 'black')
+            guplo = totc.mean('lon').plot(x = 'lat', ax = ax, label = 'total', color = 'black')
+            ax.legend()
+            ax.grid()
+            ax.set_title(subt.split()[0])
 
         figs_map.append(fig)
     else:
