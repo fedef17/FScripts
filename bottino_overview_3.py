@@ -275,7 +275,6 @@ fignames = [var for var in var_map_200+allvars_3D]
 ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
 
 
-sys.exit()
 #### for JJAS and DJFM
 ###### Plots 2D
 
@@ -288,15 +287,12 @@ for sea in ['DJFM', 'JJAS']:
 
         subtitles = []
         for ru in allru[1:]:
-            yefirst = seamean[(ru, var)].year.values[0]
-            pinko = seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimea
+            pinko = seamean[(ru, var, 'trans')]['seamean'].sel(season = sea) - pimean
             mappe.append(pinko)
             subtitles.append(ru + ' - tr')
 
         for ru in allru[1:]:
-            yefirst = seamean[(ru, var)].year.values[0]
-            yelast = seamean[(ru, var)].year.values[-1]
-            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+            pinko = seamean[(ru, var, 'stab')]['seamean'].sel(season = sea) - seamean[(ru, var, 'trans')]['seamean'].sel(season = sea)
             mappe.append(pinko)
             subtitles.append(ru + ' - eq')
 
@@ -337,7 +333,7 @@ for sea in ['DJFM', 'JJAS']:
 
     #figs_map = np.concatenate(figs_map)
     fignames = [var for var in var_map_200+allvars_3D]
-    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_{}.pdf'.format(sea), figs_map, True, fignames)
 
 
     #### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
@@ -349,26 +345,22 @@ for sea in ['DJFM', 'JJAS']:
         # Mean pattern
         mappe = []
         mappediv = []
-        pimean = seamean[('pi', var)].mean('year')
+        pimean = seamean[('pi', var)]['seamean'].sel(season = sea)
 
         totchan = []
         for ru in allru[1:]:
-            yelast = seamean[(ru, var)].year.values[-1]
-            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - pimean
+            pinko = seamean[(ru, var, 'stab')]['seamean'].sel(season = sea) - pimean
             totchan.append(pinko)
 
         subtitles = []
         for ru, totc in zip(allru[1:], totchan):
-            yefirst = seamean[(ru, var)].year.values[0]
-            pinko = seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
+            pinko = seamean[(ru, var, 'trans')]['seamean'].sel(season = sea) - pimean
             mappe.append(pinko)
             mappediv.append(pinko/totc)
             subtitles.append(ru + ' - tr')
 
         for ru, totc in zip(allru[1:], totchan):
-            yefirst = seamean[(ru, var)].year.values[0]
-            yelast = seamean[(ru, var)].year.values[-1]
-            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+            pinko = seamean[(ru, var, 'stab')]['seamean'].sel(season = sea) - seamean[(ru, var, 'trans')]['seamean'].sel(season = sea)
             mappe.append(pinko)
             mappediv.append(pinko/totc)
             subtitles.append(ru + ' - eq')
@@ -430,4 +422,4 @@ for sea in ['DJFM', 'JJAS']:
 
     #figs_map = np.concatenate(figs_map)
     fignames = [var for var in var_map_200+allvars_3D]
-    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel_{}.pdf'.format(sea), figs_map, True, fignames)
