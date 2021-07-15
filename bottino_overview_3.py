@@ -54,7 +54,7 @@ miptab = 'Amon'
 allvars_2D = 'clt pr psl rlut rsut tas uas'.split()
 allvars_3D = 'ta ua'.split()
 
-var_map_200 = 'clt pr psl tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585']
 allru2 = allru + ['ssp585']
 colors2 = colors + ['indianred']
