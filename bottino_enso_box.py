@@ -34,8 +34,10 @@ plt.rcParams['axes.axisbelow'] = True
 
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
+    cartind = '/nas/BOTTINO/indices/enso500_xr/'
 elif os.uname()[1] == 'xaru':
     cart_out = '/home/fedef/Research/lavori/BOTTINO/'
+    cartind = '/home/fedef/Research/lavori/BOTTINO/enso500_xr/'
 elif os.uname()[1] == 'tintin':
     cart_out = '/home/fabiano/work/lavori/BOTTINO/'
 
@@ -51,7 +53,7 @@ colors_vtr = ['black', 'lightgreen', 'forestgreen', 'moccasin', 'orange', 'thist
 ####################################################################################################
 
 enso = dict()
-cartind = '/nas/BOTTINO/indices/enso500_xr/'
+
 for ru in allru:
     if ru == 'pi':
         enso[ru] = xr.load_dataset(cartind + '{}_enso_360day.nc'.format(ru), use_cftime = True)
@@ -68,26 +70,33 @@ fig, ax = plt.subplots(figsize = (12,8))
 
 allpercs = dict()
 for nu in [10, 25, 50, 75, 90]:
-    allpercs['p{}'.format(nu)] = [np.percentile(enso[ru+'_'+vers]['tos'], nu) for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['mean'] = [np.mean(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['min'] = [np.min(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['max'] = [np.max(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+    allpercs['p{}'.format(nu)] = [np.percentile(enso['pi']['tos'], nu)] + [np.percentile(enso[ru+'_'+vers]['tos'], nu) for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['mean'] = [np.mean(enso['pi']['tos']).values] + [np.mean(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['min'] = [np.min(enso['pi']['tos']).values] + [np.min(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['max'] = [np.max(enso['pi']['tos']).values] + [np.max(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
 
-ru = 'pi'
-obsperc = dict()
-for nu in [10, 25, 50, 75, 90]:
-    obsperc['p{}'.format(nu)] = np.percentile(enso[ru]['tos'], nu)
-obsperc['mean'] = np.mean(enso[ru]['tos']).values
-obsperc['min'] = np.min(enso[ru]['tos']).values
-obsperc['max'] = np.max(enso[ru]['tos']).values
+# ru = 'pi'
+# obsperc = dict()
+# for nu in [10, 25, 50, 75, 90]:
+#     obsperc['p{}'.format(nu)] = np.percentile(enso[ru]['tos'], nu)
+# obsperc['mean'] = np.mean(enso[ru]['tos']).values
+# obsperc['min'] = np.min(enso[ru]['tos']).values
+# obsperc['max'] = np.max(enso[ru]['tos']).values
 
-nams = [ru+'_'+vers for ru in allru[1:] for vers in ['tr', 'st']]
-edgecol = np.concatenate([(col, col) for col in colors[1:]])
+nams = ['pi'] + [ru+'_'+vers for ru in allru[1:] for vers in ['tr', 'st']]
+edgecol = np.append(['black'], np.concatenate([(col, col) for col in colors[1:]]))
 
-ctl.boxplot_on_ax(ax, allpercs, nams, colors_vtr[1:], edge_colors = edgecol, plot_mean = False, plot_minmax = True, plot_ensmeans = False, obsperc = obsperc, obs_color = 'black', obs_name = 'pi')
+positions = [0.]
+posticks = [0.]
+for i in range(len(allru[1:])):
+    positions.append(positions[-1]+0.7+0.4)
+    positions.append(positions[-1]+0.7)
+    posticks.append(np.mean(positions[-2:]))
+
+ctl.boxplot_on_ax(ax, allpercs, nams, colors_vtr, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = True, plot_ensmeans = False)#, obsperc = obsperc, obs_color = 'black', obs_name = 'pi')
 # ax.axhline(0, color = 'gray', linewidth = 0.5)
-#ax.set_xticks(np.arange(4))
-ax.set_xticklabels(nams + ['pi'])
+ax.set_xticks(posticks)
+ax.set_xticklabels(allru)
 #ax.set_title(tit)
 
 #ctl.custom_legend(fig, colors_vtr, ['pi'] + nams, ncol = 4, add_space_below = 0.1)
