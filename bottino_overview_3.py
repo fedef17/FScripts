@@ -131,7 +131,7 @@ for var in var_map_200 + allvars_3D:
     subtitles = []
     for ru in allru[1:]:
         yefirst = yeamean[(ru, var)].year.values[0]
-        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimea
+        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
         mappe.append(pinko)
         subtitles.append(ru + ' - tr')
 
