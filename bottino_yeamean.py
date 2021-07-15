@@ -92,8 +92,14 @@ for na, ru, col in zip(allnams, allru, colors):
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
-        kose_sclim = ctl.seasonal_climatology(kose[var], allseasons = ['DJFM', 'JJAS'])
-        seamean[(ru, var)] = kose_sclim
+        yefirst = kose[var]['time'].values[0].year
+        yelast = kose[var]['time'].values[-1].year
+
+        kose_sclim = ctl.seasonal_climatology(kose[var].sel(time = slice('{}-01-01'.format(yefirst), '{}-12-31'.format(yefirst+50))), allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var, 'trans')] = kose_sclim
+
+        kose_sclim = ctl.seasonal_climatology(kose[var].sel(time = slice('{}-01-01'.format(yelast-200), '{}-12-31'.format(yelast))), allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var, 'stab')] = kose_sclim
 
 
 # 3D vars
@@ -111,8 +117,14 @@ for na, ru, col in zip(allnams, allru, colors):
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
-        kose_sclim = ctl.seasonal_climatology(kose[var], allseasons = ['DJFM', 'JJAS'])
-        seamean[(ru, var)] = kose_sclim
+        yefirst = kose[var]['time'].values[0].year
+        yelast = kose[var]['time'].values[-1].year
+
+        kose_sclim = ctl.seasonal_climatology(kose[var].sel(time = slice('{}-01-01'.format(yefirst), '{}-12-31'.format(yefirst+50))), allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var, 'trans')] = kose_sclim
+
+        kose_sclim = ctl.seasonal_climatology(kose[var].sel(time = slice('{}-01-01'.format(yelast-200), '{}-12-31'.format(yelast))), allseasons = ['DJFM', 'JJAS'])
+        seamean[(ru, var, 'stab')] = kose_sclim
 
 
 pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean.p', 'wb'))

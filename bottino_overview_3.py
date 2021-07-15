@@ -273,3 +273,161 @@ for var in var_map_200 + allvars_3D:
 #figs_map = np.concatenate(figs_map)
 fignames = [var for var in var_map_200+allvars_3D]
 ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
+
+
+sys.exit()
+#### for JJAS and DJFM
+###### Plots 2D
+
+for sea in ['DJFM', 'JJAS']:
+    figs_map = []
+    for var in var_map_200 + allvars_3D:
+        # Mean pattern
+        mappe = []
+        pimean = seamean[('pi', var)]['seamean'].sel(season = sea)
+
+        subtitles = []
+        for ru in allru[1:]:
+            yefirst = seamean[(ru, var)].year.values[0]
+            pinko = seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimea
+            mappe.append(pinko)
+            subtitles.append(ru + ' - tr')
+
+        for ru in allru[1:]:
+            yefirst = seamean[(ru, var)].year.values[0]
+            yelast = seamean[(ru, var)].year.values[-1]
+            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+            mappe.append(pinko)
+            subtitles.append(ru + ' - eq')
+
+        cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
+        cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[3:]], True, (2,98))
+        cbar_range = 3*[cbr0] + 3*[cbr1]
+
+        # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+
+        if var in var_map_200:
+            fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
+            figs_map.append(fig[0])
+        else:
+            # 3D vars
+            fig, axs = plt.subplots(2, 3, figsize = (12,8))
+            for ma, ax, subt in zip(mappe, axs.flatten(), subtitles):
+                if 'tr' in subt:
+                    vma = 10
+                else:
+                    vma = 5
+                guplo = ma.mean('lon').plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
+                try:
+                    guplo.colorbar.set_label('')
+                except Exception as exc:
+                    print(exc)
+                    pass
+
+                guplo2 = pimean.mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)
+
+            for i in range(2):
+                for j in range(3):
+                    if j > 0:
+                        axs[i,j].set_ylabel('')
+                    if i == 0:
+                        axs[i,j].set_xlabel('')
+
+            figs_map.append(fig)
+
+    #figs_map = np.concatenate(figs_map)
+    fignames = [var for var in var_map_200+allvars_3D]
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
+
+
+    #### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
+    # Other possibility is to plot the two contributions separated but in terms of ratio to the global warming. Ok doing this. AAA ok.
+
+    ###### Plots 2D
+    figs_map = []
+    for var in var_map_200 + allvars_3D:
+        # Mean pattern
+        mappe = []
+        mappediv = []
+        pimean = seamean[('pi', var)].mean('year')
+
+        totchan = []
+        for ru in allru[1:]:
+            yelast = seamean[(ru, var)].year.values[-1]
+            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - pimean
+            totchan.append(pinko)
+
+        subtitles = []
+        for ru, totc in zip(allru[1:], totchan):
+            yefirst = seamean[(ru, var)].year.values[0]
+            pinko = seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
+            mappe.append(pinko)
+            mappediv.append(pinko/totc)
+            subtitles.append(ru + ' - tr')
+
+        for ru, totc in zip(allru[1:], totchan):
+            yefirst = seamean[(ru, var)].year.values[0]
+            yelast = seamean[(ru, var)].year.values[-1]
+            pinko = seamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - seamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+            mappe.append(pinko)
+            mappediv.append(pinko/totc)
+            subtitles.append(ru + ' - eq')
+
+        cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
+        cbr1 = ctl.get_cbar_range([ma.values for ma in mappe[3:]], True, (2,98))
+        cbar_range = 3*[cbr0] + 3*[cbr1]
+
+        # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
+
+        #if var == 'tas':
+        if var in var_map_200:
+            if var == 'tas':
+                cbran = [0.4, 1.0]
+            else:
+                cbran = None
+            fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
+            figs_map.append(fig[0])
+        #elif var in var_map_200:
+            # zonal mean
+            fig, axs = plt.subplots(1, 3, figsize = (24,8))
+            for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru[1:], totchan)):
+                ma = mappe[iii]
+                guplo = ma.mean('lon').plot(x = 'lat', ax = ax, label = 'transient', color = 'orange')
+                ma2 = mappe[iii+3]
+                guplo = ma2.mean('lon').plot(x = 'lat', ax = ax, label = 'stabilization', color = 'blue')
+                guplo = totc.mean('lon').plot(x = 'lat', ax = ax, label = 'total', color = 'black')
+                ax.legend()
+                ax.grid()
+                ax.set_title(subt.split()[0])
+
+            figs_map.append(fig)
+        else:
+            # 3D vars
+            fig, axs = plt.subplots(2, 3, figsize = (12,8))
+            for ma, ax, subt, totc in zip(mappe, axs.flatten(), subtitles, 2*totchan):
+                vma = 1
+                # if 'tr' in subt:
+                #     vma = 10
+                # else:
+                #     vma = 5
+                guplo = (ma.mean('lon')/totc.mean('lon')).plot.contourf(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', vmax = vma)
+                try:
+                    guplo.colorbar.set_label('')
+                except Exception as exc:
+                    print(exc)
+                    pass
+
+                guplo2 = pimean.mean('lon').plot.contour(x = 'lat', y = 'plev', ax = ax, levels = 11, ylim = (1.e5, 1.e3), yscale = 'log', colors="k", add_colorbar=False)
+
+            for i in range(2):
+                for j in range(3):
+                    if j > 0:
+                        axs[i,j].set_ylabel('')
+                    if i == 0:
+                        axs[i,j].set_xlabel('')
+
+            figs_map.append(fig)
+
+    #figs_map = np.concatenate(figs_map)
+    fignames = [var for var in var_map_200+allvars_3D]
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
