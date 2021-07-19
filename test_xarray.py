@@ -28,6 +28,8 @@ import xesmf as xe
 
 ##############################################################
 
+filut = '/home/fedef/Research/lavori/Era/ERAInterim_mon_tas_1979-2018.nc'
+
 filon = '/data-hobbes/fabiano/CMIP6/CMIP6/model-output/MRI/MRI-ESM2-0/ssp585/atmos/Amon/r1i1p1f1/rsut/rsut_Amon_MRI-ESM2-0_ssp585_r1i1p1f1_gn_210101-230012.nc'
 
 pino = xr.load_dataset(filon, engine = 'netcdf4')
