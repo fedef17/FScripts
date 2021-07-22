@@ -76,6 +76,7 @@ dTdt_lr = np.gradient(flux_lr['ta'].values, axis = 0)
 ugrad_lr = 86400.*flux_lr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_lr['ta'].values, axis = -1)
 vgrad_lr = 86400.*flux_lr['va']*1/Re*np.gradient(flux_lr['ta'].values, axis = -2)
 vertgr_lr = 86400.*flux_lr['wap'] * (ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_lr['ta'].values, plevels, axis = 1))
+adheat_lr = 86400.*flux_lr['wap'] * ka * flux_lr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis]
 
 Q_lr = dTdt_lr + ugrad_lr + vgrad_lr - vertgr_lr
 
@@ -83,6 +84,7 @@ dTdt_hr = np.gradient(flux_hr['ta'].values, axis = 0)
 ugrad_hr = 86400.*flux_hr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_hr['ta'].values, axis = -1)
 vgrad_hr = 86400.*flux_hr['va']*1/Re*np.gradient(flux_hr['ta'].values, axis = -2)
 vertgr_hr = 86400.*flux_hr['wap'] * (ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_hr['ta'].values, plevels, axis = 1))
+adheat_lr = 86400.*flux_hr['wap'] * ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis]
 
 Q_hr = dTdt_hr + ugrad_hr + vgrad_hr - vertgr_hr
 
@@ -159,6 +161,29 @@ for finda, tag in zip(['19990111', '19990201', '19990301', '19990401'], ['10d', 
     pino.colorbar.set_label('Vertical adv + ad. heating (K/day)')
     fig.suptitle('ctrl255')
     fig.savefig(cart + 'vertgr_2mo_ctrl255.pdf')
+
+    ## Just the temperature trends
+    adheat_lr = Q_lr*0. + adheat_lr
+    adheat_hr = Q_lr*0. + adheat_hr
+
+    fig = plt.figure()
+    adheat_diff = adheat_hr - adheat_lr
+    pino = adheat_diff.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Adiab. heating (K/day)')
+    fig.suptitle('511orog255 - ctrl255')
+    fig.savefig(cart + 'adheat_2mo_511orog255-ctrl255.pdf')
+
+    fig = plt.figure()
+    pino = adheat_hr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Adiab. heating (K/day)')
+    fig.suptitle('511orog255')
+    fig.savefig(cart + 'adheat_2mo_511orog255.pdf')
+
+    fig = plt.figure()
+    pino = adheat_lr.sel(time = slice('19990101',finda), lat = slice(-40, 40)).mean(['time','lon']).plot.contourf(y = 'plev', ylim = (1.e5, 1.e3), yscale = 'log', levels = 11, vmax = 1)
+    pino.colorbar.set_label('Adiab. heating (K/day)')
+    fig.suptitle('ctrl255')
+    fig.savefig(cart + 'adheat_2mo_ctrl255.pdf')
 
     ## Just the temperature trends
     ugrad_lr = Q_lr*0. + ugrad_lr

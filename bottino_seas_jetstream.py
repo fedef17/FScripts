@@ -263,3 +263,34 @@ for co, na, lona in zip([latcose, spdcose], ['jetlat', 'jetspeed'], ['Jet latitu
         ax.set_title(area)
 
     fig.savefig(cart_out + '{}_boxplot.pdf'.format(na))
+
+
+    fig, axes = plt.subplots(1, 3, figsize = (24,8))
+
+    for area, ax in zip(areas, axes):
+        if 'N' in area:
+            sea = 'DJFM'
+        else:
+            sea = 'JJAS'
+
+        alldists = [co[('pi', sea, area)]] + [co[(ru+'_'+vers, sea, area)] for ru in allru[1:] for vers in ['tr', 'st']]
+
+        nams = ['pi'] + [ru+'_'+vers for ru in allru[1:] for vers in ['tr', 'st']]
+        edgecol = np.append(['black'], np.concatenate([(col, col) for col in colors[1:]]))
+
+        positions = [0.]
+        posticks = [0.]
+        for i in range(len(allru[1:])):
+            positions.append(positions[-1]+0.7+0.4)
+            positions.append(positions[-1]+0.7)
+            posticks.append(np.mean(positions[-2:]))
+
+        ctl.violinplot_on_ax(ax, alldists, names = nams, colors = colors_vtr, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)#, obsperc = obsperc, obs_color = 'black', obs_name = 'pi')
+        # ax.axhline(0, color = 'gray', linewidth = 0.5)
+        ax.set_xticks(posticks)
+        ax.set_xticklabels(allru)
+
+        ax.set_ylabel(lona)
+        ax.set_title(area)
+
+    fig.savefig(cart_out + '{}_violplot.pdf'.format(na))
