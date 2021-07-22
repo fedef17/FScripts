@@ -84,7 +84,7 @@ dTdt_hr = np.gradient(flux_hr['ta'].values, axis = 0)
 ugrad_hr = 86400.*flux_hr['ua']*1/(Re * coslat[np.newaxis, np.newaxis, :, np.newaxis])*np.gradient(flux_hr['ta'].values, axis = -1)
 vgrad_hr = 86400.*flux_hr['va']*1/Re*np.gradient(flux_hr['ta'].values, axis = -2)
 vertgr_hr = 86400.*flux_hr['wap'] * (ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis] - np.gradient(flux_hr['ta'].values, plevels, axis = 1))
-adheat_lr = 86400.*flux_hr['wap'] * ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis]
+adheat_hr = 86400.*flux_hr['wap'] * ka * flux_hr['ta'].values/plevels[np.newaxis, :, np.newaxis, np.newaxis]
 
 Q_hr = dTdt_hr + ugrad_hr + vgrad_hr - vertgr_hr
 
