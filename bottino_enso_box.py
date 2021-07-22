@@ -71,9 +71,9 @@ fig, ax = plt.subplots(figsize = (12,8))
 allpercs = dict()
 for nu in [10, 25, 50, 75, 90]:
     allpercs['p{}'.format(nu)] = [np.percentile(enso['pi']['tos'], nu)] + [np.percentile(enso[ru+'_'+vers]['tos'], nu) for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['mean'] = [np.mean(enso['pi']['tos']).values] + [np.mean(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['min'] = [np.min(enso['pi']['tos']).values] + [np.min(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
-allpercs['max'] = [np.max(enso['pi']['tos']).values] + [np.max(enso[ru]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['mean'] = [np.mean(enso['pi']['tos']).values] + [np.mean(enso[ru+'_'+vers]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['min'] = [np.min(enso['pi']['tos']).values] + [np.min(enso[ru+'_'+vers]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
+allpercs['max'] = [np.max(enso['pi']['tos']).values] + [np.max(enso[ru+'_'+vers]['tos']).values for ru in allru[1:] for vers in ['tr', 'st']]
 
 # ru = 'pi'
 # obsperc = dict()
