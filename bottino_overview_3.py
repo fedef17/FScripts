@@ -210,7 +210,11 @@ for var in var_map + allvars_3D:
         mappe.append(pinko)
 
         gigino = pinko/totc
-        if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is almost zero, set to nan
+        if var != 'tas': ## where the final change is less than 1%, set to nan
+            sputu = np.abs(totc/pimean) < 0.01
+            gigino.values[sputu.values] = np.nan
+            # gigino[np.abs(totc/pimean) < 0.01] = np.nan # does not work
+
         mappediv.append(gigino)
         subtitles.append(ru + ' - tr')
 
@@ -221,7 +225,10 @@ for var in var_map + allvars_3D:
         mappe.append(pinko)
 
         gigino = pinko/totc
-        if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+        if var != 'tas': ## where the final change is less than 1%, set to nan
+            sputu = np.abs(totc/pimean) < 0.01
+            gigino.values[sputu.values] = np.nan
+            # gigino[np.abs(totc/pimean) < 0.01] = np.nan # does not work
         mappediv.append(gigino)
         subtitles.append(ru + ' - eq')
 
@@ -368,7 +375,10 @@ for sea in ['DJFM', 'JJAS']:
             mappe.append(pinko)
 
             gigino = pinko/totc
-            if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            if var != 'tas': ## where the final change is less than 1%, set to nan
+                sputu = np.abs(totc/pimean) < 0.01
+                gigino.values[sputu.values] = np.nan
+                # gigino[np.abs(totc/pimean) < 0.01] = np.nan # does not work
             mappediv.append(gigino)
             subtitles.append(ru + ' - tr')
 
@@ -377,7 +387,10 @@ for sea in ['DJFM', 'JJAS']:
             mappe.append(pinko)
 
             gigino = pinko/totc
-            if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            if var != 'tas': ## where the final change is less than 1%, set to nan
+                sputu = np.abs(totc/pimean) < 0.01
+                gigino.values[sputu.values] = np.nan
+                # gigino[np.abs(totc/pimean) < 0.01] = np.nan # does not work
             mappediv.append(gigino)
             subtitles.append(ru + ' - eq')
 
