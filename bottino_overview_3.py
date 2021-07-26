@@ -208,7 +208,10 @@ for var in var_map + allvars_3D:
         yefirst = yeamean[(ru, var)].year.values[0]
         pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year') - pimean
         mappe.append(pinko)
-        mappediv.append(pinko/totc)
+
+        gigino = pinko/totc
+        gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is almost zero, set to nan
+        mappediv.append(gigino)
         subtitles.append(ru + ' - tr')
 
     for ru, totc in zip(allru[1:], totchan):
@@ -216,7 +219,10 @@ for var in var_map + allvars_3D:
         yelast = yeamean[(ru, var)].year.values[-1]
         pinko = yeamean[(ru, var)].sel(year = slice(yelast - yel, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year')
         mappe.append(pinko)
-        mappediv.append(pinko/totc)
+
+        gigino = pinko/totc
+        gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+        mappediv.append(gigino)
         subtitles.append(ru + ' - eq')
 
     cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
@@ -230,7 +236,7 @@ for var in var_map + allvars_3D:
         if var == 'tas':
             cbran = [0.4, 1.0]
         else:
-            cbran = None
+            cbran = [-2., 2.]
         fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
         figs_map.append(fig[0])
     #elif var in var_map:
@@ -360,13 +366,19 @@ for sea in ['DJFM', 'JJAS']:
         for ru, totc in zip(allru[1:], totchan):
             pinko = seamean[(ru, var, 'trans')]['seamean'].sel(season = sea) - pimean
             mappe.append(pinko)
-            mappediv.append(pinko/totc)
+
+            gigino = pinko/totc
+            gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            mappediv.append(gigino)
             subtitles.append(ru + ' - tr')
 
         for ru, totc in zip(allru[1:], totchan):
             pinko = seamean[(ru, var, 'stab')]['seamean'].sel(season = sea) - seamean[(ru, var, 'trans')]['seamean'].sel(season = sea)
             mappe.append(pinko)
-            mappediv.append(pinko/totc)
+
+            gigino = pinko/totc
+            gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            mappediv.append(gigino)
             subtitles.append(ru + ' - eq')
 
         cbr0 = ctl.get_cbar_range([ma.values for ma in mappe[:3]], True, (2,98))
@@ -380,7 +392,7 @@ for sea in ['DJFM', 'JJAS']:
             if var == 'tas':
                 cbran = [0.4, 1.0]
             else:
-                cbran = [-1., 1.]
+                cbran = [-2., 2.]
             fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
             figs_map.append(fig[0])
         #elif var in var_map:
