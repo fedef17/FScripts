@@ -54,10 +54,14 @@ miptab = 'Amon'
 allvars_2D = 'clt pr psl rlut rsut tas uas'.split()
 allvars_3D = 'ta ua'.split()
 
-var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+var_map = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585']
 allru2 = allru + ['ssp585']
 colors2 = colors + ['indianred']
+
+yef = 50
+yel = 200
+
 
 figs_glob = []
 axs_glob = []
@@ -119,11 +123,11 @@ yeamean, seamean = pickle.load(open(cart_out + 'bottino_yeamean.p', 'rb'))
 #cart_out_seas = cart_out + '../seasmean/'
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out_seas + 'bottino_seasmean.p', 'rb'))
 
-#var_map_200 = 'tas pr rlut clt'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+#var_map = 'tas pr rlut clt'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
 ###### Plots 2D
 figs_map = []
-for var in var_map_200 + allvars_3D:
+for var in var_map + allvars_3D:
     # Mean pattern
     mappe = []
     pimean = yeamean[('pi', var)].mean('year')
@@ -131,14 +135,14 @@ for var in var_map_200 + allvars_3D:
     subtitles = []
     for ru in allru[1:]:
         yefirst = yeamean[(ru, var)].year.values[0]
-        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
+        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year') - pimean
         mappe.append(pinko)
         subtitles.append(ru + ' - tr')
 
     for ru in allru[1:]:
         yefirst = yeamean[(ru, var)].year.values[0]
         yelast = yeamean[(ru, var)].year.values[-1]
-        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - yel, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year')
         mappe.append(pinko)
         subtitles.append(ru + ' - eq')
 
@@ -148,7 +152,7 @@ for var in var_map_200 + allvars_3D:
 
     # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-    if var in var_map_200:
+    if var in var_map:
         fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
         figs_map.append(fig[0])
     else:
@@ -178,8 +182,8 @@ for var in var_map_200 + allvars_3D:
         figs_map.append(fig)
 
 #figs_map = np.concatenate(figs_map)
-fignames = [var for var in var_map_200+allvars_3D]
-ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames)
+fignames = [var for var in var_map+allvars_3D]
+ctl.plot_pdfpages(cart_out + 'bott3_map_f{}vsl{}.pdf'.format(yef, yel), figs_map, True, fignames)
 
 
 #### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
@@ -187,7 +191,7 @@ ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200.pdf', figs_map, True, fignames
 
 ###### Plots 2D
 figs_map = []
-for var in var_map_200 + allvars_3D:
+for var in var_map + allvars_3D:
     # Mean pattern
     mappe = []
     mappediv = []
@@ -196,13 +200,13 @@ for var in var_map_200 + allvars_3D:
     totchan = []
     for ru in allru[1:]:
         yelast = yeamean[(ru, var)].year.values[-1]
-        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - pimean
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - yel, yelast)).mean('year') - pimean
         totchan.append(pinko)
 
     subtitles = []
     for ru, totc in zip(allru[1:], totchan):
         yefirst = yeamean[(ru, var)].year.values[0]
-        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year') - pimean
+        pinko = yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year') - pimean
         mappe.append(pinko)
         mappediv.append(pinko/totc)
         subtitles.append(ru + ' - tr')
@@ -210,7 +214,7 @@ for var in var_map_200 + allvars_3D:
     for ru, totc in zip(allru[1:], totchan):
         yefirst = yeamean[(ru, var)].year.values[0]
         yelast = yeamean[(ru, var)].year.values[-1]
-        pinko = yeamean[(ru, var)].sel(year = slice(yelast - 200, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + 50)).mean('year')
+        pinko = yeamean[(ru, var)].sel(year = slice(yelast - yel, yelast)).mean('year') - yeamean[(ru, var)].sel(year = slice(yefirst, yefirst + yef)).mean('year')
         mappe.append(pinko)
         mappediv.append(pinko/totc)
         subtitles.append(ru + ' - eq')
@@ -222,14 +226,14 @@ for var in var_map_200 + allvars_3D:
     # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
     #if var == 'tas':
-    if var in var_map_200:
+    if var in var_map:
         if var == 'tas':
             cbran = [0.4, 1.0]
         else:
             cbran = None
         fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
         figs_map.append(fig[0])
-    #elif var in var_map_200:
+    #elif var in var_map:
         # zonal mean
         fig, axs = plt.subplots(1, 3, figsize = (24,8))
         for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru[1:], totchan)):
@@ -271,8 +275,8 @@ for var in var_map_200 + allvars_3D:
         figs_map.append(fig)
 
 #figs_map = np.concatenate(figs_map)
-fignames = [var for var in var_map_200+allvars_3D]
-ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fignames)
+fignames = [var for var in var_map+allvars_3D]
+ctl.plot_pdfpages(cart_out + 'bott3_map_f{}vsl{}_rel.pdf'.format(yef, yel), figs_map, True, fignames)
 
 
 #### for JJAS and DJFM
@@ -280,7 +284,7 @@ ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel.pdf', figs_map, True, fign
 
 for sea in ['DJFM', 'JJAS']:
     figs_map = []
-    for var in var_map_200 + allvars_3D:
+    for var in var_map + allvars_3D:
         # Mean pattern
         mappe = []
         pimean = seamean[('pi', var)]['seamean'].sel(season = sea)
@@ -302,7 +306,7 @@ for sea in ['DJFM', 'JJAS']:
 
         # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
-        if var in var_map_200:
+        if var in var_map:
             fig = ctl.plot_multimap_contour(mappe, figsize = (16,8), title = var, plot_anomalies = True, add_contour_field = 6*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (2,3), subtitles = subtitles, use_different_cbars = True, cbar_range = cbar_range) #, cmap = cmaps, cbar_range = cbar_range, use_different_cbars = True, use_different_cmaps = True)
             figs_map.append(fig[0])
         else:
@@ -332,8 +336,8 @@ for sea in ['DJFM', 'JJAS']:
             figs_map.append(fig)
 
     #figs_map = np.concatenate(figs_map)
-    fignames = [var for var in var_map_200+allvars_3D]
-    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_{}.pdf'.format(sea), figs_map, True, fignames)
+    fignames = [var for var in var_map+allvars_3D]
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f{}vsl{}_{}.pdf'.format(yef, yel, sea), figs_map, True, fignames)
 
 
     #### Now, this is the ratio between the two warmings. Equilibration warming/transient (which is larger for most regions). This is always positive for temp, but maybe not for prec/rlut/clt.
@@ -341,7 +345,7 @@ for sea in ['DJFM', 'JJAS']:
 
     ###### Plots 2D
     figs_map = []
-    for var in var_map_200 + allvars_3D:
+    for var in var_map + allvars_3D:
         # Mean pattern
         mappe = []
         mappediv = []
@@ -372,14 +376,14 @@ for sea in ['DJFM', 'JJAS']:
         # subtitles = ['{} - {}'.format(ru, seasok) for seasok in ['DJF', 'MAM', 'JJA', 'SON'] for ru in allru]
 
         #if var == 'tas':
-        if var in var_map_200:
+        if var in var_map:
             if var == 'tas':
                 cbran = [0.4, 1.0]
             else:
-                cbran = None
+                cbran = [-1., 1.]
             fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
             figs_map.append(fig[0])
-        #elif var in var_map_200:
+        #elif var in var_map:
             # zonal mean
             fig, axs = plt.subplots(1, 3, figsize = (24,8))
             for iii, (ax, subt, totc) in enumerate(zip(axs.flatten(), allru[1:], totchan)):
@@ -391,6 +395,8 @@ for sea in ['DJFM', 'JJAS']:
                 ax.legend()
                 ax.grid()
                 ax.set_title(subt.split()[0])
+                ax.set_ylabel('')
+            fig.suptitle(var)
 
             figs_map.append(fig)
         else:
@@ -421,5 +427,5 @@ for sea in ['DJFM', 'JJAS']:
             figs_map.append(fig)
 
     #figs_map = np.concatenate(figs_map)
-    fignames = [var for var in var_map_200+allvars_3D]
-    ctl.plot_pdfpages(cart_out + 'bott3_map_f50vsl200_rel_{}.pdf'.format(sea), figs_map, True, fignames)
+    fignames = [var for var in var_map+allvars_3D]
+    ctl.plot_pdfpages(cart_out + 'bott3_map_f{}vsl{}_rel_{}.pdf'.format(yef, yel, sea), figs_map, True, fignames)
