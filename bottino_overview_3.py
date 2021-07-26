@@ -210,7 +210,7 @@ for var in var_map + allvars_3D:
         mappe.append(pinko)
 
         gigino = pinko/totc
-        gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is almost zero, set to nan
+        if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is almost zero, set to nan
         mappediv.append(gigino)
         subtitles.append(ru + ' - tr')
 
@@ -221,7 +221,7 @@ for var in var_map + allvars_3D:
         mappe.append(pinko)
 
         gigino = pinko/totc
-        gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+        if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
         mappediv.append(gigino)
         subtitles.append(ru + ' - eq')
 
@@ -234,7 +234,7 @@ for var in var_map + allvars_3D:
     #if var == 'tas':
     if var in var_map:
         if var == 'tas':
-            cbran = [0.4, 1.0]
+            cbran = [0., 1.0]
         else:
             cbran = [-2., 2.]
         fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
@@ -368,7 +368,7 @@ for sea in ['DJFM', 'JJAS']:
             mappe.append(pinko)
 
             gigino = pinko/totc
-            gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
             mappediv.append(gigino)
             subtitles.append(ru + ' - tr')
 
@@ -377,7 +377,7 @@ for sea in ['DJFM', 'JJAS']:
             mappe.append(pinko)
 
             gigino = pinko/totc
-            gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
+            if var != 'tas': gigino[np.abs(totc/pimean) < 0.01] = np.nan ## where the final change is less than 1%, set to nan
             mappediv.append(gigino)
             subtitles.append(ru + ' - eq')
 
@@ -390,7 +390,7 @@ for sea in ['DJFM', 'JJAS']:
         #if var == 'tas':
         if var in var_map:
             if var == 'tas':
-                cbran = [0.4, 1.0]
+                cbran = [0., 1.0]
             else:
                 cbran = [-2., 2.]
             fig = ctl.plot_multimap_contour(mappediv[:3], figsize = (24,8), title = None, plot_anomalies = True, add_contour_field = 3*[pimean], add_contour_plot_anomalies = False, add_contour_same_levels = False, fix_subplots_shape = (1,3), subtitles = allru[1:], use_different_cbars = False, cbar_range = cbran, cmap = 'viridis', cb_label = var)
