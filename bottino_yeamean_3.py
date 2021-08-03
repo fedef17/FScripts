@@ -78,14 +78,6 @@ for na, ru, col in zip(allnams, allru, colors):
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
 
-    # Separate for uas
-    fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
-    if len(fils) > 0:
-        kosettt = xr.open_mfdataset(fils, use_cftime = True)
-        kosettt = kosettt.drop_vars('time_bnds')
-        kosettt = kosettt.drop_vars('height')
-        kose = kose.assign(uas = kosettt.uas)
-
     for var in allvars_2D:
         print(var)
         if var not in kose:
