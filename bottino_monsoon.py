@@ -59,16 +59,33 @@ seamean = dict()
 
 allseasons = ['NDJFM', 'MJJAS', 'year']
 
-for na, ru, col in zip(allnams, allru, colors):
-    print(ru)
-    mem = 'r1'
+# for na, ru, col in zip(allnams, allru, colors):
+#     print(ru)
+#     mem = 'r1'
+#
+#     fils = glob.glob(filna.format(na, mem, miptab, 'pr'))
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     for sea in allseasons:
+#         seamean[(ru, sea)] = ctl.seasonal_set(kose['pr'], season = sea, seasonal_stat = 'sum')
+#
+# pickle.dump(seamean, open(cart_out + 'bottino_seamean_pr.p', 'wb'))
 
-    fils = glob.glob(filna.format(na, mem, miptab, 'pr'))
+seamean = pickle.load(open(cart_out + 'bottino_seamean_pr.p', 'rb'))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
+secuse = dict()
+for ru in allru:
     for sea in allseasons:
-        seamean[(ru, sea)] = ctl.seasonal_set(kose['pr'], season = sea, seasonal_stat = 'sum')
+        for iiy in range(5):
+            pino = seamean[(ru, sea)].isel(year = slice(100*iiy, 100*(iiy+1) )).mean('year')
+            secuse[(ru, sea, iiy)] = pino
 
-pickle.dump(seamean, open(cart_out + 'bottino_seamean_pr.p', 'wb'))
+        pino = seamean[(ru, sea)].isel(year = slice(-200, None)).mean('year')
+        secuse[(ru, sea, 'stab')] = pino
+
+        if 'pi' in ke:
+            secuse[(ru, sea, 'stab')] = seamean[(ru, sea)].mean('year')
+
+pickle.dump(secuse, open(cart_out + 'bottino_seamean_pr_secular.p', 'wb'))
