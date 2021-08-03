@@ -85,7 +85,7 @@ for ru in allru:
         pino = seamean[(ru, sea)].isel(year = slice(-200, None)).mean('year')
         secuse[(ru, sea, 'stab')] = pino
 
-        if 'pi' in ke:
+        if ru == 'pi':
             secuse[(ru, sea, 'stab')] = seamean[(ru, sea)].mean('year')
 
 pickle.dump(secuse, open(cart_out + 'bottino_seamean_pr_secular.p', 'wb'))
