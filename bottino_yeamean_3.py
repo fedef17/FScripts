@@ -73,7 +73,7 @@ for na, ru, col in zip(allnams, allru, colors):
     mem = 'r1'
     if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D])
 
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
