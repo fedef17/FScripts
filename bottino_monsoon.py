@@ -69,6 +69,6 @@ for na, ru, col in zip(allnams, allru, colors):
     kose = kose.drop_vars('time_bnds')
 
     for sea in allseasons:
-        seamean[(ru, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'sum')
+        seamean[(ru, sea)] = ctl.seasonal_set(kose['pr'], season = sea, seasonal_stat = 'sum')
 
 pickle.dump(seamean, open(cart_out + 'bottino_seamean_pr.p', 'wb'))
