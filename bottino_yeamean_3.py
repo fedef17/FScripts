@@ -52,7 +52,8 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 miptab = 'Amon'
 #allvars_2D = 'clt pr psl rlut rsut tas uas'.split()
-allvars_2D = 'pr tas'.split()
+#allvars_2D = 'pr tas'.split()
+allvars_2D = ['tas']
 #allvars_3D = 'ta ua'.split()
 
 #var_map_200 = 'clt pr psl tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
@@ -92,4 +93,4 @@ for na, ru, col in zip(allnams, allru, colors):
         else:
             yeamean[(ru, var, 'sum')] = ctl.seasonal_set(kose[var], season = 'year', seasonal_stat = 'sum')
 
-pickle.dump(yeamean, open(cart_out + 'bottino_yeastat_taspr.p', 'wb'))
+pickle.dump(yeamean, open(cart_out + 'bottino_yeastat_tas.p', 'wb'))
