@@ -170,14 +170,12 @@ for mod in models_ok_all:
         alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod][3]
 
 
-drilis = []
+drilis_all = []
 for ke in dridic:
     for pu in dridic[ke]:
-        drilis.append((ke, pu))
+        drilis_all.append((ke, pu))
 
-drilis.append(('resolution', 'atm_res'))
-drilis.append(('resolution', 'atm_lev'))
-drilis.append(('resolution', 'oce_res'))
+drilis_all.append(('resolution', 'atm_res'))
 
 tuttecose['drivers'] = alldrivs
 tuttecose['drivnam'] = drilis
@@ -239,6 +237,12 @@ def make_XY(reg, comb, models = models_all, models_ok = models_ok_all, alldrivs 
 
 
 for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, models_ok_cm6prim, models_ok_all], [models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
+
+    drilis = drilis_all
+    if ensmod not in ['solocmip5', 'all']:
+        drilis.append(('resolution', 'atm_lev'))
+        drilis.append(('resolution', 'oce_res'))
+        
     ctl.printsep()
     print(ensmod)
     ctl.printsep()
