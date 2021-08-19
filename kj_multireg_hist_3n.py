@@ -178,7 +178,7 @@ for ke in dridic:
 drilis_all.append(('resolution', 'atm_res'))
 
 tuttecose['drivers'] = alldrivs
-tuttecose['drivnam'] = drilis
+tuttecose['drivnam'] = drilis_all
 
 models_ok_all.remove('HadGEM3-GC31-LL_r1i1p1f3')
 models_ok_all.remove('HadGEM3-GC31-MM_r1i1p1f3')
@@ -242,7 +242,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
     if ensmod not in ['solocmip5', 'all']:
         drilis.append(('resolution', 'atm_lev'))
         drilis.append(('resolution', 'oce_res'))
-        
+
     ctl.printsep()
     print(ensmod)
     ctl.printsep()
@@ -260,7 +260,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     ctl.mkdir(cart_out_gen.format(ensmod))
 
-    for nu in np.arange(4, 13):
+    for nu in np.arange(4, 11):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
