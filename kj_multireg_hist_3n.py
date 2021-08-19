@@ -126,7 +126,8 @@ metrnam['R3n'] = ['fidel20', 'stabil', 'var_ratio'] + ['occ: '+rnam for rnam in 
 # leggo drivers
 drivs = os.listdir(cart_in + 'simple_drivers_1/')
 #drivs = ['NorthAtlantic', 'Arctic', 'Stratosphere', 'JetSpeed', 'Tropics', 'ENSO', 'EddyForcing'] # excluding: 'JetLatPDF'
-drivs = ['NorthAtlantic', 'Arctic', 'Stratosphere', 'JetSpeed', 'Tropics', 'EddyForcing'] # excluding: 'JetLatPDF'
+#drivs = ['NorthAtlantic', 'Arctic', 'Stratosphere', 'JetSpeed', 'Tropics', 'EddyForcing'] # excluding: 'JetLatPDF'
+drivs = ['NorthAtlantic', 'Arctic', 'Stratosphere', 'JetSpeed', 'EddyForcing'] # excluding: 'JetLatPDF'
 
 dridic = dict()
 for dri in drivs:
@@ -160,9 +161,9 @@ for mod in models_ok_all:
             alldrivs[(dri, dritip, mod)] = kos
 
     if mod in models_5_ok:
-        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod.split('_')[0]][0]
-        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod.split('_')[0]][1]
-        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod.split('_')[0]][3]
+        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod[:mod.find('historical')-1]][0]
+        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod[:mod.find('historical')-1]][1]
+        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod[:mod.find('historical')-1]][3]
     else:
         alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod][0]
         alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
@@ -255,7 +256,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     ctl.mkdir(cart_out_gen.format(ensmod))
 
-    for nu in np.arange(4, 14):
+    for nu in np.arange(4, 13):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
