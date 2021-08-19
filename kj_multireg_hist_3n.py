@@ -86,7 +86,12 @@ gigi5 = pickle.load(open(cart_in + 'metrics/cmip5_r3n_metrics.pkl', 'rb'))
 models_5 = [mo for mo in gigi5.keys() if 'r1' in mo] # only first member
 models_5.append('CCSM4-historical-r6i1p1')
 
-models_5_ok = [mod.split('_')[0] + '_' + mod.split('_')[-1] for mod in models_5]
+models_5_ok = []
+for mod in models_5:
+    pio = mod.split('-')
+    pio.remove('historical')
+    pio = '-'.join(pio)
+    models_5_ok.append(pio)
 
 for mod in models_5:
     gigi5[mod].update(gigi5_old[mod])
