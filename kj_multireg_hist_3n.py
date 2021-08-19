@@ -194,6 +194,7 @@ ctl.printsep()
 drilis_all = []
 for ke in dridic:
     for pu in dridic[ke]:
+        if 'SST-pattern' in pu: continue
         drilis_all.append((ke, pu))
 
 drilis_all.append(('resolution', 'atm_res'))
@@ -261,6 +262,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     drilis = dcp(drilis_all)
     if ensmod not in ['solocmip5', 'all']:
+        drilis.append(('NorthAtlantic', 'NorthAtlantic_SST-pattern'))
         drilis.append(('resolution', 'atm_lev'))
         drilis.append(('resolution', 'oce_res'))
 
@@ -281,7 +283,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     ctl.mkdir(cart_out_gen.format(ensmod))
 
-    for nu in np.arange(4, 11):
+    for nu in np.arange(4, 10):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
