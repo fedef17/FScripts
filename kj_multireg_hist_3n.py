@@ -195,7 +195,7 @@ for reg in regtip:
         tuttecose[(ensmod, reg, 'metrnam')] = metrics[reg]
 
 
-def make_XY(reg, comb, models = models_all, models_ok = models_ok_all, alldrivs = alldrivs, drilis = drilis, metrics = metrics, standard_Y = True):
+def make_XY(reg, comb, models = models_all, models_ok = models_ok_all, alldrivs = alldrivs, drilis = drilis_all, metrics = metrics, standard_Y = True):
     Y = []
     for mod in models:
         Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
@@ -276,7 +276,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
             # pesca i drivers, uno per tipo, e fai il model
             for ii, comb in enumerate(allcombs):
                 # print(ii, comb)
-                X, Y = make_XY(reg, comb, models, models_ok)
+                X, Y = make_XY(reg, comb, models, models_ok, drilis = drilis)
 
                 #model = LinearRegression().fit(X, Y)
                 model = Ridge().fit(X, Y)
@@ -336,7 +336,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 comb = okcombs[reg][indcomb]
                 top_comb = [drilis[co][1] for co in comb] #[dri +' '+
                 #print(namti, top_comb)
-                X, Y = make_XY(reg, comb, models, models_ok)
+                X, Y = make_XY(reg, comb, models, models_ok, drilis = drilis)
 
                 crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
 
