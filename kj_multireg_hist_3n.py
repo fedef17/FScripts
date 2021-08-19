@@ -90,8 +90,9 @@ models_5_ok = []
 for mod in models_5:
     pio = mod.split('-')
     pio.remove('historical')
-    pio = '-'.join(pio)
-    models_5_ok.append(pio)
+    ping = '-'.join(pio[:-1])
+    ping = ping + '_' + pio[-1]
+    models_5_ok.append(ping)
 
 for mod in models_5:
     gigi5[mod].update(gigi5_old[mod])
@@ -174,9 +175,9 @@ for mod in models_ok_all:
             alldrivs[(dri, dritip, mod)] = kos
 
     if mod in models_5_ok:
-        alldrivs[('resolution', 'atm_res', mod)] = cosdi['-'.join(mod.split('-')[:-1])][0]
-        alldrivs[('resolution', 'atm_lev', mod)] = cosdi['-'.join(mod.split('-')[:-1])][1]
-        alldrivs[('resolution', 'oce_res', mod)] = cosdi['-'.join(mod.split('-')[:-1])][3]
+        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod.split('_')[0]][0]
+        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod.split('_')[0]][1]
+        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod.split('_')[0]][3]
     else:
         alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod][0]
         alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
