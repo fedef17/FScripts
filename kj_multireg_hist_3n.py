@@ -93,7 +93,7 @@ for mod in models_5:
 
 gigi.update(gigi5)
 
-resolution_file = '/home/fedef/Research/lavori/KJ_regimes/drivers/resolutions.txt'
+resolution_file = cart_in + 'drivers/resolutions.txt'
 cose = ctl.read_from_txt(resolution_file, n_skip = 1, dtype = float, first_column_header = True, sep = ',')
 cose[1][cose[1] < 0] = np.nan
 cosdi = dict(zip(cose[0], cose[1]))
