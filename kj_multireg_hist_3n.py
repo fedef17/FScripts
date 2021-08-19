@@ -141,6 +141,9 @@ for dri in drivs:
 # varall = ['GW', 'PVS', 'UTWrGW', 'AArGW', 'NAWrGW', 'PST']
 # pio2 = list(itt.combinations(varall, 3))
 
+n_exc = 0
+exc_list = []
+
 alldrivs = dict()
 for mod in models_ok_all:
     for dri in drivs:
@@ -150,6 +153,8 @@ for mod in models_ok_all:
                     filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/' + dritip + '*' + mod + '*')[0]
                 elif mod in models_prim:
                     filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/PRIMAVERA/' + dritip + '*' + mod + '*')[0]
+                elif mod in models_5_ok:
+                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/CMIP5/' + dritip + '*' + mod + '*')[0]
                 kos = np.loadtxt(filo)
                 if kos.size > 1:
                     kos = kos[0]
@@ -157,6 +162,8 @@ for mod in models_ok_all:
                     kos = float(kos)
             except:
                 # print('Not found: ', dri, dritip, mod)
+                n_exc += 1
+                exc_list.append(dritip)
                 kos = np.nan
 
             alldrivs[(dri, dritip, mod)] = kos
@@ -170,6 +177,13 @@ for mod in models_ok_all:
         alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
         alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod][3]
 
+ctl.printsep()
+
+print('Found {} exceptions:\n'.format(n_exc))
+for dri in np.unique(exc_list):
+    print(dri, len([dr for dr in exc_list if dr == dri]))
+
+ctl.printsep()
 
 drilis_all = []
 for ke in dridic:
