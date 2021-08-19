@@ -174,9 +174,9 @@ for mod in models_ok_all:
             alldrivs[(dri, dritip, mod)] = kos
 
     if mod in models_5_ok:
-        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod[:mod.find('historical')-1]][0]
-        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod[:mod.find('historical')-1]][1]
-        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod[:mod.find('historical')-1]][3]
+        alldrivs[('resolution', 'atm_res', mod)] = cosdi['-'.join(mod.split('-')[:-1])][0]
+        alldrivs[('resolution', 'atm_lev', mod)] = cosdi['-'.join(mod.split('-')[:-1])][1]
+        alldrivs[('resolution', 'oce_res', mod)] = cosdi['-'.join(mod.split('-')[:-1])][3]
     else:
         alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod][0]
         alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
