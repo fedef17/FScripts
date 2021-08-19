@@ -22,6 +22,8 @@ import xarray as xr
 import glob
 import xclim
 
+import cartopy.crs as ccrs
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 22
@@ -35,7 +37,7 @@ plt.rcParams['axes.axisbelow'] = True
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/fabiano/Research/lavori/BOTTINO/yearmean/'
 elif os.uname()[1] == 'xaru':
-    cart_out = '/home/fedef/Research/lavori/BOTTINO/yearmean/'
+    cart_out = '/home/fedef/Research/lavori/BOTTINO/monsoon/'
 elif os.uname()[1] == 'tintin':
     cart_out = '/home/fabiano/work/lavori/BOTTINO/yearmean/'
 
@@ -73,19 +75,63 @@ allseasons = ['NDJFM', 'MJJAS', 'year']
 #
 # pickle.dump(seamean, open(cart_out + 'bottino_seamean_pr.p', 'wb'))
 
-seamean = pickle.load(open(cart_out + 'bottino_seamean_pr.p', 'rb'))
+# seamean = pickle.load(open(cart_out + 'bottino_seamean_pr.p', 'rb'))
+#
+# secuse = dict()
+# for ru in allru:
+#     for sea in allseasons:
+#         for iiy in range(5):
+#             pino = seamean[(ru, sea)].isel(year = slice(100*iiy, 100*(iiy+1) )).mean('year')
+#             secuse[(ru, sea, iiy)] = pino
+#
+#         pino = seamean[(ru, sea)].isel(year = slice(-200, None)).mean('year')
+#         secuse[(ru, sea, 'stab')] = pino
+#
+#         if ru == 'pi':
+#             secuse[(ru, sea, 'stab')] = seamean[(ru, sea)].mean('year')
+#
+# pickle.dump(secuse, open(cart_out + 'bottino_seamean_pr_secular.p', 'wb'))
 
-secuse = dict()
+secuse = pickle.load(open(cart_out + 'bottino_seamean_pr_secular.p', 'rb'))
+
+### index is MPI = (MJJAS - NDJFM)/annual mean prec
+## reversed for southern hemisphere
+
+spy = 86400.*365
+
+mpi = dict()
+monreg = dict()
+
 for ru in allru:
-    for sea in allseasons:
-        for iiy in range(5):
-            pino = seamean[(ru, sea)].isel(year = slice(100*iiy, 100*(iiy+1) )).mean('year')
-            secuse[(ru, sea, iiy)] = pino
+    for iiy in list(range(5)) + ['stab']:
+        # NORTH
+        diff = (secuse[(ru, 'MJJAS', iiy)] - secuse[(ru, 'NDJFM', iiy)])/secuse[(ru, 'year', iiy)]
 
-        pino = seamean[(ru, sea)].isel(year = slice(-200, None)).mean('year')
-        secuse[(ru, sea, 'stab')] = pino
+        coso = xr.merge([diff.sel(lat = slice(0, None)), -1*diff.sel(lat = slice(None, 0))])['sea_sum']
 
-        if ru == 'pi':
-            secuse[(ru, sea, 'stab')] = seamean[(ru, sea)].mean('year')
+        yemm = secuse[(ru, 'year', iiy)]/12.*spy # from kg m2 s-1 to mm yr-1
 
-pickle.dump(secuse, open(cart_out + 'bottino_seamean_pr_secular.p', 'wb'))
+        coso.values[yemm < 300.] = np.nan
+        mpi[(ru, iiy)] = coso.copy()
+
+        coso.values[coso < 0.5] = np.nan
+        coso.values[~np.isnan(coso)] = 1
+        coso.values[np.isnan(coso)] = 0
+        monreg[(ru, iiy)] = coso
+
+#### Figurez
+# only stab
+fig, ax = ctl.get_cartopy_fig_ax(coast_lw = 0.1)
+proj = ccrs.PlateCarree()
+
+for ru, col in zip(allru, colors):
+    coso = monreg[(ru, 'stab')]
+    ctl.plot_mapc_on_ax(ax, coso.values, coso.lat.values, coso.lon.values, proj, None, (0,1), plot_type = 'binary_contour', lw_contour=2., line_color = col)
+
+ctl.custom_legend(fig, colors, allru, ncol = 4)
+fig.savefig(cart_out + 'monsoon_stab.pdf')
+
+cosi = [mpi[(ru, 'stab')] for ru in allru]
+for co in cosi: co.values[co < 0.5] = np.nan
+
+ctl.plot_multimap_contour(cosi, filename = cart_out + 'monsoon_all.pdf',  cbar_range=(0.5, 1.), subtitles = allru, cmap = 'viridis')

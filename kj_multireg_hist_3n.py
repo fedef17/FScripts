@@ -77,20 +77,32 @@ for mod in models_prim:
 
 gigi.update(gigiprim)
 
+models_prim = ['CMCC-CM2-HR4_r1i1p1f1', 'CMCC-CM2-VHR4_r1i1p1f1', 'CNRM-CM6-1-HR_r1i1p1f2', 'CNRM-CM6-1_r1i1p1f2', 'EC-Earth3P-HR_r1i1p2f1', 'EC-Earth3P_r1i1p2f1', 'ECMWF-IFS-HR_r1i1p1f1', 'ECMWF-IFS-LR_r1i1p1f1', 'ECMWF-IFS-MR_r1i1p1f1', 'HadGEM3-GC31-HH_r1i1p1f1', 'HadGEM3-GC31-HM_r1i1p1f1', 'HadGEM3-GC31-LL_r1i2p1f1', 'HadGEM3-GC31-MM_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MPI-ESM1-2-XR_r1i1p1f1']
 
-models_prim = ['CMCC-CM2-HR4_r1i1p1f1', 'CMCC-CM2-VHR4_r1i1p1f1',
- 'CNRM-CM6-1-HR_r1i1p1f2', 'CNRM-CM6-1_r1i1p1f2', 'EC-Earth3P-HR_r1i1p2f1',
- 'EC-Earth3P_r1i1p2f1', 'ECMWF-IFS-HR_r1i1p1f1', 'ECMWF-IFS-LR_r1i1p1f1',
- 'ECMWF-IFS-MR_r1i1p1f1', 'HadGEM3-GC31-HH_r1i1p1f1', 'HadGEM3-GC31-HM_r1i1p1f1', 'HadGEM3-GC31-LL_r1i2p1f1', 'HadGEM3-GC31-MM_r1i1p1f1', 'MPI-ESM1-2-HR_r1i1p1f1', 'MPI-ESM1-2-XR_r1i1p1f1']
+gigi5_old = pickle.load(open(cart_in + 'metrics/cmip5_metrics.pkl', 'rb'))
+gigi5 = pickle.load(open(cart_in + 'metrics/cmip5_r3n_metrics.pkl', 'rb'))
+
+models_5 = [mo for mo in gigi5.keys() if 'r1' in mo] # only first member
+models_5.append('CCSM4-historical-r6i1p1')
+
+models_5_ok = [mod.split('_')[0] + '_' + mod.split('_')[-1] for mod in models_5]
+
+for mod in models_5:
+    gigi5[mod].update(gigi5_old[mod])
+    gigi5[mod]['R3n']['mean'] = gigi5_old[mod]['R3']['mean']
+
+gigi.update(gigi5)
 
 resolution_file = '/home/fedef/Research/lavori/KJ_regimes/drivers/resolutions.txt'
 cose = ctl.read_from_txt(resolution_file, n_skip = 1, dtype = float, first_column_header = True, sep = ',')
 cose[1][cose[1] < 0] = np.nan
 cosdi = dict(zip(cose[0], cose[1]))
 
-models_ok_all = models_cmip6 + models_prim
+models_ok_cm6prim = models_cmip6 + models_prim
+models_cm6prim = models_cm6_full + models_prim
 
-models_all = models_cm6_full + models_prim
+models_ok_all = models_cmip6 + models_prim + models_5_ok
+models_all = models_cm6_full + models_prim + models_5
 
 cart_out_gen = cart_in + 'results_{}/'
 
@@ -147,9 +159,14 @@ for mod in models_ok_all:
 
             alldrivs[(dri, dritip, mod)] = kos
 
-    alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod][0]
-    alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
-    alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod][3]
+    if mod in models_5_ok:
+        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod.split('_')[0]][0]
+        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod.split('_')[0]][1]
+        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod.split('_')[0]][3]
+    else:
+        alldrivs[('resolution', 'atm_res', mod)] = cosdi[mod][0]
+        alldrivs[('resolution', 'atm_lev', mod)] = cosdi[mod][1]
+        alldrivs[('resolution', 'oce_res', mod)] = cosdi[mod][3]
 
 
 drilis = []
@@ -170,7 +187,7 @@ models_all.remove('HadGEM3-GC31-LL_historical_r1i1p1f3')
 models_all.remove('HadGEM3-GC31-MM_historical_r1i1p1f3')
 
 for reg in regtip:
-    for models, ensmod in zip([models_cm6_full, models_prim, models_all], ['solocmip6', 'soloprim', 'cmip6prim']):
+    for models, ensmod in zip([models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
         Y = []
         for mod in models:
             Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
@@ -220,7 +237,7 @@ def make_XY(reg, comb, models = models_all, models_ok = models_ok_all, alldrivs 
     return X, Y
 
 
-for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_ok_all], [models_cm6_full, models_prim, models_all], ['solocmip6', 'soloprim', 'cmip6prim']):
+for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, models_ok_cm6prim, models_ok_all], [models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
     ctl.printsep()
     print(ensmod)
     ctl.printsep()
@@ -428,4 +445,4 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_ok_all],
             axs.set_ylabel(r'$R^2$')
             fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}driv_{}.pdf'.format(reg, nu, ensmod))
 
-pickle.dump(tuttecose, open(cart_out + 'tuttecose.p', 'wb'))
+pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
