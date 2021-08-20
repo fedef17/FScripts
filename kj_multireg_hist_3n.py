@@ -477,6 +477,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 ctl.printsep()
 
     for reg in regtip:
+        cart_out = cart_out_gen.format(ensmod) + reg + '/'
         fig_score, axs = figscores[reg]
         axs.set_xticks(np.arange(len(metrnam[reg])), minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
