@@ -283,7 +283,12 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     ctl.mkdir(cart_out_gen.format(ensmod))
 
-    for nu in np.arange(4, 10):
+    figscores = dict()
+    for reg in regtip:
+        fig_score, axs = plt.subplots(figsize=(12,8))
+        figscores[reg] = (fig_score, axs)
+
+    for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
@@ -351,9 +356,9 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
             #     print(top_comb)
 
             # ctl.printsep()
-            fig_score, axs = plt.subplots(figsize=(12,8))
 
-            for indcomb, namti, col, linst in zip([okyall, okymean, okyregs], ['all', 'pattmean', 'occpers'], ['indianred', 'forestgreen', 'orange'], ['-', '--', ':']):
+            #for indcomb, namti, col, linst in zip([okyall, okymean, okyregs], ['all', 'pattmean', 'occpers'], ['indianred', 'forestgreen', 'orange'], ['-', '--', ':']):
+            for indcomb, namti, col, linst in zip([okyall], ['all'], ['indianred'], ['-']):
                 scoall = allscores[reg][indcomb]
                 #print('all', np.mean(scoall), np.min(scoall), np.max(scoall))
                 comb = okcombs[reg][indcomb]
@@ -458,7 +463,8 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
 
-                axs.plot(np.arange(len(rsq)), rsq, label = namti, color = col, linestyle = linst)
+                fig_score, axs = figscores[reg]
+                axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
@@ -467,10 +473,12 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 ctl.printsep()
 
-            axs.set_xticks(np.arange(len(rsq)), minor = False)
-            axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
-            axs.legend()
-            axs.set_ylabel(r'$R^2$')
-            fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}driv_{}.pdf'.format(reg, nu, ensmod))
+    for reg in regtip:
+        fig_score, axs = figscores[reg]
+        axs.set_xticks(np.arange(len(rsq)), minor = False)
+        axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+        axs.legend()
+        axs.set_ylabel(r'$R^2$')
+        fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
