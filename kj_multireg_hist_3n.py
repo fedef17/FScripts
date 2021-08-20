@@ -406,11 +406,14 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 pvals = np.stack(pvals)
                 params = np.stack(params)
-                rsq = np.stack(rsq)
+                rsq_lin = np.stack(rsq)
                 pvals = pvals[:, 1:]
-                params = params[:, 1:]
+                params_lin = params[:, 1:]
 
-                skmodel = LinearRegression().fit(X, Y)
+                skmodel = Ridge().fit(X, Y)
+                rsq = r2_score(Y, skmodel.predict(X), multioutput='raw_values')
+                params = skmodel.coef_
+
                 # print('CHECK!!')
                 # #print(params)
                 # print(np.max(np.abs((params-skmodel.coef_)/params)))
@@ -475,7 +478,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     for reg in regtip:
         fig_score, axs = figscores[reg]
-        axs.set_xticks(np.arange(len(rsq)), minor = False)
+        axs.set_xticks(np.arange(len(metrnam[reg])), minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
