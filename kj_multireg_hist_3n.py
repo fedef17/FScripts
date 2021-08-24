@@ -16,6 +16,7 @@ import climdiags as cd
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
+import matplotlib.gridspec as gs
 
 from scipy import stats
 from copy import deepcopy as dcp
