@@ -405,9 +405,11 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                     est2 = est.fit()
                     est3 = est.fit_regularized(method='elastic_net', alpha=0.0) # This is a Ridge regression.
                     if np.any(est2.params - est3.params > 1.e-3):
+                        print('AAAAA - 3')
                         print(est2.params)
                         print(est3.params)
-                        raise ValueError('AAAAAAAAAAAA')
+                    elif np.any(est2.params - est3.params > 1.e-2):
+                        raise ValueError('AAAAAAAAAAAAAA - 2')
 
                     pvals.append(est2.pvalues)
                     params.append(est2.params)
