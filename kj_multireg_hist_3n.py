@@ -284,9 +284,11 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
     ctl.mkdir(cart_out_gen.format(ensmod))
 
     figscores = dict()
+    rsq_old = dict()
     for reg in regtip:
         fig_score, axs = plt.subplots(figsize=(12,8))
         figscores[reg] = (fig_score, axs)
+        rsq_old[reg] = None
 
     for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
         print('Finding best {} drivers'.format(nu))
@@ -399,7 +401,8 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 rsq = []
                 for ko in Y.T:
                     est = sm.OLS(ko, Xgi)
-                    est2 = est.fit()
+                    est2 = est.fit_regularized(method='elastic_net', alpha=0.0) # This is a Ridge regression.
+                    #est2 = est.fit()
                     pvals.append(est2.pvalues)
                     params.append(est2.params)
                     rsq.append(est2.rsquared)
@@ -466,8 +469,86 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
 
+
+                fig = plt.figure(figsize=(16,12))
+
+                ndriv = len(comb)
+                nval = len(scoall)
+                #vmi = np.percentile(np.abs(params), 95)
+                vmi = 0.6
+                ext = [0, nval, 0, ndriv]
+
+                if reg in ['R3n', 'U4']:
+                    i2 = 7
+                    toti = 11
+                else:
+                    i2 = 6
+                    toti = 9
+
+                cosi = gs.GridSpec(1, toti)
+                axs = []
+                axs.append(fig.add_subplot(cosi[:, :3]))
+                axs.append(fig.add_subplot(cosi[:, 3:i2]))
+                axs.append(fig.add_subplot(cosi[:, i2:]))
+
+                gigifig0 = axs[0].imshow(params.T[:, :3], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+                gigifig1 = axs[1].imshow(params.T[:, 3:i2], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+                gigifig2 = axs[2].imshow(params.T[:, i2:], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+
+                pvaok = pvals.T
+                for ix in range(nval):
+                    if ix < 3:
+                        ax = axs[0]
+                        ixok = ix
+                    elif iy < i2:
+                        ax = axs[1]
+                        ixok = ix - 3
+                    else:
+                        ax = axs[2]
+                        ixok = ix - i2
+
+                    for iy in range(ndriv):
+                        if pvaok[iy, ix] < 0.01:
+                            ax.scatter(ixok+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
+                        elif pvaok[iy, ix] < 0.05:
+                            ax.scatter(ixok+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
+
+                for ax in axs:
+                    ax.xaxis.tick_top()
+                axs[0].set_xticks(0.5+np.arange(3)), minor = False)
+                axs[0].set_xticklabels(metrnam[reg][:3], ha='center', rotation = 30)
+                axs[1].set_xticks(0.5+np.arange(3, i2)), minor = False)
+                axs[1].set_xticklabels(metrnam[reg][3:i2], ha='center', rotation = 30)
+                axs[2].set_xticks(0.5+np.arange(i2, toti)), minor = False)
+                axs[2].set_xticklabels(metrnam[reg][i2:], ha='center', rotation = 30)
+
+                axs[0].set_yticks(0.5+np.arange(len(top_comb)), minor = False)
+                axs[0].set_yticklabels(top_comb, va='center', rotation = 45)
+                for ax in axs[1:]:
+                    ax.set_yticks([])
+                    ax.set_yticklabels([])
+
+                for ax, lims in zip(axs, [(0,3), (3,i2), (i2, toti)]):
+                    for co in np.arange(lims[0], lims[1]):
+                        ax.axvline(co, color = 'white', linewidth = 0.1)
+                    for co in np.arange(len(top_comb)):
+                        ax.axhline(co, color = 'white', linewidth = 0.1)
+
+                #cax = fig.add_subplot(gs[6, :])
+                cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+                cb = plt.colorbar(gigifig, cax=cax, orientation='horizontal', extend = 'both')
+                cb.ax.tick_params(labelsize=18)
+                cb.set_label('Regression coefficient', fontsize=20)
+                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+
+                fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
+
                 fig_score, axs = figscores[reg]
-                axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
+                if rsq_old[reg] is None:
+                    rsq_old[reg] = len(rsq)*[0.0]
+                #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
+                axs.bar(np.arange(len(rsq)), rsq, width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
+                rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
