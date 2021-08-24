@@ -515,12 +515,6 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 for ax in axs:
                     ax.xaxis.tick_top()
-                axs[0].set_xticks(0.5+np.arange(3)), minor = False)
-                axs[0].set_xticklabels(metrnam[reg][:3], ha='center', rotation = 30)
-                axs[1].set_xticks(0.5+np.arange(3, i2)), minor = False)
-                axs[1].set_xticklabels(metrnam[reg][3:i2], ha='center', rotation = 30)
-                axs[2].set_xticks(0.5+np.arange(i2, toti)), minor = False)
-                axs[2].set_xticklabels(metrnam[reg][i2:], ha='center', rotation = 30)
 
                 axs[0].set_yticks(0.5+np.arange(len(top_comb)), minor = False)
                 axs[0].set_yticklabels(top_comb, va='center', rotation = 45)
@@ -529,6 +523,9 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                     ax.set_yticklabels([])
 
                 for ax, lims in zip(axs, [(0,3), (3,i2), (i2, toti)]):
+                    ax.set_xticks(0.5+np.arange(lims[0], lims[1]), minor = False)
+                    ax.set_xticklabels(metrnam[reg][lims[0]:lims[1]], ha='center', rotation = 30)
+
                     for co in np.arange(lims[0], lims[1]):
                         ax.axvline(co, color = 'white', linewidth = 0.1)
                     for co in np.arange(len(top_comb)):
