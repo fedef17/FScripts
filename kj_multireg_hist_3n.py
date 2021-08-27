@@ -487,7 +487,6 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 nval = len(scoall)
                 #vmi = np.percentile(np.abs(params), 95)
                 vmi = 0.6
-                ext = [0, nval, 0, ndriv]
 
                 if reg in ['R3n', 'U4']:
                     i2 = 7
@@ -502,8 +501,11 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 axs.append(fig.add_subplot(cosi[:, 3:i2]))
                 axs.append(fig.add_subplot(cosi[:, i2:]))
 
+                ext = [0, nval, 0, 3]
                 gigifig0 = axs[0].imshow(params.T[:, :3], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+                ext = [0, nval, 3, i2]
                 gigifig1 = axs[1].imshow(params.T[:, 3:i2], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
+                ext = [0, nval, i2, toti]
                 gigifig2 = axs[2].imshow(params.T[:, i2:], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
                 pvaok = pvals.T
