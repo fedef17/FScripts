@@ -561,7 +561,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 print(reg, nu, '{:5.2f}'.format(np.mean(rsq_old[reg])))
                 print(reg, nu, '{:5.2f}'.format(np.mean(rsq)))
 
-                axs.bar(np.arange(len(rsq)), rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
+                axs.bar(np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)]), rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
