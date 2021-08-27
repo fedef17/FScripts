@@ -286,6 +286,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     figscores = dict()
     rsq_old = dict()
+    xssdi = dict()
     for reg in regtip:
         fig_score, axs = plt.subplots(figsize=(12,8))
         figscores[reg] = (fig_score, axs)
@@ -561,7 +562,9 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 print(reg, nu, '{:5.2f}'.format(np.mean(rsq_old[reg])))
                 print(reg, nu, '{:5.2f}'.format(np.mean(rsq)))
 
-                axs.bar(np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)]), rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
+                xsss = np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)])
+                xssdi[reg] = xsss
+                axs.bar(xsss, rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
@@ -574,7 +577,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
     for reg in regtip:
         cart_out = cart_out_gen.format(ensmod) + reg + '/'
         fig_score, axs = figscores[reg]
-        axs.set_xticks(np.arange(len(metrnam[reg])), minor = False)
+        axs.set_xticks(xssdi[reg], minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
