@@ -443,9 +443,9 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 # print(pvals_skl)
 
                 if nu < 6:
-                    figsize = (24, 8)
+                    figsize = (24, 10)
                 else:
-                    figsize = (16, 8)
+                    figsize = (16, 10)
 
                 fig, ax = plt.subplots(figsize = figsize)
 
@@ -482,7 +482,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 cb = plt.colorbar(gigifig, cax=cax, orientation='horizontal', extend = 'both')
                 cb.ax.tick_params(labelsize=18)
                 cb.set_label('Regression coefficient', fontsize=20)
-                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
 
@@ -555,7 +555,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 cb = plt.colorbar(gigifig, cax=cax, orientation='horizontal', extend = 'both')
                 cb.ax.tick_params(labelsize=18)
                 cb.set_label('Regression coefficient', fontsize=20)
-                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.50)
+                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.50)
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
