@@ -510,15 +510,15 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 pvaok = pvals.T
                 for ix in range(nval):
-                    # if ix < 3:
-                    #     ax = axs[0]
-                    #     ixok = ix
-                    # elif ix < i2:
-                    #     ax = axs[1]
-                    #     ixok = ix - 3
-                    # else:
-                    #     ax = axs[2]
-                    #     ixok = ix - i2
+                    if ix < 3:
+                        ax = axs[0]
+                        ixok = ix
+                    elif ix < i2:
+                        ax = axs[1]
+                        ixok = ix - 3
+                    else:
+                        ax = axs[2]
+                        ixok = ix - i2
 
                     for iy in range(ndriv):
                         if pvaok[iy, ix] < 0.01:
@@ -549,7 +549,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 cb = plt.colorbar(gigifig, cax=cax, orientation='horizontal', extend = 'both')
                 cb.ax.tick_params(labelsize=18)
                 cb.set_label('Regression coefficient', fontsize=20)
-                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
+                plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.50)
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
