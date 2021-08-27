@@ -442,7 +442,12 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 #
                 # print(pvals_skl)
 
-                fig, ax = plt.subplots(figsize=(20,12))
+                if nu < 6:
+                    figsize = (24, 8)
+                else:
+                    figsize = (16, 8)
+
+                fig, ax = plt.subplots(figsize = figsize)
 
                 ndriv = len(comb)
                 nval = len(scoall)
@@ -482,7 +487,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
 
 
-                fig = plt.figure(figsize=(20,12))
+                fig = plt.figure(figsize = figsize)
 
                 ndriv = len(comb)
                 nval = len(scoall)
