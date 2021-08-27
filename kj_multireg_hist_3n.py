@@ -426,7 +426,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 rsq = r2_score(Y, skmodel.predict(X), multioutput='raw_values')
                 params = skmodel.coef_
 
-                print(reg, nu, '{:5.2f}'.format(rsq))
+                print(reg, nu, '{:5.2f}'.format(np.mean(rsq)))
 
                 # print('CHECK!!')
                 # #print(params)
@@ -556,9 +556,9 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 if rsq_old[reg] is None:
                     rsq_old[reg] = len(rsq)*[0.0]
                 #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
-                print(reg, nu, '{:5.2f}'.format(rsq_old[reg]))
-                print(reg, nu, '{:5.2f}'.format(rsq))
-                
+                print(reg, nu, '{:5.2f}'.format(np.mean(rsq_old[reg])))
+                print(reg, nu, '{:5.2f}'.format(np.mean(rsq)))
+
                 axs.bar(np.arange(len(rsq)), rsq, width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
