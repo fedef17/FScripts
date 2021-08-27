@@ -426,6 +426,8 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 rsq = r2_score(Y, skmodel.predict(X), multioutput='raw_values')
                 params = skmodel.coef_
 
+                print(reg, nu, '{:5.2f}'.format(rsq))
+
                 # print('CHECK!!')
                 # #print(params)
                 # print(np.max(np.abs((params-skmodel.coef_)/params)))
@@ -509,7 +511,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                     if ix < 3:
                         ax = axs[0]
                         ixok = ix
-                    elif iy < i2:
+                    elif ix < i2:
                         ax = axs[1]
                         ixok = ix - 3
                     else:
@@ -549,10 +551,14 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
+
                 fig_score, axs = figscores[reg]
                 if rsq_old[reg] is None:
                     rsq_old[reg] = len(rsq)*[0.0]
                 #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
+                print(reg, nu, '{:5.2f}'.format(rsq_old[reg]))
+                print(reg, nu, '{:5.2f}'.format(rsq))
+                
                 axs.bar(np.arange(len(rsq)), rsq, width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
