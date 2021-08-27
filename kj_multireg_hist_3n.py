@@ -501,30 +501,30 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 axs.append(fig.add_subplot(cosi[:, 3:i2]))
                 axs.append(fig.add_subplot(cosi[:, i2:]))
 
-                ext = [0, nval, 0, 3]
+                ext = [0, 3, 0, ndriv]
                 gigifig0 = axs[0].imshow(params.T[:, :3], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
-                ext = [0, nval, 3, i2]
+                ext = [3, i2, 0, ndriv]
                 gigifig1 = axs[1].imshow(params.T[:, 3:i2], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
-                ext = [0, nval, i2, toti]
+                ext = [i2, toti, 0, ndriv]
                 gigifig2 = axs[2].imshow(params.T[:, i2:], vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'lower',  extent = ext, aspect = 1)
 
                 pvaok = pvals.T
                 for ix in range(nval):
-                    if ix < 3:
-                        ax = axs[0]
-                        ixok = ix
-                    elif ix < i2:
-                        ax = axs[1]
-                        ixok = ix - 3
-                    else:
-                        ax = axs[2]
-                        ixok = ix - i2
+                    # if ix < 3:
+                    #     ax = axs[0]
+                    #     ixok = ix
+                    # elif ix < i2:
+                    #     ax = axs[1]
+                    #     ixok = ix - 3
+                    # else:
+                    #     ax = axs[2]
+                    #     ixok = ix - i2
 
                     for iy in range(ndriv):
                         if pvaok[iy, ix] < 0.01:
-                            ax.scatter(ixok+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
+                            ax.scatter(ix+0.5, iy+0.5, s=60, edgecolors = 'black', facecolors='white')
                         elif pvaok[iy, ix] < 0.05:
-                            ax.scatter(ixok+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
+                            ax.scatter(ix+0.5, iy+0.5, s=20, edgecolors = 'black', facecolors='white')
 
                 for ax in axs:
                     ax.xaxis.tick_top()
