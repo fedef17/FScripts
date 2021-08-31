@@ -49,12 +49,12 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 ####################################################################################################
 
 miptab = 'Amon'
-allvars_2D = 'clt  pr  psl  rlut  rsdt  rsut  tas  uas'.split()
+allvars_2D = 'clt  pr rlut rsdt rsut tas uas'.split()
 allvars_3D = []#'ta ua'.split()
 
 var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
 
-var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585', 'historical']
 allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
@@ -263,6 +263,8 @@ ax_greg.set_xlim((-0.5, 0.5))
 ax_greg.set_ylim((-0.5, 0.5))
 fig_greg.savefig(cart_out + 'bottino_gregory_pizoom.pdf')
 
+
+sys.exit()
 
 var_map_200 = 'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 
