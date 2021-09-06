@@ -103,3 +103,274 @@ ax.set_xticklabels(allru)
 ax.set_ylabel('ENSO index (K)')
 
 fig.savefig(cart_out + 'enso_boxplot.pdf')
+
+
+############# enso plot with tas/net_toa
+
+cartglob = '/home/fedef/Research/lavori/BOTTINO/seasmean/'
+glomeans, pimean = pickle.load(open(cartglob + 'bottino_glomeans.p', 'rb'))
+
+fig, axs = plt.subplots(1,2, figsize = (16,12))
+
+for ru, col in zip(allru, colors):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    tass = glomeans[(ru, 'tas')][1]
+    toaz = glomeans[(ru, 'net_toa')][1]
+    if ru == 'pi':
+        tass = tass[:-1]
+        toaz = toaz[:-1]
+    axs[0].scatter(tass, piuz, c = toaz)
+    axs[1].scatter(toaz, piuz, c = tass)
+
+axs[0].set_title('enso vs tas')
+axs[1].set_title('enso vs net_toa')
+fig.savefig(cart_out + 'enso_vs_tasytoa.pdf')
+
+
+fig, ax = plt.subplots(figsize = (16,12))
+
+nye = 50
+nchu = 10
+
+markers = ['x', 'o', 's', 'D']
+for ru, col, mark in zip(allru, colors, markers):
+    print(ru)
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    tass = glomeans[(ru, 'tas')][1]
+    toaz = glomeans[(ru, 'net_toa')][1]
+    if ru == 'pi':
+        tass = tass[:-1]
+        toaz = toaz[:-1]
+        ### PROBLEM WITH TOANET FOR PI!!!!
+        toaz = np.zeros(len(toaz))
+
+    enso_std = []
+    tass50 = []
+    toaz50 = []
+    for ich in range(nchu):
+        #DIVIDERE IN CHUNKS DI 50 anni
+        #Calcolare STD di enso e plottare scatter con quello
+        piuz_ch = piuz.isel(year = slice(ich*nye, (ich+1)*nye))
+        enso_std.append(piuz_ch.std())
+        tass50.append(tass[ich*nye:(ich+1)*nye].mean())
+        toaz50.append(toaz[ich*nye:(ich+1)*nye].mean())
+
+    ax.plot(tass50, enso_std, color = 'grey', linewidth = 0.3)
+    sc = ax.scatter(tass50, enso_std, c = toaz50, vmin = 0., vmax = 1., edgecolor = 'grey', s = 100, marker = mark)
+
+#ax.set_title('enso vs tas')
+ax.set_ylabel('Enso std (K)')
+ax.set_xlabel('Global tas (K)')
+
+cb = plt.colorbar(sc)
+cb.set_label('Global net TOA (W/m2)')
+
+fig.savefig(cart_out + 'ensostd_vs_tasytoa_50.pdf')
+
+### Trying separately with p90 e p10
+
+fig, ax = plt.subplots(figsize = (16,12))
+
+nye = 50
+nchu = 10
+
+markers = ['x', 'o', 's', 'D']
+for ru, col, mark in zip(allru, colors, markers):
+    print(ru)
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    tass = glomeans[(ru, 'tas')][1]
+    toaz = glomeans[(ru, 'net_toa')][1]
+    if ru == 'pi':
+        tass = tass[:-1]
+        toaz = toaz[:-1]
+        ### PROBLEM WITH TOANET FOR PI!!!!
+        toaz = np.zeros(len(toaz))
+
+    enso_p10 = []
+    enso_p90 = []
+    tass50 = []
+    toaz50 = []
+    for ich in range(nchu):
+        #DIVIDERE IN CHUNKS DI 50 anni
+        #Calcolare STD di enso e plottare scatter con quello
+        piuz_ch = piuz.isel(year = slice(ich*nye, (ich+1)*nye))
+        enso_p90.append(np.percentile(piuz_ch, 90))
+        enso_p10.append(np.percentile(piuz_ch, 10))
+        tass50.append(tass[ich*nye:(ich+1)*nye].mean())
+        toaz50.append(toaz[ich*nye:(ich+1)*nye].mean())
+
+    ax.plot(tass50, enso_p90, color = 'grey', linewidth = 0.3)
+    sc = ax.scatter(tass50, enso_p90, c = toaz50, vmin = 0., vmax = 1., edgecolor = 'grey', s = 100, marker = mark)
+
+    ax.plot(tass50, enso_p10, color = 'grey', linewidth = 0.3)
+    sc = ax.scatter(tass50, enso_p10, c = toaz50, vmin = 0., vmax = 1., edgecolor = 'grey', s = 100, marker = mark)
+
+#ax.set_title('enso vs tas')
+ax.set_ylabel('Enso p10/p90 (K)')
+ax.set_xlabel('Global tas (K)')
+ax.grid()
+
+cb = plt.colorbar(sc)
+cb.set_label('Global net TOA (W/m2)')
+
+fig.savefig(cart_out + 'ensoperc_vs_tasytoa_50.pdf')
+
+
+fig, axs = plt.subplots(2, 2, figsize = (16,12))
+
+for ru, ax in zip(allru, axs.flatten()):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data = piuz.values.flatten()
+    ps = np.abs(np.fft.fft(data))**2
+
+    freqs = np.fft.fftfreq(data.size, 1)
+    idx = freqs > 0
+    ax.plot(freqs[idx], ps[idx], linewidth = 0.5)
+    ps_low = ctl.butter_filter(ps, 20)
+    #ps_low = ctl.running_mean(ps, 20)
+    ax.plot(freqs[idx], ps_low[idx], linewidth = 2)
+    ps_low = ctl.butter_filter(ps, 50)
+    #ps_low = ctl.running_mean(ps, 50)
+    ax.plot(freqs[idx], ps_low[idx], linewidth = 2)
+
+    ax.set_title(ru)
+    if ax in axs[1, :]:
+        ax.set_xlabel('freq (yr-1)')
+    #ax.set_ylabel('amplitude')
+    #ax.set_xlim(2, 10)
+
+#ctl.adjust_ax_scale(axs.flatten())
+fig.savefig(cart_out + 'enso_spectra_all500.pdf')
+
+nchu = 5
+nye = 100
+colzz = ctl.color_set(5, cmap = 'viridis', use_seaborn=False)
+
+ps_max = dict()
+ps_ext = dict()
+
+fig, axs = plt.subplots(2, 2, figsize = (16,12))
+
+for ru, ax in zip(allru, axs.flatten()):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data_all = piuz.values.flatten()
+
+    for ich, col in zip(range(nchu), colzz):
+        data = data_all[ich*nye:(ich+1)*nye]
+        ps = np.abs(np.fft.fft(data))**2
+
+        freqs = np.fft.fftfreq(data.size, 1)
+        idx = freqs > 0
+        ps_low = ctl.butter_filter(ps, 10)
+        ax.plot(freqs[idx], ps_low[idx], color = col)
+
+        ku = 0
+        gi = ps[idx]
+        tot = np.sum(gi)
+        i = 0
+        while ku < 0.25*tot or i == 2000:
+            i += 1
+            ku = np.sum(gi[:i])
+
+        i10 = i
+
+        i = int(len(gi)/2.)
+        while ku < 0.75*tot or i == 2000:
+            i += 1
+            ku = np.sum(gi[:i])
+
+        i90 = i-1
+        ps_ext[(ru, ich)] = (freqs[idx][i10], freqs[idx][i90])
+
+        ps_max[(ru, ich)] = (freqs[idx][np.argmax(ps_low[idx])], np.max(ps_low[idx]))
+
+        ax.set_title(ru)
+        if ax in axs[1, :]:
+            ax.set_xlabel('freq (yr-1)')
+        #ax.set_ylabel('amplitude')
+        #ax.set_xlim(2, 10)
+
+#ctl.adjust_ax_scale(axs.flatten())
+fig.savefig(cart_out + 'enso_spectra_varying.pdf')
+
+
+fig, ax = plt.subplots(figsize = (16,12))
+markers = ['x', 'o', 's', 'D']
+
+for ru, col, mark in zip(allru, colors, markers):
+    print(ru)
+    tass = glomeans[(ru, 'tas')][1]
+    toaz = glomeans[(ru, 'net_toa')][1]
+
+    taok = []
+    took = []
+    peak_fr = []
+    peak_amp = []
+
+    fr_lo = []
+    fr_hi = []
+
+    for ich in range(nchu):
+        ta = np.mean(tass[ich*nye:(ich+1)*nye])
+        to = np.mean(toaz[ich*nye:(ich+1)*nye])
+        taok.append(ta)
+        took.append(to)
+        peak_fr.append(ps_max[(ru, ich)][0])
+        peak_amp.append(ps_max[(ru, ich)][1])
+        fr_lo.append(ps_ext[(ru, ich)][0])
+        fr_hi.append(ps_ext[(ru, ich)][1])
+
+    ax.plot(taok, peak_fr, color = 'grey', linewidth = 0.3)
+    sc = ax.scatter(taok, peak_fr, c = peak_amp, vmin = 50., vmax = 300., edgecolor = 'grey', s = 100, marker = mark)
+
+    ax.scatter(taok, fr_lo, c = peak_amp, vmin = 50., vmax = 300., s = 20, marker = mark)
+    ax.scatter(taok, fr_hi, c = peak_amp, vmin = 50., vmax = 300., s = 20, marker = mark)
+
+ax.set_ylabel('Enso peak freq (yr-1)')
+ax.set_xlabel('Global tas (K)')
+ax.grid()
+
+cb = plt.colorbar(sc)
+cb.set_label('Enso peak amp')
+
+fig.savefig(cart_out + 'ensofreq_vs_tas.pdf')
+
+
+fig, ax = plt.subplots(figsize = (16,12))
+markers = ['x', 'o', 's', 'D']
+
+for ru, col, mark in zip(allru, colors, markers):
+    print(ru)
+    tass = glomeans[(ru, 'tas')][1]
+    toaz = glomeans[(ru, 'net_toa')][1]
+
+    taok = []
+    took = []
+    peak_fr = []
+    peak_amp = []
+
+    fr_lo = []
+    fr_hi = []
+
+    for ich in range(nchu):
+        ta = np.mean(tass[ich*nye:(ich+1)*nye])
+        to = np.mean(toaz[ich*nye:(ich+1)*nye])
+        taok.append(ta)
+        took.append(to)
+        peak_fr.append(ps_max[(ru, ich)][0])
+        peak_amp.append(ps_max[(ru, ich)][1])
+        fr_lo.append(ps_ext[(ru, ich)][0])
+        fr_hi.append(ps_ext[(ru, ich)][1])
+
+    fr_wid = np.array(fr_hi)-np.array(fr_lo)
+    ax.plot(taok, fr_wid, color = 'grey', linewidth = 0.3)
+    sc = ax.scatter(taok, fr_wid, c = peak_amp, vmin = 50., vmax = 300., edgecolor = 'grey', s = 100, marker = mark)
+
+ax.set_ylabel('Enso spectrum width (yr-1)')
+ax.set_xlabel('Global tas (K)')
+ax.grid()
+
+cb = plt.colorbar(sc)
+cb.set_label('Enso peak amp')
+
+fig.savefig(cart_out + 'ensofreqwidth_vs_tas.pdf')
