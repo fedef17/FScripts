@@ -54,8 +54,9 @@ glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmea
 
 # century trends. or bicentury?
 
+trendz = dict()
 for var in ['tas', 'pr', 'clt', 'rlut']:
-    trendz = []
+    figtrend = []
     tits = []
     for ru in allru[1:]:
         for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
@@ -64,7 +65,11 @@ for var in ['tas', 'pr', 'clt', 'rlut']:
             print(coso.shape, gtas.shape)
 
             var_trend, var_intercept, var_trend_err, var_intercept_err = ctl.calc_trend_climatevar(gtas, coso)
-            trendz.append(var_trend)
+            figtrend.append(var_trend)
             tits.append(ru + ' - ' + cent)
+            trendz[(var, ru, cent)] = var_trend
+            trendz[(var, ru, cent, 'err')] = var_trend_err
 
-    ctl.plot_multimap_contour(trendz, coso.lat, coso.lon, filename = cart_out+var+'_trendz.pdf', fix_subplots_shape = (3,3), figsize = (16, 9), cbar_range = (0, 2), subtitles = tits)
+    ctl.plot_multimap_contour(figtrend, coso.lat, coso.lon, filename = cart_out+var+'_trendz.pdf', fix_subplots_shape = (3,3), figsize = (16, 9), cbar_range = (0, 2), subtitles = tits)
+
+pickle.dump(trendz, open(cart_out + 'trendz.p', 'wb'))
