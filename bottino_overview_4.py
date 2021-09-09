@@ -61,6 +61,7 @@ for var in ['tas', 'pr', 'clt', 'rlut']:
         for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
             coso = yeamean[(ru, var)][start:end]
             gtas = glomeans[(ru, var)][start:end]
+            print(coso.shape, gtas.shape)
 
             var_trend, var_intercept, var_trend_err, var_intercept_err = ctl.calc_trend_climatevar(gtas, coso)
             trendz.append(var_trend)
