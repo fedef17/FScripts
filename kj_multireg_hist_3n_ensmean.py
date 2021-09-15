@@ -282,7 +282,8 @@ def make_XY(reg, comb, modgen = modgen_all, alldrivs = alldrivs_em, gigi = gigi_
 
 
 #for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, models_ok_cm6prim, models_ok_all], [models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
-for modgen, ensmod in zip([modgen_cmip6, modgen_prim, modgen_5, modgen_all], ['solocmip6', 'soloprim', 'solocmip5', 'all']):
+#for modgen, ensmod in zip([modgen_cmip6, modgen_prim, modgen_5, modgen_all], ['solocmip6', 'soloprim', 'solocmip5', 'all']):
+for modgen, ensmod in zip([modgen_all], ['all']):
     drilis = dcp(drilis_all)
     # if ensmod not in ['solocmip5', 'all']:
     #     drilis.append(('NorthAtlantic', 'NorthAtlantic_SST-pattern'))
