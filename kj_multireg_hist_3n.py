@@ -157,11 +157,11 @@ for mod in models_ok_all:
         for dritip in dridic[dri]:
             try:
                 if mod in models_cmip6:
-                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/' + dritip + '*' + mod + '*')[0]
+                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/' + dritip + '_' + mod + '*')[0]
                 elif mod in models_prim:
-                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/PRIMAVERA/' + dritip + '*' + mod + '*')[0]
+                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/PRIMAVERA/' + dritip + '_' + mod + '*')[0]
                 elif mod in models_5_ok:
-                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/CMIP5/' + dritip + '*' + mod + '*')[0]
+                    filo = glob.glob(cart_in + 'simple_drivers_1/' + dri + '/CMIP5/' + dritip + '_' + mod + '*')[0]
                 kos = np.loadtxt(filo)
                 if kos.size > 1:
                     kos = kos[0]
