@@ -34,17 +34,17 @@ plt.rcParams['axes.axisbelow'] = True
 
 if os.uname()[1] == 'hobbes':
     cart_or = '/home/fabiano/Research/lavori/BOTTINO/'
-    cartind = '/nas/BOTTINO/indices/enso500_xr/'
+    cartind = '/nas/BOTTINO/indices/amv500_xr/'
 elif os.uname()[1] == 'xaru':
     cart_or = '/home/fedef/Research/lavori/BOTTINO/'
-    cartind = '/home/fedef/Research/lavori/BOTTINO/enso500_xr/'
+    cartind = '/home/fedef/Research/lavori/BOTTINO/amv500_xr/'
 elif os.uname()[1] == 'tintin':
     cart_or = '/home/fabiano/work/lavori/BOTTINO/'
 
 cart_out = cart_or + 'indices/'
 ctl.mkdir(cart_out)
 
-cart_out = cart_out + 'enso/'
+cart_out = cart_out + 'amv/'
 ctl.mkdir(cart_out)
 
 allru = ['pi', 'b025', 'b050', 'b100']
@@ -59,9 +59,9 @@ enso = dict()
 
 for ru in allru:
     if ru == 'pi':
-        enso[ru] = xr.load_dataset(cartind + '{}_enso_360day.nc'.format(ru), use_cftime = True)
+        enso[ru] = xr.load_dataset(cartind + 'piControl_amv_360day.nc', use_cftime = True)
     else:
-        enso[ru] = xr.load_dataset(cartind + '{}_enso_360day.nc'.format(ru), use_cftime = True)
+        enso[ru] = xr.load_dataset(cartind + '{}_amv_360day.nc'.format(ru), use_cftime = True)
 
         firstye = enso[ru].time.values[0].year
         lastye = enso[ru].time.values[-1].year
@@ -103,9 +103,9 @@ ax.set_xticklabels(allru)
 #ax.set_title(tit)
 
 #ctl.custom_legend(fig, colors_vtr, ['pi'] + nams, ncol = 4, add_space_below = 0.1)
-ax.set_ylabel('ENSO index (K)')
+ax.set_ylabel('AMV index (K)')
 
-fig.savefig(cart_out + 'enso_boxplot.pdf')
+fig.savefig(cart_out + 'amv_boxplot.pdf')
 
 
 ############# enso plot with tas/net_toa
@@ -118,15 +118,15 @@ for ru, col in zip(allru, colors):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     tass = glomeans[(ru, 'tas')][1]
     toaz = glomeans[(ru, 'net_toa')][1]
-    if ru == 'pi':
-        tass = tass[:-1]
-        toaz = toaz[:-1]
+    # if ru == 'pi':
+    #     tass = tass[:-1]
+    #     toaz = toaz[:-1]
     axs[0].scatter(tass, piuz, c = toaz)
     axs[1].scatter(toaz, piuz, c = tass)
 
-axs[0].set_title('enso vs tas')
-axs[1].set_title('enso vs net_toa')
-fig.savefig(cart_out + 'enso_vs_tasytoa.pdf')
+axs[0].set_title('amv vs tas')
+axs[1].set_title('amv vs net_toa')
+fig.savefig(cart_out + 'amv_vs_tasytoa.pdf')
 
 
 fig, ax = plt.subplots(figsize = (16,12))
@@ -140,11 +140,11 @@ for ru, col, mark in zip(allru, colors, markers):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     tass = glomeans[(ru, 'tas')][1]
     toaz = glomeans[(ru, 'net_toa')][1]
-    if ru == 'pi':
-        tass = tass[:-1]
-        toaz = toaz[:-1]
-        ### PROBLEM WITH TOANET FOR PI!!!!
-        toaz = np.zeros(len(toaz))
+    # if ru == 'pi':
+    #     tass = tass[:-1]
+    #     toaz = toaz[:-1]
+    #     ### PROBLEM WITH TOANET FOR PI!!!!
+    #     toaz = np.zeros(len(toaz))
 
     enso_std = []
     tass50 = []
@@ -161,13 +161,13 @@ for ru, col, mark in zip(allru, colors, markers):
     sc = ax.scatter(tass50, enso_std, c = toaz50, vmin = 0., vmax = 1., edgecolor = 'grey', s = 100, marker = mark)
 
 #ax.set_title('enso vs tas')
-ax.set_ylabel('Enso std (K)')
+ax.set_ylabel('Amv std (K)')
 ax.set_xlabel('Global tas (K)')
 
 cb = plt.colorbar(sc)
 cb.set_label('Global net TOA (W/m2)')
 
-fig.savefig(cart_out + 'ensostd_vs_tasytoa_50.pdf')
+fig.savefig(cart_out + 'amvstd_vs_tasytoa_50.pdf')
 
 ### Trying separately with p90 e p10
 
@@ -182,11 +182,11 @@ for ru, col, mark in zip(allru, colors, markers):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     tass = glomeans[(ru, 'tas')][1]
     toaz = glomeans[(ru, 'net_toa')][1]
-    if ru == 'pi':
-        tass = tass[:-1]
-        toaz = toaz[:-1]
-        ### PROBLEM WITH TOANET FOR PI!!!!
-        toaz = np.zeros(len(toaz))
+    # if ru == 'pi':
+    #     tass = tass[:-1]
+    #     toaz = toaz[:-1]
+    #     ### PROBLEM WITH TOANET FOR PI!!!!
+    #     toaz = np.zeros(len(toaz))
 
     enso_p10 = []
     enso_p90 = []
@@ -208,14 +208,14 @@ for ru, col, mark in zip(allru, colors, markers):
     sc = ax.scatter(tass50, enso_p10, c = toaz50, vmin = 0., vmax = 1., edgecolor = 'grey', s = 100, marker = mark)
 
 #ax.set_title('enso vs tas')
-ax.set_ylabel('Enso p10/p90 (K)')
+ax.set_ylabel('AMV p10/p90 (K)')
 ax.set_xlabel('Global tas (K)')
 ax.grid()
 
 cb = plt.colorbar(sc)
 cb.set_label('Global net TOA (W/m2)')
 
-fig.savefig(cart_out + 'ensoperc_vs_tasytoa_50.pdf')
+fig.savefig(cart_out + 'amvperc_vs_tasytoa_50.pdf')
 
 
 fig, axs = plt.subplots(2, 2, figsize = (16,12))
@@ -227,162 +227,30 @@ for ru, ax in zip(allru, axs.flatten()):
 
     freqs = np.fft.fftfreq(data.size, 1)
     idx = freqs > 0
-    ax.plot(freqs[idx], ps[idx], linewidth = 0.5)
-    ps_low = ctl.butter_filter(ps, 20)
-    #ps_low = ctl.running_mean(ps, 20)
-    ax.plot(freqs[idx], ps_low[idx], linewidth = 2)
-    ps_low = ctl.butter_filter(ps, 50)
-    #ps_low = ctl.running_mean(ps, 50)
-    ax.plot(freqs[idx], ps_low[idx], linewidth = 2)
+    ax.plot(1/freqs[idx], ps[idx], linewidth = 0.5)
+    #ps_low = ctl.butter_filter(ps, 20)
+    ps_low = ctl.running_mean(ps, 20)
+    ax.plot(1/freqs[idx], ps_low[idx], linewidth = 2)
+    #ps_low = ctl.butter_filter(ps, 50)
+    ps_low = ctl.running_mean(ps, 50)
+    ax.plot(1/freqs[idx], ps_low[idx], linewidth = 2)
 
     ax.set_title(ru)
     if ax in axs[1, :]:
-        ax.set_xlabel('freq (yr-1)')
-    #ax.set_ylabel('amplitude')
-    #ax.set_xlim(2, 10)
+        ax.set_xlabel('period (yr)')
+        #ax.set_ylabel('amplitude')
+    ax.set_xlim(2, 50)
 
 #ctl.adjust_ax_scale(axs.flatten())
-fig.savefig(cart_out + 'enso_spectra_all500.pdf')
+fig.savefig(cart_out + 'amv_spectra_all500.pdf')
 
-nchu = 5
-nye = 100
-colzz = ctl.color_set(5, cmap = 'viridis', use_seaborn=False)
 
-ps_max = dict()
-ps_ext = dict()
+#frbins = [0, 5, 10, 20, 30, 50, 100, 200]
+frbins = [1, 5, 20, 50, 100, 200]
 
 fig, axs = plt.subplots(2, 2, figsize = (16,12))
 
-for ru, ax in zip(allru, axs.flatten()):
-    piuz = enso[ru]['tos'].groupby('time.year').mean()
-    data_all = piuz.values.flatten()
-
-    for ich, col in zip(range(nchu), colzz):
-        data = data_all[ich*nye:(ich+1)*nye]
-        ps = np.abs(np.fft.fft(data))**2
-
-        freqs = np.fft.fftfreq(data.size, 1)
-        idx = freqs > 0
-        ps_low = ctl.butter_filter(ps, 10)
-        ax.plot(freqs[idx], ps_low[idx], color = col)
-
-        ku = 0
-        gi = ps[idx]
-        tot = np.sum(gi)
-        i = 0
-        while ku < 0.25*tot or i == 2000:
-            i += 1
-            ku = np.sum(gi[:i])
-
-        i10 = i
-
-        i = int(len(gi)/2.)
-        while ku < 0.75*tot or i == 2000:
-            i += 1
-            ku = np.sum(gi[:i])
-
-        i90 = i-1
-        ps_ext[(ru, ich)] = (freqs[idx][i10], freqs[idx][i90])
-
-        ps_max[(ru, ich)] = (freqs[idx][np.argmax(ps_low[idx])], np.max(ps_low[idx]))
-
-        ax.set_title(ru)
-        if ax in axs[1, :]:
-            ax.set_xlabel('freq (yr-1)')
-        #ax.set_ylabel('amplitude')
-        #ax.set_xlim(2, 10)
-
-#ctl.adjust_ax_scale(axs.flatten())
-fig.savefig(cart_out + 'enso_spectra_varying.pdf')
-
-
-fig, ax = plt.subplots(figsize = (16,12))
-markers = ['x', 'o', 's', 'D']
-
-for ru, col, mark in zip(allru, colors, markers):
-    print(ru)
-    tass = glomeans[(ru, 'tas')][1]
-    toaz = glomeans[(ru, 'net_toa')][1]
-
-    taok = []
-    took = []
-    peak_fr = []
-    peak_amp = []
-
-    fr_lo = []
-    fr_hi = []
-
-    for ich in range(nchu):
-        ta = np.mean(tass[ich*nye:(ich+1)*nye])
-        to = np.mean(toaz[ich*nye:(ich+1)*nye])
-        taok.append(ta)
-        took.append(to)
-        peak_fr.append(ps_max[(ru, ich)][0])
-        peak_amp.append(ps_max[(ru, ich)][1])
-        fr_lo.append(ps_ext[(ru, ich)][0])
-        fr_hi.append(ps_ext[(ru, ich)][1])
-
-    ax.plot(taok, peak_fr, color = 'grey', linewidth = 0.3)
-    sc = ax.scatter(taok, peak_fr, c = peak_amp, vmin = 50., vmax = 300., edgecolor = 'grey', s = 100, marker = mark)
-
-    ax.scatter(taok, fr_lo, c = peak_amp, vmin = 50., vmax = 300., s = 20, marker = mark)
-    ax.scatter(taok, fr_hi, c = peak_amp, vmin = 50., vmax = 300., s = 20, marker = mark)
-
-ax.set_ylabel('Enso peak freq (yr-1)')
-ax.set_xlabel('Global tas (K)')
-ax.grid()
-
-cb = plt.colorbar(sc)
-cb.set_label('Enso peak amp')
-
-fig.savefig(cart_out + 'ensofreq_vs_tas.pdf')
-
-
-fig, ax = plt.subplots(figsize = (16,12))
-markers = ['x', 'o', 's', 'D']
-
-for ru, col, mark in zip(allru, colors, markers):
-    print(ru)
-    tass = glomeans[(ru, 'tas')][1]
-    toaz = glomeans[(ru, 'net_toa')][1]
-
-    taok = []
-    took = []
-    peak_fr = []
-    peak_amp = []
-
-    fr_lo = []
-    fr_hi = []
-
-    for ich in range(nchu):
-        ta = np.mean(tass[ich*nye:(ich+1)*nye])
-        to = np.mean(toaz[ich*nye:(ich+1)*nye])
-        taok.append(ta)
-        took.append(to)
-        peak_fr.append(ps_max[(ru, ich)][0])
-        peak_amp.append(ps_max[(ru, ich)][1])
-        fr_lo.append(ps_ext[(ru, ich)][0])
-        fr_hi.append(ps_ext[(ru, ich)][1])
-
-    fr_wid = np.array(fr_hi)-np.array(fr_lo)
-    ax.plot(taok, fr_wid, color = 'grey', linewidth = 0.3)
-    sc = ax.scatter(taok, fr_wid, c = peak_amp, vmin = 50., vmax = 300., edgecolor = 'grey', s = 100, marker = mark)
-
-ax.set_ylabel('Enso spectrum width (yr-1)')
-ax.set_xlabel('Global tas (K)')
-ax.grid()
-
-cb = plt.colorbar(sc)
-cb.set_label('Enso peak amp')
-
-fig.savefig(cart_out + 'ensofreqwidth_vs_tas.pdf')
-
-frbins = [2, 4, 6, 8, 10, 20]
-
-allshi = [-0.3, -0.1, 0.1, 0.3]
-fig, ax = plt.subplots(figsize = (16,12))
-
-for ru, col, shi in zip(allru, colors, allshi):
+for ru, ax, col in zip(allru, axs.flatten(), colors):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     data = piuz.values.flatten()
     ps = np.abs(np.fft.rfft(data))**2
@@ -390,23 +258,26 @@ for ru, col, shi in zip(allru, colors, allshi):
     freqs = np.fft.rfftfreq(data.size, 1)
     invfr = 1/freqs
 
-    normco = np.sum(ps)
-
     barz = []
     xba = []
     for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
         xba.append('{} - {}'.format(bi0, bi1))
         okke = (bi0 <= invfr) & (invfr < bi1)
         gig = np.sum(ps[okke])
-        barz.append(gig/normco)
-    ax.bar(np.arange(len(barz))+shi, barz, color = col, width = 0.2)
+        barz.append(gig)
+    ax.bar(np.arange(len(barz)), barz, color = col)
+    ax.set_xticks(np.arange(len(barz)))
+    ax.set_xticklabels(xba, rotation = 30)
 
-ax.set_xticks(np.arange(len(barz)))
-ax.set_xticklabels(xba, rotation = 30)
-ax.set_xlabel('period (yr)')
+    ax.grid()
+    ax.set_title(ru)
+    if ax in axs[1, :]:
+        ax.set_xlabel('period (yr)')
 
-fig.savefig(cart_out + 'enso_spectra_bins11_rel.pdf')
+ctl.adjust_ax_scale(axs.flatten())
+fig.savefig(cart_out + 'amv_spectra_bins.pdf')
 
+allshi = [-0.3, -0.1, 0.1, 0.3]
 fig, ax = plt.subplots(figsize = (16,12))
 
 for ru, col, shi in zip(allru, colors, allshi):
@@ -430,16 +301,48 @@ ax.set_xticks(np.arange(len(barz)))
 ax.set_xticklabels(xba, rotation = 30)
 ax.set_xlabel('period (yr)')
 
-fig.savefig(cart_out + 'enso_spectra_bins11_abs.pdf')
+fig.savefig(cart_out + 'amv_spectra_bins11.pdf')
 
 
-nchu = 5
-nye = 100
-yesta = np.arange(0, 500, 100)
-colzz = ctl.color_set(5, cmap = 'viridis', use_seaborn=False)
+fig, ax = plt.subplots(figsize = (16,12))
+
+for ru, col, shi in zip(allru, colors, allshi):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data = piuz.values.flatten()
+    ps = np.abs(np.fft.rfft(data))**2
+
+    freqs = np.fft.rfftfreq(data.size, 1)
+    invfr = 1/freqs
+
+    normco = np.sum(ps)
+
+    barz = []
+    xba = []
+    for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+        xba.append('{} - {}'.format(bi0, bi1))
+        okke = (bi0 <= invfr) & (invfr < bi1)
+        gig = np.sum(ps[okke])
+        barz.append(gig)
+    ax.bar(np.arange(len(barz))+shi, barz, color = col, width = 0.2)
+
+ax.set_xticks(np.arange(len(barz)))
+ax.set_xticklabels(xba, rotation = 30)
+ax.set_xlabel('period (yr)')
+
+fig.savefig(cart_out + 'amv_spectra_bins11_rel.pdf')
+
+
+frbins = [1, 5, 20, 50, 100]
+nchu = 3
+nye = 200
+yesta = [0, 150, 300]
+colzz = ctl.color_set(3, cmap = 'viridis', use_seaborn=False)
+
+ps_max = dict()
+ps_ext = dict()
 
 fig, axs = plt.subplots(2, 2, figsize = (16,12))
-allshi = [-0.3, -0.15, 0., 0.15, 0.3]
+allshi = [-0.2, 0., 0.2]
 
 for ru, ax in zip(allru, axs.flatten()):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
@@ -460,7 +363,7 @@ for ru, ax in zip(allru, axs.flatten()):
             okke = (bi0 <= invfr) & (invfr < bi1)
             gig = np.sum(ps[okke])
             barz.append(gig)
-        ax.bar(np.arange(len(barz))+shi, barz, color = col, width = 0.15)
+        ax.bar(np.arange(len(barz))+shi, barz, color = col, width = 0.2)
 
     ax.set_xticks(np.arange(len(barz)))
     ax.set_xticklabels(xba, rotation = 30)
@@ -471,44 +374,6 @@ for ru, ax in zip(allru, axs.flatten()):
         ax.set_xticklabels(xba, rotation = 30)
         ax.set_xlabel('period (yr)')
 
-ctl.adjust_ax_scale(axs.flatten())
-fig.savefig(cart_out + 'enso_spectra_bins_varying.pdf')
-
-
-fig, axs = plt.subplots(2, 2, figsize = (16,12))
-allshi = [-0.3, -0.15, 0., 0.15, 0.3]
-
-for ru, ax in zip(allru, axs.flatten()):
-    piuz = enso[ru]['tos'].groupby('time.year').mean()
-    data_all = piuz.values.flatten()
-
-    for ich, ye1, col, shi in zip(range(nchu), yesta, colzz, allshi):
-        data = data_all[ye1:ye1+nye]
-        ps = np.abs(np.fft.rfft(data))**2
-
-        freqs = np.fft.rfftfreq(data.size, 1)
-
-        invfr = 1/freqs
-
-        normco = np.sum(ps)
-
-        barz = []
-        xba = []
-        for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
-            xba.append('{} - {}'.format(bi0, bi1))
-            okke = (bi0 <= invfr) & (invfr < bi1)
-            gig = np.sum(ps[okke])
-            barz.append(gig/normco)
-        ax.bar(np.arange(len(barz))+shi, barz, color = col, width = 0.15)
-
-    ax.set_xticks(np.arange(len(barz)))
-    ax.set_xticklabels(xba, rotation = 30)
-
-    ax.set_title(ru)
-    if ax in axs[1, :]:
-        ax.set_xticks(np.arange(len(barz)))
-        ax.set_xticklabels(xba, rotation = 30)
-        ax.set_xlabel('period (yr)')
 
 ctl.adjust_ax_scale(axs.flatten())
-fig.savefig(cart_out + 'enso_spectra_bins_varying_rel.pdf')
+fig.savefig(cart_out + 'amv_spectra_varying.pdf')
