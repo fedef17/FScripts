@@ -262,8 +262,8 @@ def make_XY(reg, comb, models = models_all, models_ok = models_ok_all, alldrivs 
     return X, Y
 
 
-for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, models_ok_cm6prim, models_ok_all], [models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
-
+#for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, models_ok_cm6prim, models_ok_all], [models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
+for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
     drilis = dcp(drilis_all)
     if ensmod not in ['solocmip5', 'all']:
         drilis.append(('NorthAtlantic', 'NorthAtlantic_SST-pattern'))
