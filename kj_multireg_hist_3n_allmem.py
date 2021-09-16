@@ -297,7 +297,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
         figscores[(reg, 1)] = (fig_score, axs)
         rsq_old[reg] = None
 
-    for nu, colnu in zip(np.arange(2, 9), ctl.color_set(8)):
+    for nu, colnu in zip(np.arange(2, 8), ctl.color_set(6)):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
