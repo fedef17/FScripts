@@ -173,6 +173,15 @@ for mod in models_ok_all:
                 exc_list.append(dritip)
                 kos = np.nan
 
+            if dritip == 'Arctic_Nov-mean':
+                if kos < 5 or kos > 35:
+                    print('Excluding Arctic_Nov-mean {}'.format(kos))
+                    kos = np.nan
+            elif dritip == 'NorthAtlantic_SST-grad':
+                if kos < -2:
+                    print('Excluding NorthAtlantic_SST-grad {}'.format(kos))
+                    kos = np.nan
+
             alldrivs[(dri, dritip, mod)] = kos
 
     if mod in models_5_ok:
@@ -289,10 +298,14 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
     xssdi = dict()
     for reg in regtip:
         fig_score, axs = plt.subplots(figsize=(12,8))
-        figscores[reg] = (fig_score, axs)
+        figscores[(reg, 0)] = (fig_score, axs)
+
+        fig_score, axs = plt.subplots(figsize=(12,8))
+        figscores[(reg, 1)] = (fig_score, axs)
+
         rsq_old[reg] = None
 
-    for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
+    for nu, colnu in zip(np.arange(2, 8), ctl.color_set(6)):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
@@ -309,6 +322,15 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
             for ii, comb in enumerate(allcombs):
                 # print(ii, comb)
                 X, Y = make_XY(reg, comb, models, models_ok, drilis = drilis)
+
+                crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
+                for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
+
+                if np.any(np.abs(crosscor) > 0.4):
+                    #print('Discarding.. too high correlation between drivers')
+                    okcombs[reg].append(comb)
+                    allscores[reg].append(np.zeros(len(Y.T)))
+                    continue
 
                 #model = LinearRegression().fit(X, Y)
                 model = Ridge().fit(X, Y)
@@ -560,7 +582,7 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
 
-                fig_score, axs = figscores[reg]
+                fig_score, axs = figscores[(reg, 0)]
                 if rsq_old[reg] is None:
                     rsq_old[reg] = len(rsq)*[0.0]
                 #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
@@ -573,6 +595,14 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
                 rsq_old[reg] = rsq
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
+                fig_score, axs = figscores[(reg, 1)]
+                xsss = np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)])
+                xssdi[reg] = xsss
+
+                enne = len(X)
+                adj_rsq = 1 - (1-rsq) *(enne-1)/(enne-nu-1)
+                axs.scatter(xsss+(nu-4.5)*0.05, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'o', s = 40, edgecolor = 'grey')
+
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
                 # print(reg, namti, np.mean(scoall[:ire]), np.mean(scoall[ire:]))
                 #axs.scatter(np.arange(len(rsq)), rsq, color = col)
@@ -581,11 +611,18 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
 
     for reg in regtip:
         cart_out = cart_out_gen.format(ensmod) + reg + '/'
-        fig_score, axs = figscores[reg]
+        fig_score, axs = figscores[(reg, 0)]
         axs.set_xticks(xssdi[reg], minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
         fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
+
+        fig_score, axs = figscores[(reg, 1)]
+        axs.set_xticks(xssdi[reg], minor = False)
+        axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+        axs.legend()
+        axs.set_ylabel(r'Adjusted $R^2$')
+        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}_{}.pdf'.format(reg, ensmod, katullo))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
