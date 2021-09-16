@@ -126,6 +126,8 @@ modgen_all = np.concatenate([modgen_cmip6, modgen_prim, modgen_5])
 cart_out_gen = cart_in + 'ensmean/results_{}/'
 ctl.mkdir(cart_in+'ensmean')
 
+katullo = 'ensmean'
+
 tuttecose = dict()
 
 regtip = ['U4', 'R3', 'R3n']
@@ -184,6 +186,17 @@ for mod in models_ok_all:
                 n_exc += 1
                 exc_list.append(dritip)
                 kos = np.nan
+
+            # Models with ArcticNov < 5 or > 35 were set to nan.
+            # Models with NA SST Grad < -2 were set to nan.
+            if dritip == 'Arctic_Nov-mean':
+                if kos < 5 or kos > 35:
+                    print('Excluding Arctic_Nov-mean {}'.format(kos))
+                    kos = np.nan
+            elif dritip == 'NorthAtlantic_SST-grad':
+                if kos < -2:
+                    print('Excluding NorthAtlantic_SST-grad {}'.format(kos))
+                    kos = np.nan
 
             alldrivs[(dri, dritip, mod)] = kos
 
@@ -436,7 +449,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 cb.set_label('Cross correlation', fontsize=20)
                 plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.92, wspace=0.05, hspace=0.20)
 
-                fig.savefig(cart_out + 'Crosscorr_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
+                fig.savefig(cart_out + 'Crosscorr_{}_{}_v2_{}driv_{}_{}.pdf'.format(reg, namti, nu, ensmod, katullo))
 
 
                 Xgi = sm.add_constant(X)
@@ -526,7 +539,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 cb.set_label('Regression coefficient', fontsize=20)
                 plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-                fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}.pdf'.format(reg, namti, nu, ensmod))
+                fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_{}.pdf'.format(reg, namti, nu, ensmod, katullo))
 
 
                 fig = plt.figure(figsize = figsize)
@@ -599,7 +612,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 cb.set_label('Regression coefficient', fontsize=20)
                 plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.50)
 
-                fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
+                fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit_{}.pdf'.format(reg, namti, nu, ensmod, katullo))
 
 
                 fig_score, axs = figscores[(reg, 0)]
@@ -637,14 +650,14 @@ for modgen, ensmod in zip([modgen_all], ['all']):
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
-        fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
+        fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}_{}.pdf'.format(reg, ensmod, katullo))
 
         fig_score, axs = figscores[(reg, 1)]
         axs.set_xticks(xssdi[reg], minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'Adjusted $R^2$')
-        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
+        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}_{}.pdf'.format(reg, ensmod, katullo))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
 
