@@ -329,11 +329,22 @@ for modgen, ensmod in zip([modgen_all], ['all']):
             print(reg)
             allscores[reg] = []
             okcombs[reg] = []
-
+            
+            topper = 0.
+            toppertag = ''
             # pesca i drivers, uno per tipo, e fai il model
             for ii, comb in enumerate(allcombs):
                 # print(ii, comb)
                 X, Y = make_XY(reg, comb, modgen, drilis = drilis)
+
+                crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
+                for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
+
+                if np.any(np.abs(crosscor) > 0.4):
+                    #print('Discarding.. too high correlation between drivers')
+                    okcombs[reg].append(comb)
+                    allscores[reg].append(np.zeros(len(Y.T)))
+                    continue
 
                 #model = LinearRegression().fit(X, Y)
                 model = Ridge().fit(X, Y)
@@ -342,6 +353,12 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
                 okcombs[reg].append(comb)
                 #print(pi, model.score(X, Y))
+
+                if np.mean(allscores[reg][-1]) > topper:
+                    topper = np.mean(allscores[reg][-1])
+                    toppertag = [drilis[co][1] for co in comb]
+                #print(pi, model.score(X, Y))
+            print(reg, topper, toppertag)
 
         pickle.dump([okcombs, allscores], open(cart_out_gen.format(ensmod) + 'allscores_v2_{}drivs_{}.p'.format(nu, ensmod), 'wb'))
         # fine.
@@ -630,3 +647,18 @@ for modgen, ensmod in zip([modgen_all], ['all']):
         fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
+
+dresss = dict()
+for ke in drilis:
+    dresss[ke[1]] = np.array([alldrivs[(ke[0], ke[1], mod)] for mod in models_ok_all])
+
+dreky = list(dress.keys())
+for ke in dresss:
+    for ku in dreky[dreky.index(ke):]:
+        if ke == ku: continue
+        kenan = ~np.isnan(dresss[ke])
+        kunan = ~np.isnan(dresss[ku])
+        allna = kenan & kunan
+        rco = ctl.Rcorr(dresss[ke][allna], dresss[ku][allna])
+        if np.abs(rco) > 0.3:
+            print(ke, ku, '    ->   {:5.2f}'.format(rco))
