@@ -583,7 +583,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
 
                 enne = len(X)
                 adj_rsq = 1 - (1-rsq) *(enne-1)/(enne-nu-1)
-                axs.scatter(xsss+(nu-4.5)*0.05, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'o', s = 20)
+                axs.scatter(xsss+(nu-4.5)*0.05, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'o', s = 40, edgecolor = 'grey')
 
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
