@@ -337,7 +337,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                     topper = np.mean(allscores[reg][-1])
                     toppertag = [drilis[co][1] for co in comb]
                 #print(pi, model.score(X, Y))
-            print(regtip, topper, toppertag)
+            print(reg, topper, toppertag)
 
         pickle.dump([okcombs, allscores], open(cart_out_gen.format(ensmod) + 'allscores_v2_{}drivs_{}.p'.format(nu, ensmod), 'wb'))
         # fine.
