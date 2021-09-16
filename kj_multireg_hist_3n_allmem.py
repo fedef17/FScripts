@@ -632,7 +632,7 @@ dresss = dict()
 for ke in drilis:
     dresss[ke[1]] = np.array([alldrivs[(ke[0], ke[1], mod)] for mod in models_ok_all])
 
-dreky = list(dress.keys())
+dreky = list(dresss.keys())
 for ke in dresss:
     for ku in dreky[dreky.index(ke):]:
         if ke == ku: continue
