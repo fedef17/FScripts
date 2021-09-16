@@ -320,7 +320,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
                 for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
 
-                if np.any(np.abs(crosscor) > 0.35):
+                if np.any(np.abs(crosscor) > 0.4):
                     #print('Discarding.. too high correlation between drivers')
                     okcombs[reg].append(comb)
                     allscores[reg].append(np.zeros(len(Y.T)))
