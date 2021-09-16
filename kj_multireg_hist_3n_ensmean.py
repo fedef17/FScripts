@@ -312,7 +312,9 @@ for modgen, ensmod in zip([modgen_all], ['all']):
     xssdi = dict()
     for reg in regtip:
         fig_score, axs = plt.subplots(figsize=(12,8))
-        figscores[reg] = (fig_score, axs)
+        figscores[(reg, 0)] = (fig_score, axs)
+        fig_score, axs = plt.subplots(figsize=(12,8))
+        figscores[(reg, 1)] = (fig_score, axs)
         rsq_old[reg] = None
 
     for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
@@ -583,7 +585,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
 
-                fig_score, axs = figscores[reg]
+                fig_score, axs = figscores[(reg, 0)]
                 if rsq_old[reg] is None:
                     rsq_old[reg] = len(rsq)*[0.0]
                 #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
@@ -594,6 +596,14 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 xssdi[reg] = xsss
                 axs.bar(xsss, rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
+
+                fig_score, axs = figscores[(reg, 1)]
+                xsss = np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)])
+                xssdi[reg] = xsss
+
+                enne = len(X)
+                adj_rsq = 1 - (1-rsq) *(enne-1)/(enne-nu-1)
+                axs.scatter(xsss, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'X')
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
@@ -604,11 +614,18 @@ for modgen, ensmod in zip([modgen_all], ['all']):
 
     for reg in regtip:
         cart_out = cart_out_gen.format(ensmod) + reg + '/'
-        fig_score, axs = figscores[reg]
+        fig_score, axs = figscores[(reg, 0)]
         axs.set_xticks(xssdi[reg], minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
         fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
+
+        fig_score, axs = figscores[(reg, 1)]
+        axs.set_xticks(xssdi[reg], minor = False)
+        axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+        axs.legend()
+        axs.set_ylabel(r'Adjusted $R^2$')
+        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))

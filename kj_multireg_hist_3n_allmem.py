@@ -292,7 +292,9 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
     xssdi = dict()
     for reg in regtip:
         fig_score, axs = plt.subplots(figsize=(12,8))
-        figscores[reg] = (fig_score, axs)
+        figscores[(reg, 0)] = (fig_score, axs)
+        fig_score, axs = plt.subplots(figsize=(12,8))
+        figscores[(reg, 1)] = (fig_score, axs)
         rsq_old[reg] = None
 
     for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
@@ -563,7 +565,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 fig.savefig(cart_out + 'Sm_{}_{}_v2_{}driv_{}_wsplit.pdf'.format(reg, namti, nu, ensmod))
 
 
-                fig_score, axs = figscores[reg]
+                fig_score, axs = figscores[(reg, 0)]
                 if rsq_old[reg] is None:
                     rsq_old[reg] = len(rsq)*[0.0]
                 #axs.plot(np.arange(len(rsq)), rsq, label = '{} driv'.format(nu), color = colnu)
@@ -574,6 +576,15 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 xssdi[reg] = xsss
                 axs.bar(xsss, rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
+
+                fig_score, axs = figscores[(reg, 1)]
+                xsss = np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)])
+                xssdi[reg] = xsss
+
+                enne = len(X)
+                adj_rsq = 1 - (1-rsq) *(enne-1)/(enne-nu-1)
+                axs.scatter(xsss, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'X')
+
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
@@ -584,11 +595,52 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
 
     for reg in regtip:
         cart_out = cart_out_gen.format(ensmod) + reg + '/'
-        fig_score, axs = figscores[reg]
+        fig_score, axs = figscores[(reg, 0)]
         axs.set_xticks(xssdi[reg], minor = False)
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'$R^2$')
         fig_score.savefig(cart_out + 'Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
 
+        fig_score, axs = figscores[(reg, 1)]
+        axs.set_xticks(xssdi[reg], minor = False)
+        axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
+        axs.legend()
+        axs.set_ylabel(r'Adjusted $R^2$')
+        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
+
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
+
+
+dresss = dict()
+for ke in drilis:
+    dresss[ke[1]] = np.array([alldrivs[(ke[0], ke[1], mod)] for mod in models_ok_all])
+
+for ke in dresss:
+    for ku in dresss:
+        if ke == ku: continue
+        kenan = ~np.isnan(dresss[ke])
+        kunan = ~np.isnan(dresss[ku])
+        allna = kenan & kunan
+        rco = ctl.Rcorr(dresss[ke][allna], dresss[ku][allna])
+        if np.abs(rco) > 0.3:
+            print(ke, ku, '    ->   {:5.2f}'.format(rco))
+
+plt.scatter(dresss['atm_res'], dresss['NorthAtlantic_SST-mean'])
+plt.scatter(np.arange(len(models_ok_all)), dresss['NorthAtlantic_SST-mean'])
+
+
+# NorthAtlantic_SST-mean NorthAtlantic_SST-grad     ->    0.60
+# NorthAtlantic_SST-mean Arctic_PC1-pattern     ->    0.31
+# NorthAtlantic_SST-grad NorthAtlantic_SST-mean     ->    0.60
+# NorthAtlantic_SST-grad JetSpeed     ->    0.30
+# Arctic_PC1-pattern NorthAtlantic_SST-mean     ->    0.31
+# Arctic_PC1-pattern Arctic_Nov-mean     ->   -0.32
+# Arctic_PC1-pattern QBO-std10     ->    0.31
+# Arctic_Nov-mean Arctic_PC1-pattern     ->   -0.32
+# QBO-std10 Arctic_PC1-pattern     ->    0.31
+# QBO-std10 atm_res     ->   -0.38
+# PolarVortex-var JetSpeed     ->    0.48
+# JetSpeed NorthAtlantic_SST-grad     ->    0.30
+# JetSpeed PolarVortex-var     ->    0.48
+# atm_res QBO-std10     ->   -0.38
