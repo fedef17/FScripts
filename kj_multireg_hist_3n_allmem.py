@@ -321,7 +321,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 if nu <= 7 and np.any(np.abs(crosscor) > 0.3):
                     print('Discarding.. too high correlation between drivers')
                     okcombs[reg].append(comb)
-                    allscores[reg].append(np.zeros(len(Y)))
+                    allscores[reg].append(np.zeros(len(Y.T)))
                     continue
 
                 #model = LinearRegression().fit(X, Y)
