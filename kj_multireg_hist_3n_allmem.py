@@ -315,6 +315,15 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 # print(ii, comb)
                 X, Y = make_XY(reg, comb, models, models_ok, drilis = drilis)
 
+                crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
+                for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
+
+                if nu <= 7 and np.any(np.abs(crosscor) > 0.3):
+                    print('Discarding.. too high correlation between drivers')
+                    okcombs[reg].append(comb)
+                    allscores[reg].append(np.zeros(len(Y)))
+                    continue
+
                 #model = LinearRegression().fit(X, Y)
                 model = Ridge().fit(X, Y)
 
