@@ -311,6 +311,8 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
             okcombs[reg] = []
 
             # pesca i drivers, uno per tipo, e fai il model
+            topper = 0.
+            toppertag = ''
             for ii, comb in enumerate(allcombs):
                 # print(ii, comb)
                 X, Y = make_XY(reg, comb, models, models_ok, drilis = drilis)
@@ -330,7 +332,12 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 #allscores[reg].append(model.score(X, Y))
                 allscores[reg].append(r2_score(Y, model.predict(X), multioutput='raw_values'))
                 okcombs[reg].append(comb)
+
+                if np.mean(allscores[reg][-1]) > topper:
+                    topper = np.mean(allscores[reg][-1])
+                    toppertag = [drilis[co][1] for co in comb]
                 #print(pi, model.score(X, Y))
+            print(regtip, topper, toppertag)
 
         pickle.dump([okcombs, allscores], open(cart_out_gen.format(ensmod) + 'allscores_v2_{}drivs_{}.p'.format(nu, ensmod), 'wb'))
         # fine.
