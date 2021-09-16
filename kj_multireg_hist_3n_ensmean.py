@@ -650,7 +650,7 @@ pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
 
 dresss = dict()
 for ke in drilis:
-    dresss[ke[1]] = np.array([alldrivs_em[(ke[0], ke[1], mod)] for mod in models_ok_all])
+    dresss[ke[1]] = np.array([alldrivs_em[(ke[0], ke[1], mod)] for mod in modgen_all])
 
 dreky = list(dresss.keys())
 for ke in dresss:
