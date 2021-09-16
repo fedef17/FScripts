@@ -297,7 +297,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
         figscores[(reg, 1)] = (fig_score, axs)
         rsq_old[reg] = None
 
-    for nu, colnu in zip(np.arange(2, 10), ctl.color_set(8)):
+    for nu, colnu in zip(np.arange(2, 9), ctl.color_set(8)):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
@@ -318,7 +318,7 @@ for models_ok, models, ensmod in zip([models_ok_all], [models_all], ['all']):
                 crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
                 for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
 
-                if nu <= 7 and np.any(np.abs(crosscor) > 0.3):
+                if np.any(np.abs(crosscor) > 0.35):
                     print('Discarding.. too high correlation between drivers')
                     okcombs[reg].append(comb)
                     allscores[reg].append(np.zeros(len(Y.T)))
