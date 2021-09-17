@@ -126,7 +126,7 @@ models_ok_all = models_cmip6 + models_prim + models_5_ok
 #models_all = models_cm6_full + models_prim + models_5
 models_all = models_cm6_full + models_prim + models_5_ok
 
-modgen_all = np.concatenate([modgen_cmip6, modgen_prim, modgen_5])
+modgen_all = np.unique(np.concatenate([modgen_cmip6, modgen_prim, modgen_5])) ## avoid double weighting
 
 cart_out_gen = cart_in + 'ensmean/results_{}/'
 ctl.mkdir(cart_in+'ensmean')
