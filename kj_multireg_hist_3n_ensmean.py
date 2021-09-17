@@ -106,7 +106,11 @@ for mod in models_5:
     gigi5[mod].update(gigi5_old[mod])
     gigi5[mod]['R3n']['mean'] = gigi5_old[mod]['R3']['mean']
 
-gigi.update(gigi5)
+gigi5_new = dict()
+for mod, modok in zip(models_5, models_5_ok):
+    gigi5_new[modok] = gigi5[mod] ### changing mod5 names!
+
+gigi.update(gigi5_new)
 
 modgen_5 = np.unique([mo.split('_')[0] for mo in models_5_ok])
 
@@ -119,7 +123,8 @@ models_ok_cm6prim = models_cmip6 + models_prim
 models_cm6prim = models_cm6_full + models_prim
 
 models_ok_all = models_cmip6 + models_prim + models_5_ok
-models_all = models_cm6_full + models_prim + models_5
+#models_all = models_cm6_full + models_prim + models_5
+models_all = models_cm6_full + models_prim + models_5_ok
 
 modgen_all = np.concatenate([modgen_cmip6, modgen_prim, modgen_5])
 
