@@ -249,7 +249,7 @@ for mod in modgen_all:
 ##############
 
 for reg in regtip:
-    for models, ensmod in zip([models_cm6_full, models_prim, models_5, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
+    for models, ensmod in zip([models_cm6_full, models_prim, models_5_ok, models_cm6prim, models_all], ['solocmip6', 'soloprim', 'solocmip5', 'cmip6prim', 'all']):
         Y = []
         for mod in models:
             Y.append([gigi[mod][reg][metr[0]][metr[1]] for metr in metrics[reg]])
