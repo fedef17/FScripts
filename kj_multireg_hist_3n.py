@@ -623,6 +623,6 @@ for models_ok, models, ensmod in zip([models_cmip6, models_prim, models_5_ok, mo
         axs.set_xticklabels(metrnam[reg], ha='center', rotation = 30)
         axs.legend()
         axs.set_ylabel(r'Adjusted $R^2$')
-        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}_{}.pdf'.format(reg, ensmod, katullo))
+        fig_score.savefig(cart_out + 'Adj_Rsquared_{}_v2_{}.pdf'.format(reg, ensmod))
 
 pickle.dump(tuttecose, open(cart_out + 'tuttecose_wcmip5.p', 'wb'))
