@@ -100,7 +100,7 @@ for var, vcen in zip(['tas', 'pr', 'clt', 'rlut'], vcenall):
     tits = []
 
     for ru in allru[1:]:
-        for cent, start, end in zip(['1st', '2nd', 'slow'], [0, 100, 200], [100, 200, 500]):
+        for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
             var_trend = trendz[(var, ru, cent)]
             figtrend.append(var_trend)
             fighatch.append(trendz[(var, ru, cent, 'pval')] < 0.05)
