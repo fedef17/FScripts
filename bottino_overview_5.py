@@ -236,7 +236,7 @@ for tip in ['all', 'land', 'oce']:
 
         #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
 
-        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, vmin = -0.35, vmax = 0.35)#, norm = divnorm)
+        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, vmin = -0.25, vmax = 0.25)#, norm = divnorm)
         #ax.set_xscale('logit')
 
         ax.set_xscale('function', functions = funcsca)
