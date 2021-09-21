@@ -171,6 +171,8 @@ for tip in ['all', 'land', 'oce']:
         ax.set_xticks([20., 50, 100, 200, 300, 500])
         if ru == allru[1]:
             ax.set_yticks(np.arange(-90, 91, 30))
+        else:
+            ax.set_yticks([])
 
         #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
 
@@ -187,7 +189,8 @@ for tip in ['all', 'land', 'oce']:
     cosopi = yeamean[('pi', var)]
     cosohist = yeamean[('hist', var)]
     cosossp = yeamean[('ssp585', var)]
-    cosobase = xr.concat([cosohist, cosossp], dim = 'year')
+    cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
+
 
     ypre = 30
 
@@ -240,6 +243,8 @@ for tip in ['all', 'land', 'oce']:
         ax.set_xticks([20., 50, 100, 200, 300, 500])
         if ru == allru[1]:
             ax.set_yticks(np.arange(-90, 91, 30))
+        else:
+            ax.set_yticks([])
 
         #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
     cax = plt.axes([0.1, 0.1, 0.8, 0.05])
