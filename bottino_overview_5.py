@@ -127,18 +127,22 @@ for tip in ['all', 'land', 'oce']:
     cosopi = yeamean[('pi', var)]
     cosohist = yeamean[('hist', var)]
     cosossp = yeamean[('ssp585', var)]
-    cosobase = xr.concat([cosohist, cosossp], dim = 'year')
+    cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
 
     ypre = 30
 
-    fig, axs = plt.subplots(1, 3, figsize = (16,6))
+    fig, axs = plt.subplots(1, 3, figsize = (16,7))
     for ru, ax in zip(allru[1:], axs.flatten()):
         coso = yeamean[(ru, var)]
 
         if tip == 'oce':
             coso = coso.where(oce_mask)
+            cosobase = cosohistssp.where(oce_mask)
         elif tip == 'land':
             coso = coso.where(~oce_mask)
+            cosobase = cosohistssp.where(~oce_mask)
+        else:
+            cosobase = cosohistssp
 
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
@@ -153,7 +157,7 @@ for tip in ['all', 'land', 'oce']:
             cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
             cosmu = ctl.butter_filter(cosolat, smut)
 
-            base = float(cosossp.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
 
             relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             matrix.append(relcha)
@@ -165,7 +169,8 @@ for tip in ['all', 'land', 'oce']:
 
         ax.set_xscale('function', functions = funcsca)
         ax.set_xticks([20., 50, 100, 200, 300, 500])
-        ax.set_yticks(np.arange(-90, 91, 30))
+        if ru == allru[1]:
+            ax.set_yticks(np.arange(-90, 91, 30))
 
         #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
 
@@ -186,14 +191,18 @@ for tip in ['all', 'land', 'oce']:
 
     ypre = 30
 
-    fig, axs = plt.subplots(1, 3, figsize = (16,5))
+    fig, axs = plt.subplots(1, 3, figsize = (16,7))
     for ru, ax in zip(allru[1:], axs.flatten()):
         coso = yeamean[(ru, var)]
 
         if tip == 'oce':
             coso = coso.where(oce_mask)
+            cosobase = cosohistssp.where(oce_mask)
         elif tip == 'land':
             coso = coso.where(~oce_mask)
+            cosobase = cosohistssp.where(~oce_mask)
+        else:
+            cosobase = cosohistssp
 
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
@@ -212,7 +221,7 @@ for tip in ['all', 'land', 'oce']:
             #base = cosmu[0]
             #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
             #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
-            base = float(cosossp.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
 
             # relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             # if np.mean(cosmu[-ypre:]) - base < 0.001*base:
@@ -229,7 +238,8 @@ for tip in ['all', 'land', 'oce']:
 
         ax.set_xscale('function', functions = funcsca)
         ax.set_xticks([20., 50, 100, 200, 300, 500])
-        ax.set_yticks(np.arange(-90, 91, 30))
+        if ru == allru[1]:
+            ax.set_yticks(np.arange(-90, 91, 30))
 
         #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
     cax = plt.axes([0.1, 0.1, 0.8, 0.05])
