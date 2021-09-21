@@ -234,9 +234,9 @@ for tip in ['all', 'land', 'oce']:
 
         matrix = np.stack(matrix)
 
-        divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
+        #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
 
-        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, norm = divnorm)
+        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, vmin = -0.35, vmax = 0.35)#, norm = divnorm)
         #ax.set_xscale('logit')
 
         ax.set_xscale('function', functions = funcsca)
