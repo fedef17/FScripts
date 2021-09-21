@@ -84,12 +84,17 @@ for var in ['tas', 'pr']:
 import matplotlib as mpl
 #cmappa = cm.get_cmap('viridis', 13)
 
-colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
-colo = colo.split()
-colo = colo[::-1]
-cmappa = mpl.colors.ListedColormap(colo)
+# colo = '#a50026 #d73027 #f46d43 #fdae61 #fee090 #ffffff #e0f3f8 #abd9e9 #74add1 #4575b4 #313695'
+# colo = colo.split()
+# colo = colo[::-1]
+# cmappa = mpl.colors.ListedColormap(colo)
+cmappa = cm.get_cmap('RdBu_r', 15)
 cmappa.set_over('#800026') #662506
 cmappa.set_under('#023858') #542788
+
+cmappa2 = cm.get_cmap('BrBG', 17)
+# cmappa.set_over('#800026') #662506
+# cmappa.set_under('#023858') #542788
 
 latbins = np.arange(-90, 91, 10)
 lacol = ctl.color_set(18, use_seaborn=False)
@@ -236,7 +241,7 @@ for tip in ['all', 'land', 'oce']:
 
         #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
 
-        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, vmin = -0.25, vmax = 0.25)#, norm = divnorm)
+        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa2, vmin = -0.3, vmax = 0.3)#, norm = divnorm)
         #ax.set_xscale('logit')
 
         ax.set_xscale('function', functions = funcsca)
