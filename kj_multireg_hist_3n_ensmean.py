@@ -341,7 +341,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
         figscores[(reg, 1)] = (fig_score, axs)
         rsq_old[reg] = None
 
-    for nu, colnu in zip(np.arange(2, 8), ctl.color_set(6)):
+    for nu, colnu in zip(np.arange(2, 7), ctl.color_set(6)):
         print('Finding best {} drivers'.format(nu))
         allcombs = list(itt.combinations(range(len(drilis)), nu))
 
@@ -360,6 +360,12 @@ for modgen, ensmod in zip([modgen_all], ['all']):
             for ii, comb in enumerate(allcombs):
                 # print(ii, comb)
                 X, Y = make_XY(reg, comb, modgen, drilis = drilis)
+
+                tipik = [drilis[co][0] for co in comb]
+                if nu < 7 and len(np.unique(tipik)) < len(tipik): # single driver from each family
+                    okcombs[reg].append(comb)
+                    allscores[reg].append(np.zeros(len(Y.T)))
+                    continue
 
                 crosscor = np.cov(X.T)/np.cov(X.T)[0,0]
                 for iko in range(len(crosscor)): crosscor[iko,iko] = 0.
@@ -395,6 +401,10 @@ for modgen, ensmod in zip([modgen_all], ['all']):
         cmappa = colors.ListedColormap(colo)
         cmappa.set_over('#800026') #662506
         cmappa.set_under('#023858') #542788
+
+        cmappa2 = colors.ListedColormap(colo[1:-1])
+        cmappa2.set_over('#800026') #662506
+        cmappa2.set_under('#023858') #542788
 
         for reg in regtip:
             cart_out = cart_out_gen.format(ensmod) + reg + '/'
@@ -442,10 +452,10 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 fig, ax = plt.subplots(figsize=(16,12))
 
                 ndriv = len(comb)
-                vmi = 0.6
+                vmi = 0.45
                 ext = [0, ndriv, 0, ndriv]
 
-                gigifig = ax.imshow(crosscor, vmin = -vmi, vmax = vmi, cmap = cmappa, origin = 'upper',  extent = ext, aspect = 1)
+                gigifig = ax.imshow(crosscor, vmin = -vmi, vmax = vmi, cmap = cmappa2, origin = 'upper',  extent = ext, aspect = 1)
 
                 ax.xaxis.tick_top()
                 ax.set_xticks(0.5+np.arange(len(top_comb)), minor = False)
