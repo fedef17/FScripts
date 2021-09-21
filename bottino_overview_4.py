@@ -100,14 +100,14 @@ for var, vcen in zip(['tas', 'pr', 'clt', 'rlut'], vcenall):
     tits = []
 
     for ru in allru[1:]:
-        for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
+        for cent, start, end in zip(['1st', '2nd', 'slow'], [0, 100, 200], [100, 200, 500]):
             var_trend = trendz[(var, ru, cent)]
             figtrend.append(var_trend)
-            fighatch.append(trendz[(var, ru, cent, 'pval')] < 0.01)
+            fighatch.append(trendz[(var, ru, cent, 'pval')] < 0.05)
             tits.append(ru + ' - ' + cent)
 
-    c5 = np.percentile(figtrend, 2)
-    c95 = np.percentile(figtrend, 98)
+    c5 = np.percentile(figtrend, 5)
+    c95 = np.percentile(figtrend, 95)
     divnorm = colors.TwoSlopeNorm(vmin=c5, vcenter=vcen, vmax=c95)
 
     ctl.plot_multimap_contour(figtrend, coso.lat, coso.lon, filename = cart_out+var+'_trendz.pdf', fix_subplots_shape = (3,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = tits, add_hatching = fighatch)#, n_color_levels = 11)
@@ -118,6 +118,6 @@ for var, vcen in zip(['tas', 'pr', 'clt', 'rlut'], vcenall):
 
     for ru in allru2[-2:]:
         var_trend = trendz[(var, ru)]
-        var_hatch = trendz[(var, ru, 'pval')] < 0.01
+        var_hatch = trendz[(var, ru, 'pval')] < 0.05
 
         ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch)#, n_color_levels = 11)
