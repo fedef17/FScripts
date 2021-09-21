@@ -129,7 +129,7 @@ for tip in ['all', 'land', 'oce']:
     cosossp = yeamean[('ssp585', var)]
     cosobase = xr.concat([cosohist, cosossp], dim = 'year')
 
-    ypre = 10
+    ypre = 30
 
     fig, axs = plt.subplots(1, 3, figsize = (16,6))
     for ru, ax in zip(allru[1:], axs.flatten()):
@@ -152,11 +152,7 @@ for tip in ['all', 'land', 'oce']:
             print(la1,la2)
             cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
             cosmu = ctl.butter_filter(cosolat, smut)
-            #ax.plot(coso.year, cosmu, color = col)
 
-            #base = cosmu[0]
-            #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
-            #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
             base = float(cosossp.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
 
             relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
@@ -226,7 +222,7 @@ for tip in ['all', 'land', 'oce']:
 
         matrix = np.stack(matrix)
 
-        divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.05, vcenter=0., vmax=0.2)
+        divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
 
         pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa, norm = divnorm)
         #ax.set_xscale('logit')
