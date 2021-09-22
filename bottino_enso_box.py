@@ -475,6 +475,45 @@ ctl.adjust_ax_scale(axs.flatten())
 fig.savefig(cart_out + 'enso_spectra_bins_varying.pdf')
 
 
+fig, ax = plt.subplots(figsize = (16,12))
+allshi = [-0.3, -0.1, 0.1, 0.3]
+
+for ru, col, shi in zip(allru, colors, allshi):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data_all = piuz.values.flatten()
+
+    for ich, ye1 in zip(range(nchu), yesta):
+        data = data_all[ye1:ye1+nye]
+        ps = np.abs(np.fft.rfft(data))**2
+
+        freqs = np.fft.rfftfreq(data.size, 1)
+
+        invfr = 1/freqs
+
+        barz = []
+        xba = []
+        for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+            xba.append('{} - {}'.format(bi0, bi1))
+            okke = (bi0 <= invfr) & (invfr < bi1)
+            gig = np.sum(ps[okke])
+            barz.append(gig)
+
+    barz
+
+    ax.set_xticks(np.arange(len(barz)))
+    ax.set_xticklabels(xba, rotation = 30)
+
+    ax.set_title(ru)
+    if ax in axs[1, :]:
+        ax.set_xticks(np.arange(len(barz)))
+        ax.set_xticklabels(xba, rotation = 30)
+        ax.set_xlabel('period (yr)')
+
+ctl.adjust_ax_scale(axs.flatten())
+fig.savefig(cart_out + 'enso_spectra_bins_boxes.pdf')
+
+
+
 fig, axs = plt.subplots(2, 2, figsize = (16,12))
 allshi = [-0.3, -0.15, 0., 0.15, 0.3]
 
