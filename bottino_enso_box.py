@@ -377,7 +377,7 @@ cb.set_label('Enso peak amp')
 
 fig.savefig(cart_out + 'ensofreqwidth_vs_tas.pdf')
 
-frbins = [2, 4, 6, 8, 10, 20]
+frbins = [2, 4, 6, 10, 20]
 
 allshi = [-0.3, -0.1, 0.1, 0.3]
 fig, ax = plt.subplots(figsize = (16,12))
@@ -482,6 +482,7 @@ for ru, col, shi in zip(allru, colors, allshi):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     data_all = piuz.values.flatten()
 
+    allcose = []
     for ich, ye1 in zip(range(nchu), yesta):
         data = data_all[ye1:ye1+nye]
         ps = np.abs(np.fft.rfft(data))**2
@@ -497,19 +498,23 @@ for ru, col, shi in zip(allru, colors, allshi):
             okke = (bi0 <= invfr) & (invfr < bi1)
             gig = np.sum(ps[okke])
             barz.append(gig)
+        allcose.append(barz)
 
-    barz
+    allcose = np.stack(allcose)
+    nboxs = allcose.shape[1]
 
-    ax.set_xticks(np.arange(len(barz)))
-    ax.set_xticklabels(xba, rotation = 30)
+    allpercs = dict()
+    for nu, realnu in zip([10, 25, 50, 75, 90], [0, 20, 50, 80, 100]):
+        allpercs['p{}'.format(nu)] = [np.percentile(allcose[:, iup], realnu) for iup in range(nboxs)]
 
-    ax.set_title(ru)
-    if ax in axs[1, :]:
-        ax.set_xticks(np.arange(len(barz)))
-        ax.set_xticklabels(xba, rotation = 30)
-        ax.set_xlabel('period (yr)')
+    positions = np.arange(nboxs) + shi
 
-ctl.adjust_ax_scale(axs.flatten())
+    ctl.boxplot_on_ax(ax, allpercs, xba, nboxs*[col], positions = positions, edge_colors = nboxs*[col], plot_mean = False, plot_minmax = False, plot_ensmeans = False, wi = 0.1)
+
+ax.set_xticks(np.arange(nboxs))
+ax.set_xticklabels(xba, rotation = 30)
+ax.set_xlabel('period (yr)')
+
 fig.savefig(cart_out + 'enso_spectra_bins_boxes.pdf')
 
 
