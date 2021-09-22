@@ -146,7 +146,7 @@ for var, vcen, cmap in zip(['tas', 'pr', 'clt', 'rlut'], vcenall, cmapall):
         var_trend = trendz[(var, ru)]
         var_hatch = trendz[(var, ru, 'pval')] < 0.05
 
-        ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch, cmap = cmap, n_color_levels = 13, n_color_levels = 11, hatch_styles = ['///', '', ''])
+        ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch, cmap = cmap, n_color_levels = 13, hatch_styles = ['///', '', ''])
 
     #### Now fig with ssp585 and all botts
     okfi = [trendz[(var, ru)] for ru in ['ssp585'] + allru[1:]]
