@@ -94,9 +94,11 @@ trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 pimepr = yeamean[('pi', 'pr')].mean('year')
 for ru in allru2:
     trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr
+    trendz[('pr_rel', ru, 'pval')] = trendz[('pr', ru, 'pval')]
     for cent in ['1st', '2nd', '5th']:
         if ('pr', ru, cent) in trendz:
             trendz[('pr_rel', ru, cent)] = trendz[('pr', ru, cent)]/pimepr
+            trendz[('pr_rel', ru, cent, 'pval')] = trendz[('pr', ru, cent, 'pval')]
 
 coso = yeamean[('b025', 'tas')]
 
