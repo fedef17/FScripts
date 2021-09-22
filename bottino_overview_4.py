@@ -88,30 +88,7 @@ from matplotlib import colors
 #
 # pickle.dump(trendz, open(cart_out + 'trendz.p', 'wb'))
 
-trendz2 = dict()
-for var in ['tas', 'pr', 'clt', 'rlut']:
-    print(var)
-    for ru in allru2:
-        print(ru)
-        if ru[0] != 'b': continue
-
-        gtas = glomeans[(ru, var)][1]
-        g50 = ctl.butter_filter(gtas, 50)
-
-        coso = yeamean[(ru, var)]
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50, coso)
-
-        trendz2[(var, ru)] = var_trend
-        trendz2[(var, ru, 'err')] = var_trend_err
-        trendz2[(var, ru, 'pval')] = var_pval
-
 trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
-trendz.update(trendz2)
-
-pickle.dump(trendz, open(cart_out + 'trendz.p', 'wb'))
-
-# trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 
 coso = yeamean[('b025', 'tas')]
 
@@ -153,4 +130,4 @@ for var, vcen, cmap in zip(['tas', 'pr', 'clt', 'rlut'], vcenall, cmapall):
     okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in ['ssp585'] + allru[1:]]
     oktit = ['ssp585'] + allru[1:]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 13, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,2), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 13, hatch_styles = ['////', '', ''])
