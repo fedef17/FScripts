@@ -90,12 +90,20 @@ from matplotlib import colors
 
 trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 
+## creating relative trend for pr
+pimepr = yeamean[('pi', 'pr')].mean('year')
+for ru in allru2:
+    trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr
+    for cent in ['1st', '2nd', '5th']:
+        if ('pr', ru, cent) in trendz:
+            trendz[('pr_rel', ru, cent)] = trendz[('pr', ru, cent)]/pimepr
+
 coso = yeamean[('b025', 'tas')]
 
 #Figures
-vcenall = [1., 0., 0., 0.]
-cmapall = ['RdBu_r', 'BrBG', 'BrBG', 'RdBu_r']
-for var, vcen, cmap in zip(['tas', 'pr', 'clt', 'rlut'], vcenall, cmapall):
+vcenall = [1., 0., 0., 0., 0.]
+cmapall = ['RdBu_r', 'BrBG', 'BrBG', 'BrBG', 'RdBu_r']
+for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmapall):
     figtrend = []
     fighatch = []
     tits = []
@@ -111,23 +119,23 @@ for var, vcen, cmap in zip(['tas', 'pr', 'clt', 'rlut'], vcenall, cmapall):
     c95 = np.percentile(figtrend, 95)
     divnorm = colors.TwoSlopeNorm(vmin=c5, vcenter=vcen, vmax=c95)
 
-    ctl.plot_multimap_contour(figtrend, coso.lat, coso.lon, filename = cart_out+var+'_trendz.pdf', fix_subplots_shape = (3,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = tits, add_hatching = fighatch, cmap = cmap, n_color_levels = 13, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(figtrend, coso.lat, coso.lon, filename = cart_out+var+'_trendz.pdf', fix_subplots_shape = (3,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = tits, add_hatching = fighatch, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
 
     okfi = [fi for fi, tit in zip(figtrend, tits) if '1st' in tit]+[fi for fi, tit in zip(figtrend, tits) if '5th' in tit]
     oktit = [tit for tit in tits if '1st' in tit]+[tit for tit in tits if '5th' in tit]
     okha = [fi for fi, tit in zip(fighatch, tits) if '1st' in tit]+[fi for fi, tit in zip(fighatch, tits) if '5th' in tit]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendz_fastslow.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 13, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendz_fastslow.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
 
     for ru in ['pi']+allru2[-2:]:
         var_trend = trendz[(var, ru)]
         var_hatch = trendz[(var, ru, 'pval')] < 0.05
 
-        ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch, cmap = cmap, n_color_levels = 13, hatch_styles = ['///', '', ''])
+        ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch, cmap = cmap, n_color_levels = 17, hatch_styles = ['///', '', ''])
 
     #### Now fig with ssp585 and all botts
     okfi = [trendz[(var, ru)] for ru in ['ssp585'] + allru[1:]]
     okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in ['ssp585'] + allru[1:]]
     oktit = ['ssp585'] + allru[1:]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,2), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 13, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,2), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
