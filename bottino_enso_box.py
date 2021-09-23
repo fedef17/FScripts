@@ -512,8 +512,11 @@ for ru, col, shi in zip(allru, colors, allshi):
     ctl.boxplot_on_ax(ax, allpercs, xba, nboxs*[col], positions = positions, edge_colors = nboxs*[col], plot_mean = False, plot_minmax = False, plot_ensmeans = False, wi = 0.1)
 
 ax.set_xticks(np.arange(nboxs))
+for ii in np.arange(nboxs-1) + 0.5:
+    ax.axvline(ii, color = 'grey', linestyle = ':', linewidth = 0.1)
 ax.set_xticklabels(xba, rotation = 30)
-ax.set_xlabel('period (yr)')
+ax.set_xlabel('Period (yr)')
+ax.set_ylabel(r'Integrated spectral power ($K^2$)')
 
 fig.savefig(cart_out + 'enso_spectra_bins_boxes.pdf')
 

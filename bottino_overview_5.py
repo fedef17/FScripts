@@ -88,9 +88,9 @@ import matplotlib as mpl
 # colo = colo.split()
 # colo = colo[::-1]
 # cmappa = mpl.colors.ListedColormap(colo)
-cmappa = cm.get_cmap('RdBu_r', 15)
-cmappa.set_over('#800026') #662506
-cmappa.set_under('#023858') #542788
+cmappa = cm.get_cmap('RdBu_r', 17)
+#cmappa.set_over('#800026') #662506
+#cmappa.set_under('#023858') #542788
 
 cmappa2 = cm.get_cmap('BrBG', 17)
 # cmappa.set_over('#800026') #662506

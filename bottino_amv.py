@@ -377,3 +377,48 @@ for ru, ax in zip(allru, axs.flatten()):
 
 ctl.adjust_ax_scale(axs.flatten())
 fig.savefig(cart_out + 'amv_spectra_varying.pdf')
+
+fig, ax = plt.subplots(figsize = (16,12))
+allshi = [-0.3, -0.1, 0.1, 0.3]
+
+for ru, col, shi in zip(allru, colors, allshi):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data_all = piuz.values.flatten()
+
+    allcose = []
+    for ich, ye1 in zip(range(nchu), yesta):
+        data = data_all[ye1:ye1+nye]
+        ps = np.abs(np.fft.rfft(data))**2
+
+        freqs = np.fft.rfftfreq(data.size, 1)
+
+        invfr = 1/freqs
+
+        barz = []
+        xba = []
+        for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+            xba.append('{} - {}'.format(bi0, bi1))
+            okke = (bi0 <= invfr) & (invfr < bi1)
+            gig = np.sum(ps[okke])
+            barz.append(gig)
+        allcose.append(barz)
+
+    allcose = np.stack(allcose)
+    nboxs = allcose.shape[1]
+
+    allpercs = dict()
+    for nu, realnu in zip([10, 25, 50, 75, 90], [0, 20, 50, 80, 100]):
+        allpercs['p{}'.format(nu)] = [np.percentile(allcose[:, iup], realnu) for iup in range(nboxs)]
+
+    positions = np.arange(nboxs) + shi
+
+    ctl.boxplot_on_ax(ax, allpercs, xba, nboxs*[col], positions = positions, edge_colors = nboxs*[col], plot_mean = False, plot_minmax = False, plot_ensmeans = False, wi = 0.1)
+
+ax.set_xticks(np.arange(nboxs))
+for ii in np.arange(nboxs-1) + 0.5:
+    ax.axvline(ii, color = 'grey', linestyle = ':', linewidth = 0.1)
+ax.set_xticklabels(xba, rotation = 30)
+ax.set_xlabel('Period (yr)')
+ax.set_ylabel(r'Integrated spectral power ($K^2$)')
+
+fig.savefig(cart_out + 'amv_spectra_bins_boxes.pdf')
