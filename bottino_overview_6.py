@@ -94,7 +94,7 @@ for ru, shi, col in zip(allru, allshi, colors):
         gig = np.sum(ps[okke])
         barz.append(gig)
 
-    ax_ps.bar(np.arange(len(barz))+shi, barz, width = 0.15, color = col, alpha = 0.6)
+    ax_ps.bar(np.arange(len(barz))+shi, barz, width = 0.15, color = col, alpha = 0.7, label = ru)
 
 #    allfigs.append(fig)
 
@@ -127,6 +127,7 @@ for ru, shi, col in zip(allru, allshi, colors):
     #
     # ctl.plot_pdfpages(cart_out + 'gtas_oscillations_{}.pdf'.format(ru), allfigs)
 
+ax_ps.legend()
 ax_ps.set_xticks(np.arange(len(barz)))
 ax_ps.set_xticklabels(xba, rotation = 30)
 ax_ps.set_xlabel('Period (yr)')
