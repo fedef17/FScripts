@@ -94,7 +94,7 @@ for ru in allru:
         barz.append(gig)
 
     ax.bar(np.arange(len(barz)), barz)
-    ax.set_xticks(np.arange(barz))
+    ax.set_xticks(np.arange(len(barz)))
     ax.set_xticklabels(xba, rotation = 30)
     ax.set_xlabel('Period (yr)')
     ax.set_ylabel(r'Integrated spectral power ($K^2$)')
