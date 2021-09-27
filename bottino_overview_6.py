@@ -55,7 +55,10 @@ colors2 = colors + ['indianred', 'steelblue']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
-for ru in allru:
+fig_ps, ax_ps = plt.subplots(figsize = (16,12))
+allshi = [-0.3, -0.1, 0.1, 0.3]
+
+for ru, shi, col in zip(allru, allshi, colors):
     print(ru)
     years, gtas = glomeans[(ru, 'tas')]
 
@@ -77,13 +80,11 @@ for ru in allru:
     plt.plot(years, g50_3, linewidth = 3)
     allfigs.append(fig)
 
-    fig, ax = plt.subplots(figsize = (16,12))
-
     ps = np.abs(np.fft.rfft(gtas3))**2
     frq = np.fft.rfftfreq(gtas3.size, 1)
     invfr = 1/frq
 
-    frbins = [5, 10, 20, 50, 100]
+    frbins = [0, 5, 10, 20, 50, 100]
 
     barz = []
     xba = []
@@ -93,39 +94,42 @@ for ru in allru:
         gig = np.sum(ps[okke])
         barz.append(gig)
 
-    ax.bar(np.arange(len(barz)), barz)
-    ax.set_xticks(np.arange(len(barz)))
-    ax.set_xticklabels(xba, rotation = 30)
-    ax.set_xlabel('Period (yr)')
-    ax.set_ylabel(r'Integrated spectral power ($K^2$)')
+    ax_ps.bar(np.arange(len(barz))+shi, barz, wi = 0.15, color = col, alpha = 0.6)
 
-    allfigs.append(fig)
+#    allfigs.append(fig)
 
-    for var in ['tas', 'pr', 'clt', 'rlut']:
-        tama = yeamean[(ru, var)][50:]
-        if ru != 'pi':
-            coef3_var, covmat3_var = np.polyfit(years, glomeans[(ru, var)][1], deg = 3, cov = True)
-            fitco3_var = np.polyval(coef3_var, years)
-            tama3 = tama - fitco3_var[50:, np.newaxis, np.newaxis]
-        else:
-            tama3 = tama
+    # for var in ['tas', 'pr', 'clt', 'rlut']:
+    #     tama = yeamean[(ru, var)][50:]
+    #     if ru != 'pi':
+    #         coef3_var, covmat3_var = np.polyfit(years, glomeans[(ru, var)][1], deg = 3, cov = True)
+    #         fitco3_var = np.polyval(coef3_var, years)
+    #         tama3 = tama - fitco3_var[50:, np.newaxis, np.newaxis]
+    #     else:
+    #         tama3 = tama
+    #
+    #     # plt.figure()
+    #     # plt.plot(years, np.gradient(g50_3))
+    #     # plt.grid()
+    #     incr = np.gradient(g50_3[50:]) > 0
+    #     decr = np.gradient(g50_3[50:]) < 0
+    #
+    #     tasdecr = tama3[decr].mean('year') - tama3.mean('year')
+    #     tasincr = tama3[incr].mean('year') - tama3.mean('year')
+    #
+    #     fig = ctl.plot_multimap_contour([tasincr, tasdecr], figsize = (16,9), plot_anomalies=True, subtitles= ['gtas increasing', 'gtas decreasing'], color_percentiles = (5,95), title = ru+' - '+var)
+    #     allfigs.append(fig[0])
+    #
+    #     var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50_3[50:], tama3)
+    #
+    #     fig = ctl.plot_map_contour(var_trend, tama3.lat, tama3.lon, figsize = (16,9), plot_anomalies=True, color_percentiles = (5,95), title = 'regr with gtas: '+ru+' - '+var, add_hatching = var_pval < 0.05)
+    #
+    #     allfigs.append(fig)
+    #
+    # ctl.plot_pdfpages(cart_out + 'gtas_oscillations_{}.pdf'.format(ru), allfigs)
 
-        # plt.figure()
-        # plt.plot(years, np.gradient(g50_3))
-        # plt.grid()
-        incr = np.gradient(g50_3[50:]) > 0
-        decr = np.gradient(g50_3[50:]) < 0
+ax_ps.set_xticks(np.arange(len(barz)))
+ax_ps.set_xticklabels(xba, rotation = 30)
+ax_ps.set_xlabel('Period (yr)')
+ax_ps.set_ylabel(r'Integrated spectral power ($K^2$)')
 
-        tasdecr = tama3[decr].mean('year') - tama3.mean('year')
-        tasincr = tama3[incr].mean('year') - tama3.mean('year')
-
-        fig = ctl.plot_multimap_contour([tasincr, tasdecr], figsize = (16,9), plot_anomalies=True, subtitles= ['gtas increasing', 'gtas decreasing'], color_percentiles = (5,95), title = ru+' - '+var)
-        allfigs.append(fig[0])
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50_3[50:], tama3)
-
-        fig = ctl.plot_map_contour(var_trend, tama3.lat, tama3.lon, figsize = (16,9), plot_anomalies=True, color_percentiles = (5,95), title = 'regr with gtas: '+ru+' - '+var, add_hatching = var_pval < 0.05)
-
-        allfigs.append(fig)
-
-    ctl.plot_pdfpages(cart_out + 'gtas_oscillations_{}.pdf'.format(ru), allfigs)
+fig_ps.savefig(cart_out + 'gtas_osc_spectpow.pdf')
