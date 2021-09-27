@@ -94,7 +94,7 @@ for ru, shi, col in zip(allru, allshi, colors):
         gig = np.sum(ps[okke])
         barz.append(gig)
 
-    ax_ps.bar(np.arange(len(barz))+shi, barz, wi = 0.15, color = col, alpha = 0.6)
+    ax_ps.bar(np.arange(len(barz))+shi, barz, width = 0.15, color = col, alpha = 0.6)
 
 #    allfigs.append(fig)
 
