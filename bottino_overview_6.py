@@ -93,7 +93,7 @@ for ru in allru:
         gig = np.sum(ps[okke])
         barz.append(gig)
 
-    ax.bar(np.arange(barz), barz)
+    ax.bar(np.arange(len(barz)), barz)
     ax.set_xticks(np.arange(barz))
     ax.set_xticklabels(xba, rotation = 30)
     ax.set_xlabel('Period (yr)')
