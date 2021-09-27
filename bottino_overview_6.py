@@ -77,11 +77,28 @@ for ru in allru:
     plt.plot(years, g50_3, linewidth = 3)
     allfigs.append(fig)
 
-    fig = plt.figure()
+    fig, ax = plt.subplots(figsize = (16,12))
+
     ps = np.abs(np.fft.rfft(gtas3))**2
     frq = np.fft.rfftfreq(gtas3.size, 1)
     invfr = 1/frq
-    plt.plot(invfr, ps)
+
+    frbins = [5, 10, 20, 50, 100]
+
+    barz = []
+    xba = []
+    for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+        xba.append('{} - {}'.format(bi0, bi1))
+        okke = (bi0 <= invfr) & (invfr < bi1)
+        gig = np.sum(ps[okke])
+        barz.append(gig)
+
+    ax.bar(barz)
+    ax.set_xticks(np.arange(barz))
+    ax.set_xticklabels(xba, rotation = 30)
+    ax.set_xlabel('Period (yr)')
+    ax.set_ylabel(r'Integrated spectral power ($K^2$)')
+
     allfigs.append(fig)
 
     for var in ['tas', 'pr', 'clt', 'rlut']:
