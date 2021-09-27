@@ -124,7 +124,7 @@ for ru in allru:
 
         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50_3[50:], tama3)
 
-        fig = ctl.plot_map_contour(var_trend, tama3.lat, tama3.lon, figsize = (16,9), plot_anomalies=True, color_percentiles = (5,95), title = 'regr with gtas: '+ru+' - '+var, add_hatching = var_pval > 0.05)
+        fig = ctl.plot_map_contour(var_trend, tama3.lat, tama3.lon, figsize = (16,9), plot_anomalies=True, color_percentiles = (5,95), title = 'regr with gtas: '+ru+' - '+var, add_hatching = var_pval < 0.05)
 
         allfigs.append(fig)
 
