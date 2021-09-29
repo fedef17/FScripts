@@ -385,7 +385,7 @@ fig, ax = plt.subplots(figsize = (16,12))
 for ru, col, shi in zip(allru, colors, allshi):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     data = piuz.values.flatten()
-    ps = np.abs(np.fft.rfft(data))**2
+    ps = np.abs(np.fft.rfft(data, norm='forward'))**2
 
     freqs = np.fft.rfftfreq(data.size, 1)
     invfr = 1/freqs
@@ -412,7 +412,7 @@ fig, ax = plt.subplots(figsize = (16,12))
 for ru, col, shi in zip(allru, colors, allshi):
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     data = piuz.values.flatten()
-    ps = np.abs(np.fft.rfft(data))**2
+    ps = np.abs(np.fft.rfft(data, norm='forward'))**2
 
     freqs = np.fft.rfftfreq(data.size, 1)
     invfr = 1/freqs
@@ -447,7 +447,7 @@ for ru, ax in zip(allru, axs.flatten()):
 
     for ich, ye1, col, shi in zip(range(nchu), yesta, colzz, allshi):
         data = data_all[ye1:ye1+nye]
-        ps = np.abs(np.fft.rfft(data))**2
+        ps = np.abs(np.fft.rfft(data, norm='forward'))**2
 
         freqs = np.fft.rfftfreq(data.size, 1)
 
@@ -485,7 +485,7 @@ for ru, col, shi in zip(allru, colors, allshi):
     allcose = []
     for ich, ye1 in zip(range(nchu), yesta):
         data = data_all[ye1:ye1+nye]
-        ps = np.abs(np.fft.rfft(data))**2
+        ps = np.abs(np.fft.rfft(data, norm='forward'))**2
 
         freqs = np.fft.rfftfreq(data.size, 1)
 
@@ -517,8 +517,66 @@ for ii in np.arange(nboxs-1) + 0.5:
 ax.set_xticklabels(xba, rotation = 30)
 ax.set_xlabel('Period (yr)')
 ax.set_ylabel(r'Integrated spectral power ($K^2$)')
+#ax.legend()
 
 fig.savefig(cart_out + 'enso_spectra_bins_boxes.pdf')
+
+
+fig, ax = plt.subplots(figsize = (16,12))
+allshi = [-0.3, -0.1, 0.1, 0.3]
+
+for ru, col, shi in zip(allru, colors, allshi):
+    piuz = enso[ru]['tos'].groupby('time.year').mean()
+    data_all = piuz.values.flatten()
+
+    nboxs = len(frbins[1:])
+    positions = np.arange(nboxs) + shi
+
+    ps = np.abs(np.fft.rfft(data_all, norm='forward'))**2
+    freqs = np.fft.rfftfreq(data_all.size, 1)
+    invfr = 1/freqs
+
+    barz = []
+    xba = []
+    for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+        xba.append('{} - {}'.format(bi0, bi1))
+        okke = (bi0 <= invfr) & (invfr < bi1)
+        gig = np.sum(ps[okke])
+        barz.append(gig)
+
+    ax.bar(positions, barz, width = 0.15, color = col, alpha = 0.7, label = ru)
+
+    allcose = []
+    for ich, ye1 in zip(range(nchu), yesta):
+        data = data_all[ye1:ye1+nye]
+        ps = np.abs(np.fft.rfft(data, norm='forward'))**2
+
+        freqs = np.fft.rfftfreq(data.size, 1)
+
+        invfr = 1/freqs
+
+        barz = []
+        xba = []
+        for bi0, bi1 in zip(frbins[:-1], frbins[1:]):
+            xba.append('{} - {}'.format(bi0, bi1))
+            okke = (bi0 <= invfr) & (invfr < bi1)
+            gig = np.sum(ps[okke])
+            barz.append(gig)
+        allcose.append(barz)
+
+    for barz in allcose:
+        ax.scatter(positions, barz, color = col, marker = '*', s = 20)
+
+ax.set_xticks(np.arange(nboxs))
+for ii in np.arange(nboxs-1) + 0.5:
+    ax.axvline(ii, color = 'grey', linestyle = ':', linewidth = 0.1)
+ax.set_xticklabels(xba, rotation = 30)
+ax.set_xlabel('Period (yr)')
+ax.set_ylabel(r'Integrated spectral power ($K^2$)')
+ax.legend()
+
+fig.savefig(cart_out + 'enso_spectra_bins_bars.pdf')
+
 
 
 
@@ -531,7 +589,7 @@ for ru, ax in zip(allru, axs.flatten()):
 
     for ich, ye1, col, shi in zip(range(nchu), yesta, colzz, allshi):
         data = data_all[ye1:ye1+nye]
-        ps = np.abs(np.fft.rfft(data))**2
+        ps = np.abs(np.fft.rfft(data, norm='forward'))**2
 
         freqs = np.fft.rfftfreq(data.size, 1)
 

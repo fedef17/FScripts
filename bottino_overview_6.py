@@ -80,7 +80,7 @@ for ru, shi, col in zip(allru, allshi, colors):
     plt.plot(years, g50_3, linewidth = 3)
     allfigs.append(fig)
 
-    ps = np.abs(np.fft.rfft(gtas3))**2
+    ps = np.abs(np.fft.rfft(gtas3, norm='forward'))**2
     frq = np.fft.rfftfreq(gtas3.size, 1)
     invfr = 1/frq
 

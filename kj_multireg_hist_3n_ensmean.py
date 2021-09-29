@@ -645,7 +645,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
 
                 xsss = np.concatenate([np.arange(3), np.arange(3.5, i2+0.5), np.arange(i2+1, toti+1)])
                 xssdi[reg] = xsss
-                axs.bar(xsss, rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} driv'.format(nu), color = colnu)
+                axs.bar(xsss, rsq-rsq_old[reg], width = 0.5, bottom = rsq_old[reg], label = '{} predictor'.format(nu), color = colnu)
                 rsq_old[reg] = rsq
 
                 fig_score, axs = figscores[(reg, 1)]
@@ -655,7 +655,7 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 enne = len(X)
                 adj_rsq = 1 - (1-rsq) *(enne-1)/(enne-nu-1)
                 #axs.scatter(xsss, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'X')
-                axs.scatter(xsss+(nu-4.5)*0.05, adj_rsq, label = '{} driv'.format(nu), color = colnu, marker = 'o', s = 40, edgecolor = 'grey')
+                axs.scatter(xsss+(nu-4.5)*0.05, adj_rsq, label = '{} predictor'.format(nu), color = colnu, marker = 'o', s = 40, edgecolor = 'grey')
                 #axs.plot(np.arange(len(rsq)), scoall, color = col, linestyle = '--')
 
                 # print(reg, namti, np.mean(rsq[:ire]), np.mean(rsq[ire:]))
