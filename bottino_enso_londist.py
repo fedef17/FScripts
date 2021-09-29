@@ -75,14 +75,20 @@ fig_o, axs_o = plt.subplots(2, 2, figsize = (16,12))
 fig_a, axs_a = plt.subplots(2, 2, figsize = (16,12))
 
 for ru, axo, axa, col in zip(allru, axs_o.flatten(), axs_a.flatten(), colors):
+    print(ru)
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     years, gtas = glomeans[(ru, 'tas')]
     # coef3, covmat3 = np.polyfit(years, gtas, deg = 3, cov = True)
     # fitco3 = np.polyval(coef3, years)
     g10 = ctl.butter_filter(gtas, 10)
+    yeme = yeamean[(ru, 'tas')]
+
+    if ru == 'pi':
+        g10 = g10[:-1]
+        yeme = yeme[:-1]
 
     #tasdetr = yeamean[(ru, 'tas')] - fitco3[:, np.newaxis, np.newaxis]
-    tasdetr = yeamean[(ru, 'tas')] - g10[:, np.newaxis, np.newaxis]
+    tasdetr = yeme - g10[:, np.newaxis, np.newaxis]
     tasanom = tasdetr - tasdetr.mean('year')
 
     #ctl.plot_map_contour(tasanom[0], central_lat_lon=(0, 205), draw_grid = True, add_rectangles=[160, 270, -5, 5])
