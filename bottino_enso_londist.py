@@ -101,21 +101,28 @@ for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli
     oknino = nino_yrs.values.flatten()
     oknina = nina_yrs.values.flatten()
 
-    tasanom_pac[oknino].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'indianred')
+    paclons = tasanom_pac.lon.values
+
+    #tasanom_pac[oknino].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'indianred')
+    tas90 = np.percentile(tasanom_pac[oknino], 90, axis = 0)
+    tas10 = np.percentile(tasanom_pac[oknino], 10, axis = 0)
+    axl.fill_between(paclons, tas10, tas90, color = 'indianred', alpha = 0.3)
     tasanom_pac[oknino].mean('year').plot(ax = axl, linewidth = 2, color = 'indianred')
 
-    tasanom_pac[oknina].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'steelblue')
+    # tasanom_pac[oknina].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'steelblue')
+    tas90 = np.percentile(tasanom_pac[oknina], 90, axis = 0)
+    tas10 = np.percentile(tasanom_pac[oknina], 10, axis = 0)
+    axl.fill_between(paclons, tas10, tas90, color = 'steelblue', alpha = 0.3)
     tasanom_pac[oknina].mean('year').plot(ax = axl, linewidth = 2, color = 'steelblue')
 
     axl.set_title(ru)
     axl.grid()
 
-    paclons = tasanom_pac.lon.values
     ninodist = np.argmax(tasanom_pac[oknino].values, axis = 1)
     ninadist = np.argmin(tasanom_pac[oknina].values, axis = 1)
 
-    axo.hist(paclons[ninodist], color = col)
-    axa.hist(paclons[ninadist], color = col)
+    axo.hist(paclons[ninodist], color = col, bins = np.arange(160, 271, 5))
+    axa.hist(paclons[ninadist], color = col, bins = np.arange(160, 271, 5))
 
 ctl.adjust_ax_scale(axs_o.flatten())
 ctl.adjust_ax_scale(axs_a.flatten())
