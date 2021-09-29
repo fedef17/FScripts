@@ -121,8 +121,8 @@ for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli
     ninodist = np.argmax(tasanom_pac[oknino].values, axis = 1)
     ninadist = np.argmin(tasanom_pac[oknina].values, axis = 1)
 
-    axo.hist(paclons[ninodist], color = col, bins = np.arange(160, 271, 5))
-    axa.hist(paclons[ninadist], color = col, bins = np.arange(160, 271, 5))
+    axo.hist(paclons[ninodist], color = col, bins = np.arange(190, 271, 5))
+    axa.hist(paclons[ninadist], color = col, bins = np.arange(190, 271, 5))
 
 ctl.adjust_ax_scale(axs_o.flatten())
 ctl.adjust_ax_scale(axs_a.flatten())
