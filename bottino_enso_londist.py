@@ -101,15 +101,16 @@ for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli
     oknino = nino_yrs.values.flatten()
     oknina = nina_yrs.values.flatten()
 
-    paclons = tasanom_pac.lon.values
-    axl.plot(paclons, tasanom_pac[oknino], hue = 'year', linewidth = 0.1, color = 'indianred')
-    axl.plot(paclons, tasanom_pac[oknino].mean('year'), linewidth = 2, color = 'indianred')
+    tasanom_pac[oknino].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'indianred')
+    tasanom_pac[oknino].mean('year').plot(ax = axl, linewidth = 2, color = 'indianred')
 
-    axl.plot(paclons, tasanom_pac[oknina], hue = 'year', linewidth = 0.1, color = 'steelblue')
-    axl.plot(paclons, tasanom_pac[oknina].mean('year'), linewidth = 2, color = 'steelblue')
+    tasanom_pac[oknina].plot(ax = axl, x = 'lon', hue = 'year', linewidth = 0.1, color = 'steelblue')
+    tasanom_pac[oknina].mean('year').plot(ax = axl, linewidth = 2, color = 'steelblue')
+
     axl.set_title(ru)
     axl.grid()
 
+    paclons = tasanom_pac.lon.values
     ninodist = np.argmax(tasanom_pac[oknino].values, axis = 1)
     ninadist = np.argmin(tasanom_pac[oknina].values, axis = 1)
 
