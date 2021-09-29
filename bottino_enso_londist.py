@@ -74,7 +74,9 @@ for ru in allru:
 fig_o, axs_o = plt.subplots(2, 2, figsize = (16,12))
 fig_a, axs_a = plt.subplots(2, 2, figsize = (16,12))
 
-for ru, axo, axa, col in zip(allru, axs_o.flatten(), axs_a.flatten(), colors):
+figli, axsli = plt.subplots(2, 2, figsize = (16,12))
+
+for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli.flatten(), colors):
     print(ru)
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     years, gtas = glomeans[(ru, 'tas')]
@@ -92,7 +94,7 @@ for ru, axo, axa, col in zip(allru, axs_o.flatten(), axs_a.flatten(), colors):
     tasanom = tasdetr - tasdetr.mean('year')
 
     #ctl.plot_map_contour(tasanom[0], central_lat_lon=(0, 205), draw_grid = True, add_rectangles=[160, 270, -5, 5])
-    tasanom_pac = tasanom.sel(lat = slice(-5, 5), lon = slice(160, 270)).mean('lat')
+    tasanom_pac = tasanom.sel(lat = slice(-5, 5), lon = slice(160, 270)).mean('lat') # 270 for nino3, 240 for nino34
 
     nino_yrs = piuz > 0.5
     nina_yrs = piuz < -0.5
@@ -100,6 +102,13 @@ for ru, axo, axa, col in zip(allru, axs_o.flatten(), axs_a.flatten(), colors):
     oknina = nina_yrs.values.flatten()
 
     paclons = tasanom_pac.lon.values
+    axl.plot(paclons, tasanom_pac[oknino], hue = 'year', linewidth = 0.1, color = 'indianred')
+    axl.plot(paclons, tasanom_pac[oknino].mean('year'), linewidth = 2, color = 'indianred')
+
+    axl.plot(paclons, tasanom_pac[oknina], hue = 'year', linewidth = 0.1, color = 'steelblue')
+    axl.plot(paclons, tasanom_pac[oknina].mean('year'), linewidth = 2, color = 'steelblue')
+    axl.set_title(ru)
+    axl.grid()
 
     ninodist = np.argmax(tasanom_pac[oknino].values, axis = 1)
     ninadist = np.argmin(tasanom_pac[oknina].values, axis = 1)
@@ -109,6 +118,8 @@ for ru, axo, axa, col in zip(allru, axs_o.flatten(), axs_a.flatten(), colors):
 
 ctl.adjust_ax_scale(axs_o.flatten())
 ctl.adjust_ax_scale(axs_a.flatten())
+ctl.adjust_ax_scale(axsli.flatten())
 
 fig_o.savefig(cart_out + 'nino_lon_hist.pdf')
 fig_a.savefig(cart_out + 'nina_lon_hist.pdf')
+figli.savefig(cart_out + 'nino_lon_anom.pdf')
