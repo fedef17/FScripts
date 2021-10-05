@@ -96,8 +96,8 @@ for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli
     #ctl.plot_map_contour(tasanom[0], central_lat_lon=(0, 205), draw_grid = True, add_rectangles=[160, 270, -5, 5])
     tasanom_pac = tasanom.sel(lat = slice(-5, 5), lon = slice(160, 270)).mean('lat') # 270 for nino3, 240 for nino34
 
-    nino_yrs = piuz > 0.5
-    nina_yrs = piuz < -0.5
+    nino_yrs = piuz > np.percentile(piuz, 90)#0.5
+    nina_yrs = piuz < np.percentile(piuz, 10)#-0.5
     oknino = nino_yrs.values.flatten()
     oknina = nina_yrs.values.flatten()
 
