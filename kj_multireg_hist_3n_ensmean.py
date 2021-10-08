@@ -611,8 +611,17 @@ for modgen, ensmod in zip([modgen_all], ['all']):
                 for ax in axs:
                     ax.xaxis.tick_top()
 
+                topok = []
+                for cot in top_comb:
+                    if cot == 'NorthAtlantic_SST-grad':
+                        topok.append('NA_SST-grad')
+                    elif cot == 'NorthAtlantic_SST-mean':
+                        topok.append('NA_SST-mean')
+                    else:
+                        topok.append(cot)
+
                 axs[0].set_yticks(0.5+np.arange(len(top_comb)), minor = False)
-                axs[0].set_yticklabels(top_comb, va='center', rotation = 45)
+                axs[0].set_yticklabels(topok, va='center', rotation = 45)
                 for ax in axs[1:]:
                     ax.set_yticks([])
                     ax.set_yticklabels([])

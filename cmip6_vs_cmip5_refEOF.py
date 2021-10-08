@@ -88,6 +88,7 @@ for area in ['EAT', 'PNA']:
         plocos[('var_ratio', ke, area)] = var_ratio[ke]
         freqbias[ke] = np.array([np.mean(np.abs(resdict[ke][mod]['freq_clus']-results_ref['freq_clus'])) for mod in resdict[ke].keys()])
         plocos[('freqbias', ke, area)] = freqbias[ke]
+        # freqbias_all[ke] = np.stack([resdict[ke][mod]['freq_clus']-results_ref['freq_clus'] for mod in resdict[ke].keys()])
 
         for mod in resdict[ke]:
             res_short[(ke, mod, area, 'var_ratio')] = resdict[ke][mod]['var_ratio']
