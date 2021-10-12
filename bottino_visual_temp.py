@@ -22,6 +22,11 @@ import xarray as xr
 import glob
 import xclim
 
+import matplotlib.animation as animation
+from matplotlib.animation import ImageMagickFileWriter
+
+import cartopy.crs as ccrs
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 22
@@ -65,7 +70,7 @@ for var in ['tas', 'pr']:
 
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (16, 12), coast_lw = 1)
 
-    if var == 'temp':
+    if var == 'tas':
         cb.set_label('Temp anomaly (K)', fontsize=16)
         cmappa = cm.get_cmap('gist_ncar')#('RdBu_r')
         cosoanom = coso-cosopi.mean('year')
@@ -101,7 +106,7 @@ for var in ['tas', 'pr']:
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
     cb.ax.tick_params(labelsize=14)
-    if var == 'temp':
+    if var == 'tas':
         cb.set_label('Temp anomaly (K)', fontsize=16)
     elif var == 'pr':
         cb.set_label('Pr anomaly ()', fontsize=16)
