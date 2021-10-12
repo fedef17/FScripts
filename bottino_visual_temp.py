@@ -71,13 +71,11 @@ for var in ['tas', 'pr']:
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (16, 12), coast_lw = 1)
 
     if var == 'tas':
-        cb.set_label('Temp anomaly (K)', fontsize=16)
         cmappa = cm.get_cmap('gist_ncar')#('RdBu_r')
         cosoanom = coso-cosopi.mean('year')
         cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
         #cbar_range = (-5, 5)
     elif var == 'pr':
-        cb.set_label('Pr anomaly ()', fontsize=16)
         cmappa = cm.get_cmap('BrBG')
         cosoanom = (coso-cosopi.mean('year'))/cosopi.mean('year')
         #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
