@@ -60,26 +60,30 @@ colors2 = colors + ['indianred', 'steelblue']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
+tahiss = np.concatenate([glomeans[('hist', 'tas')][1], glomeans[('ssp585', 'tas')][1]])
+
 for var in ['tas', 'pr']:
     cosopi = yeamean[('pi', var)]
+    pime = cosopi.mean('year')
     cosohist = yeamean[('hist', var)]
     cosossp = yeamean[('ssp585', var)]
     coso = xr.concat([cosohist, cosossp], dim = 'year')
+    presme = coso.sel(year = slice(1960, 1990)).mean('year')
 
     anni = coso.year.values
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (16, 12), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (9, 5), coast_lw = 1)
 
     if var == 'tas':
         cmappa = cm.get_cmap('gist_ncar')#('RdBu_r')
-        cosoanom = coso-cosopi.mean('year')
-        cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
-        #cbar_range = (-5, 5)
+        cosoanom = coso-presme.values[np.newaxis, ...]
+        #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
+        cbar_range = (-10, 10)
     elif var == 'pr':
         cmappa = cm.get_cmap('BrBG')
-        cosoanom = (coso-cosopi.mean('year'))/cosopi.mean('year')
+        cosoanom = (coso-presme.values[np.newaxis, ...])/presme.values[np.newaxis, ...]
         #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
-        cbar_range = (-50, 50)
+        cbar_range = (-20, 20)
 
     clevels = np.linspace(cbar_range[0], cbar_range[1], 21)
     cset = ctl.color_set(len(anni), bright_thres = 0., full_cb_range = True)
@@ -87,27 +91,28 @@ for var in ['tas', 'pr']:
     def animate(i, ax):
         proj = ccrs.PlateCarree()
         ax.clear()
-        map_plot = ctl.plot_mapc_on_ax(ax, coso.values[i, ...], coso.lat, coso.lon, proj, cmappa, cbar_range)
+        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom.values[i, ...], coso.lat, coso.lon, proj, cmappa, cbar_range)
         year = anni[i]
         color = cset[i]
-        tit.set_text('{}'.format(year))
+        tam = tahiss[i] - pimean['tas']
+        tit.set_text(r'{} -> {:5.1f} $\circ$C above PI'.format(year, tam))
         #showdate.set_text('{}'.format(year))#, color = color)
         #showdate.update(color = color)
-        ax.relim()
-        ax.autoscale_view()
+        #ax.relim()
+        #ax.autoscale_view()
         return
 
     # Plotting figure
     proj = ccrs.PlateCarree()
-    map_plot = ctl.plot_mapc_on_ax(ax, coso.values[0], coso.lat, coso.lon, proj, cmappa, cbar_range)
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom.values[0], coso.lat, coso.lon, proj, cmappa, cbar_range)
 
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
     cb.ax.tick_params(labelsize=14)
     if var == 'tas':
-        cb.set_label('Temp anomaly (K)', fontsize=16)
+        cb.set_label('Temperature anomaly (K)', fontsize=16)
     elif var == 'pr':
-        cb.set_label('Pr anomaly ()', fontsize=16)
+        cb.set_label('Relative precipitation anomaly (%)', fontsize=16)
 
     top    = 0.88  # the top of the subplots
     bottom = 0.20    # the bottom of the subplots
@@ -123,11 +128,14 @@ for var in ['tas', 'pr']:
     save = True
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = ImageMagickFileWriter(fps = 10, metadata = metadata)#, frame_size = (1200, 900))
-        with writer.saving(fig, cart + "{}_anomaly_animation_flat.gif".format(var), 150):
+        writer = ImageMagickFileWriter(fps = 20)#, metadata = metadata)#, frame_size = (1200, 900))
+        with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), 150):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
-                animate(i)
+                animate(i, ax)
                 writer.grab_frame()
+                if year in [1950, 2000, 2025, 2050, 2075, 2100]:
+                    for jj in range(10):
+                        writer.grab_frame()
     else:
         line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
