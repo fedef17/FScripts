@@ -81,9 +81,9 @@ for var in ['tas', 'pr']:
         cbar_range = (-10, 10)
     elif var == 'pr':
         cmappa = cm.get_cmap('BrBG')
-        cosoanom = (coso-presme.values[np.newaxis, ...])/presme.values[np.newaxis, ...]
+        cosoanom = 100*(coso-presme.values[np.newaxis, ...])/presme.values[np.newaxis, ...]
         #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
-        cbar_range = (-20, 20)
+        cbar_range = (-50, 50)
 
     clevels = np.linspace(cbar_range[0], cbar_range[1], 21)
     cset = ctl.color_set(len(anni), bright_thres = 0., full_cb_range = True)
@@ -95,7 +95,7 @@ for var in ['tas', 'pr']:
         year = anni[i]
         color = cset[i]
         tam = tahiss[i] - pimean['tas']
-        tit.set_text(r'{} -> {:5.1f} $\circ$C above PI'.format(year, tam))
+        tit.set_text(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
         #showdate.set_text('{}'.format(year))#, color = color)
         #showdate.update(color = color)
         #ax.relim()
@@ -122,20 +122,20 @@ for var in ['tas', 'pr']:
     wspace = 0.05    # width reserved for blank space
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-    tit = plt.title('1850')
+    tit = ax.set_title('1850')
     #showdate = ax.text(0.5, 0.95, '1850', fontweight = 'bold', color = cset[0], bbox=dict(facecolor='lightsteelblue', edgecolor='black', boxstyle='round,pad=1'))
 
     save = True
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = ImageMagickFileWriter(fps = 20)#, metadata = metadata)#, frame_size = (1200, 900))
-        with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), 150):
+        writer = ImageMagickFileWriter(fps = 5)#, frame_size = (600, 300))#, metadata = metadata,
+        with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), 80):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
                 animate(i, ax)
                 writer.grab_frame()
                 if year in [1950, 2000, 2025, 2050, 2075, 2100]:
-                    for jj in range(10):
+                    for jj in range(20):
                         writer.grab_frame()
     else:
         line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
