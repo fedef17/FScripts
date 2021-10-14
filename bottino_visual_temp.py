@@ -58,6 +58,7 @@ allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
 ####################################################################################################
 
+### New colormap for temperature
 col = cm.RdBu_r(np.linspace(0.,1,256))
 col2 = cm.PuRd_r(np.linspace(0.,0.75,128))
 col3 = cm.bone_r(np.linspace(0.25,0.75,128))
@@ -65,6 +66,8 @@ colors = np.concatenate([col3, col, col2])
 from matplotlib import colors as mcolors
 heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
+###
+dpi = 50
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -150,7 +153,7 @@ for var in ['tas', 'pr']:
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
         writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
-        with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), 150):
+        with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
                 animate(i, ax)
@@ -192,7 +195,7 @@ for var in ['tas', 'pr']:
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
         writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
-        with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside.gif".format(var), 150):
+        with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
                 animate(i, ax)
@@ -233,7 +236,7 @@ for var in ['tas', 'pr']:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
         writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
         clon = 0.
-        with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), 150):
+        with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
                 proj = def_projection('nearside', (50, clon), bounding_lat = 0)
