@@ -95,12 +95,12 @@ for var in ['tas', 'pr']:
         cmappa = heatmap
         cosoanom = cosolow-presme.values[np.newaxis, ...]
         #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
-        cbar_range = (-10, 10)
+        cbar_range = (-8, 8)
     elif var == 'pr':
         cmappa = cm.get_cmap('BrBG')
         cosoanom = 100*(cosolow-presme.values[np.newaxis, ...])/presme.values[np.newaxis, ...]
         #cbar_range = ctl.get_cbar_range(cosoanom, symmetrical = True)
-        cbar_range = (-50, 50)
+        cbar_range = (-30, 30)
 
     clevels = np.linspace(cbar_range[0], cbar_range[1], 21)
     cset = ctl.color_set(len(anni), bright_thres = 0., full_cb_range = True)
