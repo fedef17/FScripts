@@ -239,7 +239,7 @@ for var in ['tas', 'pr']:
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
-                proj = def_projection('nearside', (50, clon), bounding_lat = 0)
+                proj = ctl.def_projection('nearside', (50, clon), bounding_lat = 0)
                 fig.clear()
                 ax = plt.subplot(projection = proj)
                 ax.set_global()
