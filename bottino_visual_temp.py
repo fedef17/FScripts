@@ -68,7 +68,7 @@ heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
 ###
 dpi = 150
-save = True
+save = False
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -178,6 +178,9 @@ for var in ['tas', 'pr']:
                     iys.append(year)
 
         line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
+        filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
+        writer = PillowWriter(fps = 10)
+        line_ani.save(filename, writer = writer)
 
     ## Focus on Europe
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
@@ -231,6 +234,9 @@ for var in ['tas', 'pr']:
                     iys.append(year)
 
         line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
+        filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
+        writer = PillowWriter(fps = 10)
+        line_ani.save(filename, writer = writer)
 
     ## Rotating with focus on NPole/Northern mid-latitudes
     def animate_rotate(i, clon):
@@ -334,3 +340,7 @@ for var in ['tas', 'pr']:
                     iys.append(year)
 
         line_ani = animation.FuncAnimation(fig, animate_rotate, frames = anni, fargs = (clons,), interval=100, blit=False)
+
+        filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
+        writer = PillowWriter(fps = 10)
+        line_ani.save(filename, writer = writer)
