@@ -60,7 +60,7 @@ colors2 = colors + ['indianred', 'steelblue']
 
 ### New colormap for temperature
 col = cm.RdBu_r(np.linspace(0.,1,256))
-col2 = cm.PuRd_r(np.linspace(0.,0.75,128))
+col2 = cm.PuRd_r(np.linspace(0.25,0.75,128))
 col3 = cm.bone_r(np.linspace(0.25,0.75,128))
 colors = np.concatenate([col3, col, col2])
 from matplotlib import colors as mcolors
