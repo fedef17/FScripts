@@ -287,7 +287,7 @@ for var in ['tas', 'pr']:
 
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = PillowWriter(fps = 5)
+        writer = PillowWriter(fps = 10)
         #writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
         clon = 0.
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
@@ -327,26 +327,26 @@ for var in ['tas', 'pr']:
                         animate(i, ax)
                         writer.grab_frame()
     else:
-        clons = [0.]
+        clons = [180.]
         iys = [0]
         clon = 0.
         for i, year in enumerate(anni):
-            clon = (clon-7.2)%360
+            clon = (clon-3.6)%360
             clons.append(clon)
             iys.append(i)
             if year in [2050, 2075]:
-                for jj in range(50):
-                    clon = (clon-7.2)%360
+                for jj in range(100):
+                    clon = (clon-3.6)%360
                     clons.append(clon)
                     iys.append(i)
             elif year == 2100:
-                for jj in range(50):
-                    clon = (clon-7.2)%360
+                for jj in range(100):
+                    clon = (clon-3.6)%360
                     clons.append(clon)
                     iys.append(i)
 
         line_ani = animation.FuncAnimation(fig, animate_rotate, frames = len(iys), interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
-        writer = PillowWriter(fps = 5)
+        writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
