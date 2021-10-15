@@ -67,13 +67,87 @@ from matplotlib import colors as mcolors
 heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
 ###
+dpiflat = 250
 dpi = 150
-save = False
+save = True
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
 tahiss = np.concatenate([glomeans[('hist', 'tas')][1], glomeans[('ssp585', 'tas')][1]])
 tahiss = ctl.butter_filter(tahiss, 5)
+
+########
+
+def animate(ii, ax):
+    i = iys[ii]
+    proj = ccrs.PlateCarree()
+    ax.clear()
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
+    year = anni[i]
+    print(year)
+    color = cset[i]
+    tam = tahiss[i] - pimean['tas']
+    ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+    return
+
+def animate_double(ii, ax1, ax2):
+    i = iys[ii]
+
+    year = anni[i]
+    print(year)
+    color = cset[i]
+    tam = tahiss[i] - pimean['tas']
+    tit = r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam)
+    fig.suptitle(tit)
+
+    proj = ccrs.PlateCarree()
+    ax1.clear()
+    ax2.clear()
+    map_plot1 = ctl.plot_mapc_on_ax(ax1, costas[i, ...], presme.lat, presme.lon, proj, cmappas[0], cbrangs[0], draw_grid = True)
+    map_plot2 = ctl.plot_mapc_on_ax(ax2, cospr[i, ...], presme.lat, presme.lon, proj, cmappas[1], cbrangs[1], draw_grid = True)
+
+    return
+
+def animate_rotate(ii):
+    i = iys[ii]
+    clon = clons[ii]
+    proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
+    fig.clear()
+    ax = plt.subplot(projection = proj)
+    ax.set_global()
+    ax.coastlines(linewidth = 1)
+
+    pc = ccrs.PlateCarree()
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, pc, cmappa, cbar_range, draw_grid = True)
+    year = anni[i]
+    print(year)
+    color = cset[i]
+    tam = tahiss[i] - pimean['tas']
+
+    ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+
+    ## Colorbar
+    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
+    cb.ax.tick_params(labelsize=14)
+    if var == 'tas':
+        cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
+    elif var == 'pr':
+        cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
+
+    top    = 0.88  # the top of the subplots
+    bottom = 0.20    # the bottom of the subplots
+    left   = 0.02    # the left side
+    right  = 0.98  # the right side
+    hspace = 0.20   # height reserved for white space
+    wspace = 0.05    # width reserved for blank space
+    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
+    return
+
+########
+
+cosdue = dict()
 
 for var in ['tas', 'pr']:
     cosopi = yeamean[('pi', var)]
@@ -82,7 +156,6 @@ for var in ['tas', 'pr']:
     cosossp = yeamean[('ssp585', var)]
     coso = xr.concat([cosohist, cosossp], dim = 'year')
     presme = coso.sel(year = slice(1960, 1990)).mean('year')
-
 
     if os.path.exists(cart_out + 'histssp_{}_lowpass_LR.p'.format(var)):
         cosolow, presme = pickle.load(open(cart_out + 'histssp_{}_lowpass_LR.p'.format(var), 'rb'))
@@ -112,18 +185,7 @@ for var in ['tas', 'pr']:
     clevels = np.linspace(cbar_range[0], cbar_range[1], 21)
     cset = ctl.color_set(len(anni), bright_thres = 0., full_cb_range = True)
 
-
-    def animate(ii, ax):
-        i = iys[ii]
-        proj = ccrs.PlateCarree()
-        ax.clear()
-        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
-        year = anni[i]
-        print(year)
-        color = cset[i]
-        tam = tahiss[i] - pimean['tas']
-        ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
-        return
+    cosdue[var] = cosoanom
 
 
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (9, 5), coast_lw = 1)
@@ -169,16 +231,16 @@ for var in ['tas', 'pr']:
         clon = 0.
         for i, year in enumerate(anni):
             iys.append(i)
-            if year in [1950, 2000, 2025, 2050, 2075]:
-                for jj in range(20):
-                    iys.append(i)
-            elif year == 2100:
-                for jj in range(50):
+            # if year in [1950, 2000, 2025, 2050, 2075]:
+            #     for jj in range(20):
+            #         iys.append(i)
+            if year == 2100:
+                for jj in range(100):
                     iys.append(i)
 
         line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax,), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
-        writer = PillowWriter(fps = 10)
+        writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
 
     ## Focus on Europe
@@ -224,56 +286,19 @@ for var in ['tas', 'pr']:
         iys = [0]
         for i, year in enumerate(anni):
             iys.append(i)
-            if year in [1950, 2000, 2025, 2050, 2075]:
-                for jj in range(20):
-                    iys.append(i)
-            elif year == 2100:
-                for jj in range(50):
+            # if year in [1950, 2000, 2025, 2050, 2075]:
+            #     for jj in range(20):
+            #         iys.append(i)
+            if year == 2100:
+                for jj in range(100):
                     iys.append(i)
 
         line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax, ), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
-        writer = PillowWriter(fps = 10)
+        writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
 
     ## Rotating with focus on Northern mid-latitudes
-    def animate_rotate(ii):
-        i = iys[ii]
-        clon = clons[ii]
-        proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
-        fig.clear()
-        ax = plt.subplot(projection = proj)
-        ax.set_global()
-        ax.coastlines(linewidth = 1)
-
-        pc = ccrs.PlateCarree()
-        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, pc, cmappa, cbar_range, draw_grid = True)
-        year = anni[i]
-        print(year)
-        color = cset[i]
-        tam = tahiss[i] - pimean['tas']
-
-        ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
-
-        ## Colorbar
-        cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-        cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
-        cb.ax.tick_params(labelsize=14)
-        if var == 'tas':
-            cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
-        elif var == 'pr':
-            cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
-
-        top    = 0.88  # the top of the subplots
-        bottom = 0.20    # the bottom of the subplots
-        left   = 0.02    # the left side
-        right  = 0.98  # the right side
-        hspace = 0.20   # height reserved for white space
-        wspace = 0.05    # width reserved for blank space
-        plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
-
-        return
-
     ##
     clat = 30
     blat = -10
@@ -334,12 +359,12 @@ for var in ['tas', 'pr']:
             clon = (clon-3.6)%360
             clons.append(clon)
             iys.append(i)
-            if year in [2050, 2075]:
-                for jj in range(100):
-                    clon = (clon-3.6)%360
-                    clons.append(clon)
-                    iys.append(i)
-            elif year == 2100:
+            # if year in [2050, 2075]:
+            #     for jj in range(100):
+            #         clon = (clon-3.6)%360
+            #         clons.append(clon)
+            #         iys.append(i)
+            if year == 2100:
                 for jj in range(100):
                     clon = (clon-3.6)%360
                     clons.append(clon)
@@ -348,5 +373,36 @@ for var in ['tas', 'pr']:
         line_ani = animation.FuncAnimation(fig, animate_rotate, frames = len(iys), interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
-        writer = PillowWriter(fps = 10)
+        writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
+
+#### Double anim
+## Focus on Europe
+#fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
+
+cmappas = [heatmap, 'BrBG']
+cbrangs = [(-8, 8), (-30, 30)]
+
+costas = cosdue['tas']
+cospr = cosdue['pr']
+
+figs = ctl.plot_multimap_contour([costas[i], cospr[i]], lat = presme.lat, lon = presme.lon, visualization = 'nearside', central_lat_lon = (50, 20), cmap = cmappas, title = tit, cb_label = ['Temperature anomaly wrt 1960-1990 (K)', 'Relative precipitation anomaly wrt 1960-1990 (%)'], cbar_range = cbrangs, plot_anomalies = True, fix_subplots_shape = (1,2), figsize = (16,9), bounding_lat = 0, use_different_cbars = True, use_different_cmaps = True)
+fig = figs[0]
+
+ax1 = fig.get_axes()[0]
+ax2 = fig.get_axes()[1]
+
+iys = [0]
+for i, year in enumerate(anni):
+    iys.append(i)
+    # if year in [1950, 2000, 2025, 2050, 2075]:
+    #     for jj in range(20):
+    #         iys.append(i)
+    if year == 2100:
+        for jj in range(100):
+            iys.append(i)
+
+line_ani = animation.FuncAnimation(fig, animate_double, frames = len(iys), fargs = (ax1, ax2, ), interval=100, blit=False)
+filename = cart_out + "taspr_anomaly_animation_nearside.gif"
+writer = PillowWriter(fps = fps)
+line_ani.save(filename, writer = writer)
