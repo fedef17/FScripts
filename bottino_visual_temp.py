@@ -117,9 +117,10 @@ for var in ['tas', 'pr']:
         ax.clear()
         map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
         year = anni[i]
+        print(year)
         color = cset[i]
         tam = tahiss[i] - pimean['tas']
-        ax.set_title(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+        ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
         return
 
 
@@ -164,7 +165,7 @@ for var in ['tas', 'pr']:
     else:
         iys = [0]
         clon = 0.
-        for i, year in enumerate(anni[1:]):
+        for i, year in enumerate(anni):
             iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
                 for jj in range(20):
@@ -220,7 +221,7 @@ for var in ['tas', 'pr']:
     else:
         iys = [0]
         clon = 0.
-        for i, year in enumerate(anni[1:]):
+        for i, year in enumerate(anni):
             iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
                 for jj in range(20):
@@ -235,8 +236,9 @@ for var in ['tas', 'pr']:
         line_ani.save(filename, writer = writer)
 
     ## Rotating with focus on NPole/Northern mid-latitudes
-    def animate_rotate(i, clon):
-        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+    def animate_rotate(i):
+        clon = clons[i]
+        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
         fig.clear()
         ax = plt.subplot(projection = proj)
         ax.set_global()
@@ -245,10 +247,11 @@ for var in ['tas', 'pr']:
         pc = ccrs.PlateCarree()
         map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, pc, cmappa, cbar_range, draw_grid = True)
         year = anni[i]
+        print(year)
         color = cset[i]
         tam = tahiss[i] - pimean['tas']
 
-        ax.set_title(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+        ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
 
         return
 
@@ -283,7 +286,7 @@ for var in ['tas', 'pr']:
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
-                proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+                proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
                 fig.clear()
                 ax = plt.subplot(projection = proj)
                 ax.set_global()
@@ -295,7 +298,7 @@ for var in ['tas', 'pr']:
                 if year in [1950, 2000, 2025, 2050, 2075]:
                     for jj in range(20):
                         clon = (clon-18)%360
-                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+                        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -307,7 +310,7 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50):
                         clon = (clon-7.2)%360
-                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+                        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -320,7 +323,7 @@ for var in ['tas', 'pr']:
         clons = [0.]
         iys = [0]
         clon = 0.
-        for i, year in enumerate(anni[1:]):
+        for i, year in enumerate(anni):
             clon = (clon-7.2)%360
             clons.append(clon)
             iys.append(i)
@@ -335,7 +338,7 @@ for var in ['tas', 'pr']:
                     clons.append(clon)
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = iys, fargs = (clons,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = iys, interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
         writer = PillowWriter(fps = 10)
