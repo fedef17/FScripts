@@ -67,7 +67,7 @@ from matplotlib import colors as mcolors
 heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
 ###
-dpi = 50
+dpi = 150
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
