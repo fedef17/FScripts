@@ -242,6 +242,7 @@ for var in ['tas', 'pr']:
         filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
         writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
+        del line_ani
 
     ## Focus on Europe
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (12, 9), coast_lw = 1)
@@ -297,6 +298,7 @@ for var in ['tas', 'pr']:
         filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
         writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
+        del line_ani
 
     ## Rotating with focus on Northern mid-latitudes
     ##
@@ -375,6 +377,7 @@ for var in ['tas', 'pr']:
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
         writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
+        del line_ani
 
 #### Double anim
 ## Focus on Europe
@@ -406,3 +409,4 @@ line_ani = animation.FuncAnimation(fig, animate_double, frames = len(iys), fargs
 filename = cart_out + "taspr_anomaly_animation_nearside.gif"
 writer = PillowWriter(fps = fps)
 line_ani.save(filename, writer = writer)
+del line_ani
