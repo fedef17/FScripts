@@ -278,7 +278,7 @@ for var in ['tas', 'pr']:
     clat = 30
     blat = -10
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (clat, 0), bounding_lat = blat., figsize = (8, 6), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (clat, 0), bounding_lat = blat, figsize = (8, 6), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
