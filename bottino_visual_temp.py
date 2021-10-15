@@ -81,17 +81,19 @@ for var in ['tas', 'pr']:
     coso = xr.concat([cosohist, cosossp], dim = 'year')
     presme = coso.sel(year = slice(1960, 1990)).mean('year')
 
-    if os.path.exists(cart_out + 'histssp_{}_lowpass.p'.format(var)):
-        cosolow = pickle.load(open(cart_out + 'histssp_{}_lowpass.p'.format(var), 'rb'))
+
+    if os.path.exists(cart_out + 'histssp_{}_lowpass_LR.p'.format(var)):
+        cosolow, presme = pickle.load(open(cart_out + 'histssp_{}_lowpass_LR.p'.format(var), 'rb'))
     else:
+        coso = ctl.regrid_dataset(coso, regrid_to_deg = 2.)
+        presme = ctl.regrid_dataset(presme, regrid_to_deg = 2.)
         if var == 'tas':
             cosolow = ctl.butter_filter(coso, 5)
         elif var == 'pr':
             cosolow = ctl.butter_filter(coso, 10)
-        pickle.dump(cosolow, open(cart_out + 'histssp_{}_lowpass.p'.format(var), 'wb'))
+        pickle.dump([cosolow, presme], open(cart_out + 'histssp_{}_lowpass_LR.p'.format(var), 'wb'))
 
     anni = coso.year.values
-
 
     if var == 'tas':
         #cmappa = cm.get_cmap('RdBu_r')#'gist_ncar')
@@ -112,7 +114,7 @@ for var in ['tas', 'pr']:
     def animate(i, ax):
         proj = ccrs.PlateCarree()
         ax.clear()
-        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], coso.lat, coso.lon, proj, cmappa, cbar_range, draw_grid = True)
+        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
         year = anni[i]
         color = cset[i]
         tam = tahiss[i] - pimean['tas']
@@ -129,7 +131,7 @@ for var in ['tas', 'pr']:
 
     # Plotting figure
     proj = ccrs.PlateCarree()
-    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], coso.lat, coso.lon, proj, cmappa, cbar_range)
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], presme.lat, presme.lon, proj, cmappa, cbar_range)
 
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
@@ -171,7 +173,7 @@ for var in ['tas', 'pr']:
 
     # Plotting figure
     proj = ccrs.PlateCarree()
-    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], coso.lat, coso.lon, proj, cmappa, cbar_range)
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], presme.lat, presme.lon, proj, cmappa, cbar_range)
 
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
@@ -208,12 +210,12 @@ for var in ['tas', 'pr']:
         line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
 
     ## Rotating with focus on NPole/Northern mid-latitudes
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 0), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (30, 0), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
     proj = ccrs.PlateCarree()
-    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], coso.lat, coso.lon, proj, cmappa, cbar_range)
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], presme.lat, presme.lon, proj, cmappa, cbar_range)
 
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
@@ -239,7 +241,7 @@ for var in ['tas', 'pr']:
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
-                proj = ctl.def_projection('nearside', (50, clon), bounding_lat = 0)
+                proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
                 fig.clear()
                 ax = plt.subplot(projection = proj)
                 ax.set_global()
