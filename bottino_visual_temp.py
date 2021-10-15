@@ -119,13 +119,9 @@ for var in ['tas', 'pr']:
         year = anni[i]
         color = cset[i]
         tam = tahiss[i] - pimean['tas']
-        #tit.set_text(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
         ax.set_title(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
-        #showdate.set_text('{}'.format(year))#, color = color)
-        #showdate.update(color = color)
-        #ax.relim()
-        #ax.autoscale_view()
         return
+
 
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (9, 5), coast_lw = 1)
     #tit = plt.title('1850')
@@ -166,18 +162,18 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50): writer.grab_frame()
     else:
-        iys = [anni[0]]
+        iys = [0]
         clon = 0.
         for i, year in enumerate(anni[1:]):
-            iys.append(year)
+            iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
                 for jj in range(20):
-                    iys.append(year)
+                    iys.append(i)
             elif year == 2100:
                 for jj in range(50):
-                    iys.append(year)
+                    iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = anni, fargs = (ax,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = iys, fargs = (ax,), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
@@ -222,18 +218,18 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50): writer.grab_frame()
     else:
-        iys = [anni[0]]
+        iys = [0]
         clon = 0.
         for i, year in enumerate(anni[1:]):
-            iys.append(year)
+            iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
                 for jj in range(20):
-                    iys.append(year)
+                    iys.append(i)
             elif year == 2100:
                 for jj in range(50):
-                    iys.append(year)
+                    iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = anni, fargs = (ax,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = iys, fargs = (ax, ), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
@@ -322,24 +318,24 @@ for var in ['tas', 'pr']:
                         writer.grab_frame()
     else:
         clons = [0.]
-        iys = [anni[0]]
+        iys = [0]
         clon = 0.
         for i, year in enumerate(anni[1:]):
             clon = (clon-7.2)%360
             clons.append(clon)
-            iys.append(year)
+            iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
                 for jj in range(20):
                     clon = (clon-18)%360
                     clons.append(clon)
-                    iys.append(year)
+                    iys.append(i)
             elif year == 2100:
                 for jj in range(50):
                     clon = (clon-7.2)%360
                     clons.append(clon)
-                    iys.append(year)
+                    iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = anni, fargs = (clons,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = iys, fargs = (clons,), interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
         writer = PillowWriter(fps = 10)
