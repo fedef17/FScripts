@@ -67,9 +67,8 @@ from matplotlib import colors as mcolors
 heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
 ###
-dpiflat = 250
 dpi = 150
-save = True
+save = False
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -188,7 +187,7 @@ for var in ['tas', 'pr']:
     cosdue[var] = cosoanom
 
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (9, 5), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'standard', central_lat_lon = (0, 0), bounding_lat = None, figsize = (16, 9), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
