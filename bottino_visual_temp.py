@@ -177,7 +177,7 @@ for var in ['tas', 'pr']:
                 for jj in range(50):
                     iys.append(year)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = anni, fargs = (ax,), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
@@ -233,7 +233,7 @@ for var in ['tas', 'pr']:
                 for jj in range(50):
                     iys.append(year)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = anni, fargs = (ax,), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
