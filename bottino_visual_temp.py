@@ -69,6 +69,7 @@ heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 ###
 dpi = 150
 save = False
+fps = 7
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -243,7 +244,7 @@ for var in ['tas', 'pr']:
         line_ani.save(filename, writer = writer)
 
     ## Focus on Europe
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (12, 9), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
@@ -302,7 +303,7 @@ for var in ['tas', 'pr']:
     clat = 30
     blat = -10
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (clat, 0), bounding_lat = blat, figsize = (8, 6), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (clat, 0), bounding_lat = blat, figsize = (12, 9), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
@@ -377,7 +378,7 @@ for var in ['tas', 'pr']:
 
 #### Double anim
 ## Focus on Europe
-#fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
+#fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (12, 9), coast_lw = 1)
 
 cmappas = [heatmap, 'BrBG']
 cbrangs = [(-8, 8), (-30, 30)]
