@@ -287,7 +287,7 @@ for var in ['tas', 'pr']:
 
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = PillowWriter(fps = 10)
+        writer = PillowWriter(fps = 5)
         #writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
         clon = 0.
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
@@ -334,8 +334,8 @@ for var in ['tas', 'pr']:
             clon = (clon-7.2)%360
             clons.append(clon)
             iys.append(i)
-            if year in [1950, 2000, 2025, 2050, 2075]:
-                for jj in range(25):
+            if year in [2050, 2075]:
+                for jj in range(50):
                     clon = (clon-7.2)%360
                     clons.append(clon)
                     iys.append(i)
