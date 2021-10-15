@@ -23,7 +23,7 @@ import glob
 import xclim
 
 import matplotlib.animation as animation
-from matplotlib.animation import ImageMagickFileWriter
+from matplotlib.animation import ImageMagickFileWriter, PillowWriter
 
 import cartopy.crs as ccrs
 
@@ -68,6 +68,7 @@ heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
 
 ###
 dpi = 150
+save = True
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -151,10 +152,10 @@ for var in ['tas', 'pr']:
 
     #showdate = ax.text(0.5, 0.95, '1850', fontweight = 'bold', color = cset[0], bbox=dict(facecolor='lightsteelblue', edgecolor='black', boxstyle='round,pad=1'))
 
-    save = True
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
+        #writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
+        writer = PillowWriter(fps = 10)
         with writer.saving(fig, cart_out + "{}_anomaly_animation_flat.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
@@ -165,7 +166,18 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50): writer.grab_frame()
     else:
-        line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
+        iys = [anni[0]]
+        clon = 0.
+        for i, year in enumerate(anni[1:]):
+            iys.append(year)
+            if year in [1950, 2000, 2025, 2050, 2075]:
+                for jj in range(20):
+                    iys.append(year)
+            elif year == 2100:
+                for jj in range(50):
+                    iys.append(year)
+
+        line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
 
     ## Focus on Europe
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
@@ -193,10 +205,10 @@ for var in ['tas', 'pr']:
 
     #showdate = ax.text(0.5, 0.95, '1850', fontweight = 'bold', color = cset[0], bbox=dict(facecolor='lightsteelblue', edgecolor='black', boxstyle='round,pad=1'))
 
-    save = True
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
+        writer = PillowWriter(fps = 10)
+        #writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 print(year)
@@ -207,9 +219,37 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50): writer.grab_frame()
     else:
-        line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
+        iys = [anni[0]]
+        clon = 0.
+        for i, year in enumerate(anni[1:]):
+            iys.append(year)
+            if year in [1950, 2000, 2025, 2050, 2075]:
+                for jj in range(20):
+                    iys.append(year)
+            elif year == 2100:
+                for jj in range(50):
+                    iys.append(year)
+
+        line_ani = animation.FuncAnimation(fig, animate, frames = anni, interval=100, blit=False)
 
     ## Rotating with focus on NPole/Northern mid-latitudes
+    def animate_rotate(i, clon):
+        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+        fig.clear()
+        ax = plt.subplot(projection = proj)
+        ax.set_global()
+        ax.coastlines(linewidth = 1)
+
+        pc = ccrs.PlateCarree()
+        map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, pc, cmappa, cbar_range, draw_grid = True)
+        year = anni[i]
+        color = cset[i]
+        tam = tahiss[i] - pimean['tas']
+
+        ax.set_title(r'{} -> {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+
+        return
+
     fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (30, 0), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
     #tit = plt.title('1850')
 
@@ -233,10 +273,10 @@ for var in ['tas', 'pr']:
     wspace = 0.05    # width reserved for blank space
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-    save = True
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
-        writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
+        writer = PillowWriter(fps = 10)
+        #writer = ImageMagickFileWriter(fps = 10)#, frame_size = (600, 300))#, metadata = metadata,
         clon = 0.
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
@@ -251,8 +291,46 @@ for var in ['tas', 'pr']:
                 animate(i, ax)
                 writer.grab_frame()
                 if year in [1950, 2000, 2025, 2050, 2075]:
-                    for jj in range(10): writer.grab_frame()
+                    for jj in range(20):
+                        clon = (clon-18)%360
+                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+                        fig.clear()
+                        ax = plt.subplot(projection = proj)
+                        ax.set_global()
+                        ax.coastlines(linewidth = 1)
+
+                        print(year)
+                        animate(i, ax)
+                        writer.grab_frame()
                 elif year == 2100:
-                    for jj in range(50): writer.grab_frame()
+                    for jj in range(50):
+                        clon = (clon-7.2)%360
+                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -20)
+                        fig.clear()
+                        ax = plt.subplot(projection = proj)
+                        ax.set_global()
+                        ax.coastlines(linewidth = 1)
+
+                        print(year)
+                        animate(i, ax)
+                        writer.grab_frame()
     else:
-        line_ani = animation.FuncAnimation(fig, animate, len(anni), interval=100, blit=False)
+        clons = [0.]
+        iys = [anni[0]]
+        clon = 0.
+        for i, year in enumerate(anni[1:]):
+            clon = (clon-7.2)%360
+            clons.append(clon)
+            iys.append(year)
+            if year in [1950, 2000, 2025, 2050, 2075]:
+                for jj in range(20):
+                    clon = (clon-18)%360
+                    clons.append(clon)
+                    iys.append(year)
+            elif year == 2100:
+                for jj in range(50):
+                    clon = (clon-7.2)%360
+                    clons.append(clon)
+                    iys.append(year)
+
+        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = anni, fargs = (clons,), interval=100, blit=False)
