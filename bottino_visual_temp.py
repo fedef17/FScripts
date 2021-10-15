@@ -348,5 +348,5 @@ for var in ['tas', 'pr']:
         line_ani = animation.FuncAnimation(fig, animate_rotate, frames = len(iys), interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
-        writer = PillowWriter(fps = 10)
+        writer = PillowWriter(fps = 5)
         line_ani.save(filename, writer = writer)
