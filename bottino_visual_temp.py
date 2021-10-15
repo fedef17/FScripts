@@ -73,6 +73,7 @@ save = False
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
 tahiss = np.concatenate([glomeans[('hist', 'tas')][1], glomeans[('ssp585', 'tas')][1]])
+tahiss = ctl.butter_filter(tahiss, 5)
 
 for var in ['tas', 'pr']:
     cosopi = yeamean[('pi', var)]
@@ -112,7 +113,8 @@ for var in ['tas', 'pr']:
     cset = ctl.color_set(len(anni), bright_thres = 0., full_cb_range = True)
 
 
-    def animate(i, ax):
+    def animate(ii, ax):
+        i = iys[ii]
         proj = ccrs.PlateCarree()
         ax.clear()
         map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
@@ -174,7 +176,7 @@ for var in ['tas', 'pr']:
                 for jj in range(50):
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = iys, fargs = (ax,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax,), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_flat.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
@@ -215,12 +217,11 @@ for var in ['tas', 'pr']:
                 animate(i, ax)
                 writer.grab_frame()
                 if year in [1950, 2000, 2025, 2050, 2075]:
-                    for jj in range(10): writer.grab_frame()
+                    for jj in range(20): writer.grab_frame()
                 elif year == 2100:
                     for jj in range(50): writer.grab_frame()
     else:
         iys = [0]
-        clon = 0.
         for i, year in enumerate(anni):
             iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
@@ -230,15 +231,16 @@ for var in ['tas', 'pr']:
                 for jj in range(50):
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = iys, fargs = (ax, ), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax, ), interval=100, blit=False)
         filename = cart_out + "{}_anomaly_animation_nearside.gif".format(var)
         writer = PillowWriter(fps = 10)
         line_ani.save(filename, writer = writer)
 
-    ## Rotating with focus on NPole/Northern mid-latitudes
-    def animate_rotate(i):
-        clon = clons[i]
-        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
+    ## Rotating with focus on Northern mid-latitudes
+    def animate_rotate(ii):
+        i = iys[ii]
+        clon = clons[ii]
+        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
         fig.clear()
         ax = plt.subplot(projection = proj)
         ax.set_global()
@@ -255,7 +257,7 @@ for var in ['tas', 'pr']:
 
         return
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (30, 0), bounding_lat = 10., figsize = (8, 6), coast_lw = 1)
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (30, 0), bounding_lat = -10., figsize = (8, 6), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
@@ -286,7 +288,7 @@ for var in ['tas', 'pr']:
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
-                proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
+                proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
                 fig.clear()
                 ax = plt.subplot(projection = proj)
                 ax.set_global()
@@ -298,7 +300,7 @@ for var in ['tas', 'pr']:
                 if year in [1950, 2000, 2025, 2050, 2075]:
                     for jj in range(20):
                         clon = (clon-18)%360
-                        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
+                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -310,7 +312,7 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50):
                         clon = (clon-7.2)%360
-                        proj = ctl.def_projection('nearside', (20, clon), bounding_lat = -20)
+                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -338,7 +340,7 @@ for var in ['tas', 'pr']:
                     clons.append(clon)
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = iys, interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate_rotate, frames = len(iys), interval=100, blit=False)
 
         filename = cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var)
         writer = PillowWriter(fps = 10)
