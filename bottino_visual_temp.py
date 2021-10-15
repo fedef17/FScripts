@@ -137,9 +137,9 @@ for var in ['tas', 'pr']:
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
     cb.ax.tick_params(labelsize=14)
     if var == 'tas':
-        cb.set_label('Temperature anomaly (K)', fontsize=16)
+        cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
     elif var == 'pr':
-        cb.set_label('Relative precipitation anomaly (%)', fontsize=16)
+        cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
 
     top    = 0.88  # the top of the subplots
     bottom = 0.20    # the bottom of the subplots
@@ -193,9 +193,9 @@ for var in ['tas', 'pr']:
     cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
     cb.ax.tick_params(labelsize=14)
     if var == 'tas':
-        cb.set_label('Temperature anomaly (K)', fontsize=16)
+        cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
     elif var == 'pr':
-        cb.set_label('Relative precipitation anomaly (%)', fontsize=16)
+        cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
 
     top    = 0.88  # the top of the subplots
     bottom = 0.20    # the bottom of the subplots
@@ -240,7 +240,7 @@ for var in ['tas', 'pr']:
     def animate_rotate(ii):
         i = iys[ii]
         clon = clons[ii]
-        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
+        proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
         fig.clear()
         ax = plt.subplot(projection = proj)
         ax.set_global()
@@ -255,30 +255,35 @@ for var in ['tas', 'pr']:
 
         ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
 
+        ## Colorbar
+        cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+        cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
+        cb.ax.tick_params(labelsize=14)
+        if var == 'tas':
+            cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
+        elif var == 'pr':
+            cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
+
+        top    = 0.88  # the top of the subplots
+        bottom = 0.20    # the bottom of the subplots
+        left   = 0.02    # the left side
+        right  = 0.98  # the right side
+        hspace = 0.20   # height reserved for white space
+        wspace = 0.05    # width reserved for blank space
+        plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
         return
 
-    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (30, 0), bounding_lat = -10., figsize = (8, 6), coast_lw = 1)
+    ##
+    clat = 30
+    blat = -10
+
+    fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (clat, 0), bounding_lat = blat., figsize = (8, 6), coast_lw = 1)
     #tit = plt.title('1850')
 
     # Plotting figure
     proj = ccrs.PlateCarree()
     map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[0], presme.lat, presme.lon, proj, cmappa, cbar_range)
-
-    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
-    cb.ax.tick_params(labelsize=14)
-    if var == 'tas':
-        cb.set_label('Temperature anomaly (K)', fontsize=16)
-    elif var == 'pr':
-        cb.set_label('Relative precipitation anomaly (%)', fontsize=16)
-
-    top    = 0.88  # the top of the subplots
-    bottom = 0.20    # the bottom of the subplots
-    left   = 0.02    # the left side
-    right  = 0.98  # the right side
-    hspace = 0.20   # height reserved for white space
-    wspace = 0.05    # width reserved for blank space
-    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
     if save:
         metadata = dict(title='Temperature anomaly (EC-Earth CMIP6 - r4)', artist='F. Fabiano (ISAC - CNR)')
@@ -288,7 +293,7 @@ for var in ['tas', 'pr']:
         with writer.saving(fig, cart_out + "{}_anomaly_animation_nearside_rotating.gif".format(var), dpi):
             for i, (year, col) in enumerate(zip(anni, cset)):
                 clon = (clon-7.2)%360
-                proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
+                proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
                 fig.clear()
                 ax = plt.subplot(projection = proj)
                 ax.set_global()
@@ -300,7 +305,7 @@ for var in ['tas', 'pr']:
                 if year in [1950, 2000, 2025, 2050, 2075]:
                     for jj in range(20):
                         clon = (clon-18)%360
-                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
+                        proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -312,7 +317,7 @@ for var in ['tas', 'pr']:
                 elif year == 2100:
                     for jj in range(50):
                         clon = (clon-7.2)%360
-                        proj = ctl.def_projection('nearside', (30, clon), bounding_lat = -10)
+                        proj = ctl.def_projection('nearside', (clat, clon), bounding_lat = blat)
                         fig.clear()
                         ax = plt.subplot(projection = proj)
                         ax.set_global()
@@ -330,8 +335,8 @@ for var in ['tas', 'pr']:
             clons.append(clon)
             iys.append(i)
             if year in [1950, 2000, 2025, 2050, 2075]:
-                for jj in range(20):
-                    clon = (clon-18)%360
+                for jj in range(25):
+                    clon = (clon-7.2)%360
                     clons.append(clon)
                     iys.append(i)
             elif year == 2100:
