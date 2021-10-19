@@ -124,7 +124,7 @@ markers = ['x', 'o', 's', 'D']
 for ru, col, mark in zip(allru, colors, markers):
     print(ru)
     piuz = enso[ru]['tos'].groupby('time.year').mean()
-    tass = glomeans[(ru, 'tas')][1]
+    tass = glomeans[(ru, 'tas')][1]-pimean['tas']
     toaz = glomeans[(ru, 'net_toa')][1]
     dsst = dsst_all[ru]
     if ru == 'pi':
@@ -152,7 +152,7 @@ for ru, col, mark in zip(allru, colors, markers):
         ds50.append(dsst[ini:fin].mean())
 
     #ax.plot(ds50, enso_std, color = 'grey', linewidth = 0.3)
-    sc = ax.scatter(ds50, enso_std, c = tass50, edgecolor = 'grey', s = 100, marker = mark)#vmin = 0., vmax = 1.,
+    sc = ax.scatter(ds50, enso_std, c = tass50, edgecolor = 'grey', s = 100, marker = mark, vmin = 0., vmax = 8.)
 
 #ax.set_title('enso vs tas')
 ax.set_ylabel('Enso std (K)')
