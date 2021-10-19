@@ -78,7 +78,7 @@ for ru in allru:
 
 dsst_all = dict()
 
-for ru, axo, axa, axl, col in zip(allru, axs_o.flatten(), axs_a.flatten(), axsli.flatten(), colors):
+for ru, col in zip(allru, colors):
     print(ru)
     piuz = enso[ru]['tos'].groupby('time.year').mean()
     years, gtas = glomeans[(ru, 'tas')]
