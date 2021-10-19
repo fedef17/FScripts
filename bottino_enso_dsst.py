@@ -88,7 +88,7 @@ for ru, col in zip(allru, colors):
     yeme = yeamean[(ru, 'tas')]
 
     if ru == 'pi':
-        g10 = g10[:-1]
+        #g10 = g10[:-1]
         yeme = yeme[:-1]
 
     dsst = yeme.sel(lat = slice(-5, 5), lon = slice(100, 180)).mean(['lat', 'lon']) - yeme.sel(lat = slice(-5, 5), lon = slice(200, 280)).mean(['lat', 'lon'])
