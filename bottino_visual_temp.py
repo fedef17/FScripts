@@ -31,8 +31,8 @@ plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 22
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 15
+plt.rcParams['axes.titlesize'] = 28
+plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
@@ -60,8 +60,8 @@ colors2 = colors + ['indianred', 'steelblue']
 
 ### New colormap for temperature
 col = cm.RdBu_r(np.linspace(0.,1,256))
-col2 = cm.PuRd_r(np.linspace(0.25,0.75,128))
-col3 = cm.bone_r(np.linspace(0.25,0.75,128))
+col2 = cm.PuRd_r(np.linspace(0.25,0.65,100))
+col3 = cm.bone_r(np.linspace(0.25,0.65,100))
 colors = np.concatenate([col3, col, col2])
 from matplotlib import colors as mcolors
 heatmap = mcolors.LinearSegmentedColormap.from_list('heat_strong', colors)
