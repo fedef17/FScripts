@@ -111,7 +111,7 @@ def animate(ii, ax):
     #print(year)
     color = cset[i]
     tam = tahiss[i] - pimean['tas']
-    ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+    ax.set_title(r'{} $\to$ {:+5.1f} $^\circ$C wrt PI'.format(year, tam))
     return
 
 def animate_double(ii, ax1, ax2):
@@ -121,7 +121,7 @@ def animate_double(ii, ax1, ax2):
     #print(year)
     color = cset[i]
     tam = tahiss[i] - pimean['tas']
-    tit = r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam)
+    tit = r'{} $\to$ {:+5.1f} $^\circ$C wrt PI'.format(year, tam)
     fig.suptitle(tit)
 
     proj = ccrs.PlateCarree()
@@ -148,7 +148,7 @@ def animate_rotate(ii):
     color = cset[i]
     tam = tahiss[i] - pimean['tas']
 
-    ax.set_title(r'{} $\to$ {:+5.1f} $\circ$C wrt PI'.format(year, tam))
+    ax.set_title(r'{} $\to$ {:+5.1f} $^\circ$C wrt PI'.format(year, tam))
 
     ## Colorbar
     cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
@@ -313,7 +313,7 @@ for ssp in ['ssp585', 'ssp245']:
 
         ## Focus on Europe
         print('nearside {} {}'.format(var, ssp))
-        
+
         fig, ax = ctl.get_cartopy_fig_ax(visualization = 'nearside', central_lat_lon = (50, 20), bounding_lat = 10., figsize = (12, 9), coast_lw = 1)
         #tit = plt.title('1850')
 
