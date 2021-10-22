@@ -305,7 +305,7 @@ for ssp in ['ssp585', 'ssp245']:
                 for jj in range(100):
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax, plot_margins), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax, medit), interval=100, blit=False)
         filename = cart_out + "{}_anim_flat_medit_{}.gif".format(var, ssp)
         writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
