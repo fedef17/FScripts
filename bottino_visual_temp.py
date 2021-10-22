@@ -74,22 +74,22 @@ fps = 7
 ######################## LEGGO 245
 filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/ssp245/atmos/Amon/r4i1p1f1/{}/{}*nc'
 
-yeamean_245 = dict()
-glomeans_245 = dict()
-ru = 'ssp245'
-for var in ['tas', 'pr']:
-    print(var)
-    fils = glob.glob(filna.format(var, var))
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    cosoye = kose[var].groupby("time.year").mean().compute()
-    yeamean_245[(ru, var)] = cosoye
-
-    glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(cosoye))
-
-pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
+# yeamean_245 = dict()
+# glomeans_245 = dict()
+# ru = 'ssp245'
+# for var in ['tas', 'pr']:
+#     print(var)
+#     fils = glob.glob(filna.format(var, var))
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     cosoye = kose[var].groupby("time.year").mean().compute()
+#     yeamean_245[(ru, var)] = cosoye
+#
+#     glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(cosoye))
+#
+# pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
 
 glomeans_245, yeamean_245 = pickle.load(open(cart_out + 'yeamean_245.p', 'rb'))
 
@@ -102,11 +102,11 @@ yeamean.update(yeamean_245)
 
 ########
 
-def animate(ii, ax):
+def animate(ii, ax, plot_margins = None):
     i = iys[ii]
     proj = ccrs.PlateCarree()
     ax.clear()
-    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True)
+    map_plot = ctl.plot_mapc_on_ax(ax, cosoanom[i, ...], presme.lat, presme.lon, proj, cmappa, cbar_range, draw_grid = True, plot_margins = plot_margins)
     year = anni[i]
     #print(year)
     color = cset[i]
@@ -305,7 +305,7 @@ for ssp in ['ssp585', 'ssp245']:
                 for jj in range(100):
                     iys.append(i)
 
-        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax,), interval=100, blit=False)
+        line_ani = animation.FuncAnimation(fig, animate, frames = len(iys), fargs = (ax, plot_margins), interval=100, blit=False)
         filename = cart_out + "{}_anim_flat_medit_{}.gif".format(var, ssp)
         writer = PillowWriter(fps = fps)
         line_ani.save(filename, writer = writer)
