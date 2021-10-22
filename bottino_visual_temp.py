@@ -74,22 +74,22 @@ fps = 7
 ######################## LEGGO 245
 filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/ssp245/atmos/Amon/r4i1p1f1/{}/{}*nc'
 
-# yeamean_245 = dict()
-# glomeans_245 = dict()
-# ru = 'ssp245'
-# for var in ['tas', 'pr']:
-#     print(var)
-#     fils = glob.glob(filna.format(var, var))
-#
-#     kose = xr.open_mfdataset(fils, use_cftime = True)
-#     kose = kose.drop_vars('time_bnds')
-#
-#     cosoye = kose[var].groupby("time.year").mean().compute()
-#     yeamean_245[(ru, var)] = cosoye
-#
-#     glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(kose[var]))
-#
-# pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
+yeamean_245 = dict()
+glomeans_245 = dict()
+ru = 'ssp245'
+for var in ['tas', 'pr']:
+    print(var)
+    fils = glob.glob(filna.format(var, var))
+
+    kose = xr.open_mfdataset(fils, use_cftime = True)
+    kose = kose.drop_vars('time_bnds')
+
+    cosoye = kose[var].groupby("time.year").mean().compute()
+    yeamean_245[(ru, var)] = cosoye
+
+    glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(cosoye))
+
+pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
 
 glomeans_245, yeamean_245 = pickle.load(open(cart_out + 'yeamean_245.p', 'rb'))
 
