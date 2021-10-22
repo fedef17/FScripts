@@ -74,22 +74,22 @@ fps = 7
 ######################## LEGGO 245
 filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/ssp245/atmos/Amon/r4i1p1f1/{}/{}*nc'
 
-yeamean_245 = dict()
-glomeans_245 = dict()
-ru = 'ssp245'
-for var in ['tas', 'pr']:
-    print(var)
-    fils = glob.glob(filna.format(var, var))
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    cosoye = kose[var].groupby("time.year").mean().compute()
-    yeamean_245[(ru, var)] = cosoye
-
-    glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(kose[var]))
-
-pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
+# yeamean_245 = dict()
+# glomeans_245 = dict()
+# ru = 'ssp245'
+# for var in ['tas', 'pr']:
+#     print(var)
+#     fils = glob.glob(filna.format(var, var))
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     cosoye = kose[var].groupby("time.year").mean().compute()
+#     yeamean_245[(ru, var)] = cosoye
+#
+#     glomeans_245[(ru, var)] = (cosoye.year.values, ctl.global_mean(kose[var]))
+#
+# pickle.dump([glomeans_245, yeamean_245], open(cart_out + 'yeamean_245.p', 'wb'))
 
 glomeans_245, yeamean_245 = pickle.load(open(cart_out + 'yeamean_245.p', 'rb'))
 
@@ -157,7 +157,7 @@ def animate_rotate(ii):
     if var == 'tas':
         cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
     elif var == 'pr':
-        cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
+        cb.set_label('Precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
 
     top    = 0.88  # the top of the subplots
     bottom = 0.20    # the bottom of the subplots
@@ -185,16 +185,16 @@ for ssp in ['ssp585', 'ssp245']:
         coso = xr.concat([cosohist, cosossp], dim = 'year')
         presme = coso.sel(year = slice(1960, 1990)).mean('year')
 
-        # if os.path.exists(cart_out + 'histssp_{}_lowpass_LR.p'.format(var)):
-        #     cosolow, presme = pickle.load(open(cart_out + 'histssp_{}_lowpass_LR.p'.format(var), 'rb'))
-        # else:
-        coso = ctl.regrid_dataset(coso, regrid_to_deg = 2.)
-        presme = ctl.regrid_dataset(presme, regrid_to_deg = 2.)
-        if var == 'tas':
-            cosolow = ctl.butter_filter(coso, 5)
-        elif var == 'pr':
-            cosolow = ctl.butter_filter(coso, 10)
-        pickle.dump([cosolow, presme], open(cart_out + 'histssp_{}_lowpass_LR_{}.p'.format(var, ssp), 'wb'))
+        if os.path.exists(cart_out + 'histssp_{}_lowpass_LR_{}.p'.format(var, ssp)):
+            cosolow, presme = pickle.load(open(cart_out + 'histssp_{}_lowpass_LR_{}.p'.format(var, ssp), 'rb'))
+        else:
+            coso = ctl.regrid_dataset(coso, regrid_to_deg = 2.)
+            presme = ctl.regrid_dataset(presme, regrid_to_deg = 2.)
+            if var == 'tas':
+                cosolow = ctl.butter_filter(coso, 5)
+            elif var == 'pr':
+                cosolow = ctl.butter_filter(coso, 10)
+            pickle.dump([cosolow, presme], open(cart_out + 'histssp_{}_lowpass_LR_{}.p'.format(var, ssp), 'wb'))
 
         anni = coso.year.values
 
@@ -275,7 +275,7 @@ for ssp in ['ssp585', 'ssp245']:
         if var == 'tas':
             cb.set_label('Temperature anomaly wrt 1960-1990 (K)', fontsize=14)
         elif var == 'pr':
-            cb.set_label('Relative precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
+            cb.set_label('Precipitation anomaly wrt 1960-1990 (%)', fontsize=14)
 
         top    = 0.88  # the top of the subplots
         bottom = 0.20    # the bottom of the subplots
@@ -342,6 +342,7 @@ for ssp in ['ssp585', 'ssp245']:
 
     #### Double anim
     ## Focus on Europe
+    #NameError: name 'tit' is not defined
 
     # cmappas = [heatmap, 'BrBG']
     # cbrangs = [(-8, 8), (-30, 30)]
