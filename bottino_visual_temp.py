@@ -72,14 +72,14 @@ save = False
 fps = 7
 
 ######################## LEGGO 245
-filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/ssp245/atmos/Amon/r4i1p1f1/{}/{}*nc'
+filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/{}/atmos/Amon/r4i1p1f1/{}/{}*nc'
 
 # yeamean_245 = dict()
 # glomeans_245 = dict()
 # ru = 'ssp245'
 # for var in ['tas', 'pr']:
 #     print(var)
-#     fils = glob.glob(filna.format(var, var))
+#     fils = glob.glob(filna.format(ru, var, var))
 #
 #     kose = xr.open_mfdataset(fils, use_cftime = True)
 #     kose = kose.drop_vars('time_bnds')
@@ -93,12 +93,33 @@ filna = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/ssp
 
 glomeans_245, yeamean_245 = pickle.load(open(cart_out + 'yeamean_245.p', 'rb'))
 
+yeamean_126 = dict()
+glomeans_126 = dict()
+ru = 'ssp126'
+for var in ['tas', 'pr']:
+    print(var)
+    fils = glob.glob(filna.format(ru, var, var))
+
+    kose = xr.open_mfdataset(fils, use_cftime = True)
+    kose = kose.drop_vars('time_bnds')
+
+    cosoye = kose[var].groupby("time.year").mean().compute()
+    yeamean_126[(ru, var)] = cosoye
+
+    glomeans_126[(ru, var)] = (cosoye.year.values, ctl.global_mean(cosoye))
+
+pickle.dump([glomeans_126, yeamean_126], open(cart_out + 'yeamean_126.p', 'wb'))
+
+#glomeans_126, yeamean_126 = pickle.load(open(cart_out + 'yeamean_126.p', 'rb'))
+
 ########################
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
 glomeans.update(glomeans_245)
 yeamean.update(yeamean_245)
+glomeans.update(glomeans_126)
+yeamean.update(yeamean_126)
 
 ########
 
@@ -171,7 +192,7 @@ def animate_rotate(ii):
 
 ########
 
-for ssp in ['ssp585', 'ssp245']:
+for ssp in ['ssp126']:#, 'ssp245', 'ssp585']:
     tahiss = np.concatenate([glomeans[('hist', 'tas')][1], glomeans[(ssp, 'tas')][1]])
     tahiss = ctl.butter_filter(tahiss, 5)
 
