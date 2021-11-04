@@ -37,27 +37,51 @@ cart_out = '/home/fedef/Research/lavori/paolitos_LWA/'
 
 filin = cart_in + 'timeseries_{}_{}.p'
 
-areas = ['NH', 'EAT', 'PNA']
-versions = ['LR', 'HR']
+areas = ['NH', 'EAT']#, 'PNA']
+versions = ['LR', 'MR', 'HR']
 
 colors = ctl.color_set(12, sns_palette = 'Paired')
 
 cose = dict()
 for area in areas:
+    cose[area] = dict()
     for vers in versions:
         print(area, vers)
         gigi = pickle.load(open(filin.format(area, vers), 'rb'))
         print(gigi['domain'], gigi['resolution'])
+        #cose[(area, vers)] = gigi['timeseries']
         mod_names = gigi['labels']
-        cose[(area, vers)] = gigi['timeseries']
+        if 'ERA5' in mod_names:
+            cose[area]['obs'] = gigi['timeseries'][0]
+            mod_names = mod_names[1:]
+            ts = gigi['timeseries'][1:]
+        for mod, tise in zip(mod_names, ts):
+            cose[area][(mod, vers)] = tise
 
+mod_list = []
+mod_list2 = []
+allvers = []
+for mod in mod_names:
+    for vers in versions:
+        if (mod, vers) in cose['NH']:
+            mod_list.append(mod + '-' + vers)
+            mod_list2.append((mod, vers))
+            allvers.append(vers)
 
-positions = [0., 0.7]
-posticks = [0.35]
-for i in range(len(mod_names)-2):
-    positions.append(positions[-1]+0.7+0.4)
-    positions.append(positions[-1]+0.7)
-    posticks.append(np.mean(positions[-2:]))
+positions, posticks = ctl.positions(mod_list)
+
+### Adding colors for mid res
+in1 = mod_list2.index(('HadGem', 'LR'))
+colors.insert(in1+1, np.mean([colors[in1], colors[in1+1]], axis = 0))
+in1 = mod_list2.index(('ECMWF', 'LR'))
+colors.insert(in1+1, np.mean([colors[in1], colors[in1+1]], axis = 0))
+
+# positions = [0., 0.7]
+# posticks = [0.35]
+# for i in range(len(mod_names)-2):
+#     positions.append(positions[-1]+0.7+0.4)
+#     positions.append(positions[-1]+0.7)
+#     posticks.append(np.mean(positions[-2:]))
 
 positions.append(positions[-1]+0.6+0.7)
 positions.append(positions[-1]+0.7+0.4)
@@ -70,21 +94,22 @@ for area in areas:
 
     allpercs = dict()
     for nu in [10, 25, 50, 75, 90]:
-        allpercs['p{}'.format(nu)] = [np.percentile(cose[(area, vers)][i], nu) for i in range(1, len(mod_names)) for vers in versions]
-    allpercs['mean'] = [np.mean(cose[(area, vers)][i]) for i in range(1, len(mod_names)) for vers in versions]
+        allpercs['p{}'.format(nu)] = [np.percentile(cose[area][(modvers[0], modvers[1])], nu) for modvers in mod_list2]
+    allpercs['mean'] = [np.mean(cose[area][(modvers[0], modvers[1])]) for modvers in mod_list2]
 
     obsperc = dict()
     for nu in [10, 25, 50, 75, 90]:
-        obsperc['p{}'.format(nu)] = np.percentile(cose[(area, vers)][0], nu)
-    obsperc['mean'] = np.mean(cose[(area, vers)][0])
+        obsperc['p{}'.format(nu)] = np.percentile(cose[area]['obs'], nu)
+    obsperc['mean'] = np.mean(cose[area]['obs'])
 
-    nomi = [mod + '_' + vers for mod in mod_names for vers in versions]
-    allvers = [vers for mod in mod_names for vers in versions]
+    #nomi = [mod + '_' + vers for mod in mod_names for vers in versions]
+    # allvers = [vers for mod in mod_names for vers in versions]
+    nomi = mod_list
 
     ctl.boxplot_on_ax(ax, allpercs, nomi, colors, versions = allvers, plot_mean = True, plot_ensmeans = True, ens_colors = ['steelblue', 'indianred'], ens_names = ['LR', 'HR'], obsperc = obsperc, obs_color = 'black', obs_name = 'ERA5', plot_minmax = False, positions = positions)
     # ax.axhline(0, color = 'gray', linewidth = 0.5)
     ax.set_xticks(posticks)
-    ax.set_xticklabels(mod_names[1:] + ['ERA5', 'LR', 'HR'])
+    ax.set_xticklabels(mod_names + ['ERA5', 'LR', 'HR'])
     #ax.set_title(tit)
 
     #ctl.custom_legend(fig, colors, nomi, ncol = 2, add_space_below = 0.1)
@@ -95,6 +120,7 @@ for area in areas:
     fig.savefig(cart_out + 'LWA_boxplot_{}.pdf'.format(area))
 
 
+sys.exit()
 ###########################################################################################
 
 cart = '/home/fedef/Research/lavori/paolitos_LWA/LWA_patterns/'

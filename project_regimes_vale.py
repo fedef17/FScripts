@@ -93,7 +93,7 @@ for area in ['EAT', 'PNA', 'NML']:
             else:
                 clatlo = (89, 0)
 
-            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}.pdf'.format(season, area, tip), plot_type = 'pcolormesh', clatlo = clatlo, cbar_range = cbar_range)
+            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}.pdf'.format(season, area, tip), clatlo = clatlo, cbar_range = cbar_range, draw_contour_lines = False, cmappa = 'RdBu_r', n_color_levels = 21)
             print(koze['lon_area'])
 
             reg_events[(season, tip, area)] = koze
