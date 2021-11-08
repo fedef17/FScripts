@@ -26,7 +26,7 @@ reg_events = dict()
 figs_scatter = []
 figs_clouds = []
 
-with open(cart+'regimes_ref.p', 'rb') as figi:
+with open(cart+'regimes_ref_v90.p', 'rb') as figi:
     regimes_ref = pickle.load(figi)
 
 ttests = dict()
@@ -47,6 +47,20 @@ for area in ['EAT', 'PNA', 'NML']:
             lensea = 92
             add = 0
             skip = 0
+
+        if season == 'DJF':
+            cbar_range = (-200., 200.)
+        else:
+            cbar_range = (-100., 100.)
+
+        if area == 'EAT':
+            clatlo = (65, -20)
+        elif area == 'PNA':
+            clatlo = (65, -140)
+        else:
+            clatlo = (89, 0)
+
+        cd.plot_regimes(koze_ref['lat_area'], koze_ref['lon_area'], koze_ref['cluspattern_area'], cart + 'regpatt_{}_{}_ref_v90.pdf'.format(season, area), clatlo = clatlo, cbar_range = cbar_range, draw_contour_lines = False, cmappa = 'RdBu_r', n_color_levels = 21)
 
         for tip in ['pos', 'neg']:
             print(area, season, tip)
@@ -81,19 +95,7 @@ for area in ['EAT', 'PNA', 'NML']:
             koze['freq_clus'] = ctl.calc_clus_freq(koze['labels'], 4)
             koze['centroids'] = ctl.calc_effective_centroids(koze['pcs'], koze['labels'], 4)
 
-            if season == 'DJF':
-                cbar_range = (-140., 140.)
-            else:
-                cbar_range = (-70., 70.)
-
-            if area == 'EAT':
-                clatlo = (65, -20)
-            elif area == 'PNA':
-                clatlo = (65, -140)
-            else:
-                clatlo = (89, 0)
-
-            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}.pdf'.format(season, area, tip), clatlo = clatlo, cbar_range = cbar_range, draw_contour_lines = False, cmappa = 'RdBu_r', n_color_levels = 21)
+            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}_v90.pdf'.format(season, area, tip), clatlo = clatlo, cbar_range = cbar_range, draw_contour_lines = False, cmappa = 'RdBu_r', n_color_levels = 21)
             print(koze['lon_area'])
 
             reg_events[(season, tip, area)] = koze
@@ -157,12 +159,12 @@ for area in ['EAT', 'PNA', 'NML']:
         # fig.suptitle(area + ' - ' + season)
         # figs_clouds.append(fig)
 
-ctl.plot_pdfpages(cart + 'scatter_regimes.pdf', figs_scatter)
-ctl.plot_pdfpages(cart + 'clouds_regimes.pdf', figs_clouds)
+ctl.plot_pdfpages(cart + 'scatter_regimes_v90.pdf', figs_scatter)
+ctl.plot_pdfpages(cart + 'clouds_regimes_v90.pdf', figs_clouds)
 
-pickle.dump(reg_events, open(cart + 'regimes_masked.p', 'wb'))
+pickle.dump(reg_events, open(cart + 'regimes_masked_v90.p', 'wb'))
 
-pickle.dump([ttests, deltadist_all], open(cart + 'delta_pcs.p', 'wb'))
+pickle.dump([ttests, deltadist_all], open(cart + 'delta_pcs_v90.p', 'wb'))
 
 ofidpc.close()
 
@@ -267,7 +269,7 @@ cb.ax.tick_params(labelsize=18)
 cb.set_label('Fractional change in PC mean', fontsize=20)
 plt.subplots_adjust(left=0.1, bottom=0.2, right=0.98, top=0.86, wspace=0.05, hspace=0.1)
 
-fig.savefig(cart + 'pc_shift.pdf')
+fig.savefig(cart + 'pc_shift_v90.pdf')
 
 ofidpc.close()
 

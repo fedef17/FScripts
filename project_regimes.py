@@ -15,7 +15,9 @@ import climdiags as cd
 
 #cart = '/home/fabiano/Research/lavori/WeatherRegimes/ERA5/'
 cart = '/home/fedef/Research/lavori/valembo_era5/'
-fil = 'out_ERA5_{}_{}_4clus_55perc_allyrs.p'
+#fil = 'out_ERA5_{}_{}_4clus_55perc_allyrs.p'
+fil = 'ERA5_v90/out_ERA5_v90_{}_{}_4clus_90perc_allyrs.p'
+
 filmask = cart + 'mask_1D_{}_{}.p'
 
 reg_events = dict()
@@ -91,7 +93,7 @@ for area in ['EAT', 'PNA', 'NML']:
             koze['freq_clus'] = ctl.calc_clus_freq(koze['labels'], 4)
             koze['centroids'] = ctl.calc_effective_centroids(koze['pcs'], koze['labels'], 4)
 
-            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}.pdf'.format(season, area, tip), plot_type = 'pcolormesh', clatlo = (89,0))
+            cd.plot_regimes(koze['lat_area'], koze['lon_area'], koze['cluspattern_area'], cart + 'regpatt_{}_{}_{}_v90.pdf'.format(season, area, tip), plot_type = 'pcolormesh', clatlo = (89,0))
             print(koze['lon_area'])
 
             reg_events[(season, tip, area)] = koze
@@ -132,11 +134,11 @@ for area in ['EAT', 'PNA', 'NML']:
         fig.suptitle(area + ' - ' + season)
         figs_clouds.append(fig)
 
-ctl.plot_pdfpages(cart + 'scatter_regimes.pdf', figs_scatter)
-ctl.plot_pdfpages(cart + 'clouds_regimes.pdf', figs_clouds)
+ctl.plot_pdfpages(cart + 'scatter_regimes_v90.pdf', figs_scatter)
+ctl.plot_pdfpages(cart + 'clouds_regimes_v90.pdf', figs_clouds)
 
-pickle.dump(reg_events, open(cart + 'regimes_masked.p', 'wb'))
-pickle.dump(regime_ref, open(cart + 'regimes_ref.p', 'wb'))
+pickle.dump(reg_events, open(cart + 'regimes_masked_v90.p', 'wb'))
+pickle.dump(regime_ref, open(cart + 'regimes_ref_v90.p', 'wb'))
 
 # data, datacoords, aux_info = ctl.read_xr('', regrid_to_deg = 2.5, extract_level_hPa = 500.)
 #
