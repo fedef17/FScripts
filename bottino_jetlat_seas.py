@@ -83,7 +83,7 @@ for season, lensea in zip(['DJF', 'JJA'], [90, 92]):
         xose2 = dict()
         for ru in allru:
             gigi = resdict[(ru, 'jli', area, season)]
-            seasstd = gigi.reshape((-1, 90)).std(axis = 1)
+            seasstd = gigi.reshape((-1, lensea)).std(axis = 1)
             xose2[ru] = seasstd
 
         fig, ax = plt.subplots(figsize = (12,8))
@@ -102,7 +102,7 @@ for season, lensea in zip(['DJF', 'JJA'], [90, 92]):
         xose3 = dict()
         for ru in allru:
             gigi = resdict[(ru, 'jspeed', area, season)]
-            seas = gigi.reshape((-1, 90)).mean(axis = 1)
+            seas = gigi.reshape((-1, lensea)).mean(axis = 1)
             xose3[ru] = seas
 
         allpercs = dict()
