@@ -59,12 +59,12 @@ allseas = ['DJF', 'MAM', 'JJA', 'SON']
 with open(cart_out + '../analisi/res_jli200_v2.p', 'rb') as filox:
     resdict = pickle.load(filox)
 
-for season in ['DJF', 'JJA']:
+for season, lensea in zip(['DJF', 'JJA'], [90, 92]):
     for area in ['NATL', 'NEPAC', 'SPAC']:
         xose = dict()
         for ru in allru:
             gigi = resdict[(ru, 'jli', area, season)]
-            seasme = gigi.reshape((-1, 90)).mean(axis = 1)
+            seasme = gigi.reshape((-1, lensea)).mean(axis = 1)
             xose[ru] = seasme
 
         allpercs = dict()
