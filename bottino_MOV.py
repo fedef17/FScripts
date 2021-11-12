@@ -99,6 +99,7 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
 
 
     if ind == 'enso':
+        obsname = 'HadISST'
         obsnino = ctl.read_from_txt(cartind + 'nino34.long.data')
         obsni = obsnino[1].flatten()[:-3]
         base = ctl.lowpass_butter(obsni, 30*12)
@@ -107,6 +108,21 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
 
         enso['obs'] = xr.DataArray(data = obsni, dims = ['time'], coords = [date], name = 'tos')
         enso['obs'] = enso['obs'].groupby('time.month') - enso['obs'].groupby('time.month').mean()
+    elif ind == 'amv':
+        obsname = 'Kaplan SST'
+        obsnino = ctl.read_from_txt(cartind + 'amon.us.long.data')
+        obsni = obsnino[1].flatten()[:-3]
+        date = xr.cftime_range(str(obsnino[0][0]), '2021-09', freq='MS')
+
+        enso['obs'] = xr.DataArray(data = obsni, dims = ['time'], coords = [date], name = 'tos')
+    elif ind == 'pdo':
+        obsname = 'ersst'
+        obsnino = ctl.read_from_txt(cartind + 'ersst.v5.pdo.dat')
+        obsni = obsnino[1].flatten()[:-3]
+        date = xr.cftime_range(str(obsnino[0][0]), '2021-09', freq='MS')
+
+        enso['obs'] = xr.DataArray(data = obsni, dims = ['time'], coords = [date], name = 'pdo')
+
 
     # for ru in allru[1:]:
     #     firstye = enso[ru].time.values[0].year
@@ -121,10 +137,15 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
         shi = 40
         delta = 100
 
+    if 'obs' in enso:
+        allruK = allru + ['obs']
+    else:
+        allruK = allru
+
     enso_std50 = dict()
     enso_abs50 = dict()
     enso_yr = dict()
-    for ru in allru:
+    for ru in allruK:
         if ind not in ['nam', 'sam']:
             # if ru == 'b990':
             #     years = np.reshape(enso[ru].time.values, (-1, 12))[:, 0].astype(int)
@@ -137,10 +158,10 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
         elif ind == 'sam':
             piuz = ctl.seasonal_set(enso[ru], season = 'MJJAS', seasonal_stat = 'mean')
 
-        if ind == 'amv' and ru == 'pi':
-            # remove 200yr oscillation
-            piuzlow = ctl.lowpass_butter(piuz, 150)
-            piuz = piuz-piuzlow
+        # if ind == 'amv' and ru == 'pi':
+        #     # remove 200yr oscillation
+        #     piuzlow = ctl.lowpass_butter(piuz, 150)
+        #     piuz = piuz-piuzlow
 
         enso_yr[ru] = piuz
 
@@ -167,33 +188,6 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
                 y1 += shi
                 piuz_ch = enso[ru].sel(time = slice(str(y0), str(y1)))
                 enso_std50[(ru, 'mon')].append(piuz_ch.std())
-
-
-    if ind == 'enso':
-        ru = 'obs'
-
-        piuz = enso[ru].groupby('time.year').mean()
-        enso_std50[ru] = []
-        enso_abs50[ru] = []
-        y0 = 0
-        y1 = y0+delta
-        while y1+shi < len(piuz):
-            y0 += shi
-            y1 += shi
-            #piuz_ch = piuz.isel(year = slice(y0, y1))
-            piuz_ch = piuz[y0:y1]
-            enso_std50[ru].append(piuz_ch.std())
-            enso_abs50[ru].append(piuz_ch.mean())
-
-        enso_std50[(ru, 'mon')] = []
-
-        y0 = enso[ru]['time.year'][0].values
-        y1 = y0+delta
-        while y1+shi < enso[ru]['time.year'][-1].values:
-            y0 += shi
-            y1 += shi
-            piuz_ch = enso[ru].sel(time = slice(str(y0), str(y1)))
-            enso_std50[(ru, 'mon')].append(piuz_ch.std())
 
     allinds[(ind, 'mon')] = enso
     allinds[(ind, 'yr')] = enso_yr
@@ -281,7 +275,8 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
     positions = 0.7*np.arange(len(allru))
     posticks = 0.7*np.arange(len(allru))
 
-    if ind == 'enso':
+    # if ind == 'enso':
+    if 'obs' in enso_std50:
         obsperc = dict()
         for nu in [10, 25, 50, 75, 90]:
             obsperc['p{}'.format(nu)] = np.percentile(enso_std50['obs'], nu)
@@ -291,10 +286,10 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
 
         positions = np.append(positions, positions[-1] + 1.1)
         posticks = positions
-        ctl.boxplot_on_ax(ax, allpercs, nams, colors, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False, obsperc = obsperc, obs_color = 'grey', obs_name = 'HadISST')
+        ctl.boxplot_on_ax(ax, allpercs, nams, colors, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False, obsperc = obsperc, obs_color = 'grey', obs_name = obsname)
         # ax.axhline(0, color = 'gray', linewidth = 0.5)
         ax.set_xticks(posticks)
-        ax.set_xticklabels(allru + ['HadISST (1870-2021)'])
+        ax.set_xticklabels(allru + [obsname + '({}-2021)'.format(enso_yr['obs'].year[0])])
 
         ax.scatter(posticks[-1], enso_std50['obs'][-1], color = 'grey', marker = 'X', s = 100)
         ax.scatter(posticks[-1], enso_std50['obs'][0], color = 'grey', marker = 'D', s = 100)
@@ -363,15 +358,34 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
     fig, ax = plt.subplots(figsize = (16,12))
     #allshi = [-0.3, -0.1, 0.1, 0.3]
 
+    ax.set_xscale('log')
+    ax.set_yscale('log')
 
-    for ru, col in zip(allru, colors):
+    if 'obs' in enso:
+        allruK = allru + ['obs']
+        colorsK = colors + ['grey']
+    else:
+        allruK = allru
+        colorsK = colors
+
+    for ru, col in zip(allruK, colorsK):
         # piuz = enso[ru]['tos'].groupby('time.year').mean()
         # data_all = piuz.values.flatten()
         piuz = enso_yr[ru]
+
+        if ind == 'amv' and ru == 'pi':
+            print('removing amv pi oscillation')
+            # remove 200yr oscillation for spectrum
+            piuzlow = ctl.lowpass_butter(piuz, 150)
+            piuz = piuz-piuzlow
+
         data_all = piuz.squeeze()
 
-
-        if ind in ['enso', 'nam', 'sam']:
+        if ind == 'enso':
+            delta = 60
+            shi = 15
+            frme = np.arange(1, 10, 0.5)
+        elif ind in ['nam', 'sam']:
             delta = 100
             shi = 25
             # frbins = [0, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20]
@@ -388,6 +402,13 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
 
         y0 = 0
         y1 = y0+delta
+
+        data = data_all[y0:y1]
+        ps = np.abs(np.fft.rfft(data, norm='forward'))**2
+        freqs = np.fft.rfftfreq(data.size, 1)
+        invfr = 1/freqs
+        allcose.append(ps)
+
         while y1+shi < len(piuz):
             y0 += shi
             y1 += shi
@@ -426,9 +447,19 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
             spect_q1 /= zuc
             spect_q3 /= zuc
 
-        spect_mean = ctl.running_mean(spect_mean, 5)
-        spect_q1 = ctl.running_mean(spect_q1, 5)
-        spect_q3 = ctl.running_mean(spect_q3, 5)
+        if ind == 'enso':
+            ruwi = 3
+        else:
+            ruwi = 5
+
+        spect_mean = ctl.running_mean(spect_mean, ruwi)
+        spect_q1 = ctl.running_mean(spect_q1, ruwi)
+        spect_q3 = ctl.running_mean(spect_q3, ruwi)
+
+        #due giri di smoothing
+        spect_mean = ctl.running_mean(spect_mean, ruwi)
+        spect_q1 = ctl.running_mean(spect_q1, ruwi)
+        spect_q3 = ctl.running_mean(spect_q3, ruwi)
 
         # if ind == 'enso':
         #     thres = 10
@@ -441,7 +472,10 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
         # ax.plot(invfr[invfr < thres], spect_mean[invfr < thres], color = col, lw = 2)
 
         #ax.fill_between(freqs, spect_q1, spect_q3, color = col, alpha = 0.1)
-        ax.plot(freqs, spect_mean, color = col, lw = 2)
+        if ru == 'obs':
+            ax.plot(freqs, spect_mean, color = col, lw = 2, ls = '--')
+        else:
+            ax.plot(freqs, spect_mean, color = col, lw = 2)
 
         #if ind != 'enso':
 
@@ -453,12 +487,10 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
         #
         # ctl.boxplot_on_ax(ax, allpercs, xba, nboxs*[col], positions = positions, edge_colors = nboxs*[col], plot_mean = False, plot_minmax = False, plot_ensmeans = False, wi = 0.1)
 
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-    if ind == 'enso':
-        ax.set_ylim(1.e-3, 0.1)
-    elif ind == 'amv':
-        ax.set_ylim(5.e-6, 3e-3)
+    # if ind == 'enso':
+    #     ax.set_ylim(1.e-3, 0.2)
+    # elif ind == 'amv':
+    #     ax.set_ylim(5.e-6, 3e-3)
 
     #ax.set_xticks(np.arange(nboxs))
     # for ii in np.arange(nboxs-1) + 0.5:

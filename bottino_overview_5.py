@@ -127,6 +127,8 @@ masfi = '/nas/BOTTINO/masks.nc'
 cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # ocean mask: 1 over ocean, 0 over land
 
+add_ssp = True
+
 for tip in ['all', 'land', 'oce']:
     var = 'tas'
     cosopi = yeamean[('pi', var)]
@@ -149,6 +151,9 @@ for tip in ['all', 'land', 'oce']:
         else:
             cosobase = cosohistssp
 
+        if add_ssp:
+            coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
+
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
 
@@ -162,7 +167,10 @@ for tip in ['all', 'land', 'oce']:
             cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
             cosmu = ctl.butter_filter(cosolat, smut)
 
-            base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            if add_ssp:
+                base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+            else:
+                base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
 
             relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             matrix.append(relcha)
@@ -170,10 +178,14 @@ for tip in ['all', 'land', 'oce']:
         matrix = np.stack(matrix)
 
         pizz = ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa)
+        ax.axvline(0., color = 'grey', ls = '--')
         #ax.set_xscale('logit')
 
         ax.set_xscale('function', functions = funcsca)
         ax.set_xticks([20., 50, 100, 200, 300, 500])
+        if add_ssp:
+            ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
+
         if ru == allru[1]:
             ax.set_yticks(np.arange(-90, 91, 30))
         else:
@@ -212,6 +224,8 @@ for tip in ['all', 'land', 'oce']:
         else:
             cosobase = cosohistssp
 
+        if add_ssp:
+            coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
 
@@ -229,7 +243,10 @@ for tip in ['all', 'land', 'oce']:
             #base = cosmu[0]
             #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
             #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
-            base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            if add_ssp:
+                base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+            else:
+                base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
 
             # relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             # if np.mean(cosmu[-ypre:]) - base < 0.001*base:
@@ -242,10 +259,14 @@ for tip in ['all', 'land', 'oce']:
         #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
 
         pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa2, vmin = -0.3, vmax = 0.3)#, norm = divnorm)
+        ax.axvline(0., color = 'grey', ls = '--')
         #ax.set_xscale('logit')
 
         ax.set_xscale('function', functions = funcsca)
         ax.set_xticks([20., 50, 100, 200, 300, 500])
+        if add_ssp:
+            ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
+
         if ru == allru[1]:
             ax.set_yticks(np.arange(-90, 91, 30))
         else:
