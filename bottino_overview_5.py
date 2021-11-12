@@ -100,7 +100,7 @@ latbins = np.arange(-90, 91, 10)
 lacol = ctl.color_set(18, use_seaborn=False)
 
 
-def difun(years, exp = 3, idiv = 100, imax = 500):
+def difun(years, exp = 3, idiv = 100, imax = 550):
     outye = np.empty_like(years)
     okye = years < idiv
     outye[okye] = np.log(years[okye])
@@ -109,7 +109,7 @@ def difun(years, exp = 3, idiv = 100, imax = 500):
 
     return outye
 
-def invfun(outye, exp = 3, idiv = 100, imax = 500):
+def invfun(outye, exp = 3, idiv = 100, imax = 550):
     years = np.empty_like(outye)
     yexp = np.exp(outye)
     okye = yexp < idiv
