@@ -155,6 +155,7 @@ for tip in ['all', 'land', 'oce']:
             cosobase = cosohistssp
 
         if add_ssp:
+            coso = coso.assign_coords({'lat': cosohistssp.lat})
             coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
 
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
@@ -170,10 +171,11 @@ for tip in ['all', 'land', 'oce']:
             cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
             cosmu = ctl.butter_filter(cosolat, smut)
 
-            if add_ssp:
-                base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
-            else:
-                base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            # if add_ssp:
+            #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+            # else:
+            #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            base = float(cosopi.sel(lat = slice(la1, la2)).mean())
 
             relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             matrix.append(relcha)
@@ -228,6 +230,7 @@ for tip in ['all', 'land', 'oce']:
             cosobase = cosohistssp
 
         if add_ssp:
+            coso = coso.assign_coords({'lat': cosohistssp.lat})
             coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
@@ -246,10 +249,12 @@ for tip in ['all', 'land', 'oce']:
             #base = cosmu[0]
             #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
             #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
-            if add_ssp:
-                base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
-            else:
-                base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            
+            # if add_ssp:
+            #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+            # else:
+            #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+            base = float(cosopi.sel(lat = slice(la1, la2)).mean())
 
             # relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
             # if np.mean(cosmu[-ypre:]) - base < 0.001*base:
