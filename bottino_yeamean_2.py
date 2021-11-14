@@ -52,8 +52,8 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 miptab = 'Amon'
 #allvars_2D = 'clt pr psl rlut rsut tas uas'.split()
-allvars_2D = 'pr tas uas psl'.split()
-allvars_3D = 'ta ua'.split()
+allvars_2D = 'psl uas pr tas'.split()
+allvars_3D = 'ua ta'.split()
 
 #var_map_200 = 'clt pr psl tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585']
@@ -63,13 +63,13 @@ colors2 = colors + ['indianred']
 figs_glob = []
 axs_glob = []
 
-yeamean = dict()
-seamean = dict()
 
 allseasons = ['DJFM', 'JJAS']
 
 #for na, ru, col in zip(allnams, allru, colors):
 for var in allvars_2D:
+    yeamean = dict()
+    seamean = dict()
     print(var)
     for na, ru, col in zip(allnams2, allru2, colors2):
         print(ru)
@@ -92,8 +92,12 @@ for var in allvars_2D:
         for sea in allseasons:
             seamean[(ru, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'mean')
 
+    pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3_{}.p'.fprmat(var), 'wb'))
+
 # 3D vars
 for var in allvars_3D:
+    yeamean = dict()
+    seamean = dict()
     print(var)
     for na, ru, col in zip(allnams, allru, colors):
         print(ru)
@@ -116,4 +120,4 @@ for var in allvars_3D:
             seamean[(ru, var+'_850', sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'mean')
 
 
-pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3.p', 'wb'))
+    pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3_{}.p'.fprmat(var), 'wb'))

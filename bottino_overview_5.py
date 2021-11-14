@@ -207,15 +207,12 @@ for tip in ['all', 'land', 'oce']:
 
     fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
 
-
-
     var = 'pr'
 
     cosopi = yeamean[('pi', var)]
     cosohist = yeamean[('hist', var)]
     cosossp = yeamean[('ssp585', var)]
     cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
-
 
     ypre = 30
 
