@@ -143,6 +143,7 @@ for tip in ['all', 'land', 'oce']:
 
     fig, axs = plt.subplots(1, 3, figsize = (16,7))
     for ru, ax in zip(allru[1:], axs.flatten()):
+        print(ru)
         coso = yeamean[(ru, var)]
 
         if tip == 'oce':
@@ -206,6 +207,8 @@ for tip in ['all', 'land', 'oce']:
 
     fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
 
+
+
     var = 'pr'
 
     cosopi = yeamean[('pi', var)]
@@ -218,6 +221,7 @@ for tip in ['all', 'land', 'oce']:
 
     fig, axs = plt.subplots(1, 3, figsize = (16,7))
     for ru, ax in zip(allru[1:], axs.flatten()):
+        print(ru)
         coso = yeamean[(ru, var)]
 
         if tip == 'oce':
@@ -249,7 +253,7 @@ for tip in ['all', 'land', 'oce']:
             #base = cosmu[0]
             #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
             #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
-            
+
             # if add_ssp:
             #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
             # else:
