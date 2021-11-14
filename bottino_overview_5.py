@@ -127,7 +127,10 @@ masfi = '/nas/BOTTINO/masks.nc'
 cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # ocean mask: 1 over ocean, 0 over land
 
+assp = ''
 add_ssp = True
+if add_ssp:
+    assp = '_wssp50'
 
 for tip in ['all', 'land', 'oce']:
     var = 'tas'
@@ -199,7 +202,7 @@ for tip in ['all', 'land', 'oce']:
     cb.set_label('Realized change', fontsize=20)
     plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}.pdf'.format(var, tip))
+    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
 
     var = 'pr'
 
@@ -279,7 +282,7 @@ for tip in ['all', 'land', 'oce']:
     cb.set_label('Relative change', fontsize=20)
     plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}.pdf'.format(var, tip))
+    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
 
 
 # ##### NOW for each sector

@@ -52,7 +52,7 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 miptab = 'Amon'
 #allvars_2D = 'clt pr psl rlut rsut tas uas'.split()
-allvars_2D = 'pr tas uas'.split()
+allvars_2D = 'pr tas uas psl'.split()
 allvars_3D = 'ta ua'.split()
 
 #var_map_200 = 'clt pr psl tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
@@ -68,57 +68,52 @@ seamean = dict()
 
 allseasons = ['DJFM', 'JJAS']
 
-for na, ru, col in zip(allnams, allru, colors):
-#for na, ru, col in zip(allnams2, allru2, colors2):
-    print(ru)
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
+#for na, ru, col in zip(allnams, allru, colors):
+for var in allvars_2D:
+    print(var)
+    for na, ru, col in zip(allnams2, allru2, colors2):
+        print(ru)
+        mem = 'r1'
+        if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+        #fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D[:-1]])
+        fils = glob.glob(filna.format(na, mem, miptab, var))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    # Separate for uas
-    fils = glob.glob(filna.format(na, mem, miptab, allvars_2D[-1]))
-    if len(fils) > 0:
-        kosettt = xr.open_mfdataset(fils, use_cftime = True)
-        kosettt = kosettt.drop_vars('time_bnds')
-        kosettt = kosettt.drop_vars('height')
-        kose = kose.assign(uas = kosettt.uas)
-
-    for var in allvars_2D:
-        print(var)
-        if var not in kose:
+        if len(fils) == 0:
+            print('NO data for {} {}'.format(var, ru))
             continue
 
+        kose = xr.open_mfdataset(fils, use_cftime = True)
+        kose = kose.drop_vars('time_bnds')
+
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
         for sea in allseasons:
             seamean[(ru, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_average = True)
-
 
 # 3D vars
-for na, ru, col in zip(allnams, allru, colors):
-    mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
+for var in allvars_3D:
+    print(var)
+    for na, ru, col in zip(allnams, allru, colors):
+        print(ru)
+        mem = 'r1'
+        if na == 'ssp585': mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
+        #fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_3D])
+        fils = glob.glob(filna.format(na, mem, miptab, var))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
+        kose = xr.open_mfdataset(fils, use_cftime = True)
+        kose = kose.drop_vars('time_bnds')
 
-    # Just keeping the 850 hPa level
-    kose = kose.sel(plev = 85000)
+        # Just keeping the 850 hPa level
+        kose = kose.sel(plev = 85000)
 
-    for var in allvars_3D:
-        print(var)
         cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
+        yeamean[(ru, var+'_850')] = cosoye
 
         for sea in allseasons:
-            seamean[(ru, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_average = True)
+            seamean[(ru, var+'_850', sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_average = True)
 
 
-pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_2.p', 'wb'))
+pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3.p', 'wb'))
