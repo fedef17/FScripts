@@ -219,8 +219,10 @@ for tip in ['all', 'land', 'oce']:
 
     ypre = 30
 
-    fig, axs = plt.subplots(1, 3, figsize = (16,7))
-    for ru, ax in zip(allru[1:], axs.flatten()):
+    #fig, axs = plt.subplots(1, 3, figsize = (16,7))
+    #for ru, ax in zip(allru[1:], axs.flatten()):
+    for ru in allru[1:]:
+        fig, ax = plt.subplots(figsize = (16,7))
         print(ru)
         coso = yeamean[(ru, var)]
 

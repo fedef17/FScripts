@@ -90,7 +90,7 @@ for var in allvars_2D:
         yeamean[(ru, var)] = cosoye
 
         for sea in allseasons:
-            seamean[(ru, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_average = True)
+            seamean[(ru, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'mean')
 
 # 3D vars
 for var in allvars_3D:
@@ -113,7 +113,7 @@ for var in allvars_3D:
         yeamean[(ru, var+'_850')] = cosoye
 
         for sea in allseasons:
-            seamean[(ru, var+'_850', sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_average = True)
+            seamean[(ru, var+'_850', sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'mean')
 
 
 pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3.p', 'wb'))
