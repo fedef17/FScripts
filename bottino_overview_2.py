@@ -21,13 +21,14 @@ import xarray as xr
 import glob
 import xclim
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
 titlefont = 22
 plt.rcParams['figure.titlesize'] = titlefont
 plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 15
+plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['axes.axisbelow'] = True
+plt.rcParams['legend.fontsize'] = 18
 
 #############################################################################
 
@@ -56,6 +57,7 @@ add_uas = False
 allvars_3D = []#'ta ua'.split()
 
 var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
+var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
 
 var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585', 'historical']
@@ -201,7 +203,8 @@ glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -
 years = coso.year.data
 
 glomeans[(ru, var)] = (years, glomean)
-
+#
+# pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
 
 # # 3D vars
 # for na, ru, col in zip(allnams2, allru2, colors2):
@@ -258,7 +261,7 @@ fig_greg, ax_greg = plt.subplots(figsize = (16,9))
 for na, ru, col in zip(allnams3, allru3, colors3):
     print(ru)
 
-    for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
+    for var, fig, ax, vylab in zip(var_glob_mean, figs_glob, axs_glob, var_glob_ylabel):
         print(var)
         if (ru, var) not in glomeans.keys():
             print('NOT found')
@@ -268,6 +271,10 @@ for na, ru, col in zip(allnams3, allru3, colors3):
         years, glomean = glomeans[(ru, var)]
 
         ax.plot(years, glomean-pimean[var], label = ru, color = col)
+
+        if ru == allru3[0]:
+            ax.set_ylabel(vylab)
+            ax.set_xlabel('Year')
 
     # gregory
     try:
