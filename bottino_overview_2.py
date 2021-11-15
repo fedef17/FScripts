@@ -62,6 +62,10 @@ allnams2 = allnams + ['ssp585', 'historical']
 allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
 
+allnams3 = allnams2 + ['stabilization-hist-b990']
+allru3 = allru2 + ['b990']
+colors3 = colors2 + ['teal']
+
 # figs_glob = []
 # axs_glob = []
 # pimean = dict()
@@ -178,6 +182,27 @@ colors2 = colors + ['indianred', 'steelblue']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 
+### Add b990
+ru = 'b990'
+mem = 'r1'
+
+fil = '/nas/BOTTINO/indices/b990/tas_stabilization-hist-1990_199001-218912.nc'
+
+kose = xr.open_dataset(fil, use_cftime = True)
+kose = kose.drop_vars('time_bnds')
+
+var = 'tas'
+
+cosoye = kose[var].groupby("time.year").mean().compute()
+yeamean[(ru, var)] = cosoye
+
+coso = cosoye.mean('lon')
+glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+years = coso.year.data
+
+glomeans[(ru, var)] = (years, glomean)
+
+
 # # 3D vars
 # for na, ru, col in zip(allnams2, allru2, colors2):
 #     mem = 'r1'
@@ -230,7 +255,7 @@ for var in var_glob_mean:
 fig_greg, ax_greg = plt.subplots(figsize = (16,9))
 
 #for na, ru, col in zip(allnams, allru, colors):
-for na, ru, col in zip(allnams2, allru2, colors2):
+for na, ru, col in zip(allnams3, allru3, colors3):
     print(ru)
 
     for var, fig, ax in zip(var_glob_mean, figs_glob, axs_glob):
