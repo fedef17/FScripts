@@ -22,13 +22,14 @@ import xarray as xr
 import glob
 import xclim
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
 titlefont = 22
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 15
+plt.rcParams['axes.titlesize'] = 20
+plt.rcParams['axes.labelsize'] = 20
 plt.rcParams['axes.axisbelow'] = True
+plt.rcParams['legend.fontsize'] = 20
 
 #############################################################################
 
@@ -385,16 +386,19 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
             delta = 60
             shi = 15
             frme = np.arange(1, 10, 0.5)
+            frmain = [2,3,4,5,6,8,10,20]
         elif ind in ['nam', 'sam']:
             delta = 100
             shi = 25
             # frbins = [0, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20]
             # frme = [np.mean([fr1,fr2]) for fr1, fr2 in zip(frbins[:-1], frbins[1:])]
             frme = np.arange(1, 10, 0.5)
+            frmain = [2,4,6,8,10,20]
         elif ind in ['amv', 'pdo']:
             delta = 200
             shi = 50
             frme = np.arange(0, 50, 2)
+            frmain = [3, 5, 10, 20, 30, 50]
             # frbins = [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100]
             # frme = [np.mean([fr1,fr2]) for fr1, fr2 in zip(frbins[:-1], frbins[1:])]
 
@@ -473,9 +477,9 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
 
         #ax.fill_between(freqs, spect_q1, spect_q3, color = col, alpha = 0.1)
         if ru == 'obs':
-            ax.plot(freqs, spect_mean, color = col, lw = 2, ls = '--')
+            ax.plot(invfr, spect_mean, color = col, lw = 2, ls = '--', label = obsname)
         else:
-            ax.plot(freqs, spect_mean, color = col, lw = 2)
+            ax.plot(invfr, spect_mean, color = col, lw = 2, label = ru)
 
         #if ind != 'enso':
 
@@ -492,12 +496,14 @@ for ind in ['enso', 'amv', 'pdo', 'nam', 'sam']:
     # elif ind == 'amv':
     #     ax.set_ylim(5.e-6, 3e-3)
 
-    #ax.set_xticks(np.arange(nboxs))
+    ax.legend()
+    ax.set_xticks(frmain)
+    ax.set_xticklabels([str(int(fr)) for fr in frmain])
     # for ii in np.arange(nboxs-1) + 0.5:
     #     ax.axvline(ii, color = 'grey', linestyle = ':', linewidth = 0.1)
     # ax.set_xticklabels(xba, rotation = 30)
-    #ax.set_xlabel('Period (yr)')
-    ax.set_xlabel('Frequency (yr-1)')
+    ax.set_xlabel('Period (yr)')
+    #ax.set_xlabel('Frequency (yr-1)')
     if ind == 'enso':
         ax.set_ylabel(r'Spectral power (normalized)')
     elif ind in ['amv', 'pdo']:
