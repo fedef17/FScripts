@@ -65,7 +65,7 @@ for var in allvars_2D:
             fils = glob.glob(filna.format(exp, mem, miptab, var))
 
             if len(fils) == 0:
-                print('NO data for {} {}'.format(var, ru))
+                print('NO data for {} {}'.format(var, exp, mem))
                 continue
 
             kose = xr.open_mfdataset(fils, use_cftime = True)
