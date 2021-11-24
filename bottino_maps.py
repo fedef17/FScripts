@@ -194,13 +194,15 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
                 tramap = transient-pimap
                 lst = 200
 
-            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = 'stabilization/transient ratio')#, add_contour_field = tramap, add_contour_lines_step = lst)
+            #cblab = 'stabilization/transient ratio'
+            cblab = 'Ratio of change during stabilization to total change'
+            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = cblab)#, add_contour_field = tramap, add_contour_lines_step = lst)
             fig_ratio.append(mappa)
 
-            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}_medzoom.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, plot_margins = (-20, 45., 27., 50), cb_label = 'stabilization/transient ratio')#, add_contour_field = tramap, add_contour_lines_step = lst)
+            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}_medzoom.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, plot_margins = (-20, 45., 27., 50), cb_label = cblab)#, add_contour_field = tramap, add_contour_lines_step = lst)
 
         cosorun = ctl.running_mean(coso, 50)
-        equistd = (coso-cosorun)[-200:].std('year').values
+        equistd = (coso-cosorun)[-ypre_stab:].std('year').values
 
         mappa = equistd/pistd
         if varnam == 'pr_rel':
@@ -232,7 +234,8 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
         cla2 = 'Fraction of residual warming'
     else:
         addcont = fig_patt_trans
-        cla2 = 'stabilization/transient ratio'
+        #cla2 = 'stabilization/transient ratio'
+        cla2 = 'Ratio of change during stabilization to total change'
 
 
     proj = ctl.def_projection('standard')
