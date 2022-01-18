@@ -28,25 +28,38 @@ plt.rcParams['axes.titlesize'] = 28
 plt.rcParams['axes.labelsize'] = 22
 
 #############################################################################
+
+
 cart_out = '/home/fabiano/Research/lavori/TunECS/tuning/experiments/analysis/'
 
-# Loading the derivatives of the vars wrt params
-with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
-    resdic, _, derdic, _, linder, _, chandic, _ = pickle.load(filox)
+def precalc_splines(cart_out):
+    """
+    Loads the splines for interpolation.
+    """
+    # Loading the derivatives of the vars wrt params
+    with open(cart_out + 'der_sensmat_zonal.p', 'rb') as filox:
+        resdic, _, derdic, _, linder, _, chandic, _ = pickle.load(filox)
 
+    spldic = None
+    spldic_der = None
+
+    precalc_splines = False
+    if precalc_splines:
+        print('precalculating splines....')
+        spldic = dict()
+        spldic_der = dict()
+        for ke in chandic:
+            xs, ys = chandic[ke]
+            spldic[ke] = spline(xs, ys, k = 2, s = 0, ext = 2) # interpolating spline of order 2, no extrapolation
+            spldic_der[ke] = spldic[ke].derivative()
+
+    return spldic, spldic_der
+
+derdic = None
+linder = None
 spldic = None
+chandic = None
 spldic_der = None
-
-precalc_splines = False
-if precalc_splines:
-    print('precalculating splines....')
-    spldic = dict()
-    spldic_der = dict()
-    for ke in chandic:
-        xs, ys = chandic[ke]
-        spldic[ke] = spline(xs, ys, k = 2, s = 0, ext = 2) # interpolating spline of order 2, no extrapolation
-        spldic_der[ke] = spldic[ke].derivative()
-
 # with open(cart_out + 'der_sensmat_global.p', 'rb') as filox:
 #     gigi = pickle.load(filox)
 #     derdic_glo = gigi[-2]
