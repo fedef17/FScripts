@@ -145,13 +145,13 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
     anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
 
-    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
+    tl.gregplot_on_ax(ax, tas-reftas[exp], toa_net, color = col, label = exp, marker = mar)#, nfirst = 5, nlast = 30)
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
 col = 'black'
 
-tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], toa_net, color = col, label = 'c4co', marker = mar)#, nfirst = None, nlast = 0)
 
 ax.set_xlabel('Global mean TAS change (K)')
 ax.set_ylabel('Global mean net TOA flux (W/m2)')
@@ -165,13 +165,13 @@ for exp, col, mar in zip(exps[5:], colors[5:], markers[5:]):
     gregfi = cart_in + '{}/ecmean/gregory_{}.txt'.format(exp, exp)
     anni, toa_net, srf_net, tas = tl.read_gregory(gregfi)
 
-    tl.gregplot_on_ax(ax, tas-reftas[exp], srf_net, color = col, label = exp, marker = mar, nfirst = 5, nlast = 30)
+    tl.gregplot_on_ax(ax, tas-reftas[exp], srf_net, color = col, label = exp, marker = mar)#, nfirst = 5, nlast = 30)
 
 gregc4co = '/home/fabiano/Research/lavori/TunECS/gregory_c4co.txt'
 anni, toa_net, srf_net, tas = tl.read_gregory(gregc4co)
 col = 'black'
 
-tl.gregplot_on_ax(ax, tas-reftas['c4co'], srf_net, color = col, label = 'c4co', marker = mar, nfirst = 5, nlast = 30)
+tl.gregplot_on_ax(ax, tas-reftas['c4co'], srf_net, color = col, label = 'c4co', marker = mar)#, nfirst = 5, nlast = 30)
 
 ax.set_xlabel('Global mean TAS change (K)')
 ax.set_ylabel('Global mean net SRF flux (W/m2)')

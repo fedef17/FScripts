@@ -147,7 +147,8 @@ def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirs
         print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(label, c/2., err_c/2.))
 
     if calc_ECS:
-        ax.scatter(tas[-nlast:], toa[-nlast:], s = 2, color = color)
+        if nfirst is not None:
+            ax.scatter(tas[-nlast:], toa[-nlast:], s = 2, color = color)
         m, c, err_m, err_c = ctl.linear_regre_witherr(tas[-nlast:], toa[-nlast:])
         xino = np.array(list(tas[-nlast:])+[-c/m])
         ax.plot(xino, c+m*xino, color = color, linestyle = '--', linewidth = 0.5)
