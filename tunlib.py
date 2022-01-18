@@ -115,7 +115,7 @@ lacen = np.array([np.mean(laol) for laol in bands])
 
 
 
-def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirst = 5, nlast = 50, calc_ERF = True, calc_ECS = True):
+def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirst = None, nlast = 0, calc_ERF = True, calc_ECS = True):
     """
     Plots on a gregory plot and calculates ERF (using first nfirst points) and ECS (using last nlast points).
     """
