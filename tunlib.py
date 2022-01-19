@@ -146,6 +146,8 @@ def gregplot_on_ax(ax, tas, toa, color = None, label = None, marker = 'D', nfirs
         ax.plot(xino, c+m*xino, color = color, linestyle = '--', linewidth = 0.5)
         print('ERF: {} -> {:6.3f} +/- {:6.3f} W/m2'.format(label, c/2., err_c/2.))
 
+        print('K: {} -> {:6.3f} +/- {:6.3f} W/m2/K'.format(label, m, err_m))
+
     if calc_ECS:
         if nfirst is not None:
             ax.scatter(tas[-nlast:], toa[-nlast:], s = 2, color = color)
