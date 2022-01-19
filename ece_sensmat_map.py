@@ -168,13 +168,19 @@ allvars = allvars + ['toa_net']
 longnams = ['OLR (W/m2)', 'OSR (W/m2)', 'Cloud cover', 'Incoming Net TOA (W/m2)']
 for forc in ['pi', 'c4']:
     for varnam, lonam in zip(allvars, longnams):
-        mapes = [mapz[(forc, varnam, param)]/10 for param in testparams]
-        if varnam == 'ttr':
+        if varnam == 'ttr' or varnam == 'tsr':
             mapes = [-mapz[(forc, varnam, param)]/10 for param in testparams]
         elif varnam == 'tcc':
             mapes = [100.*mapz[(forc, varnam, param)]/10 for param in testparams]
+        else:
+            mapes = [mapz[(forc, varnam, param)]/10 for param in testparams]
 
         mapes_err = [np.abs(mapz[(forc, varnam, param)]) > mapz_err[(forc, varnam, param)] for param in testparams]
 
+        mapes_ok = []
+        for map, maperr in zip(maper, mapes_err):
+            map[~maperr] = np.nan
+            mapes_ok.append(map)
+
         fil = 'fgprint_{}_{}.pdf'.format(forc, varnam)
-        ctl.plot_multimap_contour(mapes, gigi.lat, gigi.lon, filename = cart_out + fil, plot_anomalies = True, cbar_range = (-3, 3), fix_subplots_shape = (3,3), add_hatching = mapes_err, subtitles = testparams, cb_label = lonam)
+        ctl.plot_multimap_contour(mapes, gigi.lat, gigi.lon, filename = cart_out + fil, plot_anomalies = True, cbar_range = (-3, 3), fix_subplots_shape = (3,3), subtitles = testparams, cb_label = lonam)#, add_hatching = mapes_err)
