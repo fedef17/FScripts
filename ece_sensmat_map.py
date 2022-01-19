@@ -183,7 +183,7 @@ for forc in ['pi', 'c4']:
         mapes_err = [np.abs(mapz[(forc, varnam, param)]) > mapz_err[(forc, varnam, param)] for param in testparams]
 
         mapes_ok = []
-        for map, maperr in zip(maper, mapes_err):
+        for map, maperr in zip(mapes, mapes_err):
             map[~maperr] = np.nan
             mapes_ok.append(map)
 
