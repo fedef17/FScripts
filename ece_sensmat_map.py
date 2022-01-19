@@ -161,6 +161,11 @@ allvars = ['ttr', 'tsr', 'tcc']#, 'str', 'ssr', 'sshf', 'slhf', 'tcc', 'cp', 'ls
 #
 # pickle.dump([mapz, mapz_err], open(cart_out + 'mapz_fgprint.p', 'wb'))
 
+mok = 'pina'
+ye = 1851
+varnam = 'ttr'
+gigi = xr.load_dataset(fil.format(mok, ye, mok, ye, varnam))
+
 mapz, mapz_err = pickle.load(open(cart_out + 'mapz_fgprint.p', 'rb'))
 
 allvars = ['ttr', 'tsr', 'tcc']
