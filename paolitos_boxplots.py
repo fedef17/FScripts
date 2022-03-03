@@ -120,17 +120,19 @@ for area in areas:
     fig.savefig(cart_out + 'LWA_boxplot_{}.pdf'.format(area))
 
 
-sys.exit()
 ###########################################################################################
 
-cart = '/home/fedef/Research/lavori/paolitos_LWA/LWA_patterns/'
+#cart = '/home/fedef/Research/lavori/paolitos_LWA/LWA_patterns/'
+cart = '/home/fedef/Research/lavori/paolitos_LWA/LWA_patterns/LWA_anoms/' # anomalies 12/01
+
 # che devo fa: leggere i pattern di ERA, fare patcor e RMS o il taylor?
 # farei il taylor e poi uno scatter tra montg e transLWA patcors
 
 resu = dict()
 for fil in os.listdir(cart):
     if 'WR_' in fil:
-        mod = fil[3:-2]
+        #mod = fil[3:-2]
+        mod = fil[3:-5] # anomalies 12/01
         resu[mod] = pickle.load(open(cart+fil, 'rb'))
         resu[mod]['Montg streamf'] = np.stack(resu[mod]['Montg streamf'])[:, ::-1, :] # il montg è invertito
 
@@ -181,9 +183,13 @@ for gi in mr_cos:
     colors.insert(gi, np.mean(colors[gi-1:gi+1], axis = 0))
 
 gigi = resu['ERA5']
+gigieraold = pickle.load(open(cart + '../WR_ERA5.p', 'rb')) # anomalies 12/01
+gigi['lon'] = gigieraold['lon'] # anomalies 12/01
+gigi['lat'] = gigieraold['lat'] # anomalies 12/01
+
 gogo = dict()
 gogo['lat'] = resu['EC-Earth3']['lat']
-gogo['lon'] = gigi['lon']
+gogo['lon'] = gigieraold['lon']
 for nom in ['tot LWA', 'trans LWA', 'Montg streamf']:
     gigixr = xr.DataArray(np.stack(gigi[nom]).squeeze(), dims = ('reg', 'lat', 'lon'), coords = {'reg': [0, 1, 2, 3], 'lat': gigi['lat'], 'lon': gigi['lon']})
     gigixr_int = gigixr.interp(lat=gogo['lat'], lon = gogo['lon'])
@@ -277,7 +283,9 @@ for aaa in ['NML', 'EAT', 'EAText']:
             axes.append(ax)
             ax.grid(axis = 'y')
             #if num in [2,3]: ax.set_xlabel('regime streamf. pattern correlation')
-            if num in [0,2]: ax.set_ylabel('{} pattern correlation'.format(tip))
+            #if num in [0,2]: ax.set_ylabel('{} pattern correlation'.format(tip))
+            if tip == 'tot LWA':
+                if num in [0,2]: ax.set_ylabel('LWA anomaly pattern correlation'.format(tip)) # anomalies 12/01
 
         ctl.adjust_ax_scale(axes)
         # ax.text(0.05, 0.75, 'EAT', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 35)
