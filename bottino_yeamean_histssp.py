@@ -60,6 +60,7 @@ for var in allvars_2D:
     for exp in ['historical', 'ssp585']:
         print(exp)
         members = os.listdir(filcart.format(exp))
+        memok = []
         for mem in members:
             print(mem)
             fils = glob.glob(filna.format(exp, mem, miptab, var))
@@ -67,6 +68,7 @@ for var in allvars_2D:
             if len(fils) == 0:
                 print('NO data for {} {}'.format(var, exp, mem))
                 continue
+            memok.append(mem)
 
             kose = xr.open_mfdataset(fils, use_cftime = True)
             kose = kose.drop_vars('time_bnds')
@@ -77,9 +79,10 @@ for var in allvars_2D:
             for sea in allseasons:
                 seamean[(exp, mem, var, sea)] = ctl.seasonal_set(kose[var], season = sea, seasonal_stat = 'mean')
 
-        cosoye = np.mean([yeamean[(exp, mem, var)] for mem in members], axis = 0)
+        cosoye = np.mean([yeamean[(exp, mem, var)] for mem in memok], axis = 0)
         yeamean[(exp, 'ensmean', var)] = cosoye
-        cosoye = np.std([yeamean[(exp, mem, var)] for mem in members], axis = 0)
+        cosoye = np.std([yeamean[(exp, mem, var)] for mem in memok], axis = 0)
         yeamean[(exp, 'ensstd', var)] = cosoye
+        yeamean[(exp, 'members')] = memok
 
         pickle.dump([yeamean, seamean], open(cart_out + 'bottino_yeamean_3_{}_{}.p'.format(exp, var), 'wb'))

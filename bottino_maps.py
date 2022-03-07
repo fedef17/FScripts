@@ -57,6 +57,22 @@ colors2 = colors + ['indianred', 'steelblue']
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 
+for var in ['tas', 'pr']:
+    for exp in ['ssp585', 'historical']:
+        yeamean_hs, seamean_hs = pickle.load(open(cart_in + '../yearmean/bottino_yeamean_3_{}_{}.p'.format(exp, var), 'rb'))
+        if exp == 'ssp585':
+            memok = yeamean_hs[(exp, 'members')]
+
+        print(memok)
+        lenmin = np.min([len(yeamean_hs[(exp, mem, var)]) for mem in memok])
+        cosoye = np.mean([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
+
+        # cosok = xr.DataArray(data = cosoye, dims = ['year', 'lat', 'lon'], coords = [sssssssssssss], name = 'tos')
+
+        yeamean[(exp+'_mean', var)] = cosoye
+        cosoye = np.std([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
+        yeamean[(exp+'_std', var)] = cosoye
+
 
 ext_pr = (-500., 500.)
 ext_pr_rel = (-0.5, 0.5)
@@ -84,9 +100,13 @@ cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
 #fig, axs = plt.subplots(1, 3, figsize = (18,5))
 for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['tas', 'pr', 'pr'], [cmappa_tas, cmappa_pr, cmappa_pr], [ext_tas, ext_pr, ext_pr_rel], [ext_relcha, ext_relcha_pr, ext_relcha_pr], cb_labels):
     cosopi = yeamean[('pi', var)]
-    cosohist = yeamean[('hist', var)]
-    cosossp = yeamean[('ssp585', var)]
-    cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
+    # cosohist = yeamean[('hist', var)]
+    # cosossp = yeamean[('ssp585', var)]
+    cosohist = yeamean[('historical_mean', var)]
+    cosossp = yeamean[('ssp585_mean', var)]
+    #cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
+    cosohistssp = np.concatenate([cosohist, cosossp], axis = 0)
+    yeahissp = np.arange(1970, 2101)
 
     fact = 1
     if varnam == 'pr':
@@ -110,14 +130,15 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
 
     for ru in allru[1:]:
         coso = yeamean[(ru, var)]
-        y0 = coso.year[0]
+        y0 = coso.year[0].values
 
         #transient = fact*xr.concat([cosohistssp.sel(year = slice(None, y0)), coso[:ypre_trans//2+1]], dim = 'year').sel(year = slice(y0-ypre_trans//2, y0+ypre_trans//2)).mean('year').values
 
         # finestra a cavallo
         #transient = fact*np.concatenate([cosohistssp.sel(year = slice(y0-ypre_trans//2, y0)).values, coso.sel(year = slice(y0, y0+ypre_trans//2)).values], axis = 0).mean(axis = 0)
         # finestra tutta prima
-        transient = fact*cosohistssp.sel(year = slice(y0-ypre_trans, y0)).mean('year').values
+        #transient = fact*cosohistssp.sel(year = slice(y0-ypre_trans, y0)).mean('year').values
+        transient = fact*np.mean(cosohistssp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0), ...], axis = 0)
 
         equi = fact*coso[-ypre_stab:].mean('year').values
 
