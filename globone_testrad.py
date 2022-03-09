@@ -31,14 +31,21 @@ plt.rcParams['axes.labelsize'] = 15
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
-cart = '/home/fedef/Research/lavori/globone/test_output/'
-# rsync -auv --progress -e "ssh" fabiano@tintin.bo.isac.cnr.it:/work/users/davini/globone/runtime/GLOBO_KM078_TEST/o* .
+
+#expnam = 'LONG_KM156L50'
+expnam = 'GLOBO_KM078_1YEAR'
+cart = '/home/{}/Research/lavori/globone/test_output/{}/'.format(os.getlogin(), expnam)
+ctl.mkdir(cart)
+
+#init = 45
+init = 1
 
 # surface fluxes
 rad_flds = dict()
 for var in 'chflux clwfl cqflux cswfl'.split():
     var_name, nlon, nlat, cose = ctl.read_globo_plotout(cart + var)
-    rad_flds[var] = cose/86400.
+    #rad_flds[var] = cose/86400.
+    rad_flds[var] = cose[init:]/86400.
     print(nlon, nlat)
 
 lats = np.linspace(-90, 90, nlat)
@@ -57,7 +64,7 @@ print('NET SRF', ctl.global_mean(ok_coso, lats))
 
 for var in 'osrtotc olrtotc'.split():
     var_name, nlon, nlat, cose = ctl.read_globo_plotout(cart + var)
-    rad_flds[var] = cose/86400.
+    rad_flds[var] = cose[init:]/86400.
     print(nlon, nlat)
 
 rad_flds['net_toa'] = rad_flds['osrtotc'] + rad_flds['olrtotc']
@@ -80,7 +87,7 @@ print('NET ATM', ctl.global_mean(ok_coso, lats))
 
 for var in 'qf_accum totprec'.split():
     var_name, nlon, nlat, cose = ctl.read_globo_plotout(cart + var)
-    rad_flds[var] = cose#/86400.
+    rad_flds[var] = cose[init:]#/86400.
     print(nlon, nlat)
 
 rad_flds['p-e'] = rad_flds['totprec'] + rad_flds['qf_accum']
@@ -91,6 +98,88 @@ ctl.plot_map_contour(ok_coso, lats, lons, plot_anomalies=False, cbar_range = (-7
 
 print('P-E', ctl.global_mean(ok_coso, lats))
 
+
+##### stampo timeseries globali
+# lowpass di 30 giorni
+
+filt = np.where(np.any(rad_flds['cswfl'] != 0., axis = (1,2)))[0]
+
+fig = plt.figure()
+for var in 'chflux clwfl cqflux cswfl net_srf'.split():
+    #pino = ctl.running_mean(ctl.global_mean(rad_flds[var][filt], lats), 30)
+    pino = ctl.global_mean(rad_flds[var][filt], lats)
+    plt.plot(pino, label = var)
+plt.legend()
+plt.grid()
+plt.ylabel('W/m2')
+plt.title('surface fluxes in time')
+fig.savefig(cart + 'time_evmon_srf.pdf')
+
+print(ctl.global_mean(np.mean(rad_flds['net_srf'][filt], axis = 0), lats))
+
+fig = plt.figure()
+for var in 'olrtotc osrtotc net_toa'.split():
+    #pino = ctl.running_mean(ctl.global_mean(rad_flds[var], lats), 30)
+    pino = ctl.global_mean(rad_flds[var][filt], lats)
+    plt.plot(pino, label = var)
+
+plt.legend()
+plt.grid()
+plt.ylabel('W/m2')
+plt.title('TOA fluxes in time')
+fig.savefig(cart + 'time_evmon_toa.pdf')
+
+
+fig = plt.figure()
+for var in 'qf_accum totprec p-e'.split():
+    #pino = ctl.running_mean(ctl.global_mean(rad_flds[var], lats), 30)
+    pino = ctl.global_mean(rad_flds[var][filt], lats)
+    plt.plot(pino, label = var)
+
+plt.legend()
+plt.grid()
+plt.ylabel('mm/day')
+plt.title('evap/prec in time')
+fig.savefig(cart + 'time_evmon_prec.pdf')
+
+
+###### zonal plots
+
+fig = plt.figure()
+for var in 'chflux clwfl cqflux cswfl net_srf'.split():
+    pino = ctl.zonal_mean(np.mean(rad_flds[var], axis = 0))
+    plt.plot(lats, pino, label = var)
+
+plt.legend()
+plt.grid()
+plt.ylabel('W/m2')
+plt.title('surface fluxes - zonal mean')
+fig.savefig(cart + 'zonal_srf.pdf')
+
+ok_coso = np.mean(rad_flds['net_toa'][1:], axis = 0)
+
+fig = plt.figure()
+for var in 'olrtotc osrtotc net_toa'.split():
+    pino = ctl.zonal_mean(np.mean(rad_flds[var], axis = 0))
+    plt.plot(lats, pino, label = var)
+
+plt.legend()
+plt.grid()
+plt.ylabel('W/m2')
+plt.title('TOA fluxes - zonal mean')
+fig.savefig(cart + 'zonal_toa.pdf')
+
+
+fig = plt.figure()
+for var in 'qf_accum totprec p-e'.split():
+    pino = ctl.zonal_mean(np.mean(rad_flds[var], axis = 0))
+    plt.plot(lats, pino, label = var)
+
+plt.legend()
+plt.grid()
+plt.ylabel('mm/day')
+plt.title('evap/prec - zonal mean')
+fig.savefig(cart + 'zonal_prec.pdf')
 
 # [1]   Terminated              ncview fml1_2013_snr_map.nc
 # [2]-  Terminated              ncview fml1_2013_tnr_map.nc
