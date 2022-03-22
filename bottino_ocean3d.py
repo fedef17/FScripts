@@ -107,6 +107,7 @@ n_proc = 50
 for ru, nam in zip(allru, allnams):
     print(ru)
     allfils = glob.glob(filna.format(ru, nam, mem))
+    allfils.sort()
     allchu = np.array_split(allfils, n_proc)
 
     cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
