@@ -32,7 +32,7 @@ plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
 
-ru = sys.argv[1]
+#ru = sys.argv[1]
 
 # if os.uname()[1] == 'hobbes':
 #     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
@@ -50,7 +50,7 @@ filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC
 
 allru = ['b025', 'b050', 'b100']#['pi',
 allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
-nam = allnams[allru.index(ru)]
+#nam = allnams[allru.index(ru)]
 
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
@@ -74,34 +74,41 @@ lons = np.linspace(0, 359, 360)
 
 yeamean = dict()
 
-#for ru, nam in zip(allru, allnams):
-print(ru)
-cose = []
-#for fi in glob.glob(filna.format(nam, mem, miptab, var))[:2]:
-for fi in glob.glob(filna.format(ru, nam, mem))[:2]:
-    print(fi)
-    gigi = xr.load_dataset(fi)
+def do_cross(fils, coda):
+    cose = []
+    for fi in fils:
+        print(fi)
+        gigi = xr.load_dataset(fi)
 
-    gog = gigi['thetao']
-    nuvarz = dict()
+        gog = gigi['thetao']
+        nuvarz = dict()
 
-    for basnam in basnames:
-        pinzu = np.array(subbas[basnam])
-        pinzu[pinzu == 0] = np.nan
+        for basnam in basnames:
+            pinzu = np.array(subbas[basnam])
+            pinzu[pinzu == 0] = np.nan
 
-        goggolo = gog*pinzu[np.newaxis, np.newaxis, ...]
-        nuvarz['thetao_'+basnam[:3]] = goggolo
+            goggolo = gog*pinzu[np.newaxis, np.newaxis, ...]
+            nuvarz['thetao_'+basnam[:3]] = goggolo
 
-    gigi = gigi.assign(nuvarz)
-    zuki = ctl.regrid_dataset(gigi, lats, lons)
+        gigi = gigi.assign(nuvarz)
+        zuki = ctl.regrid_dataset(gigi, lats, lons)
 
-    gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
-    #gigi = gigi.drop_dims('vertices')
+        gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
+        #gigi = gigi.drop_dims('vertices')
 
-    #### Now the zonal cross section
-    gogcross = zuki.mean(('time', 'lon'))
-    cose.append(gogcross)
+        #### Now the zonal cross section
+        gogcross = zuki.mean(('time', 'lon'))
+        cose.append(gogcross)
 
-#sys.exit()
+    coda.put(cose)
+    #return cose
 
-pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
+n_proc = 50
+for ru, nam in zip(allru, allnams):
+    print(ru)
+    allfils = glob.glob(filna.format(ru, nam, mem))
+    allchu = np.array_split(allfils, n_proc)
+
+    cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
+
+    pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
