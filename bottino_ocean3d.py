@@ -32,20 +32,25 @@ plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
 
-if os.uname()[1] == 'hobbes':
-    cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
-elif os.uname()[1] == 'xaru':
-    cart_out = '/home/fedef/Research/lavori/BOTTINO/'
-elif os.uname()[1] == 'tintin':
-    cart_out = '/home/fabiano/work/lavori/BOTTINO/'
+#ru = sys.argv[1]
 
+# if os.uname()[1] == 'hobbes':
+#     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
+# elif os.uname()[1] == 'xaru':
+#     cart_out = '/home/fedef/Research/lavori/BOTTINO/'
+# elif os.uname()[1] == 'tintin':
+#     cart_out = '/home/fabiano/work/lavori/BOTTINO/'
+
+cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/thetao/gn/v20210315/thetao*nc'
+# filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
-allru = ['pi', 'b025', 'b050', 'b100']
-allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+allru = ['b025', 'b050', 'b100']#['pi',
+allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
+#nam = allnams[allru.index(ru)]
 
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
@@ -61,22 +66,50 @@ var = 'thetao'
 
 # read subbasin.nc
 
-basnames = ['altmsk', 'indmsk', 'pacmsk']
+basnames = ['atlmsk', 'indmsk', 'pacmsk']
 subbas = xr.load_dataset(cart_out + 'subbasins.nc')
+
+lats = np.linspace(-89.5, 89.5, 180)
+lons = np.linspace(0, 359, 360)
 
 yeamean = dict()
 
-for ru, nam in zip(allru, allnams):
+def do_cross(fils, coda):
     cose = []
-    for fi in glob.glob(filna.format(na, mem, miptab, var)):
+    for fi in fils:
+        print(fi)
         gigi = xr.load_dataset(fi)
 
-        gog = np.array(gigi['thetao'])
+        gog = gigi['thetao']
+        nuvarz = dict()
 
         for basnam in basnames:
             pinzu = np.array(subbas[basnam])
             pinzu[pinzu == 0] = np.nan
 
             goggolo = gog*pinzu[np.newaxis, np.newaxis, ...]
+            nuvarz['thetao_'+basnam[:3]] = goggolo
 
-            
+        gigi = gigi.assign(nuvarz)
+        zuki = ctl.regrid_dataset(gigi, lats, lons)
+
+        gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
+        #gigi = gigi.drop_dims('vertices')
+
+        #### Now the zonal cross section
+        gogcross = zuki.mean(('time', 'lon'))
+        cose.append(gogcross)
+
+    coda.put(cose)
+    #return cose
+
+n_proc = 50
+for ru, nam in zip(allru, allnams):
+    print(ru)
+    allfils = glob.glob(filna.format(ru, nam, mem))
+    allfils.sort()
+    allchu = np.array_split(allfils, n_proc)
+
+    cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
+
+    pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
