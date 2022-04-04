@@ -49,9 +49,9 @@ loctime = loctime.swapaxes(1,2)
 for yea in range(2008, 2017):
     for mo in range(1, 13):
         if mo < 12:
-            dates = ctl.date_series(datetime(yea, mo, 1, 0, 0), datetime(yea, mo+1, 1, 0, 0), freq = '6H')[:-1]
+            dates = ctl.date_series(datetime(yea, mo, 1, 6, 0), datetime(yea, mo+1, 1, 0, 0), freq = '6H')#[:-1]
         else:
-            dates = ctl.date_series(datetime(yea, mo, 1, 0, 0), datetime(yea+1, 1, 1, 0, 0), freq = '6H')[:-1]
+            dates = ctl.date_series(datetime(yea, mo, 1, 6, 0), datetime(yea+1, 1, 1, 0, 0), freq = '6H')#[:-1]
 
         loc_ok = np.vstack(len(dates)//4*[loctime])
 
