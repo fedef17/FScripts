@@ -217,6 +217,8 @@ def animate(i, ax1, ax2, windtype = 'quiver'):
     print(i)
     ax1.clear()
     ax2.clear()
+    ax1.set_title('Physical space')
+    ax2.set_title('Phase space')
 
     zgok = zgan_low[i]
     uok = u_low[i]
