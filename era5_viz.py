@@ -121,7 +121,7 @@ lame, lome = np.meshgrid(lon, lat)
 cmappa = 'RdBu_r'
 cbar_range = (-300, 300)
 
-proj = ctl.def_projection('nearside', central_lat_lon = (50., -20.))
+proj = ctl.def_projection('nearside', central_lat_lon = (50., -20.), bounding_lat = 20.)
 fig = plt.figure(figsize = (16,9))
 ax1 = plt.subplot(1, 2, 1, projection = proj)
 ax1.set_global()
