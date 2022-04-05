@@ -121,14 +121,17 @@ lame, lome = np.meshgrid(lon, lat)
 cmappa = 'RdBu_r'
 cbar_range = (-300, 300)
 
-proj = ctl.def_projection('nearside', central_lat_lon = (50., -20.), bounding_lat = 20.)
+proj = ctl.def_projection('nearside', central_lat_lon = (50., -20.), bounding_lat = 30.)
 fig = plt.figure(figsize = (16,9))
 ax1 = plt.subplot(1, 2, 1, projection = proj)
 ax1.set_global()
 ax1.coastlines(linewidth = 1)
 gl = ax1.gridlines(crs = ccrs.PlateCarree(), draw_labels = False, linewidth = 1, color = 'gray', alpha = 0.5, linestyle = ':')
 
+ax1.set_title('Physical space')
+
 ax2 = plt.subplot(1, 2, 2, projection='3d')
+ax2.set_title('Phase space')
 colorz = ctl.color_set(4)
 colorz = ['steelblue', 'orange', 'indianred', 'forestgreen']
 
@@ -271,7 +274,7 @@ line_ani.save(filename, writer = writer)
 
 filename = cart_out + 'wr_anim_nearside_21-22_{}.mp4'.format(windtype)
 FFwriter = FFMpegWriter(filename)
-lin_ani.save(filename, writer = FFwriter, fps=fps)
+line_ani.save(filename, writer = FFwriter, fps=fps)
 
 # windtype = 'streamplot'
 # line_ani = animation.FuncAnimation(fig, animate, frames = len(zgan), fargs = (ax1, ax2, windtype, ), interval=100, blit=False)
