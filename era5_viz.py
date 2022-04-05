@@ -24,7 +24,7 @@ import glob
 import xclim
 
 import matplotlib.animation as animation
-from matplotlib.animation import ImageMagickFileWriter, PillowWriter
+from matplotlib.animation import ImageMagickFileWriter, PillowWriter, FFMpegWriter
 
 import cartopy.crs as ccrs
 
@@ -264,9 +264,14 @@ windtype = 'quiver'
 fps = 4
 numframes = len(zgan)
 line_ani = animation.FuncAnimation(fig, animate, frames = numframes, fargs = (ax1, ax2, windtype, ), interval=100, blit=False)
+
 filename = cart_out + 'wr_anim_nearside_21-22_{}.gif'.format(windtype)
 writer = PillowWriter(fps = fps)
 line_ani.save(filename, writer = writer)
+
+filename = cart_out + 'wr_anim_nearside_21-22_{}.mp4'.format(windtype)
+FFwriter = FFMpegWriter(filename)
+lin_ani.save(filename, writer = FFwriter, fps=fps)
 
 # windtype = 'streamplot'
 # line_ani = animation.FuncAnimation(fig, animate, frames = len(zgan), fargs = (ax1, ax2, windtype, ), interval=100, blit=False)
