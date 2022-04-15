@@ -22,6 +22,8 @@ import xarray as xr
 import glob
 import xclim
 
+import multiprocessing as mp
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 22
@@ -74,7 +76,7 @@ lons = np.linspace(0, 359, 360)
 
 yeamean = dict()
 
-def do_cross(fils, coda):
+def do_cross(fils):#, coda):
     print("I'm process", os.getpid())
     cose = []
     for fi in fils:
@@ -101,16 +103,19 @@ def do_cross(fils, coda):
         gogcross = zuki.mean(('time', 'lon'))
         cose.append(gogcross)
 
-    coda.put(cose)
-    #return cose
+    #coda.put(cose)
+    return cose
 
-n_proc = 48
+n_proc = 10
 for ru, nam in zip(allru, allnams):
     print(ru)
     allfils = glob.glob(filna.format(ru, nam, mem))
     allfils.sort()
     allchu = np.array_split(allfils, n_proc)
 
-    cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
+    pool = mp.Pool(n_proc)
+    cose = pool.map(do_cross, allchu, 1)
+
+    #cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
 
     pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
