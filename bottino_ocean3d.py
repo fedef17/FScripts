@@ -75,10 +75,11 @@ lons = np.linspace(0, 359, 360)
 yeamean = dict()
 
 def do_cross(fils, coda):
+    print("I'm process", os.getpid())
     cose = []
     for fi in fils:
         print(fi)
-        gigi = xr.load_dataset(fi)
+        gigi = xr.load_dataset(fi, use_cftime = True)
 
         gog = gigi['thetao']
         nuvarz = dict()
@@ -103,7 +104,7 @@ def do_cross(fils, coda):
     coda.put(cose)
     #return cose
 
-n_proc = 50
+n_proc = 48
 for ru, nam in zip(allru, allnams):
     print(ru)
     allfils = glob.glob(filna.format(ru, nam, mem))
