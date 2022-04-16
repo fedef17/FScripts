@@ -111,10 +111,12 @@ for ru, nam in zip(allru, allnams):
     print(ru)
     allfils = glob.glob(filna.format(ru, nam, mem))
     allfils.sort()
-    allchu = np.array_split(allfils, n_proc)
 
-    pool = mp.Pool(n_proc)
-    cose = pool.map(do_cross, allchu, 1)
+    cose = do_cross(allfils)
+    # allchu = np.array_split(allfils, n_proc)
+    #
+    # pool = mp.Pool(n_proc)
+    # cose = pool.map(do_cross, allchu, 1)
 
     #cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
 
