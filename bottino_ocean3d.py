@@ -34,7 +34,7 @@ plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
 
-#ru = sys.argv[1]
+ru = sys.argv[1]
 
 # if os.uname()[1] == 'hobbes':
 #     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
@@ -107,17 +107,20 @@ def do_cross(fils):#, coda):
     return cose
 
 n_proc = 10
-for ru, nam in zip(allru, allnams):
-    print(ru)
-    allfils = glob.glob(filna.format(ru, nam, mem))
-    allfils.sort()
+#for ru, nam in zip(allru, allnams):
 
-    cose = do_cross(allfils)
-    # allchu = np.array_split(allfils, n_proc)
-    #
-    # pool = mp.Pool(n_proc)
-    # cose = pool.map(do_cross, allchu, 1)
+print(ru)
+nam = allnams[allru.index(ru)]
 
-    #cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
+allfils = glob.glob(filna.format(ru, nam, mem))
+allfils.sort()
 
-    pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
+cose = do_cross(allfils)
+# allchu = np.array_split(allfils, n_proc)
+#
+# pool = mp.Pool(n_proc)
+# cose = pool.map(do_cross, allchu, 1)
+
+#cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
+
+pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
