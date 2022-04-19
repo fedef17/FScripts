@@ -103,6 +103,7 @@ def do_cross(fils, fil_out):#, coda):
         gogcross = zuki.mean(('time', 'lon'))
         #cose.append(gogcross)
         pickle.dump(gogcross, fil_out)
+        fil_out.flush()
 
     #coda.put(cose)
     #return cose
