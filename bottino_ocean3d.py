@@ -76,9 +76,9 @@ lons = np.linspace(0, 359, 360)
 
 yeamean = dict()
 
-def do_cross(fils):#, coda):
+def do_cross(fils, fil_out):#, coda):
     print("I'm process", os.getpid())
-    cose = []
+    #cose = []
     for fi in fils:
         print(fi)
         gigi = xr.load_dataset(fi, use_cftime = True)
@@ -101,10 +101,12 @@ def do_cross(fils):#, coda):
 
         #### Now the zonal cross section
         gogcross = zuki.mean(('time', 'lon'))
-        cose.append(gogcross)
+        #cose.append(gogcross)
+        pickle.dump(gogcross, fil_out)
 
     #coda.put(cose)
-    return cose
+    #return cose
+    return
 
 n_proc = 10
 #for ru, nam in zip(allru, allnams):
@@ -115,7 +117,15 @@ nam = allnams[allru.index(ru)]
 allfils = glob.glob(filna.format(ru, nam, mem))
 allfils.sort()
 
-cose = do_cross(allfils)
+
+filo = open(cart_out + 'thetao_{}.p'.format(ru), 'wb')
+
+#cose = do_cross(allfils)
+
+do_cross(allfils, filo)
+
+filo.close()
+
 # allchu = np.array_split(allfils, n_proc)
 #
 # pool = mp.Pool(n_proc)
@@ -123,4 +133,4 @@ cose = do_cross(allfils)
 
 #cose = ctl.run_parallel(do_cross, n_proc, args = allchu)
 
-pickle.dump(cose, open(cart_out + 'thetao_{}.p'.format(ru), 'wb'))
+#pickle.dump(cose, )
