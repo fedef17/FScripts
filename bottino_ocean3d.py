@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+
 import numpy as np
 import sys
 import os
@@ -48,6 +49,7 @@ sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 os.dup2(logfile.fileno(), sys.stdout.fileno())
 os.dup2(logfile.fileno(), sys.stderr.fileno())
 
+print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 # if os.uname()[1] == 'hobbes':
 #     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
 # elif os.uname()[1] == 'xaru':
@@ -87,6 +89,8 @@ lats = np.linspace(-89.5, 89.5, 180)
 lons = np.linspace(0, 359, 360)
 
 yeamean = dict()
+
+print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
 def do_cross(fils, fil_out):#, coda):
     print("I'm process", os.getpid())
