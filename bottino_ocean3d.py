@@ -95,7 +95,7 @@ def do_cross(fils, fil_out):#, coda):
     #cose = []
     for fi in fils:
         print(fi)
-        print('total RAM memory used 1:', psutil.virtual_memory()[0])
+        print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
 
         gigi = xr.load_dataset(fi, use_cftime = True)
 
@@ -109,7 +109,7 @@ def do_cross(fils, fil_out):#, coda):
 
         gigi = gigi.assign(nuvarz)
 
-        print('total RAM memory used 2:', psutil.virtual_memory()[0])
+        print('total RAM memory used 2:', psutil.virtual_memory()[3]/1.e9)
 
         del nuvarz, goggolo
         gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
@@ -122,7 +122,7 @@ def do_cross(fils, fil_out):#, coda):
         #cose.append(gogcross)
         pickle.dump(gogcross, fil_out)
 
-        print('total RAM memory used 3:', psutil.virtual_memory()[0])
+        print('total RAM memory used 3:', psutil.virtual_memory()[3]/1.e9)
 
         fil_out.flush()
 
