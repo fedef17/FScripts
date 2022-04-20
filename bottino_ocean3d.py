@@ -23,6 +23,7 @@ import glob
 import xclim
 
 import multiprocessing as mp
+import psutil
 
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
@@ -35,6 +36,17 @@ plt.rcParams['axes.axisbelow'] = True
 #############################################################################
 
 ru = sys.argv[1]
+
+# open our log file
+logname = 'log_oceall_{}.log'.format(ru)
+logfile = open(logname,'w') #self.name, 'w', 0)
+
+# re-open stdout without buffering
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
+# redirect stdout and stderr to the log file opened above
+os.dup2(logfile.fileno(), sys.stdout.fileno())
+os.dup2(logfile.fileno(), sys.stderr.fileno())
 
 # if os.uname()[1] == 'hobbes':
 #     cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
@@ -78,32 +90,43 @@ yeamean = dict()
 
 def do_cross(fils, fil_out):#, coda):
     print("I'm process", os.getpid())
+    # Getting % usage of virtual_memory ( 3rd field)
+
     #cose = []
     for fi in fils:
         print(fi)
+        print('total RAM memory used 1:', psutil.virtual_memory()[0])
+
         gigi = xr.load_dataset(fi, use_cftime = True)
 
-        gog = gigi['thetao']
         nuvarz = dict()
-
         for basnam in basnames:
             pinzu = np.array(subbas[basnam])
             pinzu[pinzu == 0] = np.nan
 
-            goggolo = gog*pinzu[np.newaxis, np.newaxis, ...]
+            goggolo = gigi['thetao']*pinzu[np.newaxis, np.newaxis, ...]
             nuvarz['thetao_'+basnam[:3]] = goggolo
 
         gigi = gigi.assign(nuvarz)
+
+        print('total RAM memory used 2:', psutil.virtual_memory()[0])
+
+        del nuvarz, goggolo
+        gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
         zuki = ctl.regrid_dataset(gigi, lats, lons)
 
-        gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
         #gigi = gigi.drop_dims('vertices')
 
         #### Now the zonal cross section
         gogcross = zuki.mean(('time', 'lon'))
         #cose.append(gogcross)
         pickle.dump(gogcross, fil_out)
+
+        print('total RAM memory used 3:', psutil.virtual_memory()[0])
+
         fil_out.flush()
+
+        del gigi, gogcross, zuki
 
     #coda.put(cose)
     #return cose
