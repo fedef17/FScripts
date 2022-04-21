@@ -5,23 +5,23 @@
 import numpy as np
 import sys
 import os
-from matplotlib import pyplot as plt
-from matplotlib import cm
+#from matplotlib import pyplot as plt
+#from matplotlib import cm
 
 import pickle
-import netCDF4 as nc
+#import netCDF4 as nc
 
 import climtools_lib as ctl
-import climdiags as cd
+#import climdiags as cd
 #from tunlib import gregplot_on_ax
 
-from matplotlib.colors import LogNorm
-from datetime import datetime
+#from matplotlib.colors import LogNorm
+#from datetime import datetime
 
-from scipy import stats
+#from scipy import stats
 import xarray as xr
 import glob
-import xclim
+#import xclim
 
 import multiprocessing as mp
 import psutil
