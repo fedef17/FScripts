@@ -26,13 +26,13 @@ import glob
 import multiprocessing as mp
 import psutil
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
-titlefont = 22
-plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 15
-plt.rcParams['axes.axisbelow'] = True
+# plt.rcParams['xtick.labelsize'] = 15
+# plt.rcParams['ytick.labelsize'] = 15
+# titlefont = 22
+# plt.rcParams['figure.titlesize'] = titlefont
+# plt.rcParams['axes.titlesize'] = 18
+# plt.rcParams['axes.labelsize'] = 15
+# plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
 
