@@ -51,6 +51,10 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 allnams2 = allnams + ['ssp585', 'historical']
 allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
+
+allnams3 = allnams2 + ['stabilization-hist-1990']
+allru3 = allru2 + ['b990']
+colors3 = colors2 + ['teal']
 ####################################################################################################
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
@@ -61,7 +65,7 @@ from matplotlib import colors
 # trendz = dict()
 # for var in ['tas', 'pr', 'clt', 'rlut']:
 #     print(var)
-#     for ru in allru2:
+#     for ru in allru3:
 #         print(ru)
 #         gtas = glomeans[(ru, 'tas')][1]
 #         g50 = ctl.butter_filter(gtas, 50)
@@ -92,7 +96,7 @@ trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 
 ## creating relative trend for pr
 pimepr = yeamean[('pi', 'pr')].mean('year')
-for ru in allru2:
+for ru in allru3:
     trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr
     trendz[('pr_rel', ru, 'pval')] = trendz[('pr', ru, 'pval')]
     for cent in ['1st', '2nd', '5th']:
@@ -104,7 +108,9 @@ coso = yeamean[('b025', 'tas')]
 
 #Figures
 vcenall = [1., 0., 0., 0., 0.]
-cmapall = ['RdBu_r', 'BrBG', 'BrBG', 'BrBG', 'RdBu_r']
+#cmapall = ['RdBu_r', 'BrBG', 'BrBG', 'BrBG', 'RdBu_r']
+cmapall = [ctl.heatmap(), 'BrBG', 'BrBG', 'BrBG', ctl.heatmap()]
+
 for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmapall):
     figtrend = []
     fighatch = []
@@ -133,15 +139,20 @@ for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmap
 
     ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendz_fastslow.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
 
-    for ru in ['pi']+allru2[-2:]:
+    #for ru in ['pi']+allru2[-2:]:
+    for ru in allru + ['b990']:
         var_trend = trendz[(var, ru)]
         var_hatch = trendz[(var, ru, 'pval')] < 0.05
 
         ctl.plot_map_contour(var_trend, coso.lat, coso.lon, filename = cart_out+var+'_trend_{}.pdf'.format(ru), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, add_hatching = var_hatch, cmap = cmap, n_color_levels = 17, hatch_styles = ['///', '', ''])
 
     #### Now fig with ssp585 and all botts
-    okfi = [trendz[(var, ru)] for ru in ['ssp585'] + allru[1:]]
-    okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in ['ssp585'] + allru[1:]]
-    oktit = ['ssp585'] + allru[1:]
+    # okfi = [trendz[(var, ru)] for ru in ['ssp585'] + allru[1:]]
+    # okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in ['ssp585'] + allru[1:]]
+    # oktit = ['ssp585'] + allru[1:]
+    okru = ['hist', 'ssp585'] + ['b990'] + allru[1:]
+    okfi = [trendz[(var, ru)] for ru in okru]
+    okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in okru]
+    oktit = okru
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,2), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])

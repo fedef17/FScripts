@@ -55,133 +55,151 @@ allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilizat
 colors = ['forestgreen', 'orange', 'violet']
 
 ru = 'b100'
-syear = allsyear[allru.index(ru)]
+for ru in allru:
+    syear = allsyear[allru.index(ru)]
 
-filo = open(cart_out + 'thetao_{}.p'.format(ru), 'rb')
-zuk = []
-for ii in range(500):
-    try:
-        pitu = pickle.load(filo)
-    except EOFError:
-        print('Only {} entries found'.format(ii))
-        break
+    filo = open(cart_out + 'thetao_{}.p'.format(ru), 'rb')
+    zuk = []
+    for ii in range(500):
+        try:
+            pitu = pickle.load(filo)
+        except EOFError:
+            print('Only {} entries found'.format(ii))
+            break
 
-    zuk.append(pitu.assign_coords(year = syear + ii))
+        zuk.append(pitu.assign_coords(year = syear + ii))
 
-thetao = xr.concat(zuk, 'year')
+    thetao = xr.concat(zuk, 'year')
 
-trends = dict()
-for nam in thetao.data_vars:
-    print(nam)
-    coso = thetao[nam]
+    trends = dict()
+    for nam in thetao.data_vars:
+        print(nam)
+        coso = thetao[nam]
 
-    trendmat = np.empty_like(coso.values[0])
-    errtrendmat = np.empty_like(coso.values[0])
+        trendmat = np.empty_like(coso.values[0])
+        errtrendmat = np.empty_like(coso.values[0])
 
-    for i in np.arange(trendmat.shape[0]):
-        for j in np.arange(trendmat.shape[1]):
-            m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
-            #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
-            trendmat[i,j] = m
-            errtrendmat[i,j] = err_m
+        for i in np.arange(trendmat.shape[0]):
+            for j in np.arange(trendmat.shape[1]):
+                m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
+                #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
+                trendmat[i,j] = m
+                errtrendmat[i,j] = err_m
 
-    trends[(ru, nam)] = 100*trendmat
+        trends[(ru, nam)] = 100*trendmat
 
-    coso = thetao[nam].sel(year = slice(syear + 300, syear + 500))
+        coso = thetao[nam].sel(year = slice(syear + 300, syear + 500))
 
-    trendmat = np.empty_like(coso[0].values)
-    errtrendmat = np.empty_like(coso[0].values)
+        trendmat = np.empty_like(coso[0].values)
+        errtrendmat = np.empty_like(coso[0].values)
 
-    for i in np.arange(trendmat.shape[0]):
-        for j in np.arange(trendmat.shape[1]):
-            m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
-            #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
-            trendmat[i,j] = m
-            errtrendmat[i,j] = err_m
+        for i in np.arange(trendmat.shape[0]):
+            for j in np.arange(trendmat.shape[1]):
+                m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
+                #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
+                trendmat[i,j] = m
+                errtrendmat[i,j] = err_m
 
-    trends[(ru, nam, 'last200')] = 100*trendmat
+        trends[(ru, nam, 'last200')] = 100*trendmat
 
-    coso = thetao[nam].sel(year = slice(syear, syear + 200))
+        coso = thetao[nam].sel(year = slice(syear, syear + 200))
 
-    trendmat = np.empty_like(coso[0].values)
-    errtrendmat = np.empty_like(coso[0].values)
+        trendmat = np.empty_like(coso[0].values)
+        errtrendmat = np.empty_like(coso[0].values)
 
-    for i in np.arange(trendmat.shape[0]):
-        for j in np.arange(trendmat.shape[1]):
-            m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
-            #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
-            trendmat[i,j] = m
-            errtrendmat[i,j] = err_m
+        for i in np.arange(trendmat.shape[0]):
+            for j in np.arange(trendmat.shape[1]):
+                m, c, err_m, err_c = ctl.linear_regre_witherr(coso.year.values, coso.values[:,i,j])
+                #coeffs, covmat = np.polyfit(years, var_set[i,j], deg = deg, cov = True)
+                trendmat[i,j] = m
+                errtrendmat[i,j] = err_m
 
-    trends[(ru, nam, 'first200')] = 100*trendmat
+        trends[(ru, nam, 'first200')] = 100*trendmat
 
-############################################################
-#### Plots ####
+    ############################################################
+    #### Plots ####
 
-cbran = (0., 1)
-top    = 0.88  # the top of the subplots
-bottom = 0.20    # the bottom of the subplots
-left   = 0.1    # the left side
-right  = 0.98  # the right side
-hspace = 0.20   # height reserved for white space
-wspace = 0.05    # width reserved for blank space
+    cbran = (0., 1)
+    top    = 0.88  # the top of the subplots
+    bottom = 0.20    # the bottom of the subplots
+    left   = 0.1    # the left side
+    right  = 0.98  # the right side
+    hspace = 0.20   # height reserved for white space
+    wspace = 0.05    # width reserved for blank space
 
-nams = ['thetao_atl', 'thetao_ind', 'thetao_pac']
-tits = ['Atlantic', 'Indian', 'Pacific']
+    nams = ['thetao_atl', 'thetao_ind', 'thetao_pac']
+    tits = ['Atlantic', 'Indian', 'Pacific']
 
-fig, axes = plt.subplots(1,3, figsize = (24,9))
-for nam, tit, ax in zip(nams, tits, axes.flatten()):
-    map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
-    ax.set_title(tit)
-    if tits.index(tit) > 0:
-        ax.set_yticklabels([])
-        ax.set_ylabel('')
+    fig, axes = plt.subplots(1,3, figsize = (24,9))
+    for nam, tit, ax in zip(nams, tits, axes.flatten()):
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        ax.set_title(tit)
+        if tits.index(tit) > 0:
+            ax.set_yticklabels([])
+            ax.set_ylabel('')
 
-cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
-cb.ax.tick_params(labelsize=14)
-cb.set_label('Trend (K/cent)', fontsize=16)
-plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#, labelsize=18)
+    cb.ax.tick_params(labelsize=14)
+    cb.set_label('Trend (K/cent)', fontsize=16)
+    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-fig.savefig(cart_out + 'oce_trends_{}.pdf'.format(ru))
+    fig.savefig(cart_out + 'oce_trends_{}.pdf'.format(ru))
 
-fig, axes = plt.subplots(1,3, figsize = (24,9))
-for nam, tit, ax in zip(nams, tits, axes.flatten()):
-    map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
-    ax.set_title(tit)
-    if tits.index(tit) > 0:
-        ax.set_yticklabels([])
-        ax.set_ylabel('')
+    fig, axes = plt.subplots(1,3, figsize = (24,9))
+    for nam, tit, ax in zip(nams, tits, axes.flatten()):
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        ax.set_title(tit)
+        if tits.index(tit) > 0:
+            ax.set_yticklabels([])
+            ax.set_ylabel('')
 
-cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
-cb.ax.tick_params(labelsize=14)
-cb.set_label('Trend (K/cent)', fontsize=16)
-plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
+    cb.ax.tick_params(labelsize=14)
+    cb.set_label('Trend (K/cent)', fontsize=16)
+    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-fig.savefig(cart_out + 'oce_trends_{}_last200.pdf'.format(ru))
+    fig.savefig(cart_out + 'oce_trends_{}_last200.pdf'.format(ru))
 
-cbran = (0., 2)
+    cbran = (0., 2)
 
-fig, axes = plt.subplots(1,3, figsize = (24,9))
-for nam, tit, ax in zip(nams, tits, axes.flatten()):
-    map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
-    ax.set_title(tit)
-    if tits.index(tit) > 0:
-        ax.set_yticklabels([])
-        ax.set_ylabel('')
+    fig, axes = plt.subplots(1,3, figsize = (24,9))
+    for nam, tit, ax in zip(nams, tits, axes.flatten()):
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        ax.set_title(tit)
+        if tits.index(tit) > 0:
+            ax.set_yticklabels([])
+            ax.set_ylabel('')
 
-cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
-cb.ax.tick_params(labelsize=14)
-cb.set_label('Trend (K/cent)', fontsize=16)
-plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
+    cb.ax.tick_params(labelsize=14)
+    cb.set_label('Trend (K/cent)', fontsize=16)
+    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-fig.savefig(cart_out + 'oce_trends_{}_first200.pdf'.format(ru))
+    fig.savefig(cart_out + 'oce_trends_{}_first200.pdf'.format(ru))
 
-cbran = (-0.3, 0.3)
+    cbran = (-0.3, 0.3)
 
-fig, axes = plt.subplots(1,3, figsize = (24,9))
+    fig, axes = plt.subplots(1,3, figsize = (24,9))
+    for nam, tit, ax in zip(nams, tits, axes.flatten()):
+        map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
+        ax.set_title(tit)
+        if tits.index(tit) > 0:
+            ax.set_yticklabels([])
+            ax.set_ylabel('')
+
+    cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+    cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
+    cb.ax.tick_params(labelsize=14)
+    cb.set_label('Trend diff (K/cent)', fontsize=16)
+    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+
+    fig.savefig(cart_out + 'oce_trends_{}_diff.pdf'.format(ru))
+
+AAAAAAAAAAAAAAAAAAAAA
+fig, axes = plt.subplots(2, 3, figsize = (16,9))
 for nam, tit, ax in zip(nams, tits, axes.flatten()):
     map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
     ax.set_title(tit)

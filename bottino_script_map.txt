@@ -1,0 +1,110 @@
+### mappa script bottineschi
+
+## seasmean
+
+- bottino_overview_2    ->    [seasmean]
+                              vars: clt pr rlut rsdt rsut tas
+                              fa le global means (glomeans) e i plot. fa anche le mappe di yearly means (yeamean). mapmean non è più usato.
+                              mip: Amon
+                              salva in 'bottino_seasmean_2D.p'
+
+- bottino_overview_4    ->    [trends]
+                              fa i trends e li plotta, partendo da bottino_seasmean_2D.p
+
+- bottino_overview_5    ->    [trends]
+                              fa gli ovmoller della stabilizzazione, partendo da bottino_seasmean_2D.p
+
+- bottino_overview_6    ->    [internal_var]
+                              fa lo spettro di global tas, partendo da bottino_seasmean_2D.p
+
+- bottino_overview_seaice ->  [seasmean]
+                              fa le medie e il plot del sea ice, partendo dai dati originali (SImon)
+
+- bottino_map             ->  [simple_maps]
+                              usa bottino_seasmean_2D.p e bottino_yeamean_3_{exp}_{var}.p
+                              fa le mappe di cambiamento trans vs stab
+
+## yeamean
+
+- bottino_yeamean   ->        [yearmean]
+                              produce bottino_yeamean.p.
+                              Usa i dati a 2.5 (Amon_r25)
+                              fa medie sia in 2D (clt pr psl rlut rsut tas uas) che in 3D (ta, ua)
+
+- bottino_overview_3    ->    [yearmean]
+                              fa differenze tra inizio e fine dei run partendo da bottino_yeamean.p. sembra non usato da un po'..
+
+- bottino_yeamean_2   ->      [yearmean]
+                              produce bottino_yeamean_3_{var}.p.
+                              Usa i dati originali (Amon)
+                              fa medie solo in 2D ma year, DJFM, JJAS (psl uas tas pr u850 t850)
+
+- bottino_yeamean_histssp ->  [yearmean]
+                              produce bottino_yeamean_3_{exp}_{var}.p
+                              come bottino_yeamean_2 ma per historical e ssp585 (tutti i membri)
+
+- bottino_yeamean_3   ->      [yearmean]
+                              produce bottino_yeastat_{var}.p
+                              dati originali (Amon)
+                              seasonal extremes di tas (e pr?)
+
+### Ocean
+
+- bottino_ocean3d         ->  [ocean3d]
+                              calcola i trend 3d di thetao per bacino
+                              produce i filez thetao_{exp}.p
+                              (girato a cineka)
+
+- bottino_ocean3d_plot    ->  [ocean3d]
+                              usa i filez thetao_{exp}.p
+                              plot della cross section dei trends
+
+### Modes of variability
+
+- bottino_MOV             ->  [indices/{index}]
+                              plotta timeseries (red/blue), boxplot e spettro di tutti gli indici
+
+- bottino_enso_dsst       ->  [indices/enso]
+                              fa scatter di enso con il gradiente delle SST nel pacifico
+
+- bottino_enso_londist    ->  [indices/enso]
+                              plot della distribuzione in longitudine del picco di enso
+
+- bottino_monsoon         ->  [monsoon] (solo su xaru)
+                              calcola indice MPI
+                              plotta regione del monsoon
+
+- DEPRECATED: bottino_AMV, bottino_enso_box, bottino_enso_box_v2 (superati da bottino_MOV)
+
+
+
+### variability, extremes
+
+- bottino_regional_dist   ->  [regsdist]
+                              produce bottino_monsea_areadist.p
+                              fa le pdf di tas e pr stagionali su diverse aree del globo
+
+- bottino_riskratio_taspr ->  [extreme_risk]
+                              usa bottino_yeastat_{var}.p
+                              fa le mappe di riskratio
+                              produce extreme_maps.p
+
+
+### Jet stream
+
+- bottino_seas_jetstream  ->  [yearmean]
+                              usa bottino_seamean_wind.p (NESSUNO SCRIPT LO PRODUCE)
+                              fa i boxplot di mean jet stagionale e la bruttissima linea del jet su mappa
+
+- bottino_jetlat          ->  [analisi]
+                              fa il jli sui daily
+                              produce res_jli200_v2.p
+                              fa i plot delle pdf del jli
+
+- bottino_jetlat_seas     ->  [jetlat]
+                              legge res_jli200_v2.p
+                              fa medie e std di jetlat stagionali partendo dal jli daily
+
+-> STRANO: i plot di bottino_seas_jetstream e di bottino_jetlat_seas sono in contraddizione sulla speed
+
+DEPRECATED: bottino_overview,

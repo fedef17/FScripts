@@ -51,6 +51,10 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 allnams2 = allnams + ['ssp585', 'historical']
 allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
+
+allnams3 = allnams2 + ['stabilization-hist-1990']
+allru3 = allru2 + ['b990']
+colors3 = colors2 + ['teal']
 ####################################################################################################
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
@@ -61,8 +65,8 @@ latbins = np.arange(-90, 91, 20)
 lacol = ctl.color_set(9, use_seaborn=False)
 
 for var in ['tas', 'pr']:
-    fig, axs = plt.subplots(2, 3, figsize = (16,9))
-    for ru, ax in zip(allru2, axs.flatten()):
+    fig, axs = plt.subplots(2, 4, figsize = (16,9))
+    for ru, ax in zip(allru3, axs.flatten()):
         coso = yeamean[(ru, var)]
         coso1 = coso[:10].mean(axis = 0)
         cosoanom = coso-coso1
@@ -128,9 +132,14 @@ cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # ocean mask: 1 over ocean, 0 over land
 
 assp = ''
-add_ssp = True
+add_ssp = False
 if add_ssp:
     assp = '_wssp50'
+
+ab90 = ''
+plot_b990 = True
+if plot_b990:
+    ab90 = '_wb990'
 
 for tip in ['all', 'land', 'oce']:
     var = 'tas'
@@ -141,8 +150,14 @@ for tip in ['all', 'land', 'oce']:
 
     ypre = 30
 
-    fig, axs = plt.subplots(1, 3, figsize = (16,7))
-    for ru, ax in zip(allru[1:], axs.flatten()):
+    if plot_b990:
+        fig, axs = plt.subplots(2, 2, figsize = (16,9))
+        okru = ['b990'] + allru[1:]
+    else:
+        fig, axs = plt.subplots(1, 3, figsize = (16,7))
+        okru = allru[1:]
+
+    for ru, ax in zip(okru, axs.flatten()):
         print(ru)
         coso = yeamean[(ru, var)]
 
@@ -156,8 +171,12 @@ for tip in ['all', 'land', 'oce']:
             cosobase = cosohistssp
 
         if add_ssp:
-            coso = coso.assign_coords({'lat': cosohistssp.lat})
-            coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
+            if ru == 'b990':
+                coso = coso.assign_coords({'lat': cosohistssp.lat})
+                coso = xr.concat([cosohistssp[-75:-25], coso], dim = 'year')
+            else:
+                coso = coso.assign_coords({'lat': cosohistssp.lat})
+                coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
 
         # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
         # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
@@ -205,7 +224,7 @@ for tip in ['all', 'land', 'oce']:
     cb.set_label('Realized change', fontsize=20)
     plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
+    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
 
     var = 'pr'
 
@@ -216,10 +235,18 @@ for tip in ['all', 'land', 'oce']:
 
     ypre = 30
 
+    if plot_b990:
+        fig, axs = plt.subplots(2, 2, figsize = (16,9))
+        okru = ['b990'] + allru[1:]
+    else:
+        fig, axs = plt.subplots(1, 3, figsize = (16,7))
+        okru = allru[1:]
+
+    for ru, ax in zip(okru, axs.flatten()):
     #fig, axs = plt.subplots(1, 3, figsize = (16,7))
     #for ru, ax in zip(allru[1:], axs.flatten()):
-    for ru in allru[1:]:
-        fig, ax = plt.subplots(figsize = (16,7))
+    # for ru in allru[1:]:
+    #     fig, ax = plt.subplots(figsize = (16,7))
         print(ru)
         coso = yeamean[(ru, var)]
 
@@ -233,10 +260,12 @@ for tip in ['all', 'land', 'oce']:
             cosobase = cosohistssp
 
         if add_ssp:
-            coso = coso.assign_coords({'lat': cosohistssp.lat})
-            coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
-        # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
-        # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
+            if ru == 'b990':
+                coso = coso.assign_coords({'lat': cosohistssp.lat})
+                coso = xr.concat([cosohistssp[-75:-25], coso], dim = 'year')
+            else:
+                coso = coso.assign_coords({'lat': cosohistssp.lat})
+                coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
 
         ax.set_title(ru)
         smut = 50
@@ -290,7 +319,7 @@ for tip in ['all', 'land', 'oce']:
     cb.set_label('Relative change', fontsize=20)
     plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}.pdf'.format(var, tip, assp))
+    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
 
 
 # ##### NOW for each sector

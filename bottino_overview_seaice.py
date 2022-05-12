@@ -56,13 +56,18 @@ resdict = dict()
 
 fig, axs = plt.subplots(2,2,figsize = (12,12))
 
-allnams2 = ['ssp585'] + allnams
-allru2 = ['ssp585'] + allru
-colors2 = ['indianred'] + colors
+allnams2 = ['ssp585', 'historical'] + allnams
+allru2 = ['ssp585', 'hist'] + allru
+colors2 = ['indianred', 'steelblue'] + colors
 
-for na, ru, col in zip(allnams2, allru2, colors2):
+allnams3 = allnams2 + ['stabilization-hist-1990']
+allru3 = allru2 + ['b990']
+colors3 = colors2 + ['teal']
+
+for na, ru, col in zip(allnams3, allru3, colors3):
+    print(ru)
     mem = 'r1'
-    if na == 'ssp585': mem = 'r4'
+    if ru in ['ssp585', 'hist']: mem = 'r4'
     filist = glob.glob(filna.format(na, mem, miptab, varnam))
     gigi = xr.open_mfdataset(filist, use_cftime=True)
 
@@ -123,7 +128,7 @@ axs[0,1].set_title('September')
 axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
 axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
 #axs[1,1].legend()
-ctl.custom_legend(fig, colors2, allru2, ncol = 3)
+ctl.custom_legend(fig, colors3, allru3, ncol = 4)
 fig.savefig(cart_out + 'bottseaice.pdf')
 
 sys.exit()
