@@ -106,7 +106,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     # total freshwater flux: derivative of volume
     frw_flu = -np.diff(water_vol, axis = 0)/(1.e6*3.1e7)
     snowco[(ru, 'freshwater_flux (Sv)')] = frw_flu
-    axs[1].plot(water_vol.year, frw_flu, color = col, label = ru)
+    axs[1].plot(water_vol.year[1:], frw_flu, color = col, label = ru)
 
 axs[0].set_yscale('log')
 axs[0].set_ylabel(r'Total water volume ($m^3$)')
