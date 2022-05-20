@@ -54,6 +54,7 @@ allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilizat
 
 colors = ['forestgreen', 'orange', 'violet']
 
+
 ru = 'b100'
 for ru in allru:
     syear = allsyear[allru.index(ru)]
@@ -132,7 +133,7 @@ for ru in allru:
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -148,7 +149,7 @@ for ru in allru:
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -166,7 +167,7 @@ for ru in allru:
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=True, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -198,19 +199,24 @@ for ru in allru:
 
     fig.savefig(cart_out + 'oce_trends_{}_diff.pdf'.format(ru))
 
-AAAAAAAAAAAAAAAAAAAAA
-fig, axes = plt.subplots(2, 3, figsize = (16,9))
-for nam, tit, ax in zip(nams, tits, axes.flatten()):
-    map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
-    ax.set_title(tit)
-    if tits.index(tit) > 0:
-        ax.set_yticklabels([])
-        ax.set_ylabel('')
 
-cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
-cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
-cb.ax.tick_params(labelsize=14)
-cb.set_label('Trend diff (K/cent)', fontsize=16)
-plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+for ke in trends:
+    print(ke, 'points with negative trend: ', np.sum(trends[ke] < 0.))
 
-fig.savefig(cart_out + 'oce_trends_{}_diff.pdf'.format(ru))
+
+# AAAAAAAAAAAAAAAAAAAAA
+# fig, axes = plt.subplots(2, 3, figsize = (16,9))
+# for nam, tit, ax in zip(nams, tits, axes.flatten()):
+#     map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
+#     ax.set_title(tit)
+#     if tits.index(tit) > 0:
+#         ax.set_yticklabels([])
+#         ax.set_ylabel('')
+#
+# cax = plt.axes([0.1, 0.11, 0.8, 0.05]) #horizontal
+# cb = plt.colorbar(map_plot, cax=cax, orientation='horizontal')#,
+# cb.ax.tick_params(labelsize=14)
+# cb.set_label('Trend diff (K/cent)', fontsize=16)
+# plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
+#
+# fig.savefig(cart_out + 'oce_trends_{}_diff.pdf'.format(ru))
