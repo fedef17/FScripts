@@ -101,21 +101,22 @@ for ru, mem, col in zip(allru, allmems, colors):
     water_vol = water_vol.sum(['lat', 'lon'])
     snowco[(ru, 'water_vol (m3)')] = water_vol
 
-    axs[0].plot(water_vol.year[:50], water_vol[:50], color = col, label = ru)
+    axs[0].plot(water_vol.year, water_vol, color = col, label = ru)
 
     # total freshwater flux: derivative of volume
     frw_flu = -np.diff(water_vol, axis = 0)/(1.e6*3.1e7)
     snowco[(ru, 'freshwater_flux (Sv)')] = frw_flu
-    axs[1].plot(water_vol.year[:50], frw_flu[:50], color = col, label = ru)
+    axs[1].plot(water_vol.year, frw_flu, color = col, label = ru)
 
 axs[0].set_yscale('log')
 axs[0].set_ylabel(r'Total water volume ($m^3$)')
-
 axs[1].set_ylabel('Mean meltwater flux (Sv)')
 axs[0].set_xlabel('year')
-
 axs[0].legend()
-
 fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
+
+axs[0].set_xlim(2100, 2140)
+axs[1].set_xlim(2100, 2140)
+fig.savefig(cart_out + 'check_greenland_snw_melt_zoom.pdf')
 
 pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
