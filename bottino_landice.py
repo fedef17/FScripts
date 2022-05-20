@@ -85,18 +85,19 @@ for ru, mem, col in zip(allru, allmems, colors):
 
     snw = xr.open_mfdataset(filz, use_cftime = True)['snw']
 
-    gr_snw = snw.sel(lat = slice(gr_latsli), lon = slice(gr_lonsli)).groupby('time.year').mean()
+    gr_snw = snw.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli)).groupby('time.year').mean()
 
     # total volume over greenland. need cell area/land-sea mask. can also approximate
     lamesh, lomesh = np.meshgrid(gr_snw.lat, gr_snw.lon)
 
-    dtheta = np.deg2rad(gr_snw.lat[1]-gr_snw.lat[0])
-    dphi = np.deg2rad(gr_snw.lon[1]-gr_snw.lon[0])
+    dtheta = np.deg2rad(gr_snw.lat[1]-gr_snw.lat[0]).values
+    dphi = np.deg2rad(gr_snw.lon[1]-gr_snw.lon[0]).values
     cell_area = ctl.Rearth**2*np.cos(np.deg2rad(lamesh))*dtheta*dphi
+    cell_area = np.swapaxes(cell_area,0,1)
 
     print(np.mean(cell_area), np.max(cell_area), np.min(cell_area))
 
-    water_vol = gr_snw*cell_area
+    water_vol = gr_snw*cell_area[np.newaxis, ...]
     water_vol = water_vol.sum(['lat', 'lon'])
     snowco[(ru, 'water_vol (m3)')] = water_vol
 
@@ -105,7 +106,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     # total freshwater flux: derivative of volume
     frw_flu = -np.diff(water_vol, axis = 0)/(1.e6*3.1e7)
     snowco[(ru, 'freshwater_flux (Sv)')] = frw_flu
-    axs[1].plot(frw_flu.year[:50], frw_flu[:50], color = col, label = ru)
+    axs[1].plot(water_vol.year[:50], frw_flu[:50], color = col, label = ru)
 
 axs[0].set_yscale('log')
 axs[0].set_ylabel(r'Total water volume ($m^3$)')
