@@ -191,7 +191,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi = gigi-273.15
 
     gtas_mon = ctl.global_mean(gigi[:60])
-    ax2.plot(gtas_mon.time[:60], gtas_mon, color = col, label = ru)
+    ax2.plot(gtas_mon, color = col, label = ru)
 
     ygigi = gigi.groupby('time.year').mean()
     gtas = ctl.global_mean(ygigi)
