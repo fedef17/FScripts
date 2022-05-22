@@ -84,6 +84,7 @@ var = 'snw'
 fig, axs = plt.subplots(2, 1, figsize = (16,9))
 
 for ru, mem, col in zip(allru, allmems, colors):
+    print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
@@ -143,6 +144,7 @@ gr_lonsli = (270., 355.)
 fig, axs = plt.subplots(2, 1, figsize = (16,9))
 
 for ru, mem, col in zip(allru, allmems, colors):
+    print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
@@ -183,6 +185,7 @@ var = 'tas'
 fig, axs = plt.subplots(2, 1, figsize = (16,9))
 
 for ru, mem, col in zip(allru, allmems, colors):
+    print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
