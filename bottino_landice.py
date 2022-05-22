@@ -26,12 +26,12 @@ import glob
 import multiprocessing as mp
 import psutil
 
-plt.rcParams['xtick.labelsize'] = 15
-plt.rcParams['ytick.labelsize'] = 15
+plt.rcParams['xtick.labelsize'] = 12
+plt.rcParams['ytick.labelsize'] = 12
 titlefont = 22
 plt.rcParams['figure.titlesize'] = titlefont
 plt.rcParams['axes.titlesize'] = 18
-plt.rcParams['axes.labelsize'] = 15
+plt.rcParams['axes.labelsize'] = 12
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
@@ -115,7 +115,7 @@ for ru, mem, col in zip(allru, allmems, colors):
 
 axs[0].set_yscale('log')
 axs[0].set_ylabel(r'Total water volume ($m^3$)')
-axs[1].set_ylabel('Water from snow melting (Sv, yearly average)')
+axs[1].set_ylabel('Water from snow melting (Sv)')#', yearly average)')
 axs[0].set_xlabel('year')
 axs[0].legend()
 #fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
@@ -132,8 +132,6 @@ areas = xr.load_dataset(cart_run + 'areas.nc')
 areavar = 'O1t0.srf'
 okarea = areas[areavar]
 okarea = okarea.rename({'x_3' : 'i', 'y_3' : 'j'})
-
-friver = dict()
 
 miptab = 'Omon'
 var = 'friver'
@@ -156,7 +154,7 @@ for ru, mem, col in zip(allru, allmems, colors):
 
     frwat = (gogo*okar).sum(['i', 'j'])*0.001/1.e6 # kg * m2 * s-1 to m3 * s-1 to Sv
 
-    pino = frwat.groupby('time.year').sum()
+    pino = frwat.groupby('time.year').mean()
     pimax = frwat.groupby('time.year').max()
 
     snowco[(ru, 'freshwater flux (Sv)')] = frwat
@@ -165,8 +163,8 @@ for ru, mem, col in zip(allru, allmems, colors):
     axs[1].plot(pino.year, pino, color = col, label = ru)
 
 #axs[0].set_yscale('log')
-axs[0].set_ylabel(r'Monthly freshwater flux (Sv)')
-axs[1].set_ylabel('Yearly freshwater flux (Sv)')
+axs[0].set_ylabel(r'Monthly max freshwater flux (Sv)')
+axs[1].set_ylabel('Yearly mean freshwater flux (Sv)')
 axs[1].set_xlabel('year')
 axs[0].legend()
 axs[0].set_xlim(2100, 2200)
@@ -177,12 +175,12 @@ pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
 #pickle.dump(friver, open(cart_out + 'friver_{}.p'.format(ru), 'wb'))
 
 ###
-snowco = dict()
-
 miptab = 'Amon'
 var = 'tas'
 
 fig, axs = plt.subplots(2, 1, figsize = (16,9))
+
+fig2, ax2 = plt.subplots()
 
 for ru, mem, col in zip(allru, allmems, colors):
     print(ru)
@@ -190,6 +188,10 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz.sort()
 
     gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
+    gigi = gigi-273.15
+
+    gtas_mon = ctl.global_mean(gigi.sel(time < '2105-01-01'))
+    ax2.plot(gtas_mon.time, gtas_mon, color = col, label = ru)
 
     ygigi = gigi.groupby('time.year').mean()
     gtas = ctl.global_mean(ygigi)
@@ -210,12 +212,53 @@ for ru, mem, col in zip(allru, allmems, colors):
     axs[1].plot(gr_max.year, gr_max, color = col, label = ru, ls = ':', lw = 0.2)
     axs[1].plot(gr_min.year, gr_min, color = col, label = ru, ls = ':', lw = 0.2)
 
-axs[0].set_ylabel(r'Global tas (K)')
-axs[1].set_ylabel('Spatial-mean (max/min) annual peak temp over Greenland (K)')
+axs[0].set_ylabel(r'Global tas')
+axs[1].set_ylabel('Mean (max/min) summer peak temp over Greenland')
 axs[0].set_xlabel('year')
 axs[0].legend()
 axs[0].set_xlim(2100, 2200)
 axs[1].set_xlim(2100, 2200)
 fig.savefig(cart_out + 'check_greenland_temp.pdf')
 
+ax2.legend()
+fig2.savefig(cart_out + 'check_monthly_temp_start.pdf')
+
 pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
+
+
+###
+masfi = cart_run + 'masks.nc'
+cose = xr.load_dataset(masfi)
+land_mask = ~cose['RnfA.msk'].values.astype('bool') # 1 over land
+
+miptab = 'Amon'
+var1 = 'rsdscs'
+var2 = 'rsuscs'
+
+fig, ax = plt.subplots(figsize = (16,9))
+
+for ru, mem, col in zip(allru, allmems, colors):
+    print(ru)
+    filz = glob.glob(filna.format(ru, mem, miptab, var1, var1))
+    filz.sort()
+    gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var1]
+
+    filz = glob.glob(filna.format(ru, mem, miptab, var2, var2))
+    filz.sort()
+    gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var2]
+
+    gigi = gigi2/gigi1
+    gr_gigi = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
+
+    ygigi = gr_gigi.sel('time.month' == 9)
+    mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
+
+    ax.plot(ygigi.time, mean_albedo, color = col, label = ru)
+
+ax.set_ylabel(r'Mean greenland albedo')
+ax.legend()
+ax.set_xlim(2100, 2200)
+
+fig.savefig(cart_out + 'check_greenland_albedo.pdf')
+
+#pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
