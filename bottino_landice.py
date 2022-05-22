@@ -241,7 +241,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var1, var1))
     filz.sort()
-    gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var1]
+    gigi1 = xr.open_mfdataset(filz[:100], use_cftime = True)[var1]
 
     filz = glob.glob(filna.format(ru, mem, miptab, var2, var2))
     filz.sort()
