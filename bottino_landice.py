@@ -204,7 +204,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     snowco[(ru, 'gtas')] = gtas
     snowco[(ru, 'Greenland mean temp')] = gr_mean
 
-    axs[0].plot(ygigi.year, water_vol, color = col, label = ru)
+    axs[0].plot(ygigi.year, gtas, color = col, label = ru)
 
     axs[1].plot(gr_max.year, gr_mean, color = col, label = ru)
     axs[1].plot(gr_max.year, gr_max, color = col, label = ru, ls = ':', lw = 0.2)
