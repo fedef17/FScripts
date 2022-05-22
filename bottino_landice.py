@@ -87,7 +87,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    snw = xr.open_mfdataset(filz, use_cftime = True)[var]
+    snw = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
 
     gr_snw = snw.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli)).groupby('time.year').mean()
 
@@ -117,7 +117,7 @@ axs[0].set_ylabel(r'Total water volume ($m^3$)')
 axs[1].set_ylabel('Water from snow melting (Sv, yearly average)')
 axs[0].set_xlabel('year')
 axs[0].legend()
-fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
+#fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
 
 axs[0].set_xlim(2100, 2200)
 axs[1].set_xlim(2100, 2200)
@@ -146,7 +146,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    gigi = xr.open_mfdataset(filz, use_cftime = True)[var]
+    gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
 
     cond = (gigi.latitude > gr_latsli[0]) & (gigi.latitude < gr_latsli[1]) & (gigi.longitude > gr_lonsli[0]) & (gigi.longitude < gr_lonsli[1]) & (gigi.i > 235)
     gogo = gigi.where(cond)
@@ -186,7 +186,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    gigi = xr.open_mfdataset(filz, use_cftime = True)[var]
+    gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
 
     ygigi = gigi.groupby('time.year').mean()
     gtas = ctl.global_mean(ygigi)
