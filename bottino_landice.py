@@ -209,8 +209,8 @@ for ru, mem, col in zip(allru, allmems, colors):
     axs[0].plot(ygigi.year, gtas, color = col, label = ru)
 
     axs[1].plot(gr_max.year, gr_mean, color = col, label = ru)
-    axs[1].plot(gr_max.year, gr_max, color = col, label = ru, ls = ':', lw = 0.2)
-    axs[1].plot(gr_min.year, gr_min, color = col, label = ru, ls = ':', lw = 0.2)
+    axs[1].plot(gr_max.year, gr_max, color = col, label = ru, ls = ':')
+    axs[1].plot(gr_min.year, gr_min, color = col, label = ru, ls = ':')
 
 axs[0].set_ylabel(r'Global tas')
 axs[1].set_ylabel('Mean (max/min) summer peak temp over Greenland')
