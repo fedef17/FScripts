@@ -190,8 +190,8 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
     gigi = gigi-273.15
 
-    gtas_mon = ctl.global_mean(gigi.sel(time < '2105-01-01'))
-    ax2.plot(gtas_mon.time, gtas_mon, color = col, label = ru)
+    gtas_mon = ctl.global_mean(gigi[:60])
+    ax2.plot(gtas_mon.time[:60], gtas_mon, color = col, label = ru)
 
     ygigi = gigi.groupby('time.year').mean()
     gtas = ctl.global_mean(ygigi)
