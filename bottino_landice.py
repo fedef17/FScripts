@@ -62,7 +62,8 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'landice/'
 ctl.mkdir(cart_out)
 
-filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2100/r1i1p1{}/LImon/snw/gr/v*/snw_*nc'
+filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2100/r1i1p1{}/{}/{}/*/v*/{}_*nc'
+
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['b100', 'b00A', 'b00I']#['pi',
@@ -77,13 +78,16 @@ gr_lonsli = (288., 350.)
 
 snowco = dict()
 
+miptab = 'LImon'
+var = 'snw'
+
 fig, axs = plt.subplots(2, 1, figsize = (16,9))
 
 for ru, mem, col in zip(allru, allmems, colors):
-    filz = glob.glob(filna.format(ru, mem))
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    snw = xr.open_mfdataset(filz, use_cftime = True)['snw']
+    snw = xr.open_mfdataset(filz, use_cftime = True)[var]
 
     gr_snw = snw.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli)).groupby('time.year').mean()
 
@@ -105,18 +109,110 @@ for ru, mem, col in zip(allru, allmems, colors):
 
     # total freshwater flux: derivative of volume
     frw_flu = -np.diff(water_vol, axis = 0)/(1.e6*3.1e7)
-    snowco[(ru, 'freshwater_flux (Sv)')] = frw_flu
+    snowco[(ru, 'melted_snpw (Sv)')] = frw_flu
     axs[1].plot(water_vol.year[1:], frw_flu, color = col, label = ru)
 
 axs[0].set_yscale('log')
 axs[0].set_ylabel(r'Total water volume ($m^3$)')
-axs[1].set_ylabel('Mean meltwater flux (Sv)')
+axs[1].set_ylabel('Water from snow melting (Sv, yearly average)')
 axs[0].set_xlabel('year')
 axs[0].legend()
 fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
 
-axs[0].set_xlim(2100, 2140)
-axs[1].set_xlim(2100, 2140)
+axs[0].set_xlim(2100, 2200)
+axs[1].set_xlim(2100, 2200)
 fig.savefig(cart_out + 'check_greenland_snw_melt_zoom.pdf')
+
+pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
+
+##### Reading friver
+cart_run = '/g100_scratch/userexternal/ffabiano/ece3/b00I/runtime/'
+areas = xr.load_dataset(cart_run + 'areas.nc')
+areavar = 'O1t0.srf'
+okarea = areas[areavar]
+okarea = okarea.rename({'x_3' : 'i', 'y_3' : 'j'})
+
+friver = dict()
+
+miptab = 'Omon'
+var = 'friver'
+
+gr_latsli = (55., 90.)
+gr_lonsli = (270., 355.)
+
+fig, axs = plt.subplots(2, 1, figsize = (16,9))
+
+for ru, mem, col in zip(allru, allmems, colors):
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.open_mfdataset(filz, use_cftime = True)[var]
+
+    cond = (gigi.latitude > gr_latsli[0]) & (gigi.latitude < gr_latsli[1]) & (gigi.longitude > gr_lonsli[0]) & (gigi.longitude < gr_lonsli[1]) & (gigi.i > 235)
+    gogo = gigi.where(cond)
+    okar = okarea.where(cond)
+
+    frwat = (gogo*okar).sum(['i', 'j'])*0.001/1.e6 # kg * m2 * s-1 to m3 * s-1 to Sv
+
+    pino = frwat.groupby('time.year').sum()
+    pimax = frwat.groupby('time.year').max()
+
+    snowco[(ru, 'freshwater flux (Sv)')] = frwat
+
+    axs[0].plot(pimax.year, pimax, color = col, label = ru)
+    axs[1].plot(pino.year, pino, color = col, label = ru)
+
+#axs[0].set_yscale('log')
+axs[0].set_ylabel(r'Monthly freshwater flux (Sv)')
+axs[1].set_ylabel('Yearly freshwater flux (Sv)')
+axs[1].set_xlabel('year')
+axs[0].legend()
+axs[0].set_xlim(2100, 2200)
+axs[1].set_xlim(2100, 2200)
+fig.savefig(cart_out + 'check_greenland_friver.pdf')
+
+pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
+#pickle.dump(friver, open(cart_out + 'friver_{}.p'.format(ru), 'wb'))
+
+###
+snowco = dict()
+
+miptab = 'Amon'
+var = 'tas'
+
+fig, axs = plt.subplots(2, 1, figsize = (16,9))
+
+for ru, mem, col in zip(allru, allmems, colors):
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.open_mfdataset(filz, use_cftime = True)[var]
+
+    ygigi = gigi.groupby('time.year').mean()
+    gtas = ctl.global_mean(ygigi)
+
+    gr_tas = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
+
+    gr_tas_max = gr_tas.groupby('time.year').max()
+    gr_max = gr_tas_max.max(['lat', 'lon'])
+    gr_mean = gr_tas_max.mean(['lat', 'lon'])
+    gr_min = gr_tas_max.min(['lat', 'lon'])
+
+    snowco[(ru, 'gtas')] = gtas
+    snowco[(ru, 'Greenland mean temp')] = gr_mean
+
+    axs[0].plot(ygigi.year, water_vol, color = col, label = ru)
+
+    axs[1].plot(gr_max.year, gr_mean, color = col, label = ru)
+    axs[1].plot(gr_max.year, gr_max, color = col, label = ru, ls = ':', lw = 0.2)
+    axs[1].plot(gr_min.year, gr_min, color = col, label = ru, ls = ':', lw = 0.2)
+
+axs[0].set_ylabel(r'Global tas (K)')
+axs[1].set_ylabel('Spatial-mean (max/min) annual peak temp over Greenland (K)')
+axs[0].set_xlabel('year')
+axs[0].legend()
+axs[0].set_xlim(2100, 2200)
+axs[1].set_xlim(2100, 2200)
+fig.savefig(cart_out + 'check_greenland_temp.pdf')
 
 pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
