@@ -87,8 +87,8 @@ for var in 'snw tas clt rlut rlus rlds rsds rsus hfls hfss hurs psl tasmin tasma
     filz.sort()
 
     gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
-
     b100_map = gigi[0]
+    del gigi
 
     ru = 'b00A'
     mem = allmems[allru.index(ru)]
@@ -97,8 +97,8 @@ for var in 'snw tas clt rlut rlus rlds rsds rsus hfls hfss hurs psl tasmin tasma
     filz.sort()
 
     gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
-
     b00A_map = gigi[0]
+    del gigi
 
     map_diff = b00A_map - b100_map
 
