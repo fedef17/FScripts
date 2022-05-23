@@ -72,43 +72,6 @@ allru = ['b100', 'b00A', 'b00I']#['pi',
 allmems = ['f1', 'f2', 'f3']
 colors = ['violet', 'chocolate', 'steelblue']
 
-##################################################
-## check first day of b00A
-cart_out_fig = cart_out + 'check_day0/'
-ctl.mkdir(cart_out_fig)
-
-allfi = []
-miptab = 'day'
-for var in 'snw tas tasmin tasmax clt rlut rlus rlds rsds rsus hfls hfss hurs psl'.split():
-    print(var)
-
-    ru = 'b100'
-    mem = allmems[allru.index(ru)]
-
-    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
-    filz.sort()
-
-    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
-    b100_map = gigi[0]
-    del gigi
-
-    ru = 'b00A'
-    mem = allmems[allru.index(ru)]
-
-    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
-    filz.sort()
-
-    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
-    b00A_map = gigi[0]
-    del gigi
-
-    map_diff = b00A_map - b100_map
-
-    fig = ctl.plot_map_contour(map_diff, filename = cart_out_fig + 'check_b00A-b100_day0_{}.pdf'.format(var), title = var, plot_anomalies = True, color_percentiles = (5,95), figsize = (16,9))
-    allfi.append(fig)
-
-ctl.plot_pdfpages(cart_out + 'check_b00A-b100_day0.pdf', allfi)
-
 
 ####################################################################################################
 gr_latsli = (60., 85.)
@@ -309,10 +272,47 @@ allfi = []
 diff_b00A = alb_maps['b00A']-alb_maps['b100']
 diff_b00I = alb_maps['b00I']-alb_maps['b100']
 for mo in range(12):
-    figs = ctl.plot_multimap_contour([diff_b00A[mo], diff_b00I[mo]], filename = None, subtitles = ['b00A-b100', 'b00I-b100'], figsize = (16,9), plot_anomalies = True)
+    figs = ctl.plot_multimap_contour([diff_b00A[mo], diff_b00I[mo]], filename = None, subtitles = ['b00A-b100', 'b00I-b100'], figsize = (16,9), plot_anomalies = True, cbar_range = (-0.3, 0.3))
     allfi.append(figs[0])
 
 ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
 
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
 #######
+##################################################
+sys.exit()
+## check first day of b00A
+cart_out_fig = cart_out + 'check_day0/'
+ctl.mkdir(cart_out_fig)
+
+allfi = []
+miptab = 'day'
+for var in 'snw tas tasmin tasmax clt rlut rlus rlds rsds rsus hfls hfss hurs psl'.split():
+    print(var)
+
+    ru = 'b100'
+    mem = allmems[allru.index(ru)]
+
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
+    b100_map = gigi[0]
+    del gigi
+
+    ru = 'b00A'
+    mem = allmems[allru.index(ru)]
+
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
+    b00A_map = gigi[0]
+    del gigi
+
+    map_diff = b00A_map - b100_map
+
+    fig = ctl.plot_map_contour(map_diff, filename = cart_out_fig + 'check_b00A-b100_day0_{}.pdf'.format(var), title = var, plot_anomalies = True, color_percentiles = (5,95), figsize = (16,9))
+    allfi.append(fig)
+
+ctl.plot_pdfpages(cart_out + 'check_b00A-b100_day0.pdf', allfi)
