@@ -248,7 +248,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var2]
 
     gigi = gigi2/gigi1
-    gigi = gigi.sel(land_mask)
+    gigi = gigi.where(land_mask)
     gr_gigi = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
 
     # ygigi = gr_gigi.sel('time.month' == 9)
