@@ -267,6 +267,6 @@ ax.set_xlim(2100, 2200)
 
 fig.savefig(cart_out + 'check_greenland_albedo.pdf')
 
-ctl.plot_multimap_contour([alb_maps['b00A']-alb_maps['b100'], alb_maps['b00A']-alb_maps['b100'], filename = cart_out + 'check_albedo_global_month0.pdf')
+ctl.plot_multimap_contour([alb_maps['b00A']-alb_maps['b100'], alb_maps['b00I']-alb_maps['b100']], filename = cart_out + 'check_albedo_global_month0.pdf', subtitles = ['b00A-b100', 'b00I-b100'])
 
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
