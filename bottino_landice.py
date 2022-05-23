@@ -79,7 +79,7 @@ ctl.mkdir(cart_out_fig)
 
 allfi = []
 miptab = 'day'
-for var in 'snw tas clt rlut rlus rlds rsds rsus hfls hfss hurs psl tasmin tasmax'.split():
+for var in 'snw tas tasmin tasmax clt rlut rlus rlds rsds rsus hfls hfss hurs psl'.split():
     print(var)
 
     ru = 'b100'
