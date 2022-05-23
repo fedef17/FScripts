@@ -250,10 +250,11 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi = gigi2/gigi1
     gr_gigi = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
 
-    ygigi = gr_gigi.sel('time.month' == 9)
+    # ygigi = gr_gigi.sel('time.month' == 9)
+    ygigi = gr_gigi[gr_gigi.groupby('time.month').groups[9]]
     mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
 
-    ax.plot(ygigi.time, mean_albedo, color = col, label = ru)
+    ax.plot(ygigi.year, mean_albedo, color = col, label = ru)
 
 ax.set_ylabel(r'Mean greenland albedo')
 ax.legend()
