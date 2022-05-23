@@ -77,7 +77,7 @@ colors = ['violet', 'chocolate', 'steelblue']
 
 allfi = []
 miptab = 'day'
-for var in 'snw tas clt rlut rlus rlds rsut rsds rsus hfls hfss hurs psl tasmin tasmax'.split():
+for var in 'snw tas clt rlut rlus rlds rsds rsus hfls hfss hurs psl tasmin tasmax'.split():
     print(var)
 
     ru = 'b100'
