@@ -277,3 +277,37 @@ for mo in range(12):
 ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
 
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
+#######
+## check first day of b00A
+
+allfi = []
+miptab = 'day'
+for var in 'snw tas clt rlut rlus rlds rsut rsds rsus hfls hfss hurs psl tasmin tasmax':
+    print(var)
+
+    ru = 'b100'
+    mem = allmems[allru.index(ru)]
+
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
+
+    b100_map = gigi[0]
+
+    ru = 'b00A'
+    mem = allmems[allru.index(ru)]
+
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+
+    gigi = xr.load_dataset(filz[0], use_cftime = True)[var]
+
+    b00A_map = gigi[0]
+
+    map_diff = b00A_map - b100_map
+
+    fig = ctl.plot_map_contour(map_diff, title = var, plot_anomalies = True, color_percentiles = (5,95), figsize = (16,9))
+    allfi.append(fig)
+
+ctl.plot_pdfpages(cart_out + 'check_b00A-b100_firstday.pdf', allfi)
