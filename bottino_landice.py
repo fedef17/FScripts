@@ -74,6 +74,8 @@ colors = ['violet', 'chocolate', 'steelblue']
 
 ##################################################
 ## check first day of b00A
+cart_out_fig = cart_out + 'check_day0/'
+ctl.mkdir(cart_out_fig)
 
 allfi = []
 miptab = 'day'
@@ -102,10 +104,10 @@ for var in 'snw tas clt rlut rlus rlds rsds rsus hfls hfss hurs psl tasmin tasma
 
     map_diff = b00A_map - b100_map
 
-    fig = ctl.plot_map_contour(map_diff, title = var, plot_anomalies = True, color_percentiles = (5,95), figsize = (16,9))
+    fig = ctl.plot_map_contour(map_diff, filename = cart_out_fig + 'check_b00A-b100_day0_{}.pdf'.format(var), title = var, plot_anomalies = True, color_percentiles = (5,95), figsize = (16,9))
     allfi.append(fig)
 
-ctl.plot_pdfpages(cart_out + 'check_b00A-b100_firstday.pdf', allfi)
+ctl.plot_pdfpages(cart_out + 'check_b00A-b100_day0.pdf', allfi)
 
 
 ####################################################################################################
