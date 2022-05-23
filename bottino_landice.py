@@ -237,6 +237,8 @@ var2 = 'rsuscs'
 
 fig, ax = plt.subplots(figsize = (16,9))
 
+alb_maps = dict()
+
 for ru, mem, col in zip(allru, allmems, colors):
     print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var1, var1))
@@ -248,20 +250,23 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var2]
 
     gigi = gigi2/gigi1
+    alb_maps[ru] = gigi[0]
     gigi = gigi.where(land_mask)
     gr_gigi = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
 
     # ygigi = gr_gigi.sel('time.month' == 9)
     ygigi = gr_gigi[gr_gigi.groupby('time.month').groups[9]]
-    mean_albedo = ygigi.mean(['lat', 'lon'])
+    mean_albedo = ygigi.mean(['lat', 'lon']).groupby('time.year').mean()
     #mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
 
-    ax.plot(mean_albedo.time, mean_albedo, color = col, label = ru)
+    ax.plot(mean_albedo.year, mean_albedo, color = col, label = ru)
 
 ax.set_ylabel(r'Mean greenland albedo')
 ax.legend()
 ax.set_xlim(2100, 2200)
 
 fig.savefig(cart_out + 'check_greenland_albedo.pdf')
+
+ctl.plot_multimap_contour([alb_maps['b00A']-alb_maps['b100'], alb_maps['b00A']-alb_maps['b100'], filename = cart_out + 'check_albedo_global_month0.pdf')
 
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
