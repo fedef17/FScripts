@@ -248,11 +248,13 @@ for ru, mem, col in zip(allru, allmems, colors):
     gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var2]
 
     gigi = gigi2/gigi1
+    gigi = gigi.sel(land_mask)
     gr_gigi = gigi.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli))#.groupby('time.year').mean()
 
     # ygigi = gr_gigi.sel('time.month' == 9)
     ygigi = gr_gigi[gr_gigi.groupby('time.month').groups[9]]
-    mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
+    mean_albedo = ygigi.mean(['lat', 'lon'])
+    #mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
 
     ax.plot(ygigi.year, mean_albedo, color = col, label = ru)
 
