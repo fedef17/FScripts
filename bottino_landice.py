@@ -277,6 +277,31 @@ for mo in range(12):
 
 ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
 
+
+###
+miptab = 'Amon'
+var = 'uas'
+
+winmap = dict()
+
+for ru, mem, col in zip(allru, allmems, colors):
+    print(ru)
+    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+    filz.sort()
+    gigi = xr.open_mfdataset(filz[:30], use_cftime = True)[var]
+
+    gigi = gigi.groupby('time.season').mean()
+
+    winmap[ru] = gigi
+
+diff_b00A = winmap['b00A']-winmap['b100']
+diff_b00I = winmap['b00I']-winmap['b100']
+figs = ctl.plot_multimap_contour(diff_b00A, filename = cart_out + 'check_surfwind_clim20_b00A-b100.pdf', subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True)
+
+figs = ctl.plot_multimap_contour(diff_b00A, filename = cart_out + 'check_surfwind_clim20_b00I-b100.pdf', subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True)
+
+ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
+
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
 #######
 ##################################################
