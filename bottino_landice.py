@@ -256,7 +256,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     mean_albedo = ygigi.mean(['lat', 'lon'])
     #mean_albedo = ygigi.values[:, land_mask].mean(axis = 1)
 
-    ax.plot(ygigi.year, mean_albedo, color = col, label = ru)
+    ax.plot(mean_albedo.time, mean_albedo, color = col, label = ru)
 
 ax.set_ylabel(r'Mean greenland albedo')
 ax.legend()
