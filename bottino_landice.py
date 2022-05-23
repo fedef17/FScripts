@@ -271,7 +271,7 @@ allfi = []
 diff_b00A = alb_maps['b00A']-alb_maps['b100']
 diff_b00I = alb_maps['b00I']-alb_maps['b100']
 for mo in range(12):
-    figs = ctl.plot_multimap_contour([diff_b00A[mo], diff_b00I[mo]], filename = None, subtitles = ['b00A-b100', 'b00I-b100'])
+    figs = ctl.plot_multimap_contour([diff_b00A[mo], diff_b00I[mo]], filename = None, subtitles = ['b00A-b100', 'b00I-b100'], figsize = (16,9), plot_anomalies = True)
     allfi.append(figs[0])
 
 ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
