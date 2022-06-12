@@ -48,8 +48,10 @@ long = long.squeeze()
 latg = latg*180/np.pi
 long = long*180/np.pi
 
-# define oasis integer mask (0 over ocean, 1 over land)
-fmask_oasis = fmask != 1.
+
+# globo: 1 ocean, 0 land
+# define oasis integer mask (0 over ocean and fractional points, 1 over land)
+fmask_oasis = fmask < 0.5
 fmask_oasis = fmask_oasis.astype('int32')
 
 # latvert = np.stack([latg-dlat/2, latg-dlat/2, latg+dlat/2, latg+dlat/2])
