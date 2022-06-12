@@ -109,7 +109,7 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
 
         gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
-        oht = gigi*gigi2*gigi_a.values[:, np.newaxis, ...]
+        oht = gigi*gigi2*gigi_a.values[np.newaxis, np.newaxis, ...]
 
         oht_lev = oht.mean('time').sum(['i', 'j'])
 
