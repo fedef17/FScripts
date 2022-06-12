@@ -107,7 +107,7 @@ def do_cross(fils, fils2, fil_out):#, coda):
         gigi = xr.load_dataset(fi1, use_cftime = True)
         gigi2 = xr.load_dataset(fi2, use_cftime = True)
 
-        oht = gigi*gigi2
+        oht = gigi['bigthetao']*gigi2['masscello']
 
         oht_lev = gigi.mean('time').sum(['i', 'j'])
 
