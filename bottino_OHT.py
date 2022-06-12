@@ -61,8 +61,8 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/bigthetao/gn/v20210315/bigthetao*nc'
-filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/masscello/gn/v20210315/masscello*nc'
+filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/gn/v20210315/{}*nc'
+filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['b025', 'b050', 'b100']#['pi',
@@ -95,21 +95,31 @@ yeamean = dict()
 
 print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
-def do_cross(fils, fils2, fil_out):#, coda):
+def do_cross(fils, fils2, fils_area, fil_out):#, coda):
     print("I'm process", os.getpid())
     # Getting % usage of virtual_memory ( 3rd field)
 
     #cose = []
-    for fi1, fi2 in zip(fils, fils2):
+    for fi1, fi2, fia in zip(fils, fils2, fils_area):
         print(fi1)
         print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
 
-        gigi = xr.load_dataset(fi1, use_cftime = True)
-        gigi2 = xr.load_dataset(fi2, use_cftime = True)
+        gigi = xr.load_dataset(fi1, use_cftime = True)['bigthetao']
+        gigi2 = xr.load_dataset(fi2, use_cftime = True)['masscello']
 
-        oht = gigi['bigthetao']*gigi2['masscello']
+        gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
-        oht_lev = gigi.mean('time').sum(['i', 'j'])
+        oht = gigi*gigi2*gigi_a.values[:, np.newaxis, ...]
+
+        oht_lev = oht.mean('time').sum(['i', 'j'])
+
+        oht700 = oht.sel(lev = slice(0., 700.)).mean('time').integrate('lev')
+        oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').integrate('lev')
+        oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').integrate('lev')
+
+        zuki700 = ctl.regrid_dataset(oht700, lats, lons)
+        zuki2000 = ctl.regrid_dataset(oht2000, lats, lons)
+        zuki_deep = ctl.regrid_dataset(oht_deep, lats, lons)
 
         # nuvarz = dict()
         # for basnam in basnames:
@@ -132,13 +142,13 @@ def do_cross(fils, fils2, fil_out):#, coda):
         # gogcross = zuki.mean(('time', 'lon'))
         # #cose.append(gogcross)
         # pickle.dump(gogcross, fil_out)
-        pickle.dump(oht_lev, fil_out)
+        pickle.dump([oht_lev, zuki700, zuki2000, zuki_deep], fil_out)
 
         print('total RAM memory used 3:', psutil.virtual_memory()[3]/1.e9)
 
         fil_out.flush()
 
-        del gigi, gigi2, oht, oht_lev
+        del gigi, gigi2, oht, oht_lev, zuki700, zuki2000, zuki_deep, oht700, oht2000, oht_deep
 
     #coda.put(cose)
     #return cose
@@ -150,18 +160,21 @@ n_proc = 10
 print(ru)
 nam = allnams[allru.index(ru)]
 
-allfils = glob.glob(filna.format(ru, nam, mem))
+allfils = glob.glob(filna.format(ru, nam, mem, var, var))
 allfils.sort()
 
-allfils2 = glob.glob(filna2.format(ru, nam, mem))
+allfils2 = glob.glob(filna.format(ru, nam, mem, mvar, mvar))
 allfils2.sort()
+
+allfils_a = glob.glob(filna2.format(ru, nam, mem))
+allfils_a.sort()
 
 
 filo = open(cart_out + 'oht_{}.p'.format(ru), 'wb')
 
 #cose = do_cross(allfils)
 
-do_cross(allfils, allfils2, filo)
+do_cross(allfils, allfils2, allfils_a, filo)
 
 filo.close()
 
