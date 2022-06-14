@@ -155,6 +155,6 @@ for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmap
     okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in okru]
     oktit = okru
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 17, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 41, hatch_styles = ['////', '', ''])
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp_viridis.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), color_percentiles = (2,98), subtitles = oktit, add_hatching = okha, cmap = 'viridis', n_color_levels = 17, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp_viridis.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), color_percentiles = (5,95), subtitles = oktit, add_hatching = okha, cmap = 'viridis', n_color_levels = 17, hatch_styles = ['////', '', ''])

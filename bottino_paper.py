@@ -324,8 +324,7 @@ fig_greg, ax_greg = plt.subplots(figsize = (16,9))
 for ru, col in zip(allru, colors):
     print(ru)
     checkdi = True
-    if ru in ['hist', 'pi', 'ssp585']:
-        checkdi = False
+    if ru in ['hist', 'pi']: checkdi = False
     ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, mean5yr = False, check_diff=checkdi)
 
 #ax_greg.legend()
@@ -352,13 +351,14 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
 
     nspli = 9
     wind = 100
+    shift = 25
     ini = 0
 
-    gino = np.argsort(tas_anom)
-    pr_anom = pr_anom[gino]
-    tas_anom = tas_anom[gino]
-
-    for spli in range(nspli):
+    # gino = np.argsort(tas_anom)
+    # pr_anom = pr_anom[gino]
+    # tas_anom = tas_anom[gino]
+    #for spli in range(nspli):
+    while ini <= 500-wind:
         fin = ini + wind
         print(fin)
 
@@ -367,8 +367,8 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
         rutas = ctl.running_mean(tas_anom[in0:fin+5], 5, remove_nans = True)
         rupr = ctl.running_mean(pr_anom[in0:fin+5], 5, remove_nans = True)
 
-        m, c, err_m, err_c = ctl.linear_regre_witherr(tas_anom[ini:fin], pr_anom[ini:fin])
-        #m, c, err_m, err_c = ctl.linear_regre_witherr(rutas, rupr)
+        #m, c, err_m, err_c = ctl.linear_regre_witherr(tas_anom[ini:fin], pr_anom[ini:fin])
+        m, c, err_m, err_c = ctl.linear_regre_witherr(rutas, rupr)
         stron = r'{}: $\lambda = {:5.3f} \pm {:5.3f} \ W/m^2/K$'.format(ru, m, err_m)
         print(stron)
         #ax.text(-0.3, -1.5-(allru.index(ru)-2)*0.2, stron, fontsize = 14)
@@ -377,14 +377,15 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
         else:
             lab = None
         #plt.scatter(np.mean(tas_anom[ini:fin]), m, s = 10, color = col, label = lab)
-        xs.append(np.mean(tas_anom[ini:fin]))
+        #xs.append(np.mean(tas_anom[ini:fin]))
+        xs.append(np.mean([fin, ini]))
         ys.append(m)
         yerrs.append(err_m)
+        ini = int(ini + shift)
 
-        plt.errorbar(xs[-1], ys[-1], yerr = yerrs[-1], color = col, label = lab, capsize = 2, lw = 2)
-        plt.scatter(xs[-1], ys[-1], s = 20, color = col)#, label = lab)
+    plt.errorbar(xs, ys, yerr = yerrs, color = col, label = lab, capsize = 2, lw = 2)
+    plt.scatter(xs, ys, s = 20, color = col)#, label = lab)
 
-        ini = int(ini + wind/2)
 
 plt.grid()
 plt.legend()
