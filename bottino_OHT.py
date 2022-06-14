@@ -111,11 +111,16 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
 
         oht = gigi*gigi2*gigi_a.values[np.newaxis, np.newaxis, ...]
 
+        # areacello is m2
+        # masscello is kg/m2
+        # bigthetao is C
+        # to have real oht must multiply by cp
+
         oht_lev = oht.mean('time').sum(['i', 'j'])
 
-        oht700 = oht.sel(lev = slice(0., 700.)).mean('time').integrate('lev')
-        oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').integrate('lev')
-        oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').integrate('lev')
+        oht700 = oht.sel(lev = slice(0., 700.)).mean('time').sum('lev')
+        oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
+        oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
 
         zuki700 = ctl.regrid_dataset(oht700, lats, lons)
         zuki2000 = ctl.regrid_dataset(oht2000, lats, lons)
