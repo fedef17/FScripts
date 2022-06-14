@@ -131,195 +131,204 @@ masfi = '/nas/BOTTINO/masks.nc'
 cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # ocean mask: 1 over ocean, 0 over land
 
-assp = ''
-add_ssp = False
-if add_ssp:
-    assp = '_wssp50'
-
-ab90 = ''
+add_ssp = True
 plot_b990 = True
-if plot_b990:
-    ab90 = '_wb990'
 
-for tip in ['all', 'land', 'oce']:
-    var = 'tas'
-    cosopi = yeamean[('pi', var)]
-    cosohist = yeamean[('hist', var)]
-    cosossp = yeamean[('ssp585', var)]
-    cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
+cases = [True, True, False, False]
+cases2 = [True, False, True, False]
 
-    ypre = 30
+for add_ssp, plot_b990 in zip(cases, cases2):
+    assp = ''
+    ab90 = ''
+    if add_ssp: assp = '_wssp50'
+    if plot_b990: ab90 = '_wb990'
 
-    if plot_b990:
-        fig, axs = plt.subplots(2, 2, figsize = (16,9))
-        okru = ['b990'] + allru[1:]
-    else:
-        fig, axs = plt.subplots(1, 3, figsize = (16,7))
-        okru = allru[1:]
+    for tip in ['all', 'land', 'oce']:
+        var = 'tas'
+        cosopi = yeamean[('pi', var)]
+        cosohist = yeamean[('hist', var)]
+        cosossp = yeamean[('ssp585', var)]
+        cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
 
-    for ru, ax in zip(okru, axs.flatten()):
-        print(ru)
-        coso = yeamean[(ru, var)]
+        ypre = 30
+
+        if plot_b990:
+            fig, axs = plt.subplots(1, 4, figsize = (20,7))
+            okru = ['b990'] + allru[1:]
+        else:
+            fig, axs = plt.subplots(1, 3, figsize = (16,7))
+            okru = allru[1:]
 
         if tip == 'oce':
-            coso = coso.where(oce_mask)
-            cosobase = cosohistssp.where(oce_mask)
+            cosohistssp = cosohistssp.where(oce_mask)
+            cosopi = cosopi.where(oce_mask)
         elif tip == 'land':
-            coso = coso.where(~oce_mask)
-            cosobase = cosohistssp.where(~oce_mask)
-        else:
-            cosobase = cosohistssp
+            cosohistssp = cosohistssp.where(~oce_mask)
+            cosopi = cosopi.where(~oce_mask)
 
-        if add_ssp:
-            if ru == 'b990':
+        for ru, ax in zip(okru, axs.flatten()):
+            print(ru)
+            coso = yeamean[(ru, var)]
+
+            if tip == 'oce':
+                coso = coso.where(oce_mask)
+            elif tip == 'land':
+                coso = coso.where(~oce_mask)
+
+            if add_ssp:
+                # if ru == 'b990':
+                #     coso = coso.assign_coords({'lat': cosohistssp.lat})
+                #     coso = xr.concat([cosohistssp[-75:-25], coso], dim = 'year')
+                # else:
+                y0 = coso.year.values[0]
+                cosolu = cosohistssp.sel(year = slice(y0-50, y0))
                 coso = coso.assign_coords({'lat': cosohistssp.lat})
-                coso = xr.concat([cosohistssp[-75:-25], coso], dim = 'year')
+                coso = xr.concat([cosolu, coso], dim = 'year')
+
+            # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
+            # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
+
+            ax.set_title(ru)
+            smut = 50
+
+            matrix = []
+
+            for la1, la2, col in zip(latbins[:-1], latbins[1:], lacol):
+                print(la1,la2)
+                cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
+                cosmu = ctl.butter_filter(cosolat, smut)
+
+                # if add_ssp:
+                #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+                # else:
+                #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+                base = float(cosopi.sel(lat = slice(la1, la2)).mean())
+
+                relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
+                matrix.append(relcha)
+
+            matrix = np.stack(matrix)
+
+            pizz = ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa)
+            #ax.set_xscale('logit')
+
+            ax.set_xscale('function', functions = funcsca)
+            ax.set_xticks([20., 50, 100, 200, 300, 500])
+            if add_ssp:
+                ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
+                ax.axvline(0., color = 'grey', ls = '--')
+
+            if ru == okru[0]:
+                ax.set_yticks(np.arange(-90, 91, 30))
             else:
-                coso = coso.assign_coords({'lat': cosohistssp.lat})
-                coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
+                ax.set_yticks([])
 
-        # pio = cosossp.sel(year = slice(2015, int('2'+ru[1:])))
-        # coso = xr.concat([pio, yeamean[(ru, var)]], dim = 'year')
+            #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
 
-        ax.set_title(ru)
-        smut = 50
+        cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+        cb = plt.colorbar(pizz, cax=cax, orientation='horizontal', extend = 'both')
+        cb.ax.tick_params(labelsize=18)
+        cb.set_label('Realized change', fontsize=20)
+        plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-        matrix = []
+        fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
 
-        for la1, la2, col in zip(latbins[:-1], latbins[1:], lacol):
-            print(la1,la2)
-            cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
-            cosmu = ctl.butter_filter(cosolat, smut)
+        var = 'pr'
 
-            # if add_ssp:
-            #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
-            # else:
-            #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
-            base = float(cosopi.sel(lat = slice(la1, la2)).mean())
+        cosopi = yeamean[('pi', var)]
+        cosohist = yeamean[('hist', var)]
+        cosossp = yeamean[('ssp585', var)]
+        cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
 
-            relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
-            matrix.append(relcha)
+        ypre = 30
 
-        matrix = np.stack(matrix)
-
-        pizz = ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa)
-        ax.axvline(0., color = 'grey', ls = '--')
-        #ax.set_xscale('logit')
-
-        ax.set_xscale('function', functions = funcsca)
-        ax.set_xticks([20., 50, 100, 200, 300, 500])
-        if add_ssp:
-            ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
-
-        if ru == allru[1]:
-            ax.set_yticks(np.arange(-90, 91, 30))
+        if plot_b990:
+            #fig, axs = plt.subplots(2, 2, figsize = (16,9))
+            fig, axs = plt.subplots(1, 4, figsize = (20,7))
+            okru = ['b990'] + allru[1:]
         else:
-            ax.set_yticks([])
-
-        #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
-
-    cax = plt.axes([0.1, 0.1, 0.8, 0.05])
-    cb = plt.colorbar(pizz, cax=cax, orientation='horizontal', extend = 'both')
-    cb.ax.tick_params(labelsize=18)
-    cb.set_label('Realized change', fontsize=20)
-    plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
-
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
-
-    var = 'pr'
-
-    cosopi = yeamean[('pi', var)]
-    cosohist = yeamean[('hist', var)]
-    cosossp = yeamean[('ssp585', var)]
-    cosohistssp = xr.concat([cosohist, cosossp], dim = 'year')
-
-    ypre = 30
-
-    if plot_b990:
-        fig, axs = plt.subplots(2, 2, figsize = (16,9))
-        okru = ['b990'] + allru[1:]
-    else:
-        fig, axs = plt.subplots(1, 3, figsize = (16,7))
-        okru = allru[1:]
-
-    for ru, ax in zip(okru, axs.flatten()):
-    #fig, axs = plt.subplots(1, 3, figsize = (16,7))
-    #for ru, ax in zip(allru[1:], axs.flatten()):
-    # for ru in allru[1:]:
-    #     fig, ax = plt.subplots(figsize = (16,7))
-        print(ru)
-        coso = yeamean[(ru, var)]
+            fig, axs = plt.subplots(1, 3, figsize = (16,7))
+            okru = allru[1:]
 
         if tip == 'oce':
-            coso = coso.where(oce_mask)
-            cosobase = cosohistssp.where(oce_mask)
+            cosohistssp = cosohistssp.where(oce_mask)
+            cosopi = cosopi.where(oce_mask)
         elif tip == 'land':
-            coso = coso.where(~oce_mask)
-            cosobase = cosohistssp.where(~oce_mask)
-        else:
-            cosobase = cosohistssp
+            cosohistssp = cosohistssp.where(~oce_mask)
+            cosopi = cosopi.where(~oce_mask)
 
-        if add_ssp:
-            if ru == 'b990':
+        for ru, ax in zip(okru, axs.flatten()):
+        #fig, axs = plt.subplots(1, 3, figsize = (16,7))
+        #for ru, ax in zip(allru[1:], axs.flatten()):
+        # for ru in allru[1:]:
+        #     fig, ax = plt.subplots(figsize = (16,7))
+            print(ru)
+            coso = yeamean[(ru, var)]
+
+            if tip == 'oce':
+                coso = coso.where(oce_mask)
+            elif tip == 'land':
+                coso = coso.where(~oce_mask)
+
+            if add_ssp:
+                y0 = coso.year.values[0]
+                cosolu = cosohistssp.sel(year = slice(y0-50, y0))
                 coso = coso.assign_coords({'lat': cosohistssp.lat})
-                coso = xr.concat([cosohistssp[-75:-25], coso], dim = 'year')
+                coso = xr.concat([cosolu, coso], dim = 'year')
+
+            ax.set_title(ru)
+            smut = 50
+
+            matrix = []
+
+            for la1, la2, col in zip(latbins[:-1], latbins[1:], lacol):
+                print(la1,la2)
+                cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
+                cosmu = ctl.butter_filter(cosolat, smut)
+                #ax.plot(coso.year, cosmu, color = col)
+
+                #base = cosmu[0]
+                #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
+                #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
+
+                # if add_ssp:
+                #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
+                # else:
+                #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
+                base = float(cosopi.sel(lat = slice(la1, la2)).mean())
+
+                # relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
+                # if np.mean(cosmu[-ypre:]) - base < 0.001*base:
+                #     relcha = np.nan*relcha
+                relcha = (cosmu-base)/base
+                matrix.append(relcha)
+
+            matrix = np.stack(matrix)
+
+            #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
+
+            pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa2, vmin = -0.4, vmax = 0.4)#, norm = divnorm)
+            #ax.set_xscale('logit')
+
+            ax.set_xscale('function', functions = funcsca)
+            ax.set_xticks([20., 50, 100, 200, 300, 500])
+            if add_ssp:
+                ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
+                ax.axvline(0., color = 'grey', ls = '--')
+
+            if ru == okru[0]:
+                ax.set_yticks(np.arange(-90, 91, 30))
             else:
-                coso = coso.assign_coords({'lat': cosohistssp.lat})
-                coso = xr.concat([cosohistssp[-50:], coso], dim = 'year')
+                ax.set_yticks([])
 
-        ax.set_title(ru)
-        smut = 50
+            #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
+        cax = plt.axes([0.1, 0.1, 0.8, 0.05])
+        cb = plt.colorbar(pizz, cax=cax, orientation='horizontal', extend = 'both')
+        cb.ax.tick_params(labelsize=18)
+        cb.set_label('Relative change', fontsize=20)
+        plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
 
-        matrix = []
-
-        for la1, la2, col in zip(latbins[:-1], latbins[1:], lacol):
-            print(la1,la2)
-            cosolat = coso.sel(lat = slice(la1, la2)).mean(['lat','lon'])
-            cosmu = ctl.butter_filter(cosolat, smut)
-            #ax.plot(coso.year, cosmu, color = col)
-
-            #base = cosmu[0]
-            #base = float(cosopi.sel(lat = slice(la1, la2)).mean())
-            #base = float(cosohist[-20:].sel(lat = slice(la1, la2)).mean())
-
-            # if add_ssp:
-            #     base = float(cosobase.sel(year = slice(1984, 2014), lat = slice(la1, la2)).mean())
-            # else:
-            #     base = float(cosobase.sel(year = slice(coso.year[0]-ypre, coso.year[0]), lat = slice(la1, la2)).mean())
-            base = float(cosopi.sel(lat = slice(la1, la2)).mean())
-
-            # relcha = (cosmu-base)/(np.mean(cosmu[-ypre:]) - base)
-            # if np.mean(cosmu[-ypre:]) - base < 0.001*base:
-            #     relcha = np.nan*relcha
-            relcha = (cosmu-base)/base
-            matrix.append(relcha)
-
-        matrix = np.stack(matrix)
-
-        #divnorm = mpl.colors.TwoSlopeNorm(vmin=-0.2, vcenter=0., vmax=0.5)
-
-        pizz = ax.imshow(matrix, aspect = 0.02, origin = 'lower', extent = [10, len(coso), -90, 90], cmap = cmappa2, vmin = -0.3, vmax = 0.3)#, norm = divnorm)
-        ax.axvline(0., color = 'grey', ls = '--')
-        #ax.set_xscale('logit')
-
-        ax.set_xscale('function', functions = funcsca)
-        ax.set_xticks([20., 50, 100, 200, 300, 500])
-        if add_ssp:
-            ax.set_xticklabels([-30, 0, 50, 150, 250, 450])
-
-        if ru == allru[1]:
-            ax.set_yticks(np.arange(-90, 91, 30))
-        else:
-            ax.set_yticks([])
-
-        #ax.imshow(matrix, vmin = 0, vmax = 1, aspect = 3, origin = 'lower', extent = [0, 500, -90, 90], cmap = cmappa)
-    cax = plt.axes([0.1, 0.1, 0.8, 0.05])
-    cb = plt.colorbar(pizz, cax=cax, orientation='horizontal', extend = 'both')
-    cb.ax.tick_params(labelsize=18)
-    cb.set_label('Relative change', fontsize=20)
-    plt.subplots_adjust(left=0.1, bottom=0.17, right=0.98, top=0.86, wspace=0.05, hspace=0.20)
-
-    fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
+        fig.savefig(cart_out + '{}_ovmol_lattime_{}{}{}.pdf'.format(var, tip, assp, ab90))
 
 
 # ##### NOW for each sector

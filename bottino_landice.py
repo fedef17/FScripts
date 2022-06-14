@@ -280,27 +280,28 @@ ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
 
 ###
 miptab = 'Amon'
-var = 'uas'
+vars = ['sfcWind', 'uas', 'tas', 'psl']
+cbran = [(-2, 2), (-2, 2), (-3, 3), (-300, 300)]
+tits = ['surface wind speed (m/s)', 'surface u wind diff (m/s)', 'tas diff (K)', 'psl diff (Pa)']
 
-winmap = dict()
+for var, tit, cbr in zip(vars, tits, cbran):
+    winmap = dict()
+    for ru, mem, col in zip(allru, allmems, colors):
+        print(ru)
+        filz = glob.glob(filna.format(ru, mem, miptab, var, var))
+        filz.sort()
+        gigi = xr.open_mfdataset(filz[:30], use_cftime = True)[var]
 
-for ru, mem, col in zip(allru, allmems, colors):
-    print(ru)
-    filz = glob.glob(filna.format(ru, mem, miptab, var, var))
-    filz.sort()
-    gigi = xr.open_mfdataset(filz[:30], use_cftime = True)[var]
+        gigi = gigi.groupby('time.season').mean()
 
-    gigi = gigi.groupby('time.season').mean()
+        winmap[ru] = gigi
 
-    winmap[ru] = gigi
+    diff_b00A = winmap['b00A']-winmap['b100']
+    diff_b00I = winmap['b00I']-winmap['b100']
+    figs = ctl.plot_multimap_contour(diff_b00A, filename = cart_out + 'check_{}_clim30_b00A-b100.pdf'.format(var), subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True, cb_label = tit, cbar_range = cbr)
 
-diff_b00A = winmap['b00A']-winmap['b100']
-diff_b00I = winmap['b00I']-winmap['b100']
-figs = ctl.plot_multimap_contour(diff_b00A, filename = cart_out + 'check_surfwind_clim20_b00A-b100.pdf', subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True)
+    figs = ctl.plot_multimap_contour(diff_b00I, filename = cart_out + 'check_{}_clim30_b00I-b100.pdf'.format(var), subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True, cb_label = tit, cbar_range = cbr)
 
-figs = ctl.plot_multimap_contour(diff_b00A, filename = cart_out + 'check_surfwind_clim20_b00I-b100.pdf', subtitles = gigi.season.values, figsize = (16,12), plot_anomalies = True)
-
-ctl.plot_pdfpages(cart_out + 'check_albedo_global_year0.pdf', allfi)
 
 #pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
 #######

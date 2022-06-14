@@ -91,64 +91,66 @@ for grb in zucu:
 zucu.rewind()
 lice = sd == 10.
 
-# Reading initial snow cover for b100
-b100_ini = pygrib.open(cart_out + '../c585-21000101/ICMGGc585INIT')
+# Reading initial snow cover for b100, b065 and b080
+for ye in ['2100', '2080', '2065']:
+    b100_ini = pygrib.open(cart_out + '../c585-'+ye+'0101/ICMGGc585INIT')
 
-fig, ax = ctl.get_cartopy_fig_ax()
-plt.scatter(long, latg, transform = ccrs.PlateCarree(), s = 1)
+    fig, ax = ctl.get_cartopy_fig_ax()
+    plt.scatter(long, latg, transform = ccrs.PlateCarree(), s = 1)
 
-b100_ini.rewind()
-for grb in b100_ini:
-    grb.expand_grid(False)
-    if grb.name == 'Snow depth':
-        print(grb.name)
-        sd100 = grb.values
+    b100_ini.rewind()
+    for grb in b100_ini:
+        grb.expand_grid(False)
+        if grb.name == 'Snow depth':
+            print(grb.name)
+            sd100 = grb.values
 
-# masking non-greenland glaciers
-lice[(long < 180) & (latg > 0)] = False
-lice[(long < 290) & (latg > 0)] = False
-lice[(long < 300) & (latg > 0) & (latg < 73)] = False
-lice[(long > 334) & (latg > 0) & (latg < 66.5)] = False
+    # masking non-greenland glaciers
+    lice[(long < 180) & (latg > 0)] = False
+    lice[(long < 290) & (latg > 0)] = False
+    lice[(long < 300) & (latg > 0) & (latg < 73)] = False
+    lice[(long > 334) & (latg > 0) & (latg < 66.5)] = False
 
-plt.scatter(long[lice], latg[lice], transform = ccrs.PlateCarree(), s = 1, color = 'orange')
+    plt.scatter(long[lice], latg[lice], transform = ccrs.PlateCarree(), s = 1, color = 'orange')
 
-sd100_mod_unif = sd100.copy()
-sd100_mod_unif[lice] = 100. * sd100[lice]
+    sd100_mod_unif = sd100.copy()
+    sd100_mod_unif[lice] = 100. * sd100[lice]
 
-sd100_mod_unif1000 = sd100.copy()
-sd100_mod_unif1000[lice] = 1000.
+    sd100_mod_unif1000 = sd100.copy()
+    sd100_mod_unif1000[lice] = 1000.
 
-fig, ax = ctl.get_cartopy_fig_ax()
-plt.scatter(long, latg, c = sd100_mod_unif, transform = ccrs.PlateCarree(), s = 2)
-plt.colorbar()
+    fig, ax = ctl.get_cartopy_fig_ax()
+    plt.scatter(long, latg, c = sd100_mod_unif, transform = ccrs.PlateCarree(), s = 2)
+    plt.colorbar()
 
-b100_ini.rewind()
-allstr = []
-for grb in b100_ini:
-    grb.expand_grid(False)
-    if grb.name == 'Snow depth':
-        grb.values = sd100_mod_unif
-    allstr.append(grb.tostring())
+    b100_ini.rewind()
+    allstr = []
+    for grb in b100_ini:
+        grb.expand_grid(False)
+        if grb.name == 'Snow depth':
+            grb.values = sd100_mod_unif
+        allstr.append(grb.tostring())
 
-grbout = open(cart_out + 'new_b100_init_landicex100.grb','wb')
-for msg in allstr:
-    grbout.write(msg)
-grbout.close()
+    grbout = open(cart_out + 'new_b'+ye[1:]+'_init_landicex100.grb','wb')
+    for msg in allstr:
+        grbout.write(msg)
+    grbout.close()
 
 
-b100_ini.rewind()
-allstr = []
-for grb in b100_ini:
-    grb.expand_grid(False)
-    if grb.name == 'Snow depth':
-        grb.values = sd100_mod_unif1000
-    allstr.append(grb.tostring())
+    b100_ini.rewind()
+    allstr = []
+    for grb in b100_ini:
+        grb.expand_grid(False)
+        if grb.name == 'Snow depth':
+            grb.values = sd100_mod_unif1000
+        allstr.append(grb.tostring())
 
-grbout = open(cart_out + 'new_b100_init_landice1000.grb','wb')
-for msg in allstr:
-    grbout.write(msg)
-grbout.close()
+    grbout = open(cart_out + 'new_b'+ye[1:]+'_init_landice1000.grb','wb')
+    for msg in allstr:
+        grbout.write(msg)
+    grbout.close()
 
+sys.exit()
 ##########################################################
 # Modifying bare soil albedo
 bsa = pygrib.open(cart_out + 'bare_soil_albedos.grb')

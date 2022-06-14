@@ -89,7 +89,7 @@ for ru in allru:
 
         trends[(ru, nam)] = 100*trendmat
 
-        coso = thetao[nam].sel(year = slice(syear + 300, syear + 500))
+        coso = thetao[nam].sel(year = slice(syear + 400, syear + 500))
 
         trendmat = np.empty_like(coso[0].values)
         errtrendmat = np.empty_like(coso[0].values)
@@ -101,9 +101,9 @@ for ru in allru:
                 trendmat[i,j] = m
                 errtrendmat[i,j] = err_m
 
-        trends[(ru, nam, 'last200')] = 100*trendmat
+        trends[(ru, nam, 'last100')] = 100*trendmat
 
-        coso = thetao[nam].sel(year = slice(syear, syear + 200))
+        coso = thetao[nam].sel(year = slice(syear, syear + 100))
 
         trendmat = np.empty_like(coso[0].values)
         errtrendmat = np.empty_like(coso[0].values)
@@ -115,7 +115,7 @@ for ru in allru:
                 trendmat[i,j] = m
                 errtrendmat[i,j] = err_m
 
-        trends[(ru, nam, 'first200')] = 100*trendmat
+        trends[(ru, nam, 'first100')] = 100*trendmat
 
     ############################################################
     #### Plots ####
@@ -131,9 +131,12 @@ for ru in allru:
     nams = ['thetao_atl', 'thetao_ind', 'thetao_pac']
     tits = ['Atlantic', 'Indian', 'Pacific']
 
+    cmapa = cm.get_cmap('viridis')
+    cmapa.set_under('grey')
+
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam)], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = cmapa, ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -149,7 +152,7 @@ for ru in allru:
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'last100')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = cmapa, ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -161,13 +164,13 @@ for ru in allru:
     cb.set_label('Trend (K/cent)', fontsize=16)
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-    fig.savefig(cart_out + 'oce_trends_{}_last200.pdf'.format(ru))
+    fig.savefig(cart_out + 'oce_trends_{}_last100.pdf'.format(ru))
 
     cbran = (0., 2)
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first200')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = 'viridis', ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection(trends[(ru, nam, 'first100')], thetao.lat, thetao.lev, ax = ax, set_logscale_levels=False, cmap = cmapa, ylim = (None, 10), ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -179,13 +182,13 @@ for ru in allru:
     cb.set_label('Trend (K/cent)', fontsize=16)
     plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
 
-    fig.savefig(cart_out + 'oce_trends_{}_first200.pdf'.format(ru))
+    fig.savefig(cart_out + 'oce_trends_{}_first100.pdf'.format(ru))
 
     cbran = (-0.3, 0.3)
 
     fig, axes = plt.subplots(1,3, figsize = (24,9))
     for nam, tit, ax in zip(nams, tits, axes.flatten()):
-        map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
+        map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last100')]-trends[(ru, nam, 'first100')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
         ax.set_title(tit)
         if tits.index(tit) > 0:
             ax.set_yticklabels([])
@@ -207,7 +210,7 @@ for ke in trends:
 # AAAAAAAAAAAAAAAAAAAAA
 # fig, axes = plt.subplots(2, 3, figsize = (16,9))
 # for nam, tit, ax in zip(nams, tits, axes.flatten()):
-#     map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last200')]-trends[(ru, nam, 'first200')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
+#     map_plot = ctl.plot_lat_crosssection((trends[(ru, nam, 'last100')]-trends[(ru, nam, 'first100')]), thetao.lat, thetao.lev, ax = ax, cmap = 'RdBu_r', ylabel='Depth (m)', xlabel = 'Latitude', cb_label='Trend diff (K/year)', cbar_range = cbran)
 #     ax.set_title(tit)
 #     if tits.index(tit) > 0:
 #         ax.set_yticklabels([])
