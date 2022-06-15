@@ -56,6 +56,7 @@ for var in allvars_2D:
     yeamean = dict()
     seamean = dict()
     print(var)
+    ref_lat = None
     #for na, ru, col in zip(allnams2, allru2, colors2):
     for exp in ['historical', 'ssp585']:
         print(exp)
@@ -73,7 +74,17 @@ for var in allvars_2D:
             kose = xr.open_mfdataset(fils, use_cftime = True)
             kose = kose.drop_vars('time_bnds')
 
+            if ref_lat is None:
+                ref_lat = kose.lat
+            else:
+                checko = np.all(kose.lat.values == ref_lat.values)
+                print(mem, checko)
+                if not checko:
+                    print('Re-assigning lats!!')
+                    kose = kose.assign({"lat": ref_lat})
+
             cosoye = kose[var].groupby("time.year").mean().compute()
+            #print(kose.lat)
             yeamean[(exp, mem, var)] = cosoye
 
             for sea in allseasons:

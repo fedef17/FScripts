@@ -96,6 +96,10 @@ trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 
 ## creating relative trend for pr
 pimepr = yeamean[('pi', 'pr')].mean('year')
+zerom = pimepr < 50
+
+mask_zerom = False # Mask points with less than 50 mm/yr
+
 for ru in allru3:
     trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr
     trendz[('pr_rel', ru, 'pval')] = trendz[('pr', ru, 'pval')]
@@ -103,6 +107,9 @@ for ru in allru3:
         if ('pr', ru, cent) in trendz:
             trendz[('pr_rel', ru, cent)] = trendz[('pr', ru, cent)]/pimepr
             trendz[('pr_rel', ru, cent, 'pval')] = trendz[('pr', ru, cent, 'pval')]
+
+            if mask_zerom:
+                trendz[('pr_rel', ru, cent)][zerom] = np.nan
 
 coso = yeamean[('b025', 'tas')]
 
@@ -115,6 +122,8 @@ for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmap
     figtrend = []
     fighatch = []
     tits = []
+    # if var == 'pr':
+    #     thres = pimap < 50.
 
     for ru in allru[1:]:
         for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
@@ -155,9 +164,9 @@ for var, vcen, cmap in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmap
     okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in okru]
     oktit = okru
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 41, hatch_styles = ['////', '', ''])
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (c5, c95), color_norm = divnorm, subtitles = oktit, add_hatching = okha, cmap = cmap, n_color_levels = 41, hatch_styles = ['////', '', ''], visualization = 'Robinson')
 
     if var == 'tas':
-        ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp_magma.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (0, 3), subtitles = oktit, add_hatching = okha, cmap = 'magma', n_color_levels = 17, hatch_styles = ['////', '', ''])
+        ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp_magma.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), cbar_range = (0, 2.5), subtitles = oktit, add_hatching = okha, cmap = 'magma', n_color_levels = 17, hatch_styles = ['////', '', ''], visualization = 'Robinson')
 
         ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+var+'_trendzfull_vs_ssp_plasma.pdf', fix_subplots_shape = (2,3), figsize = (16, 9), color_percentiles = (2,98), subtitles = oktit, add_hatching = okha, cmap = 'plasma', n_color_levels = 17, hatch_styles = ['////', '', ''])
