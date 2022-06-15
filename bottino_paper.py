@@ -317,6 +317,56 @@ ax.set_xlabel('GTAS change (K)')
 ax.set_ylabel(r'Change in net incoming TOA ($W/m^2$)')
 fig.savefig(cart_out + 'feedback_evolution_yearly.pdf'.format(var))
 
+
+
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    pr = glomeans[(ru, var)][1]
+
+    pr_anom = pr-np.mean(pr[:10])
+    #pr_anom = ctl.running_mean(pr_anom, 5, remove_nans = True)[::5]
+    #pr_anom = np.mean(np.split(pr_anom, int(len(pr_anom)/5)), axis = 1)
+
+    tas = glomeans[(ru, 'tas')][1]
+    tas_anom = tas - tas[:10].mean()
+    #tas_anom = np.mean(np.split(tas_anom, int(len(tas_anom)/5)), axis = 1)
+    #tas_anom = ctl.running_mean(tas_anom, 5, remove_nans = True)[::5]
+
+    x_nu = np.arange(tas_anom.min(), tas_anom.max(), 0.1)
+
+    pr_ok = []
+    tas_ok = []
+    for xi in x_nu:
+        indi = (tas_anom >= xi) & (tas_anom < xi + 0.1)
+        pr_ok.append(np.mean(pr_anom[indi]))
+        tas_ok.append(np.mean(tas_anom[indi]))
+
+    pr_ok = np.array(pr_ok)
+    tas_ok = np.array(tas_ok)
+
+    ax.scatter(tas_anom, pr_anom, color = col, s = 1)
+    ax.scatter(tas_ok, pr_ok, color = col, s = 5, facecolor = 'none', marker = 'o')
+
+    coeffs, covmat = np.polyfit(tas_ok, pr_ok, deg = 1, cov = True)
+    fitted = np.polyval(coeffs, x_nu)
+    ax.plot(x_nu, fitted, color = col, lw = 2, label = ru)
+
+    coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 1, cov = True)
+    fitted = np.polyval(coeffs, x_nu)
+    ax.plot(x_nu, fitted, color = col, lw = 1, label = ru, ls = '--')
+
+    m, c, err_m, err_c = ctl.linear_regre_witherr(tas_ok, pr_ok)
+    stron = r'{}: $\lambda = {:5.3f} \pm {:5.3f} \ W/m^2/K$'.format(ru, m, err_m)
+    print(stron)
+    ax.text(-0.3, -2-(allru.index(ru)-2)*0.2, stron, fontsize = 14)
+
+ax.grid()
+ax.legend()
+#ctl.custom_legend(fig, colors[2:-1], allru[2:-1])
+#ax.subplots_adjust(bottom = 0.2)
+ax.set_xlabel('GTAS change (K)')
+ax.set_ylabel(r'Change in net incoming TOA ($W/m^2$)')
+fig.savefig(cart_out + 'feedback_evolution_tasbin.pdf'.format(var))
 ##################################################################
 
 fig_greg, ax_greg = plt.subplots(figsize = (16,9))
