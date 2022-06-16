@@ -122,13 +122,13 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
         oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
         oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
 
-        print(np.sum(np.isnan(oht_deep))/np.size(oht_deep))
+        print(np.sum(np.isnan(oht_deep.values))/np.size(oht_deep.values))
 
         zuki700 = ctl.regrid_dataset(oht700, lats, lons)
         zuki2000 = ctl.regrid_dataset(oht2000, lats, lons)
         zuki_deep = ctl.regrid_dataset(oht_deep, lats, lons)
 
-        print(np.sum(np.isnan(zuki_deep))/np.size(zuki_deep))
+        print(np.sum(np.isnan(zuki_deep.values))/np.size(zuki_deep.values))
 
         # nuvarz = dict()
         # for basnam in basnames:
