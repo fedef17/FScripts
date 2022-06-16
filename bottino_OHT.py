@@ -128,6 +128,8 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
         zuki2000 = ctl.regrid_dataset(oht2000, lats, lons)
         zuki_deep = ctl.regrid_dataset(oht_deep, lats, lons)
 
+        print(zuki_deep)
+        print(zuki_deep.max(), zuki_deep.min(), zuki_deep.mean())
         print('nans', np.sum(np.isnan(zuki_deep.values)))
 
         # nuvarz = dict()
