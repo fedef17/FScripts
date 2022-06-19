@@ -93,6 +93,8 @@ lice = sd == 10.
 
 # Reading initial snow cover for b100, b065 and b080
 for ye in ['2100', '2080', '2065']:
+#for ye in ['2080', '2065']:
+    print(ye)
     b100_ini = pygrib.open(cart_out + '../c585-'+ye+'0101/ICMGGc585INIT')
 
     fig, ax = ctl.get_cartopy_fig_ax()
