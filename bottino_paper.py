@@ -558,9 +558,18 @@ oht_all = dict()
 
 oht1ref = None
 for ru, col, ax in zip(allru[3:-1], colors[3:-1], axs.flatten()):
-    filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
-    gigi = pickle.load(filo)
+    oht_lev = []
+    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+    for i in range(500):
+        try:
+            gigi = pickle.load(filo)
+        except:
+            break
+        oht_lev.append(gigi[0])
+
     filo.close()
+
+    oht_lev = xr.concat(oht_lev, dim = 'year')
 
     gtas = glomeans[(ru, 'tas')][1]
     yeas = np.arange(500)
@@ -614,7 +623,9 @@ pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
 #############################################################
 ### maps of OHT trends
 
+refoht = dict() #### THIS IS now assigned to b025, but should be pi
 oht_patt = dict()
+
 for ru, col in zip(allru[3:-1], colors[3:-1]):
     print(ru)
     filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
@@ -638,17 +649,28 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
     filo.close()
 
     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
+        var[var == 0.0] = np.nan
+
         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
 
         oht_patt[(ru, lab)] = var_trend
         oht_patt[(ru, lab, 'err')] = var_trend_err
         oht_patt[(ru, lab, 'pval')] = var_pval
 
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(oht_all[(ru, lab)], var)
+        nonan = ~np.isnan(var[0])
+        gmea = ctl.global_mean(var, lats, mask = nonan)
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gmea, var)
 
         oht_patt[(ru, lab, 'rel')] = var_trend
         oht_patt[(ru, lab, 'rel_err')] = var_trend_err
         oht_patt[(ru, lab, 'rel_pval')] = var_pval
+
+
+        if refoht[lab] is None:
+            refoht[lab] = var[:20].mean(axis = 0)
+
+        oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
 
 pickle.dump(oht_patt, open(carto + 'oht_patt_deep.p', 'wb'))
 
@@ -663,9 +685,13 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
     for ru, col in zip(allru[3:-1], colors[3:-1]):
         plpa.append(oht_patt[(ru, lev)])
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
-        subt.append(ru + ' - ' + str(lev))
+        subt.append(ru + ': ' + tit)
 
-ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend (J/year)', add_hatching = hatch)
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend (J/year)', add_hatching = hatch)
+
+for ax in fig.gca():
+    ax.set_facecolor('gainsboro')
+fig.savefig(carto + 'oht_patt_deep.pdf')
 
 
 plpa = []
@@ -675,6 +701,22 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
     for ru, col in zip(allru[3:-1], colors[3:-1]):
         plpa.append(oht_patt[(ru, lev, 'rel')])
         hatch.append(oht_patt[(ru, lev, 'rel_pval')] < 0.05)
-        subt.append(ru + ' - ' + str(lev))
+        subt.append(ru + ': ' + tit)
 
-ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern')
+for ax in fig.gca():
+    ax.set_facecolor('gainsboro')
+fig.savefig(carto + 'oht_patt_deep_rel.pdf')
+
+plpa = []
+subt = []
+hatch = []
+for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
+    for ru, col in zip(allru[3:-1], colors[3:-1]):
+        plpa.append(oht_patt[(ru, lev, 'change')])
+        subt.append(ru + ': ' + tit)
+
+ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC change')
+for ax in fig.gca():
+    ax.set_facecolor('gainsboro')
+fig.savefig(carto + 'oht_patt_deep_change.pdf')
