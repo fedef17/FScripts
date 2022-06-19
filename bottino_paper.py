@@ -640,7 +640,7 @@ lons = np.linspace(0, 359, 360)
 refoht = dict() #### THIS IS now assigned to b025, but should be pi
 oht_patt = dict()
 
-areacello = xr.load_dataset(carto + 'areacello.nc')
+areacello = xr.load_dataset(carto + 'areacello.nc')['areacello']
 regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
 for ru, col in zip(allru[3:-1], colors[3:-1]):
