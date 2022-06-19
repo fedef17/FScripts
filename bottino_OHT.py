@@ -109,7 +109,7 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
 
         gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
-        oht = gigi*gigi2#*gigi_a.values[np.newaxis, np.newaxis, ...]
+        oht = gigi*gigi2*gigi_a.values[np.newaxis, np.newaxis, ...]
         # for the pattern, do not multiply for area!!
 
         # areacello is m2
@@ -117,11 +117,11 @@ def do_cross(fils, fils2, fils_area, fil_out):#, coda):
         # bigthetao is C
         # to have real oht must multiply by cp
 
-        oht_lev = oht*gigi_a.values[np.newaxis, np.newaxis, ...].mean('time').sum(['i', 'j'])
+        oht_lev = oht.mean('time').sum(['i', 'j'])
 
-        oht700 = oht.sel(lev = slice(0., 700.)).mean('time').sum('lev')
-        oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
-        oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
+        oht700 = gigi.sel(lev = slice(0., 700.)).mean('time').sum('lev')
+        oht2000 = gigi.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
+        oht_deep = gigi.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
 
         print('nans', np.sum(np.isnan(oht_deep.values)))
 
