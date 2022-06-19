@@ -716,7 +716,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         subt.append(ru + ': ' + tit)
 
 #divnorm = colors.TwoSlopeNorm(vmin=-1., vcenter=1., vmax=3.5)
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), color_norm = , figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
 fig.savefig(carto + 'oht_patt_deep_rel.pdf')
