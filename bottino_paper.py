@@ -641,6 +641,7 @@ refoht = dict() #### THIS IS now assigned to b025, but should be pi
 oht_patt = dict()
 
 areacello = xr.load_dataset(carto + 'areacello.nc')
+regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
 for ru, col in zip(allru[3:-1], colors[3:-1]):
     print(ru)
@@ -665,9 +666,9 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
     ohtdeep = np.stack(ohtdeep)
 
     ### Ri-divide by areacello! I want density of OHC here
-    oht700 = oht700/areacello.values
-    oht2000 = oht2000/areacello.values
-    ohtdeep = ohtdeep/areacello.values
+    oht700 = oht700/regr_acello.values
+    oht2000 = oht2000/regr_acello.values
+    ohtdeep = ohtdeep/regr_acello.values
 
     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
         var[var == 0.0] = np.nan
