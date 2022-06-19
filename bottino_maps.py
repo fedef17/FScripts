@@ -53,15 +53,27 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 allnams2 = allnams + ['ssp585', 'historical']
 allru2 = allru + ['ssp585', 'hist']
 colors2 = colors + ['indianred', 'steelblue']
+
+allnams3 = ['stabilization-hist-1990'] + allnams[1:]
+allru3 = ['b990'] + allru[1:]
+colors3 = ['teal'] + colors[1:]
 ####################################################################################################
 
 glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
+
+plot_all = False
 
 for var in ['tas', 'pr']:
     for exp in ['ssp585', 'historical']:
         yeamean_hs, seamean_hs = pickle.load(open(cart_in + '../yearmean/bottino_yeamean_3_{}_{}.p'.format(exp, var), 'rb'))
         if exp == 'ssp585':
             memok = yeamean_hs[(exp, 'members')]
+
+        yeamean[(exp+'_mean', var)] = yeamean_hs[(exp, 'ensmean', var)]
+        yeamean[(exp+'_std', var)] = yeamean_hs[(exp, 'ensstd', var)]
+
+        continue
+        print(yeamean[(exp+'_mean', var)].shape)
 
         print(memok)
         lenmin = np.min([len(yeamean_hs[(exp, mem, var)]) for mem in memok])
@@ -93,7 +105,7 @@ cmappa_pr = cm.get_cmap('BrBG').copy()
 cmappa_pr.set_bad('lightslategray', alpha = 0.5)
 
 ypre_trans = 30#50
-ypre_stab = 100
+ypre_stab = 50
 
 cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
 
@@ -127,8 +139,9 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
 
     fig_ratio = []
     fig_std = []
+    fig_tot = []
 
-    for ru in allru[1:]:
+    for ru in ['hist', 'ssp585'] + allru3:
         coso = yeamean[(ru, var)]
         y0 = coso.year[0].values
 
@@ -143,43 +156,76 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
         equi = fact*coso[-ypre_stab:].mean('year').values
 
         #mappe = [transient-pimap, equi-pimap, equi-transient]
-        if varnam == 'pr_rel':
-            transient[thres] = np.nan
-            equi[thres] = np.nan
-            mappe = [(transient-pimap)/pimap, (equi-transient)/pimap]
-        elif varnam == 'tas':
-            mappe = [transient-pimap, equi-transient]
-            #mappe = [ma - ctl.global_mean(ma, coso.lat) for ma in mappe]
-        else:
-            mappe = [transient-pimap, equi-transient]
+        if ru in allru3:
+            if plot_all:
+                if varnam == 'pr_rel':
+                    transient[thres] = np.nan
+                    equi[thres] = np.nan
+                    mappe = [(transient-pimap)/pimap, (equi-transient)/pimap]
+                elif varnam == 'tas':
+                    mappe = [transient-pimap, equi-transient]
+                    #mappe = [ma - ctl.global_mean(ma, coso.lat) for ma in mappe]
+                else:
+                    mappe = [transient-pimap, equi-transient]
 
-        ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (16,6), cb_label = cblab)
+                ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (16,6), cb_label = cblab)
 
-        fig_patt_trans.append(mappe[0])
-        fig_patt_stab.append(mappe[1])
+                fig_patt_trans.append(mappe[0])
+                fig_patt_stab.append(mappe[1])
 
-        mappe += [mappe[0]+mappe[1]]
-        ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'triple_trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization', 'final'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (18,5), fix_subplots_shape = (1,3), cb_label = cblab)
+                mappe += [mappe[0]+mappe[1]]
+                ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'triple_trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization', 'final'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (18,5), fix_subplots_shape = (1,3), cb_label = cblab)
 
-        ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'triple_trans_vs_stab_{}_{}_medzoom.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization', 'final'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (18,5), plot_margins = (-20, 45., 27., 50), fix_subplots_shape = (1,3), cb_label = cblab)
+                ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'triple_trans_vs_stab_{}_{}_medzoom.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization', 'final'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (18,5), plot_margins = (-20, 45., 27., 50), fix_subplots_shape = (1,3), cb_label = cblab)
 
+                if varnam == 'tas':
+                    mappe = [transient-pimap, equi-pimap]
+                    cmap = cmappa_tas2
+                    cbran = (0., 20.)
+                elif varnam == 'pr_rel':
+                    mappe = [(transient-pimap)/pimap, (equi-pimap)/pimap]
+                    cmap = cmappa
+                    cbran = ext
+                elif varnam == 'pr':
+                    mappe = [transient-pimap, equi-pimap]
+                    cmap = cmappa
+                    cbran = ext
+
+                ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'abs_trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['start', 'end'], cmap = cmap, plot_anomalies = True, cbar_range = ext, figsize = (16, 6), cb_label = cblab)
+
+                fig_abs_start.append(mappe[0])
+                fig_abs_end.append(mappe[1])
+
+
+        deltatas = glomeans[(ru, 'tas')][1][-ypre_stab:].mean()-pimean['tas']
         if varnam == 'tas':
-            mappe = [transient-pimap, equi-pimap]
-            cmap = cmappa_tas2
-            cbran = (0., 20.)
+            mappe = (equi-pimap)/deltatas
+            cmap = 'magma'
+            cbran = (0.5, 3.5)
+            divnorm = None
+            plotanom = False
         elif varnam == 'pr_rel':
-            mappe = [(transient-pimap)/pimap, (equi-pimap)/pimap]
-            cmap = cmappa
-            cbran = ext
+            c5 = -0.1
+            c95 = 0.2
+            divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+            mappe = ((equi-pimap)/pimap)/deltatas
+            mappe[thres] = np.nan
+            cmap = 'BrBG'
+            cbran = (c5, c95)
+            plotanom = False
         elif varnam == 'pr':
-            mappe = [transient-pimap, equi-pimap]
-            cmap = cmappa
+            # c5 = -0.1
+            # c95 = 0.3
+            # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+            divnorm = None
+            plotanom = True
+            mappe = (equi-pimap)/deltatas
+            cmap = 'BrBG'
             cbran = ext
 
-        ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'abs_trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['start', 'end'], cmap = cmap, plot_anomalies = True, cbar_range = ext, figsize = (16, 6), cb_label = cblab)
+        ctl.plot_map_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'tot_stab_{}_{}.pdf'.format(varnam, ru), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 6), color_norm = divnorm, cb_label = cblab)
 
-        fig_abs_start.append(mappe[0])
-        fig_abs_end.append(mappe[1])
+        fig_tot.append(mappe)
 
         # mappeanom = [ma-ctl.global_mean(ma, coso.lat) for ma in mappe]
         # ctl.plot_multimap_contour(mappeanom, coso.lat, coso.lon, cmap = cmappa, plot_anomalies = True, cbar_range = [-10., 10.])
@@ -188,92 +234,120 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
         cmap.set_under('violet')
         cmap.set_over('lightgreen')
 
-        if varnam == 'tas':
-            print('entro tas')
-            mappa = (equi-transient)/(equi-pimap)
-            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = 'Fraction of residual warming')
-            fig_ratio.append(mappa)
-            print(len(fig_ratio))
-        # elif varnam == 'pr_rel':
-        else:
-            # cmap = cm.get_cmap('viridis').copy()
-            # cmap.set_under('violet')
-            # cmap.set_bad('lightslategray', alpha = 0.5)
+        if plot_all and ru in allru3:
+            if varnam == 'tas':
+                print('entro tas')
+                mappa = (equi-transient)/(equi-pimap)
+                ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = 'Fraction of residual warming')
+                fig_ratio.append(mappa)
+                print(len(fig_ratio))
+            # elif varnam == 'pr_rel':
+            else:
+                # cmap = cm.get_cmap('viridis').copy()
+                # cmap.set_under('violet')
+                # cmap.set_bad('lightslategray', alpha = 0.5)
 
-            #mappa = (equi-transient)/(transient-pimap)
-            mappa = (equi-transient)/(equi-pimap)
+                #mappa = (equi-transient)/(transient-pimap)
+                mappa = (equi-transient)/(equi-pimap)
 
+                if varnam == 'pr_rel':
+                    #mappa[np.abs(transient-pimap)/pimap < 0.02] = np.nan
+                    mappa[np.abs(equi-pimap)/pimap < 0.02] = np.nan
+                    tramap = (transient-pimap)/pimap
+                    tramap[thres] = np.nan
+                    lst = 0.25
+                elif varnam == 'pr':
+                    #mappa[np.abs(transient-pimap) < 20] = np.nan
+                    mappa[np.abs(equi-pimap) < 20] = np.nan
+                    tramap = transient-pimap
+                    lst = 200
+
+                #cblab = 'stabilization/transient ratio'
+                cblabU = 'Ratio of change during stabilization to total change'
+                ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = cblabU)#, add_contour_field = tramap, add_contour_lines_step = lst)
+                fig_ratio.append(mappa)
+
+                ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}_medzoom.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, plot_margins = (-20, 45., 27., 50), cb_label = cblabU)#, add_contour_field = tramap, add_contour_lines_step = lst)
+
+            cosorun = ctl.running_mean(coso, 50)
+            equistd = (coso-cosorun)[-ypre_stab:].std('year').values
+
+            mappa = equistd/pistd
             if varnam == 'pr_rel':
-                #mappa[np.abs(transient-pimap)/pimap < 0.02] = np.nan
-                mappa[np.abs(equi-pimap)/pimap < 0.02] = np.nan
-                tramap = (transient-pimap)/pimap
-                tramap[thres] = np.nan
-                lst = 0.25
-            elif varnam == 'pr':
-                #mappa[np.abs(transient-pimap) < 20] = np.nan
-                mappa[np.abs(equi-pimap) < 20] = np.nan
-                tramap = transient-pimap
-                lst = 200
+                mappa[thres] = np.nan
 
-            #cblab = 'stabilization/transient ratio'
-            cblab = 'Ratio of change during stabilization to total change'
-            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, cb_label = cblab)#, add_contour_field = tramap, add_contour_lines_step = lst)
-            fig_ratio.append(mappa)
-
-            ctl.plot_map_contour(mappa, coso.lat, coso.lon, filename = cart_out + 'stabtransratio_{}_{}_medzoom.pdf'.format(varnam, ru), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, plot_margins = (-20, 45., 27., 50), cb_label = cblab)#, add_contour_field = tramap, add_contour_lines_step = lst)
-
-        cosorun = ctl.running_mean(coso, 50)
-        equistd = (coso-cosorun)[-ypre_stab:].std('year').values
-
-        mappa = equistd/pistd
-        if varnam == 'pr_rel':
-            mappa[thres] = np.nan
-
-        ctl.plot_map_contour(mappa, coso.lat, coso.lon, cmap = cmappa, plot_anomalies = True, cbar_range = [0., 2.], filename = cart_out + 'equistdratio_{}_{}.pdf'.format(varnam, ru), cb_label = 'Interannual variability ratio')
-        fig_std.append(mappa)
+            ctl.plot_map_contour(mappa, coso.lat, coso.lon, cmap = cmappa, plot_anomalies = True, cbar_range = [0., 2.], filename = cart_out + 'equistdratio_{}_{}.pdf'.format(varnam, ru), cb_label = 'Interannual variability ratio')
+            fig_std.append(mappa)
 
 
     #######
 
-    ctl.plot_multimap_contour(fig_patt_trans+fig_patt_stab, coso.lat, coso.lon, filename = cart_out + 'All_trans_vs_stab_{}.pdf'.format(varnam), subtitles = allru[1:]+3*[None], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (16,9), fix_subplots_shape = (2,3), cb_label = cblab)
-
     if varnam == 'tas':
-        cmap = cmappa_tas2
-        cbran = (0., 20.)
-    else:
-        cmap = cmappa
+        cmap = 'magma'
+        cbran = (0., 2.5)
+        divnorm = None
+        plotanom = False
+    elif varnam == 'pr_rel':
+        c5 = -0.1
+        c95 = 0.3
+        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        cmap = 'BrBG'
+        cbran = (c5, c95)
+        plotanom = False
+    elif varnam == 'pr':
+        # c5 = -0.1
+        # c95 = 0.3
+        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        divnorm = None
+        plotanom = True
+        cmap = 'BrBG'
         cbran = ext
-    ctl.plot_multimap_contour(fig_abs_start+fig_abs_end, coso.lat, coso.lon, filename = cart_out + 'All_abs_trans_vs_stab_{}.pdf'.format(varnam), subtitles = allru[1:]+3*[None], cmap = cmap, plot_anomalies = True, cbar_range = cbran, figsize = (16,9), fix_subplots_shape = (2,3), cb_label = cblab)
 
-    cmap = mcolors.LinearSegmentedColormap.from_list('bau', ['violet', 'white', 'lightgreen'])
-    cmap.set_under('violet')
-    cmap.set_over('lightgreen')
+    okru = ['hist', 'ssp585'] + allru3
+    okfi = fig_tot
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_tot_stab_{}.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab)
 
-    if varnam == 'tas':
-        addcont = None
-        lst = 1.
-        cla2 = 'Fraction of residual warming'
-    else:
-        addcont = fig_patt_trans
-        #cla2 = 'stabilization/transient ratio'
-        cla2 = 'Ratio of change during stabilization to total change'
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_tot_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,-120.))
+    ###########################3
 
+    if plot_all:
+        ctl.plot_multimap_contour(fig_patt_trans+fig_patt_stab, coso.lat, coso.lon, filename = cart_out + 'All_trans_vs_stab_{}.pdf'.format(varnam), subtitles = allru3+4*[None], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (16,6), fix_subplots_shape = (2,4), cb_label = cblab)
 
-    proj = ctl.def_projection('standard')
+        if varnam == 'tas':
+            cmap = cmappa_tas2
+            cbran = (0., 20.)
+        else:
+            cmap = cmappa
+            cbran = ext
+        ctl.plot_multimap_contour(fig_abs_start+fig_abs_end, coso.lat, coso.lon, filename = cart_out + 'All_abs_trans_vs_stab_{}.pdf'.format(varnam), subtitles = allru3+4*[None], cmap = cmap, plot_anomalies = True, cbar_range = cbran, figsize = (16,6), fix_subplots_shape = (2,4), cb_label = cblab)
 
-    fig = plt.figure(figsize = (16, 12))
-    gsco = gs.GridSpec(2, 4)
-    ax1 = plt.subplot(gsco[0, :2], projection = proj)
-    ax2 = plt.subplot(gsco[0, 2:], projection = proj)
-    ax3 = plt.subplot(gsco[1, 1:3], projection = proj)
+        cmap = mcolors.LinearSegmentedColormap.from_list('bau', ['violet', 'white', 'lightgreen'])
+        cmap.set_under('violet')
+        cmap.set_over('lightgreen')
 
-    axs = [ax1, ax2, ax3]
-    for ax in axs:
-        ax.set_global()
-        ax.coastlines(linewidth = 1.)
+        if varnam == 'tas':
+            addcont = None
+            lst = 1.
+            cla2 = 'Fraction of residual warming'
+        else:
+            addcont = fig_patt_trans
+            #cla2 = 'stabilization/transient ratio'
+            cla2 = 'Ratio of change during stabilization to total change'
 
-    print(len(fig_ratio))
-    ctl.plot_multimap_contour(fig_ratio, coso.lat, coso.lon, filename = cart_out + 'All_stabtransratio_{}.pdf'.format(varnam), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, fig_external = fig, axs_external = axs, subtitles = allru[1:], cb_label = cla2)#figsize = (18,5), fix_subplots_shape = (1,3))
+        # fig = plt.figure(figsize = (16, 12))
+        # gsco = gs.GridSpec(2, 4)
+        # ax1 = plt.subplot(gsco[0, :2], projection = proj)
+        # ax2 = plt.subplot(gsco[0, 2:], projection = proj)
+        # ax3 = plt.subplot(gsco[1, 1:3], projection = proj)
+        #
+        # axs = [ax1, ax2, ax3]
+        # for ax in axs:
+        #     ax.set_global()
+        #     ax.coastlines(linewidth = 1.)
+        #
+        # print(len(fig_ratio))
+        # ctl.plot_multimap_contour(fig_ratio, coso.lat, coso.lon, filename = cart_out + 'All_stabtransratio_{}.pdf'.format(varnam), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, fig_external = fig, axs_external = axs, subtitles = allru3, cb_label = cla2)#figsize = (18,5), fix_subplots_shape = (1,3))
+        ctl.plot_multimap_contour(fig_ratio, coso.lat, coso.lon, filename = cart_out + 'All_stabtransratio_{}.pdf'.format(varnam), plot_anomalies = True, cbar_range = ext_rel, cmap = cmap, subtitles = allru3, cb_label = cla2)#figsize = (18,5), fix_subplots_shape = (1,3))
 
-    ctl.plot_multimap_contour(fig_std, coso.lat, coso.lon, cmap = cmappa, plot_anomalies = True, cbar_range = [0., 2.], filename = cart_out + 'All_equistdratio_{}.pdf'.format(varnam), figsize = (18,5), fix_subplots_shape = (1,3), subtitles = allru[1:], cb_label = 'Interannual variability ratio')
-    fig_std.append(mappa)
+        ctl.plot_multimap_contour(fig_std, coso.lat, coso.lon, cmap = cmappa, plot_anomalies = True, cbar_range = [0., 2.], filename = cart_out + 'All_equistdratio_{}.pdf'.format(varnam), figsize = (18,5), subtitles = allru3, cb_label = 'Interannual variability ratio')
+        fig_std.append(mappa)
