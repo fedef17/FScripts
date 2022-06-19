@@ -640,6 +640,8 @@ lons = np.linspace(0, 359, 360)
 refoht = dict() #### THIS IS now assigned to b025, but should be pi
 oht_patt = dict()
 
+areacello = xr.load_dataset(carto + 'areacello.nc')
+
 for ru, col in zip(allru[3:-1], colors[3:-1]):
     print(ru)
     filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
@@ -656,11 +658,16 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
         oht2000.append(oht2000_i)
         ohtdeep.append(ohtdeep_i)
 
+    filo.close()
+
     oht700 = np.stack(oht700)
     oht2000 = np.stack(oht2000)
     ohtdeep = np.stack(ohtdeep)
 
-    filo.close()
+    ### Ri-divide by areacello! I want density of OHC here
+    oht700 = oht700/areacello.values
+    oht2000 = oht2000/areacello.values
+    ohtdeep = ohtdeep/areacello.values
 
     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
         var[var == 0.0] = np.nan
@@ -699,7 +706,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend (J/year)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = r'OHC trend ($J m^{-2} yr^{-1}$)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
@@ -729,7 +736,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC change')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'oht_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = r'OHC change ($J m^{-2}$)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
