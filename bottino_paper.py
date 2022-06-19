@@ -554,6 +554,8 @@ fig3.savefig(carto + 'oht_deep_gtas.pdf')
 
 fig, axs = plt.subplots(1, 3, figsize = (16,6))
 
+oht_all = dict()
+
 oht1ref = None
 for ru, col, ax in zip(allru[3:-1], colors[3:-1], axs.flatten()):
     filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
@@ -570,6 +572,10 @@ for ru, col, ax in zip(allru[3:-1], colors[3:-1], axs.flatten()):
     oht1 = gigi.sel(lev = slice(0., 700.)).sum('lev')
     oht2 = gigi.sel(lev = slice(700., 2000.)).sum('lev')
     oht3 = gigi.sel(lev = slice(2000., 6000.)).sum('lev')
+
+    oht_all[(ru, 700)] = oht1
+    oht_all[(ru, 2000)] = oht2
+    oht_all[(ru, 'deep')] = oht3
 
     if oht1ref is None:
         oht1ref = oht1[:10].mean()
@@ -603,3 +609,72 @@ ctl.adjust_ax_scale(axs)
 ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['0-700m', '700-2000m', '> 2000m'], ncol = 3)
 plt.subplots_adjust(bottom = 0.25)
 fig.savefig(carto + 'oht_deep_all_evol.pdf')
+
+pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
+#############################################################
+### maps of OHT trends
+
+oht_patt = dict()
+for ru, col in zip(allru[3:-1], colors[3:-1]):
+    print(ru)
+    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+
+    oht700 = []
+    oht2000 = []
+    ohtdeep = []
+    for i in range(500):
+        try:
+            oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
+        except:
+            break
+        oht700.append(oht700_i)
+        oht2000.append(oht2000_i)
+        ohtdeep.append(ohtdeep_i)
+
+    oht700 = np.stack(oht700)
+    oht2000 = np.stack(oht2000)
+    ohtdeep = np.stack(ohtdeep)
+
+    filo.close()
+
+    for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
+
+        oht_patt[(ru, lab)] = var_trend
+        oht_patt[(ru, lab, 'err')] = var_trend_err
+        oht_patt[(ru, lab, 'pval')] = var_pval
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(oht_all[(ru, lab)], var)
+
+        oht_patt[(ru, lab, 'rel')] = var_trend
+        oht_patt[(ru, lab, 'rel_err')] = var_trend_err
+        oht_patt[(ru, lab, 'rel_pval')] = var_pval
+
+pickle.dump(oht_patt, open(carto + 'oht_patt_deep.p', 'wb'))
+
+lats = np.linspace(-89.5, 89.5, 180)
+lons = np.linspace(0, 359, 360)
+
+
+plpa = []
+subt = []
+hatch = []
+for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
+    for ru, col in zip(allru[3:-1], colors[3:-1]):
+        plpa.append(oht_patt[(ru, lev)])
+        hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
+        subt.append(ru + ' - ' + str(lev))
+
+ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend (J/year)', add_hatching = hatch)
+
+
+plpa = []
+subt = []
+hatch = []
+for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
+    for ru, col in zip(allru[3:-1], colors[3:-1]):
+        plpa.append(oht_patt[(ru, lev, 'rel')])
+        hatch.append(oht_patt[(ru, lev, 'rel_pval')] < 0.05)
+        subt.append(ru + ' - ' + str(lev))
+
+ctl.plot_multimap_contour(plpa, lats, lons, filename = carto + 'oht_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern')
