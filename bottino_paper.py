@@ -577,10 +577,10 @@ for ru, col, ax in zip(allru[3:-1], colors[3:-1], axs.flatten()):
         gtas = gtas[5:]
         yeas = yeas[5:]
 
-    oht_tot = gigi.sum('lev')
-    oht1 = gigi.sel(lev = slice(0., 700.)).sum('lev')
-    oht2 = gigi.sel(lev = slice(700., 2000.)).sum('lev')
-    oht3 = gigi.sel(lev = slice(2000., 6000.)).sum('lev')
+    oht_tot = oht_lev.sum('lev')
+    oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
+    oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
+    oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
 
     oht_all[(ru, 700)] = oht1
     oht_all[(ru, 2000)] = oht2
