@@ -681,7 +681,7 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
         oht_patt[(ru, lab, 'rel_pval')] = var_pval
 
 
-        if refoht[lab] is None:
+        if lab not in refoht:
             refoht[lab] = var[:20].mean(axis = 0)
 
         oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
