@@ -489,9 +489,21 @@ fig, ax = plt.subplots(figsize = (16,9))
 fig2, ax2 = plt.subplots(figsize = (16,9))
 fig3, ax3 = plt.subplots(figsize = (16,9))
 for ru, col in zip(allru[3:-1], colors[3:-1]):
-    filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
-    gigi = pickle.load(filo)
+    oht_lev = []
+    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+    for i in range(500):
+        try:
+            gigi = pickle.load(filo)
+        except:
+            break
+        oht_lev.append(gigi[0])
+
     filo.close()
+
+    oht_lev = xr.concat(oht_lev, dim = 'year')
+    # filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
+    # gigi = pickle.load(filo)
+    # filo.close()
 
     gtas = glomeans[(ru, 'tas')][1]
     yeas = np.arange(500)
@@ -499,7 +511,7 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
         gtas = gtas[5:]
         yeas = yeas[5:]
 
-    oht_tot = gigi.sum('lev')*cp0
+    oht_tot = oht_lev.sum('lev')*cp0
     t_deep = 273.15 + oht_tot/oce_mass/cp0
 
     #ax.scatter(gtas, (1-t_deep/gtas), s = 3, color = col)
@@ -513,9 +525,9 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
     # fitted = np.polyval(coeffs, x_nu)
     # ax.plot(x_nu, fitted, color = col, label = ru, lw = 2)
 
-    oht1 = gigi.sel(lev = slice(0., 700.)).sum('lev')
-    oht2 = gigi.sel(lev = slice(700., 2000.)).sum('lev')
-    oht3 = gigi.sel(lev = slice(2000., 6000.)).sum('lev')
+    oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
+    oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
+    oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
 
     ax2.plot(oht1, color = col, ls = '-', label = ru, lw = 2)
     ax2.plot(oht2, color = col, ls = '--', lw = 2)
@@ -622,6 +634,8 @@ fig.savefig(carto + 'oht_deep_all_evol.pdf')
 pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
 #############################################################
 ### maps of OHT trends
+lats = np.linspace(-89.5, 89.5, 180)
+lons = np.linspace(0, 359, 360)
 
 refoht = dict() #### THIS IS now assigned to b025, but should be pi
 oht_patt = dict()
@@ -674,8 +688,6 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
 
 pickle.dump(oht_patt, open(carto + 'oht_patt_deep.p', 'wb'))
 
-lats = np.linspace(-89.5, 89.5, 180)
-lons = np.linspace(0, 359, 360)
 
 
 plpa = []
