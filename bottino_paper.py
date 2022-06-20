@@ -665,10 +665,9 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
     oht2000 = np.stack(oht2000)
     ohtdeep = np.stack(ohtdeep)
 
-    ### Ri-divide by areacello! I want density of OHC here
-    oht700 = oht700/regr_acello.values
-    oht2000 = oht2000/regr_acello.values
-    ohtdeep = ohtdeep/regr_acello.values
+    # oht700 = oht700/regr_acello.values
+    # oht2000 = oht2000/regr_acello.values
+    # ohtdeep = ohtdeep/regr_acello.values
 
     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
         var[var == 0.0] = np.nan
@@ -695,8 +694,7 @@ for ru, col in zip(allru[3:-1], colors[3:-1]):
         oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
 
 pickle.dump(oht_patt, open(carto + 'temp_patt_deep.p', 'wb'))
-
-
+#oht_patt = pickle.load(open(carto + 'temp_patt_deep.p', 'rb'))
 
 plpa = []
 subt = []
@@ -707,7 +705,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = r'Conservative temperature trend ($K yr^{-1}$)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
@@ -725,7 +723,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         subt.append(ru + ': ' + tit)
 
 #divnorm = colors.TwoSlopeNorm(vmin=-1., vcenter=1., vmax=3.5)
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'OHC trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Cons. temp. trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
 #fig.savefig(carto + 'oht_patt_deep_rel.pdf')
@@ -739,7 +737,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = r'Conservative temperature change ($K$)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Conservative temperature change (K)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
