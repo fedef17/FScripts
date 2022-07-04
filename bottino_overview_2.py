@@ -51,13 +51,17 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 ####################################################################################################
 
 miptab = 'Amon'
-allvars_2D = 'clt pr rlut rsdt rsut tas'.split()
+#allvars_2D = 'clt pr rlut rsdt rsut tas'.split()
+allvars_2D = 'rsds rsus rlds rlus hfss hfls'.split()
 add_uas = False
 
 allvars_3D = []#'ta ua'.split()
 
-var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
-var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
+#var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
+var_glob_mean = 'rsds rsus rlds rlus hfss hfls net_srf'.split()
+
+#var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
+var_glob_ylabel = var_glob_mean
 
 var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
 allnams2 = allnams + ['ssp585', 'historical']
@@ -108,7 +112,9 @@ for na, ru, col in zip(allnams3, allru3, colors3):
     kose = kose.drop_vars('time_bnds')
 
     try:
-        kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+        #kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+        kose = kose.assign(net_sfc = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
+        print('assigned net_srf')
     except Exception as exc:
         print(exc)
         pass
@@ -184,10 +190,13 @@ for na, ru, col in zip(allnams3, allru3, colors3):
 #ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True)
 #fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
 
-pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
+#pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
+pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
 
-pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+#pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
 
+sys.exit()
 
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 

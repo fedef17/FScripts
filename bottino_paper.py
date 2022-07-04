@@ -776,7 +776,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
         plpa.append(oht_patt[(ru, lev, '500')]-oht_patt[(ru, lev, '100')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_500-100.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Conservative temperature trend (K/yr) difference (last - fitst century)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_500-100.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), cbar_range = (-0.02, 0.02), n_color_levels = 37, figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Cons. temp. trend difference (K/yr) (last - fitst century)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
