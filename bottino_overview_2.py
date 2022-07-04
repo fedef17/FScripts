@@ -103,6 +103,10 @@ for na, ru, col in zip(allnams3, allru3, colors3):
 
     fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D])
 
+    if len(fils) == 0:
+        print('no files for {}'.format(na))
+        continue
+
     # for var in allvars_2D:
     #     print(var, len(glob.glob(filna.format(na, mem, miptab, var))))
     #     print(filna.format(na, mem, miptab, var))
