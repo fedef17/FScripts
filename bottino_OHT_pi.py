@@ -165,6 +165,7 @@ print(ru)
 #nam = allnams[allru.index(ru)]
 nam = ru
 
+print(filna.format(nam, mem, var, var))
 allfils = glob.glob(filna.format(nam, mem, var, var))
 allfils.sort()
 
