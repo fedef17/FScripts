@@ -62,7 +62,7 @@ elif os.uname()[1] == 'tintin':
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/gn/v20210315/{}*nc'
+filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/*/*/{}*nc'
 
 areafil = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2025/r1i1p1f1/Ofx/areacello/areacello_Ofx_EC-Earth3_stabilization-ssp585-2025_r1i1p1f1_gn.nc'
 
