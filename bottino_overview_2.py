@@ -50,6 +50,11 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 ####################################################################################################
 
+cart_run = '/home/fabiano/Research/git/ece_runtime/run/'
+masfi = cart_run + 'masks.nc'
+cose = xr.load_dataset(masfi)
+oce_mask = cose['RnfA.msk'].values.astype('bool') # 1 over ocean
+
 miptab = 'Amon'
 #allvars_2D = 'clt pr rlut rsdt rsut tas'.split()
 allvars_2D = 'rsds rsus rlds rlus hfss hfls'.split()
@@ -142,8 +147,12 @@ for na, ru, col in zip(allnams3, allru3, colors3):
         cosoye = kose[var].groupby("time.year").mean().compute()
         yeamean[(ru, var)] = cosoye
 
-        coso = cosoye.mean('lon')
-        glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+        # coso = cosoye.mean('lon')
+        # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+        glomean = ctl.global_mean(cosoye)
+        glomean_oce = ctl.global_mean(cosoye, mask = oce_mask)
+        glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
+
         if ru == 'pi':
             years = coso.year.data-2256+2015
             pimean[var] = np.mean(glomean)
@@ -152,6 +161,9 @@ for na, ru, col in zip(allnams3, allru3, colors3):
 
         glomeans[(ru, var)] = (years, glomean)
         ax.plot(years, glomean-pimean[var], label = ru, color = col)
+
+        glomeans[(ru, var, 'oce')] = (years, glomean_oce)
+        glomeans[(ru, var, 'land')] = (years, glomean_land)
 
         if ru == 'b100':
             ax.legend()
