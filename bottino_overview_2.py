@@ -126,6 +126,7 @@ for na, ru, col in zip(allnams3, allru3, colors3):
         print('assigned net_srf')
     except Exception as exc:
         print(exc)
+        print(kose.data_vars)
         pass
 
     # Separate for uas
@@ -154,10 +155,10 @@ for na, ru, col in zip(allnams3, allru3, colors3):
         glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
 
         if ru == 'pi':
-            years = coso.year.data-2256+2015
+            years = cosoye.year.data-2256+2015
             pimean[var] = np.mean(glomean)
         else:
-            years = coso.year.data
+            years = cosoye.year.data
 
         glomeans[(ru, var)] = (years, glomean)
         ax.plot(years, glomean-pimean[var], label = ru, color = col)
