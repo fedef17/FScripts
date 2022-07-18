@@ -53,7 +53,6 @@ for res, nlalo in zip(all_res, n_latlon):
     latg = latg*180/np.pi
     long = long*180/np.pi
 
-
     # globo: 1 ocean, 0 land
     # define oasis integer mask (0 over ocean and fractional points, 1 over land)
     fmask_oasis = fmask < 0.5
@@ -101,3 +100,7 @@ for res, nlalo in zip(all_res, n_latlon):
     data_vars = dict(zip(['AMIP.msk', 'glog.msk'], [(('y_amip', 'x_amip'), amip_msk), (('y_glog', 'x_glog'), fmask_oasis)]))
     masks = xr.Dataset(data_vars=data_vars, coords = coords)
     masks.to_netcdf(cart + 'masks_globo_{}.nc'.format(res))
+
+    data_vars = dict(zip(['AMIP.msk', 'glog.msk'], [(('y_amip', 'x_amip'), amip_msk), (('y_glog', 'x_glog'), fmask)]))
+    masks = xr.Dataset(data_vars=data_vars, coords = coords)
+    masks.to_netcdf(cart + 'masks_fractional_globo_{}.nc'.format(res))

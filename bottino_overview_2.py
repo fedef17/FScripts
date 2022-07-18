@@ -122,7 +122,7 @@ for na, ru, col in zip(allnams3, allru3, colors3):
 
     try:
         #kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-        kose = kose.assign(net_sfc = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
+        kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
         print('assigned net_srf')
     except Exception as exc:
         print(exc)
