@@ -77,6 +77,8 @@ colors = ['violet', 'chocolate', 'steelblue']
 gr_latsli = (60., 85.)
 gr_lonsli = (288., 350.)
 
+nyea = 200
+
 snowco = dict()
 
 miptab = 'LImon'
@@ -89,7 +91,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    snw = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
+    snw = xr.open_mfdataset(filz[:nyea], use_cftime = True)[var]
 
     gr_snw = snw.sel(lat = slice(*gr_latsli), lon = slice(*gr_lonsli)).groupby('time.year').mean()
 
@@ -121,8 +123,8 @@ axs[0].set_xlabel('year')
 axs[0].legend()
 #fig.savefig(cart_out + 'check_greenland_snw_melt.pdf')
 
-axs[0].set_xlim(2100, 2200)
-axs[1].set_xlim(2100, 2200)
+axs[0].set_xlim(2100, 2100+nyea)
+axs[1].set_xlim(2100, 2100+nyea)
 fig.savefig(cart_out + 'check_greenland_snw_melt_zoom.pdf')
 
 pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
@@ -147,7 +149,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
+    gigi = xr.open_mfdataset(filz[:nyea], use_cftime = True)[var]
 
     cond = (gigi.latitude > gr_latsli[0]) & (gigi.latitude < gr_latsli[1]) & (gigi.longitude > gr_lonsli[0]) & (gigi.longitude < gr_lonsli[1]) & (gigi.i > 235)
     gogo = gigi.where(cond)
@@ -168,8 +170,8 @@ axs[0].set_ylabel(r'Monthly max freshwater flux (Sv)')
 axs[1].set_ylabel('Yearly mean freshwater flux (Sv)')
 axs[1].set_xlabel('year')
 axs[0].legend()
-axs[0].set_xlim(2100, 2200)
-axs[1].set_xlim(2100, 2200)
+axs[0].set_xlim(2100, 2100+nyea)
+axs[1].set_xlim(2100, 2100+nyea)
 fig.savefig(cart_out + 'check_greenland_friver.pdf')
 
 pickle.dump(snowco, open(cart_out + 'snowcover_{}.p'.format(ru), 'wb'))
@@ -188,7 +190,7 @@ for ru, mem, col in zip(allru, allmems, colors):
     filz = glob.glob(filna.format(ru, mem, miptab, var, var))
     filz.sort()
 
-    gigi = xr.open_mfdataset(filz[:100], use_cftime = True)[var]
+    gigi = xr.open_mfdataset(filz[:nyea], use_cftime = True)[var]
     gigi = gigi-273.15
 
     gtas_mon = ctl.global_mean(gigi[:60])
@@ -217,8 +219,8 @@ axs[0].set_ylabel(r'Global tas')
 axs[1].set_ylabel('Mean (max/min) summer peak temp over Greenland')
 axs[0].set_xlabel('year')
 axs[0].legend()
-axs[0].set_xlim(2100, 2200)
-axs[1].set_xlim(2100, 2200)
+axs[0].set_xlim(2100, 2100+nyea)
+axs[1].set_xlim(2100, 2100+nyea)
 fig.savefig(cart_out + 'check_greenland_temp.pdf')
 
 ax2.legend()
@@ -244,11 +246,11 @@ for ru, mem, col in zip(allru, allmems, colors):
     print(ru)
     filz = glob.glob(filna.format(ru, mem, miptab, var1, var1))
     filz.sort()
-    gigi1 = xr.open_mfdataset(filz[:100], use_cftime = True)[var1]
+    gigi1 = xr.open_mfdataset(filz[:nyea], use_cftime = True)[var1]
 
     filz = glob.glob(filna.format(ru, mem, miptab, var2, var2))
     filz.sort()
-    gigi2 = xr.open_mfdataset(filz[:100], use_cftime = True)[var2]
+    gigi2 = xr.open_mfdataset(filz[:nyea], use_cftime = True)[var2]
 
     gigi = gigi2/gigi1
     alb_maps[ru] = gigi[:12]
@@ -264,7 +266,7 @@ for ru, mem, col in zip(allru, allmems, colors):
 
 ax.set_ylabel(r'Mean greenland albedo')
 ax.legend()
-ax.set_xlim(2100, 2200)
+ax.set_xlim(2100, 2100+nyea)
 
 fig.savefig(cart_out + 'check_greenland_albedo.pdf')
 
