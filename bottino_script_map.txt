@@ -59,6 +59,14 @@
                               usa i filez thetao_{exp}.p
                               plot della cross section dei trends
 
+- bottino_oht.py          ->  [ocean3d]
+                              calcola ohc dell'oceano integrato globalmente e i pattern a 3 livelli in profondità
+                              (girato a cineka)
+
+- bottino_paper.py        ->  [nonlin_evol]
+                              fa una serie di plots "finali": la storia dei feedback nonlineari, i trend di precipitazione area-averaged, i trend oceanici e l'evoluzione del OHC
+
+
 ### Modes of variability
 
 - bottino_MOV             ->  [indices/{index}]
