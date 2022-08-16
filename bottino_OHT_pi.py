@@ -36,7 +36,8 @@ import psutil
 
 #############################################################################
 
-ru = sys.argv[1]
+#ru = sys.argv[1]
+ru = 'piControl'
 
 # open our log file
 logname = 'log_oceall_{}.log'.format(ru)

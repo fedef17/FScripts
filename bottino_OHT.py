@@ -61,15 +61,19 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/gn/v20210315/{}*nc'
-filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
+if ru != 'b990':
+    filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/gn/v20210315/{}*nc'
+    filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
+else:
+    filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/{}*nc'
+    filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/areacello*nc'
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
-allru = ['b025', 'b050', 'b100']#['pi',
-allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
+allru = ['b990', 'b025', 'b050', 'b100']#['pi',
+allnams = ['stabilization-historical-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
 #nam = allnams[allru.index(ru)]
 
-colors = ['black', 'forestgreen', 'orange', 'violet']
+colors = ['teal', 'forestgreen', 'orange', 'violet']
 
 ####################################################################################################
 
@@ -176,15 +180,20 @@ n_proc = 10
 print(ru)
 nam = allnams[allru.index(ru)]
 
-allfils = glob.glob(filna.format(ru, nam, mem, var, var))
-allfils.sort()
-
-allfils2 = glob.glob(filna.format(ru, nam, mem, mvar, mvar))
-allfils2.sort()
-
-allfils_a = glob.glob(filna2.format(ru, nam, mem))
-allfils_a.sort()
-
+if ru != 'b990':
+    allfils = glob.glob(filna.format(ru, nam, mem, var, var))
+    allfils.sort()
+    allfils2 = glob.glob(filna.format(ru, nam, mem, mvar, mvar))
+    allfils2.sort()
+    allfils_a = glob.glob(filna2.format(ru, nam, mem))
+    allfils_a.sort()
+else:
+    allfils = glob.glob(filna.format(ru, var))
+    allfils.sort()
+    allfils2 = glob.glob(filna.format(ru, mvar))
+    allfils2.sort()
+    allfils_a = glob.glob(filna2.format(ru))
+    allfils_a.sort()
 
 filo = open(cart_out + 'oht_{}.p'.format(ru), 'wb')
 
