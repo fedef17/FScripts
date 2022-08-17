@@ -204,7 +204,7 @@ filo = open(cart_out + 'oht_{}.p'.format(ru), 'wb')
 #cose = do_cross(allfils)
 print(allfils)
 print(allfils2)
-print(allfils_a)
+#print(allfils_a)
 
 #do_cross(allfils, allfils2, allfils_a, filo)
 do_cross(allfils, allfils2, fia, filo)
