@@ -63,11 +63,12 @@ ctl.mkdir(cart_out)
 
 if ru != 'b990':
     filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/{}/gn/v20210315/{}*nc'
-    filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
+    #filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
 else:
     filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/{}*nc'
     #filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/areacello*nc'
-    fia = '/g100_work/IscrB_QUECLIM/BOTTINO/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
+
+fia = '/g100_work/IscrB_QUECLIM/BOTTINO/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['b990', 'b025', 'b050', 'b100']#['pi',
@@ -188,15 +189,15 @@ if ru != 'b990':
     allfils.sort()
     allfils2 = glob.glob(filna.format(ru, nam, mem, mvar, mvar))
     allfils2.sort()
-    allfils_a = glob.glob(filna2.format(ru, nam, mem))
-    allfils_a.sort()
+    #allfils_a = glob.glob(filna2.format(ru, nam, mem))
+    #allfils_a.sort()
 else:
     allfils = glob.glob(filna.format(ru, var))
     allfils.sort()
     allfils2 = glob.glob(filna.format(ru, mvar))
     allfils2.sort()
-    allfils_a = glob.glob(filna2.format(ru))
-    allfils_a.sort()
+    #allfils_a = glob.glob(filna2.format(ru))
+    #allfils_a.sort()
 
 filo = open(cart_out + 'oht_{}.p'.format(ru), 'wb')
 
@@ -205,7 +206,8 @@ print(allfils)
 print(allfils2)
 print(allfils_a)
 
-do_cross(allfils, allfils2, allfils_a, filo)
+#do_cross(allfils, allfils2, allfils_a, filo)
+do_cross(allfils, allfils2, fia, filo)
 
 filo.close()
 
