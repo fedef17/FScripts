@@ -66,7 +66,8 @@ if ru != 'b990':
     filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Ofx/areacello/gn/v20210315/areacello*nc'
 else:
     filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/{}*nc'
-    filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/areacello*nc'
+    #filna2 = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/areacello*nc'
+    fia = '/g100_work/IscrB_QUECLIM/BOTTINO/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['b990', 'b025', 'b050', 'b100']#['pi',
@@ -99,12 +100,14 @@ yeamean = dict()
 
 print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
-def do_cross(fils, fils2, fils_area, fil_out):#, coda):
+#def do_cross(fils, fils2, fils_area, fil_out):
+def do_cross(fils, fils2, fia, fil_out):
     print("I'm process", os.getpid())
     # Getting % usage of virtual_memory ( 3rd field)
 
     #cose = []
-    for fi1, fi2, fia in zip(fils, fils2, fils_area):
+    #for fi1, fi2, fia in zip(fils, fils2, fils_area):
+    for fi1, fi2 in zip(fils, fils2):
         print(fi1)
         print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
 
