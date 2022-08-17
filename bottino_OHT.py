@@ -70,7 +70,7 @@ else:
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['b990', 'b025', 'b050', 'b100']#['pi',
-allnams = ['stabilization-historical-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
+allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
 #nam = allnams[allru.index(ru)]
 
 colors = ['teal', 'forestgreen', 'orange', 'violet']

@@ -61,14 +61,20 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/thetao/gn/v20210315/thetao*nc'
+if ru != 'b990':
+    filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/Omon/thetao/gn/v20210315/thetao*nc'
+else:
+    filna = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/thetao*nc'
 # filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
-allru = ['b025', 'b050', 'b100']#['pi',
-allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
+# allru = ['b025', 'b050', 'b100']#['pi',
+# allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
+# #nam = allnams[allru.index(ru)]
+allru = ['b990', 'b025', 'b050', 'b100']#['pi',
+allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']#'piControl',
 #nam = allnams[allru.index(ru)]
 
-colors = ['black', 'forestgreen', 'orange', 'violet']
+colors = ['teal', 'forestgreen', 'orange', 'violet']
 
 ####################################################################################################
 
@@ -142,8 +148,12 @@ n_proc = 10
 print(ru)
 nam = allnams[allru.index(ru)]
 
-allfils = glob.glob(filna.format(ru, nam, mem))
-allfils.sort()
+if ru != 'b990':
+    allfils = glob.glob(filna.format(ru, nam, mem))
+    allfils.sort()
+else:
+    allfils = glob.glob(filna.format(ru))
+    allfils.sort()
 
 
 filo = open(cart_out + 'thetao_{}.p'.format(ru), 'wb')
