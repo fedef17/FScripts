@@ -487,6 +487,20 @@ cp0 = 3989.245 # J/kg/K
 
 plot_old_ocean = True
 if plot_old_ocean:
+    oht_lev = []
+    filo = open(carto + 'oht_piControl.p', 'rb')
+    for i in range(500):
+        try:
+            gigi = pickle.load(filo)
+        except:
+            break
+        oht_lev.append(gigi[0])
+    filo.close()
+
+    oht_lev_pi = xr.concat(oht_lev, dim = 'year').mean('year')
+    oht_tot_pi = oht_lev.sum('lev')*cp0
+    t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
+
     fig, ax = plt.subplots(figsize = (16,9))
     fig2, ax2 = plt.subplots(figsize = (16,9))
     fig3, ax3 = plt.subplots(figsize = (16,9))
@@ -503,6 +517,8 @@ if plot_old_ocean:
         filo.close()
 
         oht_lev = xr.concat(oht_lev, dim = 'year')
+        oht_lev = oht_lev - oht_lev_pi # removing pi base level
+
         # filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
         # gigi = pickle.load(filo)
         # filo.close()
