@@ -498,7 +498,7 @@ if plot_old_ocean:
     filo.close()
 
     oht_lev_pi = xr.concat(oht_lev, dim = 'year').mean('year')
-    oht_tot_pi = oht_lev.sum('lev')*cp0
+    oht_tot_pi = oht_lev_pi.sum('lev')*cp0
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
     fig, ax = plt.subplots(figsize = (16,9))
