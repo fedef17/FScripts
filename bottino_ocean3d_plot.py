@@ -48,12 +48,11 @@ cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
 
-allru = ['b025', 'b050', 'b100']
-allsyear = [2030, 2050, 2100]
-allnams = ['stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+allru = ['b990', 'b025', 'b050', 'b100']
+allsyear = [1990, 2025, 2050, 2100]
+allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
 
-colors = ['forestgreen', 'orange', 'violet']
-
+colors = ['teal', 'forestgreen', 'orange', 'violet']
 
 ru = 'b100'
 for ru in allru:
