@@ -509,9 +509,9 @@ if plot_old_ocean:
 
         gtas = glomeans[(ru, 'tas')][1]
         yeas = np.arange(500)
-        if ru == 'b025':
-            gtas = gtas[5:]
-            yeas = yeas[5:]
+        # if ru == 'b025':
+        #     gtas = gtas[5:]
+        #     yeas = yeas[5:]
 
         oht_tot = oht_lev.sum('lev')*cp0
         t_deep = 273.15 + oht_tot/oce_mass/cp0
@@ -592,9 +592,9 @@ for ru, col, ax in zip(allru[2:-1], colors[3:-1], axs.flatten()):
 
         gtas = glomeans[(ru, 'tas')][1]
         yeas = np.arange(500)
-        if ru == 'b025':
-            gtas = gtas[5:]
-            yeas = yeas[5:]
+        #if ru == 'b025':
+        #    gtas = gtas[5:]
+        #    yeas = yeas[5:]
 
         oht_tot = oht_lev.sum('lev')
         oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
