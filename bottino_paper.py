@@ -485,8 +485,13 @@ carto = cart_out + '../ocean3d/'
 oce_mass = 1.381107e+21 # global and vertical sum of masscello*areacello (year 2222)
 cp0 = 3989.245 # J/kg/K
 
-plot_old_ocean = True
-if plot_old_ocean:
+read_ts = False
+if read_ts:
+    oht_all = pickle.load(open(carto + 'oht_ts_deep.p', 'rb'))
+else:
+    oht_all = dict()
+
+if not read_ts:
     oht_lev = []
     filo = open(carto + 'oht_piControl.p', 'rb')
     for i in range(500):
@@ -501,10 +506,11 @@ if plot_old_ocean:
     oht_tot_pi = oht_lev_pi.sum('lev')
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
-    fig, ax = plt.subplots(figsize = (16,9))
-    fig2, ax2 = plt.subplots(figsize = (16,9))
-    fig3, ax3 = plt.subplots(figsize = (16,9))
-    for ru, col in zip(allru[2:-1], colors[2:-1]):
+fig, ax = plt.subplots(figsize = (16,9))
+fig2, ax2 = plt.subplots(figsize = (16,9))
+fig3, ax3 = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    if not read_ts:
         oht_lev = []
         filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
         for i in range(500):
@@ -519,137 +525,94 @@ if plot_old_ocean:
         oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
         oht_lev = oht_lev - oht_lev_pi # removing pi base level
 
-        # filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
-        # gigi = pickle.load(filo)
-        # filo.close()
-
-        gtas = glomeans[(ru, 'tas')][1]
-        yeas = np.arange(500)
-        # if ru == 'b025':
-        #     gtas = gtas[5:]
-        #     yeas = yeas[5:]
-
-        oht_tot = oht_lev.sum('lev')
-        t_deep = 273.15 + oht_tot/oce_mass/cp0
-
-        #ax.scatter(gtas, (1-t_deep/gtas), s = 3, color = col)
-        ax.scatter(gtas-273.15, t_deep-273.15, s = 5, color = col, label = ru)
-        grun = ctl.running_mean(gtas, 5, remove_nans = True)
-        #larun = ctl.running_mean(1-t_deep/gtas, 5, remove_nans = True)
-        larun = ctl.running_mean(t_deep, 5, remove_nans = True)
-        # ax.plot(grun, larun, color = col, label = ru)
-        # x_nu = np.arange(gtas.min(), gtas.max(), 0.1)
-        # coeffs, covmat = np.polyfit(grun, larun, deg = 2, cov = True)
-        # fitted = np.polyval(coeffs, x_nu)
-        # ax.plot(x_nu, fitted, color = col, label = ru, lw = 2)
-
         oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
         oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
         oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
-
-        ax2.plot(oht1, color = col, ls = '-', label = ru, lw = 2)
-        ax2.plot(oht2, color = col, ls = '--', lw = 2)
-        ax2.plot(oht3, color = col, ls = ':', lw = 2)
-
-        grun = ctl.running_mean(gtas, 10, remove_nans = True)
-        oht1l = ctl.running_mean(oht1, 10, remove_nans = True)
-        oht2l = ctl.running_mean(oht2, 10, remove_nans = True)
-        oht3l = ctl.running_mean(oht3, 10, remove_nans = True)
-
-        # ax3.scatter(grun, oht1l, color = col, label = ru, s = 20)
-        # ax3.scatter(grun, oht2l, edgecolor = col, s = 20, marker = 'd', facecolor = 'none')
-        # ax3.scatter(grun, oht3l, color = col, s = 20, marker = '*')
-        ax3.plot(grun, oht1l, color = col, label = ru, lw = 2)
-        ax3.plot(grun, oht2l, color = col, ls = '--', lw = 2)
-        ax3.plot(grun, oht3l, color = col, ls = '-.', lw = 2)
-
-    ax.legend()
-    ax.grid()
-    #ax.set_ylabel(r'$(1-T_d/T_s)$')
-    ax.set_ylabel('T bulk ocean (K)')
-    ax.set_xlabel('GTAS (K)')
-
-    ax2.legend()
-    ax2.grid()
-    ax2.set_ylabel('OHC anomaly (J)')
-    ax2.set_xlabel('Years after stabilization')
-
-    ax3.legend()
-    ax3.grid()
-    ax3.set_ylabel('OHC anomaly (J)')
-    ax3.set_xlabel('GTAS (K)')
-
-    fig.savefig(carto + 'lambda_factor.pdf')
-    fig2.savefig(carto + 'oht_deep_time.pdf')
-    fig3.savefig(carto + 'oht_deep_gtas.pdf')
-
-#############################################################
-
-read_ts = False
-if read_ts:
-    oht_all = pickle.load(open(carto + 'oht_ts_deep.p', 'rb'))
-else:
-    oht_all = dict()
-
-fig, axs = plt.subplots(1, 4, figsize = (18,6))
-
-oht1ref = None
-for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
-    if not read_ts:
-        oht_lev = []
-        filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
-        for i in range(500):
-            try:
-                gigi = pickle.load(filo)
-            except:
-                break
-            oht_lev.append(gigi[0])
-
-        filo.close()
-
-        oht_lev = xr.concat(oht_lev, dim = 'year')
-
-        gtas = glomeans[(ru, 'tas')][1]
-        yeas = np.arange(500)
-        #if ru == 'b025':
-        #    gtas = gtas[5:]
-        #    yeas = yeas[5:]
-
         oht_tot = oht_lev.sum('lev')
-        oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
-        oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
-        oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
 
         oht_all[(ru, 700)] = oht1
         oht_all[(ru, 2000)] = oht2
         oht_all[(ru, 'deep')] = oht3
+        oht_all[(ru, 'tot')] = oht_tot
+
     else:
         oht1 = oht_all[(ru, 700)]
         oht2 = oht_all[(ru, 2000)]
         oht3 = oht_all[(ru, 'deep')]
-        oht_tot = oht1 + oht2 + oht3
+        oht_tot = oht_all[(ru, 'tot')]
 
-    if oht1ref is None:
-        oht1ref = oht1[:10].mean()
-        oht2ref = oht2[:10].mean()
-        oht3ref = oht3[:10].mean()
-        ohttotref = oht_tot[:10].mean()
+    t_deep = 273.15 + oht_tot/oce_mass/cp0
 
-    # ax.fill_between(np.zeros(len(oht3)), (oht3-oht3ref)/(oht_tot-ohttotref), color = 'steelblue', alpha = 0.5)
-    # ax.fill_between((oht3-oht3ref)/(oht_tot-ohttotref), ((oht3-oht3ref)+(oht2-oht2ref))/(oht_tot-ohttotref), color = 'forestgreen', alpha = 0.5)
-    # ax.fill_between(((oht3-oht3ref)+(oht2-oht2ref))/(oht_tot-ohttotref), np.ones(len(oht1)), color = 'gold', alpha = 0.5)
-    #
-    # ax.plot((oht3-oht3ref)/(oht_tot-ohttotref), color = 'steelblue', ls = '-', lw = 2)
-    # ax.plot(((oht3-oht3ref)+(oht2-oht2ref))/(oht_tot-ohttotref), color = 'forestgreen', ls = '-', lw = 2)
-    # # ax.plot(oht3-oht3ref, color = col, ls = '-.', lw = 2)
+    gtas = glomeans[(ru, 'tas')][1]
+    yeas = np.arange(500)
+    # if ru == 'b025':
+    #     gtas = gtas[5:]
+    #     yeas = yeas[5:]
 
-    ax.fill_between(np.arange(len(oht3)), np.zeros(len(oht3)), (oht3-oht3ref), color = 'steelblue', alpha = 0.5)
-    ax.fill_between(np.arange(len(oht3)), (oht3-oht3ref), (oht3-oht3ref)+(oht2-oht2ref), color = 'forestgreen', alpha = 0.5)
-    ax.fill_between(np.arange(len(oht3)), (oht3-oht3ref)+(oht2-oht2ref), oht_tot-ohttotref, color = 'gold', alpha = 0.5)
+    ax.scatter(gtas-273.15, t_deep-273.15, s = 5, color = col, label = ru)
+    grun = ctl.running_mean(gtas, 5, remove_nans = True)
+    larun = ctl.running_mean(t_deep, 5, remove_nans = True)
+    # ax.plot(grun, larun, color = col, label = ru)
+    # x_nu = np.arange(gtas.min(), gtas.max(), 0.1)
+    # coeffs, covmat = np.polyfit(grun, larun, deg = 2, cov = True)
+    # fitted = np.polyval(coeffs, x_nu)
+    # ax.plot(x_nu, fitted, color = col, label = ru, lw = 2)
 
-    ax.plot((oht3-oht3ref), color = 'steelblue', ls = '-', lw = 2)
-    ax.plot((oht3-oht3ref)+(oht2-oht2ref), color = 'forestgreen', ls = '-', lw = 2)
-    ax.plot(oht_tot-ohttotref, color = 'gold', ls = '-', lw = 2)
+    ax2.plot(oht1, color = col, ls = '-', label = ru, lw = 2)
+    ax2.plot(oht2, color = col, ls = '--', lw = 2)
+    ax2.plot(oht3, color = col, ls = ':', lw = 2)
+
+    grun = ctl.running_mean(gtas, 10, remove_nans = True)
+    oht1l = ctl.running_mean(oht1, 10, remove_nans = True)
+    oht2l = ctl.running_mean(oht2, 10, remove_nans = True)
+    oht3l = ctl.running_mean(oht3, 10, remove_nans = True)
+
+    # ax3.scatter(grun, oht1l, color = col, label = ru, s = 20)
+    # ax3.scatter(grun, oht2l, edgecolor = col, s = 20, marker = 'd', facecolor = 'none')
+    # ax3.scatter(grun, oht3l, color = col, s = 20, marker = '*')
+    ax3.plot(grun, oht1l, color = col, label = ru, lw = 2)
+    ax3.plot(grun, oht2l, color = col, ls = '--', lw = 2)
+    ax3.plot(grun, oht3l, color = col, ls = '-.', lw = 2)
+
+ax.legend()
+ax.grid()
+#ax.set_ylabel(r'$(1-T_d/T_s)$')
+ax.set_ylabel('T bulk ocean (K)')
+ax.set_xlabel('GTAS (K)')
+
+ax2.legend()
+ax2.grid()
+ax2.set_ylabel('OHC anomaly (J)')
+ax2.set_xlabel('Years after stabilization')
+
+ax3.legend()
+ax3.grid()
+ax3.set_ylabel('OHC anomaly (J)')
+ax3.set_xlabel('GTAS (K)')
+
+fig.savefig(carto + 'lambda_factor.pdf')
+fig2.savefig(carto + 'oht_deep_time.pdf')
+fig3.savefig(carto + 'oht_deep_gtas.pdf')
+
+pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
+#############################################################
+
+
+fig, axs = plt.subplots(1, 4, figsize = (18,6))
+
+for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
+    oht1 = oht_all[(ru, 700)]
+    oht2 = oht_all[(ru, 2000)]
+    oht3 = oht_all[(ru, 'deep')]
+    oht_tot = oht_all[(ru, 'tot')]
+
+    ax.fill_between(np.arange(len(oht3)), np.zeros(len(oht3)), oht3, color = 'steelblue', alpha = 0.5)
+    ax.fill_between(np.arange(len(oht3)), oht3, oht3+oht2, color = 'forestgreen', alpha = 0.5)
+    ax.fill_between(np.arange(len(oht3)), oht3+oht2, oht_tot, color = 'gold', alpha = 0.5)
+
+    ax.plot(oht3, color = 'steelblue', ls = '-', lw = 2)
+    ax.plot(oht3+oht2, color = 'forestgreen', ls = '-', lw = 2)
+    ax.plot(oht_tot, color = 'gold', ls = '-', lw = 2)
 
     ax.set_title(ru)
     ax.grid()
@@ -662,7 +625,6 @@ ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['> 2000m', '700-20
 plt.subplots_adjust(bottom = 0.25)
 fig.savefig(carto + 'oht_deep_all_evol.pdf')
 
-pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
 #############################################################
 ### maps of OHT trends
 lats = np.linspace(-89.5, 89.5, 180)
