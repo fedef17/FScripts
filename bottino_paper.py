@@ -497,8 +497,8 @@ if plot_old_ocean:
         oht_lev.append(gigi[0])
     filo.close()
 
-    oht_lev_pi = xr.concat(oht_lev, dim = 'year').mean('year')
-    oht_tot_pi = oht_lev_pi.sum('lev')*cp0
+    oht_lev_pi = xr.concat(oht_lev, dim = 'year').mean('year')*cp0
+    oht_tot_pi = oht_lev_pi.sum('lev')
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
     fig, ax = plt.subplots(figsize = (16,9))
@@ -516,7 +516,7 @@ if plot_old_ocean:
 
         filo.close()
 
-        oht_lev = xr.concat(oht_lev, dim = 'year')
+        oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
         oht_lev = oht_lev - oht_lev_pi # removing pi base level
 
         # filo = open(carto + 'oht_{}_global.p'.format(ru), 'rb')
@@ -529,7 +529,7 @@ if plot_old_ocean:
         #     gtas = gtas[5:]
         #     yeas = yeas[5:]
 
-        oht_tot = oht_lev.sum('lev')*cp0
+        oht_tot = oht_lev.sum('lev')
         t_deep = 273.15 + oht_tot/oce_mass/cp0
 
         #ax.scatter(gtas, (1-t_deep/gtas), s = 3, color = col)
@@ -549,16 +549,19 @@ if plot_old_ocean:
 
         ax2.plot(oht1, color = col, ls = '-', label = ru, lw = 2)
         ax2.plot(oht2, color = col, ls = '--', lw = 2)
-        ax2.plot(oht3, color = col, ls = '-.', lw = 2)
+        ax2.plot(oht3, color = col, ls = ':', lw = 2)
 
         grun = ctl.running_mean(gtas, 10, remove_nans = True)
         oht1l = ctl.running_mean(oht1, 10, remove_nans = True)
         oht2l = ctl.running_mean(oht2, 10, remove_nans = True)
         oht3l = ctl.running_mean(oht3, 10, remove_nans = True)
 
-        ax3.scatter(grun, oht1l, color = col, label = ru, s = 20)
-        ax3.scatter(grun, oht2l, edgecolor = col, s = 20, marker = 'd', facecolor = 'none')
-        ax3.scatter(grun, oht3l, color = col, s = 20, marker = '*')
+        # ax3.scatter(grun, oht1l, color = col, label = ru, s = 20)
+        # ax3.scatter(grun, oht2l, edgecolor = col, s = 20, marker = 'd', facecolor = 'none')
+        # ax3.scatter(grun, oht3l, color = col, s = 20, marker = '*')
+        ax3.plot(grun, oht1l, color = col, label = ru, lw = 2)
+        ax3.plot(grun, oht2l, color = col, ls = '--', lw = 2)
+        ax3.plot(grun, oht3l, color = col, ls = '-.', lw = 2)
 
     ax.legend()
     ax.grid()
@@ -568,12 +571,12 @@ if plot_old_ocean:
 
     ax2.legend()
     ax2.grid()
-    ax2.set_ylabel('OHT (J)')
+    ax2.set_ylabel('OHC anomaly (J)')
     ax2.set_xlabel('Years after stabilization')
 
     ax3.legend()
     ax3.grid()
-    ax3.set_ylabel('OHT (J)')
+    ax3.set_ylabel('OHC anomaly (J)')
     ax3.set_xlabel('GTAS (K)')
 
     fig.savefig(carto + 'lambda_factor.pdf')
@@ -588,7 +591,7 @@ if read_ts:
 else:
     oht_all = dict()
 
-fig, axs = plt.subplots(1, 3, figsize = (16,6))
+fig, axs = plt.subplots(1, 4, figsize = (18,6))
 
 oht1ref = None
 for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
@@ -651,7 +654,7 @@ for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
     ax.set_title(ru)
     ax.grid()
 
-axs[0].set_ylabel('OHT (J)')
+axs[0].set_ylabel('OHC anomaly (J)')
 axs[1].set_xlabel('Years after stabilization')
 
 ctl.adjust_ax_scale(axs)
@@ -746,7 +749,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
@@ -765,7 +768,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         subt.append(ru + ': ' + tit)
 
 #divnorm = colors.TwoSlopeNorm(vmin=-1., vcenter=1., vmax=3.5)
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Cons. temp. trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Cons. temp. trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
 #fig.savefig(carto + 'oht_patt_deep_rel.pdf')
@@ -780,7 +783,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Conservative temperature change (K)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
@@ -796,7 +799,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         plpa.append(oht_patt[(ru, lev, '500')]-oht_patt[(ru, lev, '100')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_500-100.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), cbar_range = (-0.02, 0.02), n_color_levels = 37, figsize = (16,12), fix_subplots_shape = (3,3), cb_label = 'Cons. temp. trend difference (K/yr) (last - fitst century)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_500-100.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), cbar_range = (-0.02, 0.02), n_color_levels = 37, figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Cons. temp. trend difference (K/yr) (last - fitst century)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
