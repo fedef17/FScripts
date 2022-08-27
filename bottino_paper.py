@@ -711,7 +711,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 0.008), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 #[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
@@ -746,7 +746,7 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 5.), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
 #[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
 
 for ax in fig.axes[:-1]:
