@@ -485,7 +485,7 @@ carto = cart_out + '../ocean3d/'
 oce_mass = 1.381107e+21 # global and vertical sum of masscello*areacello (year 2222)
 cp0 = 3989.245 # J/kg/K
 
-read_ts = False
+read_ts = True
 if read_ts:
     oht_all = pickle.load(open(carto + 'oht_ts_deep.p', 'rb'))
 else:
@@ -636,70 +636,70 @@ oht_patt = dict()
 areacello = xr.load_dataset(carto + 'areacello.nc')['areacello']
 regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
-for ru, col in zip(allru[2:-1], colors[2:-1]):
-    print(ru)
-    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
-
-    oht700 = []
-    oht2000 = []
-    ohtdeep = []
-    for i in range(500):
-        try:
-            oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
-        except:
-            break
-        oht700.append(oht700_i)
-        oht2000.append(oht2000_i)
-        ohtdeep.append(ohtdeep_i)
-
-    filo.close()
-
-    oht700 = np.stack(oht700)
-    oht2000 = np.stack(oht2000)
-    ohtdeep = np.stack(ohtdeep)
-
-    # oht700 = oht700/regr_acello.values
-    # oht2000 = oht2000/regr_acello.values
-    # ohtdeep = ohtdeep/regr_acello.values
-
-    for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
-        var[var == 0.0] = np.nan
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
-
-        oht_patt[(ru, lab)] = var_trend
-        oht_patt[(ru, lab, 'err')] = var_trend_err
-        oht_patt[(ru, lab, 'pval')] = var_pval
-
-        nonan = ~np.isnan(var[0])
-        gmea = ctl.global_mean(var, lats, mask = nonan)
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gmea, var)
-
-        oht_patt[(ru, lab, 'rel')] = var_trend
-        oht_patt[(ru, lab, 'rel_err')] = var_trend_err
-        oht_patt[(ru, lab, 'rel_pval')] = var_pval
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[:100])
-
-        oht_patt[(ru, lab, '100')] = var_trend
-        oht_patt[(ru, lab, '100_err')] = var_trend_err
-        oht_patt[(ru, lab, '100_pval')] = var_pval
-
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[-100:])
-
-        oht_patt[(ru, lab, '500')] = var_trend
-        oht_patt[(ru, lab, '500_err')] = var_trend_err
-        oht_patt[(ru, lab, '500_pval')] = var_pval
-
-
-        if lab not in refoht:
-            refoht[lab] = var[:20].mean(axis = 0) # taking b025 as reference
-
-        oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
-
-pickle.dump(oht_patt, open(carto + 'temp_patt_deep.p', 'wb'))
-#oht_patt = pickle.load(open(carto + 'temp_patt_deep.p', 'rb'))
+# for ru, col in zip(allru[2:-1], colors[2:-1]):
+#     print(ru)
+#     filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+#
+#     oht700 = []
+#     oht2000 = []
+#     ohtdeep = []
+#     for i in range(500):
+#         try:
+#             oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
+#         except:
+#             break
+#         oht700.append(oht700_i)
+#         oht2000.append(oht2000_i)
+#         ohtdeep.append(ohtdeep_i)
+#
+#     filo.close()
+#
+#     oht700 = np.stack(oht700)
+#     oht2000 = np.stack(oht2000)
+#     ohtdeep = np.stack(ohtdeep)
+#
+#     # oht700 = oht700/regr_acello.values
+#     # oht2000 = oht2000/regr_acello.values
+#     # ohtdeep = ohtdeep/regr_acello.values
+#
+#     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
+#         var[var == 0.0] = np.nan
+#
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
+#
+#         oht_patt[(ru, lab)] = var_trend
+#         oht_patt[(ru, lab, 'err')] = var_trend_err
+#         oht_patt[(ru, lab, 'pval')] = var_pval
+#
+#         nonan = ~np.isnan(var[0])
+#         gmea = ctl.global_mean(var, lats, mask = nonan)
+#
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gmea, var)
+#
+#         oht_patt[(ru, lab, 'rel')] = var_trend
+#         oht_patt[(ru, lab, 'rel_err')] = var_trend_err
+#         oht_patt[(ru, lab, 'rel_pval')] = var_pval
+#
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[:100])
+#
+#         oht_patt[(ru, lab, '100')] = var_trend
+#         oht_patt[(ru, lab, '100_err')] = var_trend_err
+#         oht_patt[(ru, lab, '100_pval')] = var_pval
+#
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[-100:])
+#
+#         oht_patt[(ru, lab, '500')] = var_trend
+#         oht_patt[(ru, lab, '500_err')] = var_trend_err
+#         oht_patt[(ru, lab, '500_pval')] = var_pval
+#
+#
+#         if lab not in refoht:
+#             refoht[lab] = var[:20].mean(axis = 0) # taking b025 as reference
+#
+#         oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
+#
+# pickle.dump(oht_patt, open(carto + 'temp_patt_deep.p', 'wb'))
+oht_patt = pickle.load(open(carto + 'temp_patt_deep.p', 'rb'))
 
 plpa = []
 subt = []
@@ -711,7 +711,8 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+# [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
@@ -745,7 +746,8 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
+# [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
