@@ -504,7 +504,7 @@ if plot_old_ocean:
     fig, ax = plt.subplots(figsize = (16,9))
     fig2, ax2 = plt.subplots(figsize = (16,9))
     fig3, ax3 = plt.subplots(figsize = (16,9))
-    for ru, col in zip(allru[2:-1], colors[3:-1]):
+    for ru, col in zip(allru[2:-1], colors[2:-1]):
         oht_lev = []
         filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
         for i in range(500):
@@ -591,7 +591,7 @@ else:
 fig, axs = plt.subplots(1, 3, figsize = (16,6))
 
 oht1ref = None
-for ru, col, ax in zip(allru[2:-1], colors[3:-1], axs.flatten()):
+for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
     if not read_ts:
         oht_lev = []
         filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
@@ -671,7 +671,7 @@ oht_patt = dict()
 areacello = xr.load_dataset(carto + 'areacello.nc')['areacello']
 regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
-for ru, col in zip(allru[2:-1], colors[3:-1]):
+for ru, col in zip(allru[2:-1], colors[2:-1]):
     print(ru)
     filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
 
@@ -741,7 +741,7 @@ subt = []
 hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
-    for ru, col in zip(allru[2:-1], colors[3:-1]):
+    for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev)])
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
@@ -759,7 +759,7 @@ subt = []
 hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
-    for ru, col in zip(allru[2:-1], colors[3:-1]):
+    for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, 'rel')])
         hatch.append(oht_patt[(ru, lev, 'rel_pval')] < 0.05)
         subt.append(ru + ': ' + tit)
@@ -776,7 +776,7 @@ subt = []
 hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
-    for ru, col in zip(allru[2:-1], colors[3:-1]):
+    for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
@@ -792,7 +792,7 @@ subt = []
 hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
-    for ru, col in zip(allru[2:-1], colors[3:-1]):
+    for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, '500')]-oht_patt[(ru, lev, '100')])
         subt.append(ru + ': ' + tit)
 
