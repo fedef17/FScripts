@@ -572,7 +572,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     # ax3.scatter(grun, oht3l, color = col, s = 20, marker = '*')
     ax3.plot(grun, oht1l, color = col, label = ru, lw = 2)
     ax3.plot(grun, oht2l, color = col, ls = '--', lw = 2)
-    ax3.plot(grun, oht3l, color = col, ls = '-.', lw = 2)
+    ax3.plot(grun, oht3l, color = col, ls = ':', lw = 2)
 
 ax.legend()
 ax.grid()
