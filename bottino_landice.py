@@ -77,7 +77,7 @@ colors = ['violet', 'chocolate', 'steelblue']
 gr_latsli = (60., 85.)
 gr_lonsli = (288., 350.)
 
-nyea = 200
+nyea = 500
 
 snowco = dict()
 
