@@ -105,9 +105,12 @@ cmappa_pr = cm.get_cmap('BrBG').copy()
 cmappa_pr.set_bad('lightslategray', alpha = 0.5)
 
 ypre_trans = 30#50
-ypre_stab = 50
+ypre_stab = 30
 
 cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
+coso = yeamean[('b025', 'tas')]
+
+glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
 
 #fig, axs = plt.subplots(1, 3, figsize = (18,5))
 for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['tas', 'pr', 'pr'], [cmappa_tas, cmappa_pr, cmappa_pr], [ext_tas, ext_pr, ext_pr_rel], [ext_relcha, ext_relcha_pr, ext_relcha_pr], cb_labels):
@@ -134,6 +137,7 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
 
     fig_patt_trans = []
     fig_patt_stab = []
+    fig_patt_stab_relcha = []
     fig_abs_start = []
     fig_abs_end = []
 
@@ -155,6 +159,9 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
 
         equi = fact*coso[-ypre_stab:].mean('year').values
 
+        deltatas = glomeans[(ru, 'tas')][1][-ypre_stab:].mean()-pimean['tas']
+        deltatas_ini = glotas_hissp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0)].mean()-pimean['tas']
+
         #mappe = [transient-pimap, equi-pimap, equi-transient]
         if ru in allru3:
             if plot_all:
@@ -172,6 +179,7 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
 
                 fig_patt_trans.append(mappe[0])
                 fig_patt_stab.append(mappe[1])
+                fig_patt_stab_relcha.append(mappe[1]/(deltatas-deltatas_ini))
 
                 mappe += [mappe[0]+mappe[1]]
                 ctl.plot_multimap_contour(mappe, coso.lat, coso.lon, filename = cart_out + 'triple_trans_vs_stab_{}_{}.pdf'.format(varnam, ru), subtitles = ['transient', 'stabilization', 'final'], cmap = cmappa, plot_anomalies = True, cbar_range = ext, figsize = (18,5), fix_subplots_shape = (1,3), cb_label = cblab)
@@ -196,19 +204,20 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
                 fig_abs_start.append(mappe[0])
                 fig_abs_end.append(mappe[1])
 
-
-        deltatas = glomeans[(ru, 'tas')][1][-ypre_stab:].mean()-pimean['tas']
         if varnam == 'tas':
-            mappe = (equi-pimap)/deltatas
-            cmap = 'magma'
-            cbran = (0.5, 3.5)
+            #mappe = (equi-pimap)/deltatas
+            mappe = (equi-pimap)
+            cmap = ctl.heatmap_mono()
+            #cmap = 'gist_ncar'
+            #cbran = (0.5, 3.5)
+            cbran = (0, 12)
             divnorm = None
             plotanom = False
         elif varnam == 'pr_rel':
-            c5 = -0.1
-            c95 = 0.2
+            c5 = -10
+            c95 = 20
             divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-            mappe = ((equi-pimap)/pimap)/deltatas
+            mappe = 100*((equi-pimap)/pimap)/deltatas
             mappe[thres] = np.nan
             cmap = 'BrBG'
             cbran = (c5, c95)
@@ -283,17 +292,21 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
     #######
 
     if varnam == 'tas':
-        cmap = 'magma'
-        cbran = (0., 2.5)
+        cmap = ctl.heatmap_mono()
+        cbran = (0., 12)
         divnorm = None
         plotanom = False
+        cblab = 'Temperature anomaly (K)'
     elif varnam == 'pr_rel':
-        c5 = -0.1
-        c95 = 0.3
-        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-        cmap = 'BrBG'
-        cbran = (c5, c95)
-        plotanom = False
+        # c5 = -0.1
+        # c95 = 0.2
+        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        # cmap = 'BrBG'
+        # cbran = (c5, c95)
+        cmap = ctl.wetmap()
+        cbran = (-30, 30)
+        plotanom = True
+        cblab = 'Relative precipitation change per degree of global warming (%/K)'
     elif varnam == 'pr':
         # c5 = -0.1
         # c95 = 0.3
@@ -302,12 +315,13 @@ for varnam, var, cmappa, ext, ext_rel, cblab in zip(['tas', 'pr', 'pr_rel'], ['t
         plotanom = True
         cmap = 'BrBG'
         cbran = ext
+        cblab = 'Precipitation anomaly (mm/year)'
 
     okru = ['hist', 'ssp585'] + allru3
     okfi = fig_tot
     ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_tot_stab_{}.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab)
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_tot_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,-120.))
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_tot_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.))
     ###########################3
 
     if plot_all:
