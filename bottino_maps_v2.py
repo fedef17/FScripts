@@ -93,7 +93,7 @@ cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
 coso = yeamean[('b025', 'tas')]
 
 
-glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
+# glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
 
 anom_maps = dict() # maps of anomalies
 patt_maps = dict() # maps of anomalies divided by change in global tas
@@ -158,7 +158,9 @@ del mapmean
 anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps.p', 'rb'))
 
 ## now the figures
-for varnam in ['tas', 'pr', 'pr_rel']:
+#for varnam in ['tas', 'pr', 'pr_rel']:
+plotanom = False
+for varnam in ['pr', 'pr_rel']:
     # maps of total change at the end of the sims
     if varnam == 'tas':
         cmap = ctl.heatmap_mono()
@@ -167,64 +169,67 @@ for varnam in ['tas', 'pr', 'pr_rel']:
         plotanom = False
         cblab = 'Temperature anomaly (K)'
     elif varnam == 'pr_rel':
-        # c5 = -0.1
-        # c95 = 0.2
-        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-        # cmap = 'BrBG'
-        # cbran = (c5, c95)
-        cmap = ctl.wetmap()
-        cbran = (-80, 80)
-        plotanom = True
+        c5 = -50
+        c95 = 100
+        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        cmap = 'BrBG'
+        cbran = (c5, c95)
+        # cmap = ctl.wetmap()
+        # cbran = (-80, 80)
+        # plotanom = True
         cblab = 'Relative precipitation change (%)'
     elif varnam == 'pr':
-        # c5 = -0.1
-        # c95 = 0.3
-        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-        divnorm = None
-        plotanom = True
-        #cmap = 'BrBG'
-        cmap = ctl.wetmap()
-        cbran = (-500., 500.)
+        c5 = -500
+        c95 = 1000
+        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        cmap = 'BrBG'
+        cbran = (c5, c95)
+        # divnorm = None
+        # plotanom = True
+        # cmap = ctl.wetmap()
+        # cbran = (-1000., 1000.)
         cblab = 'Precipitation anomaly (mm/year)'
 
-    okru = ['hist', 'ssp585'] + allru3
+    okru = ['hist', 'b990', 'b025', 'ssp585', 'b050', 'b100']
     okfi = [anom_maps[(varnam, ru, 'fin')] for ru in okru]
 
     ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_anom_fin_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.))
     ###########################
 
     # maps of change per degree of global warming during the simulation (-> stab for the bottins)
+    n_color_levels = 27
     if varnam == 'tas':
         cmap = ctl.heatmap()
-        cbran = (0., 3.5)
+        cbran = (0.25, 3.25)
         divnorm = mcolors.TwoSlopeNorm(vmin=0., vcenter=1., vmax=3.5)
         plotanom = False
         cblab = 'Temperature change per degree of global warming'
     elif varnam == 'pr_rel':
-        # c5 = -0.1
-        # c95 = 0.2
-        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-        # cmap = 'BrBG'
-        # cbran = (c5, c95)
-        cmap = ctl.wetmap()
-        cbran = (-30, 30)
-        plotanom = True
+        c5 = -10
+        c95 = 20
+        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        cmap = 'BrBG'
+        cbran = (c5, c95)
+        #cmap = ctl.wetmap()
+        #cbran = (-30, 30)
+        #plotanom = True
         cblab = 'Relative precipitation change per degree of global warming (%/K)'
     elif varnam == 'pr':
-        # c5 = -0.1
-        # c95 = 0.3
-        # divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
-        divnorm = None
-        plotanom = True
-        #cmap = 'BrBG'
-        cmap = ctl.wetmap()
-        cbran = (-500., 500.)
+        c5 = -150
+        c95 = 300
+        cbran = (c5, c95)
+        divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+        cmap = 'BrBG'
+        # divnorm = None
+        # plotanom = True
+        #cmap = ctl.wetmap()
+        # cbran = (-300., 300.)
         cblab = 'Precipitation change per degree of global warming (mm/year/K)'
 
-    okru = ['hist', 'ssp585'] + allru3
-    okfi = [patt_maps[(varnam, ru, 'fin')] for ru in ['hist', 'ssp585']] + [patt_maps[(varnam, ru, 'fin')] for ru in allru3]
+    okru = ['hist', 'b990', 'b025', 'ssp585', 'b050', 'b100']
+    okfi = [patt_maps[(varnam, ru, 'fin')] if ru in ['hist', 'ssp585'] else patt_maps[(varnam, ru, 'stab')] for ru in okru]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.))
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = n_color_levels)
 
     #################
     # trans vs stab pattern for each bottin
@@ -232,4 +237,4 @@ for varnam in ['tas', 'pr', 'pr_rel']:
     okru = allru3 + 4*['']
     okfi = [patt_maps[(varnam, ru, 'trans')] for ru in allru3] + [patt_maps[(varnam, ru, 'stab')] for ru in allru3]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_transvsstab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,4), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.))
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_transvsstab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,4), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = n_color_levels)
