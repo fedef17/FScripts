@@ -17,15 +17,11 @@ import glob
 # open log file
 logname = 'log_amoc_calc.log'
 logfile = open(logname,'w')
-
 # re-open stdout without buffering
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-
 # redirect stdout and stderr to the log file opened above
 os.dup2(logfile.fileno(), sys.stdout.fileno())
 os.dup2(logfile.fileno(), sys.stderr.fileno())
-
-print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
 cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'amoc/'
@@ -39,6 +35,7 @@ var = 'msftyz'
 
 amoc_all = dict()
 for ru in allru:
+    print(ru)
     if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
         datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
     else:
@@ -48,31 +45,27 @@ for ru in allru:
     if 'I' in ru:
         mem = 'r3'
 
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/{}i1p1f1/{}/{}/gn/v20210315/{}*nc'.format(mem, miptab, var, var)
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/{}i1p1f1/{}/{}/gn/v*/{}*nc'.format(mem, miptab, var, var)
     listafi = glob.glob(filna)
-
+    listafi.sort()
 
     amoc_max = []
     amoc_wid = []
     for fi in filna:
+        print(fi)
         coso = xr.load_dataset(fi, use_cftime = True)[var]
-        amax = coso.sel(basin = 1, lat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['lat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
+        amax = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['rlat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
         amoc_max.append(amax)
 
-        gino = coso.sel(basin = 1, lat = slice(30, 50)).mean('time')
-        zino = np.all(gino.values < amax/2., axis = 0)
+        gino = coso.sel(basin = 1, rlat = slice(30, 50)).mean('time')
+        zino = np.all(gino.values < amax/2., axis = 1)
         for i, lev in enumerate(coso.lev):
             if np.all(zino[i:]):
                 awid = lev
                 break
 
-        if lev > 4000. or lev < 500.:
-            print(i, lev)
-            print(zino)
-            print(gino.lev)
-            sys.exit()
-
         amoc_wid.append(awid)
+        print(amax, awid)
 
     amoc_max = np.stack(amoc_max)
     amoc_wid = np.stack(amoc_wid)
