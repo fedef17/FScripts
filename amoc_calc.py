@@ -45,13 +45,13 @@ for ru in allru:
     if 'I' in ru:
         mem = 'r3'
 
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/{}i1p1f1/{}/{}/gn/v*/{}*nc'.format(mem, miptab, var, var)
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/{}i1p1f1/{}/{}/g*/v*/{}*nc'.format(mem, miptab, var, var)
     listafi = glob.glob(filna)
     listafi.sort()
 
     amoc_max = []
     amoc_wid = []
-    for fi in filna:
+    for fi in listafi:
         print(fi)
         coso = xr.load_dataset(fi, use_cftime = True)[var]
         amax = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['rlat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
