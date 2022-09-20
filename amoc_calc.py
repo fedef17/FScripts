@@ -41,11 +41,11 @@ for ru in allru:
     else:
         datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
 
-    mem = 'r1'
+    fis = 'f1'
     if 'I' in ru:
-        mem = 'r3'
+        fis = 'f3'
 
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/{}i1p1f1/{}/{}/g*/v*/{}*nc'.format(mem, miptab, var, var)
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1{}/{}/{}/g*/v*/{}*nc'.format(fis, miptab, var, var)
     listafi = glob.glob(filna)
     listafi.sort()
 
@@ -61,7 +61,7 @@ for ru in allru:
         zino = np.all(gino.values < amax/2., axis = 1)
         for i, lev in enumerate(coso.lev):
             if np.all(zino[i:]):
-                awid = lev
+                awid = lev.values
                 break
 
         amoc_wid.append(awid)
