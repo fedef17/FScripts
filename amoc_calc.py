@@ -50,12 +50,21 @@ for ru in allru:
     listafi.sort()
 
     amoc_max = []
+    amoc_max_lev = []
     amoc_wid = []
+    aabw_max = []
+    aabw_max_lev = []
+    aby_max = []
+    aby_max_lev = []
     for fi in listafi:
         print(fi)
         coso = xr.load_dataset(fi, use_cftime = True)[var]
         amax = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['rlat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
         amoc_max.append(amax)
+
+        zuki = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').argmax(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(500., 2000.)).lev[zuki['lev']].values
+        amoc_max_lev.append(maxlev)
 
         gino = coso.sel(basin = 1, rlat = slice(30, 50)).mean('time')
         zino = np.all(gino.values < amax/2., axis = 1)
@@ -67,9 +76,28 @@ for ru in allru:
         amoc_wid.append(awid)
         print(amax, awid)
 
-    amoc_max = np.stack(amoc_max)
-    amoc_wid = np.stack(amoc_wid)
-    amoc_all[(ru, 'max')] = amoc_max
-    amoc_all[(ru, 'wid')] = amoc_wid
+        ### AABW
+        amax = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').min(['rlat', 'lev']).values
+        aabw_max.append(amax)
+
+        zuki = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').argmin(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
+        aabw_max_lev.append(maxlev)
+
+        ### abyssal amoc
+        amax = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').min(['rlat', 'lev']).values
+        aby_max.append(amax)
+
+        zuki = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').argmin(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(2500., 4500.)).lev[zuki['lev']].values
+        aby_max_lev.append(maxlev)
+
+    amoc_all[(ru, 'amoc_max')] = np.stack(amoc_max)
+    amoc_all[(ru, 'amoc_wid')] = np.stack(amoc_wid)
+    amoc_all[(ru, 'amoc_maxlev')] = np.stack(amoc_max_lev)
+    amoc_all[(ru, 'aabw_max')] = np.stack(aabw_max)
+    amoc_all[(ru, 'aabw_maxlev')] = np.stack(aabw_maxlev)
+    amoc_all[(ru, 'aby_max')] = np.stack(aby_max)
+    amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_maxlev)
 
 pickle.dump(amoc_all, open(cart_out + 'amoc_all.p', 'wb'))
