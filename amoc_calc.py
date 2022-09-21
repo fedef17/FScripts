@@ -96,8 +96,8 @@ for ru in allru:
     amoc_all[(ru, 'amoc_wid')] = np.stack(amoc_wid)
     amoc_all[(ru, 'amoc_maxlev')] = np.stack(amoc_max_lev)
     amoc_all[(ru, 'aabw_max')] = np.stack(aabw_max)
-    amoc_all[(ru, 'aabw_maxlev')] = np.stack(aabw_maxlev)
+    amoc_all[(ru, 'aabw_maxlev')] = np.stack(aabw_max_lev)
     amoc_all[(ru, 'aby_max')] = np.stack(aby_max)
-    amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_maxlev)
+    amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_max_lev)
 
 pickle.dump(amoc_all, open(cart_out + 'amoc_all.p', 'wb'))
