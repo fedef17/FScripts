@@ -47,12 +47,12 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-if ru in ['b990', 'b080', 'b065']:
+if ru in ['b100', 'b050', 'b080', 'b065', 'b990']:
     cartbase = '/g100_scratch/userexternal/ffabiano/ece3/'
 else:
     cartbase = '/g100_work/IscrB_QUECLIM/BOTTINO/'
 
-filna = cartbase + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/*/Omon/{}/gn/v*/{}*nc'
+filna = cartbase + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/*/{}/{}/g*/v*/{}*nc'
 
 ####################################################################################################
 
@@ -66,8 +66,10 @@ yeamean = dict()
 
 print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
+miptab = 'Omon'
 var1 = 'bigthetao'
 var2 = 'wo'
+miptab2 = 'Ofx'
 var3 = 'areacello'
 
 #def do_cross(fils, fils2, fils_area, fil_out):
@@ -117,11 +119,11 @@ n_proc = 10
 
 print(ru)
 
-allfils = glob.glob(filna.format(ru, var1, var1))
+allfils = glob.glob(filna.format(ru, miptab, var1, var1))
 allfils.sort()
-allfils2 = glob.glob(filna.format(ru, var2, var2))
+allfils2 = glob.glob(filna.format(ru, miptab, var2, var2))
 allfils2.sort()
-allfils_a = glob.glob(filna.format(ru, var3, var3))
+allfils_a = glob.glob(filna.format(ru, miptab2, var3, var3))
 allfils_a.sort()
 
 filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
