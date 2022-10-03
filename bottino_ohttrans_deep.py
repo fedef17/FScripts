@@ -116,7 +116,6 @@ n_proc = 10
 #for ru, nam in zip(allru, allnams):
 
 print(ru)
-nam = allnams[allru.index(ru)]
 
 allfils = glob.glob(filna.format(ru, var1, var1))
 allfils.sort()
