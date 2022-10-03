@@ -131,7 +131,7 @@ print(allfils[0])
 print(allfils2[0])
 print(allfils_a[0])
 
-do_cross(allfils, allfils2, allfils_a, filo)
+do_cross(allfils[:500], allfils2[:500], allfils_a[:500], filo)
 
 filo.close()
 
