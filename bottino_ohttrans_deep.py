@@ -69,23 +69,26 @@ print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 miptab = 'Omon'
 var1 = 'bigthetao'
 var2 = 'wo'
-miptab2 = 'Ofx'
-var3 = 'areacello'
+# miptab2 = 'Ofx'
+# var3 = 'areacello'
+
+fia = '/g100_work/IscrB_QUECLIM/BOTTINO/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
+gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
 #def do_cross(fils, fils2, fils_area, fil_out):
-def do_cross(fils, fils2, fia, fil_out):
+def do_cross(fils, fils2, gigi_a, fil_out):
     print("I'm process", os.getpid())
     # Getting % usage of virtual_memory ( 3rd field)
 
     #cose = []
-    for fi1, fi2, fia in zip(fils, fils2, fils_area):
+    #for fi1, fi2, fia in zip(fils, fils2, fils_area):
+    for fi1, fi2 in zip(fils, fils2):
         print(fi1)
         print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
 
         gigi = xr.load_dataset(fi1, use_cftime = True)['bigthetao']
         gigi2 = xr.load_dataset(fi2, use_cftime = True)['wo']
 
-        gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
         pino = gigi2.interp(lev = gigi.lev)
 
         oht = pino*gigi2*gigi_a.values[np.newaxis, np.newaxis, ...]
@@ -123,17 +126,14 @@ allfils = glob.glob(filna.format(ru, miptab, var1, var1))
 allfils.sort()
 allfils2 = glob.glob(filna.format(ru, miptab, var2, var2))
 allfils2.sort()
-allfils_a = glob.glob(filna.format(ru, miptab2, var3, var3))
-allfils_a.sort()
 
 filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
 
 #cose = do_cross(allfils)
 print(allfils[0])
 print(allfils2[0])
-print(allfils_a[0])
 
-do_cross(allfils[:500], allfils2[:500], allfils_a[:500], filo)
+do_cross(allfils[:500], allfils2[:500], gigi_a, filo)
 
 filo.close()
 
