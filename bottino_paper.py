@@ -51,9 +51,12 @@ cart_in = cart_out + '../seasmean/'
 gogo = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 glomeans, pimean, yeamean, _ = gogo
 
-do_pr = False
-
+do_pr = True
 if do_pr:
+    # A coefficient for clausius-clapeyron applied to global pr
+    exptas = lambda t : np.exp(17.625*(t-273.15)/(t-30.11))
+    A = pimean['pr']/exptas(pimean['tas'])
+
     fig = plt.figure(figsize = (16,9))
     for ru, col in zip(allru, colors):
         plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'pr')][1]-pimean['pr'], color = col, s = 10, label = ru)
@@ -61,7 +64,8 @@ if do_pr:
         if ru == 'ssp585':
             pr = glomeans[(ru, 'pr')][1]
             pr_anom = pr-pimean['pr']
-            tas_anom = glomeans[(ru, 'tas')][1]-pimean['tas']
+            tas = glomeans[(ru, 'tas')][1]
+            tas_anom = tas-pimean['tas']
 
             # coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 2, cov = True)
             # x_nu = np.arange(-0.5, 9.6, 0.5)
@@ -74,14 +78,19 @@ if do_pr:
             fitted = np.exp(np.polyval(coeffs, x_nu))
             plt.plot(x_nu, fitted-pimean['pr'], color = col)
 
+            fitted2 = A*exptas(x_nu+pimean['tas'])
+            plt.plot(x_nu, fitted2-pimean['pr'], color = col, linestyle = '--')
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     plt.grid()
     #plt.legend()
     ctl.custom_legend(fig, colors, allru)
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
     plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
-    fig.savefig(cart_out + 'pr_gtas_scatter.pdf')
+    fig.savefig(cart_out + 'pr_gtas_scatter_CC.pdf')
 
+    sys.exit()
 
     fig = plt.figure(figsize = (16,9))
     for ru, col in zip(allru, colors):
@@ -225,6 +234,8 @@ if do_pr:
             plt.ylabel(r'LW outgoing radiation at TOA ($W/m^2$)')
         fig.savefig(cart_out + '{}_gtas_scatter.pdf'.format(var))
 
+
+sys.exit()
 
 do_fb = False
 if do_fb:
