@@ -91,7 +91,7 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         pino = gigi2.interp(lev = gigi.lev)
 
-        oht = pino*gigi2*gigi_a.values[np.newaxis, np.newaxis, ...]
+        oht = pino*gigi*gigi_a.values[np.newaxis, np.newaxis, ...]
         # to have real oht must multiply by cp
 
         oht_lev = oht.mean('time').sum(['i', 'j'])
