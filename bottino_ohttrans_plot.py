@@ -80,9 +80,9 @@ for ru, col in zip(allru, colors):
 
         oht_lev = xr.concat(oht_lev, dim = 'year')*cp0*rho
 
-        oht100 = oht.sel(lev = slice(98., 99.)).mean('lev')
-        oht700 = oht.sel(lev = slice(697., 698.)).mean('lev')
-        oht2000 = oht.sel(lev = slice(1945., 1946.)).mean('lev')
+        oht100 = oht_lev.sel(lev = slice(98., 99.)).mean('lev')
+        oht700 = oht_lev.sel(lev = slice(697., 698.)).mean('lev')
+        oht2000 = oht_lev.sel(lev = slice(1945., 1946.)).mean('lev')
 
         oht_all[(ru, 100)] = oht100
         oht_all[(ru, 700)] = oht700
