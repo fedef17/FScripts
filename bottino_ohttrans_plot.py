@@ -95,7 +95,7 @@ for ru, col in zip(allru, colors):
     for cosu, ax in zip([oht100, oht700, oht2000], axs.flatten()):
         ax.scatter(gtas, cosu, s = 5, color = col, label = ru)
         larun = ctl.running_mean(cosu, 20, remove_nans = True)
-        ax.plot(grun, larun, color = col, label = ru, ls = sti)
+        ax.plot(grun, larun, color = col, label = ru, lw = 2)
 
 for ax, tit in zip(axs.flatten(), ['100 m', '700 m', '2000 m']):
     ax.grid()
