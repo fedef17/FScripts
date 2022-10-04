@@ -68,7 +68,7 @@ fig, axs = plt.subplots(1, 3, figsize = (18,6))
 for ru, col in zip(allru, colors):
     if not read_ts:
         oht_lev = []
-        filo = open(carto + 'ohtrans_{}.p'.format(ru), 'rb')
+        filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'rb')
         for i in range(500):
             try:
                 gigi = pickle.load(filo)
@@ -105,9 +105,9 @@ for ax, tit in zip(axs.flatten(), ['100 m', '700 m', '2000 m']):
 axs[0,2].legend()
 axs[0,0].set_ylabel('Downward OHT (J/s)')
 
-fig.savefig(carto + 'ohtrans_vs_gtas.pdf')
+fig.savefig(cart_out + 'ohtrans_vs_gtas.pdf')
 
-pickle.dump(oht_all, open(carto + 'ohtrans_mean.p', 'wb'))
+pickle.dump(oht_all, open(cart_out + 'ohtrans_mean.p', 'wb'))
 
 #############################################################
 
@@ -120,7 +120,7 @@ oht_patt = dict()
 
 for ru, col in zip(allru, colors):
     print(ru)
-    filo = open(carto + 'ohtrans_{}.p'.format(ru), 'rb')
+    filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'rb')
 
     oht100 = []
     oht700 = []
@@ -147,8 +147,8 @@ for ru, col in zip(allru, colors):
         oht_patt[(ru, lab, 'fin')] = var[-50:].mean(axis = 0)*cp0*rho
         oht_patt[(ru, lab, 'change')] = oht_patt[(ru, lab, 'fin')] - oht_patt[(ru, lab, 'ini')]
 
-pickle.dump(oht_patt, open(carto + 'ohtrans_patt.p', 'wb'))
-oht_patt = pickle.load(open(carto + 'ohtrans_patt.p', 'rb'))
+pickle.dump(oht_patt, open(cart_out + 'ohtrans_patt.p', 'wb'))
+oht_patt = pickle.load(open(cart_out + 'ohtrans_patt.p', 'rb'))
 
 plpa = []
 subt = []
@@ -159,8 +159,8 @@ for lev, tit in zip([100, 700, 2000], ['100 m', '700 m', '2000 m']):
         plpa.append(oht_patt[(ru, lev, 'fin')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'ohtrans_patt_fin.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 0.008), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 0.008), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
-fig.savefig(carto + 'ohtrans_patt_fin.pdf')
+fig.savefig(cart_out + 'ohtrans_patt_fin.pdf')
