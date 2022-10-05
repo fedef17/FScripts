@@ -96,9 +96,9 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         oht_lev = oht.mean('time').sum(['i', 'j'])
 
-        oht100 = oht.sel(lev = slice(98., 99.)).mean('time').mean('lev')
-        oht700 = oht.sel(lev = slice(697., 698.)).mean('time').mean('lev')
-        oht2000 = oht.sel(lev = slice(1945., 1946.)).mean('time').mean('lev')
+        oht100 = oht.sel(lev = slice(96., 98.)).mean('time').mean('lev')
+        oht700 = oht.sel(lev = slice(696., 698.)).mean('time').mean('lev')
+        oht2000 = oht.sel(lev = slice(1944., 1946.)).mean('time').mean('lev')
 
         zuki100 = ctl.regrid_dataset(oht100, lats, lons)
         zuki700 = ctl.regrid_dataset(oht700, lats, lons)
