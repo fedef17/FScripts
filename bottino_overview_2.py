@@ -56,30 +56,38 @@ cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # 1 over ocean
 
 miptab = 'Amon'
-#allvars_2D = 'clt pr rlut rsdt rsut tas'.split()
-allvars_2D = 'rsds rsus rlds rlus hfss hfls'.split()
+allvars_2D = 'clt pr rlut rsdt rsut tas'.split()
+#allvars_2D = 'rsds rsus rlds rlus hfss hfls'.split()
+#allvars_2D = 'clt pr rlut rsdt rsut tas rsds rsus rlds rlus hfss hfls'.split()
 add_uas = False
 
 allvars_3D = []#'ta ua'.split()
 
-#var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
-var_glob_mean = 'rsds rsus rlds rlus hfss hfls net_srf'.split()
+var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
+#var_glob_mean = 'tas pr clt rlut rsut net_toa rsds rsus rlds rlus hfss hfls net_srf'.split()
 
-#var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
-var_glob_ylabel = var_glob_mean
+# #var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
+# var_glob_ylabel = var_glob_mean
+#
+# var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
+# allnams2 = allnams + ['ssp585', 'historical']
+# allru2 = allru + ['ssp585', 'hist']
+# colors2 = colors + ['indianred', 'steelblue']
+#
+# allnadd = ['stabilization-hist-1990']
+# allrudd = ['b990']
+# colorsdd = ['teal']
+#
+# allnams3 = allnams2 + ['stabilization-hist-1990']
+# allru3 = allru2 + ['b990']
+# colors3 = colors2 + ['teal']
 
-var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
-allnams2 = allnams + ['ssp585', 'historical']
-allru2 = allru + ['ssp585', 'hist']
-colors2 = colors + ['indianred', 'steelblue']
+allruadd2 = ['b065', 'b080']
+allnadd2 = ['stabilization-ssp585-2065', 'stabilization-ssp585-2080']
+colorsadd2 = ['chocolate', 'maroon']
 
-allnadd = ['stabilization-hist-1990']
-allrudd = ['b990']
-colorsdd = ['teal']
-
-allnams3 = allnams2 + ['stabilization-hist-1990']
-allru3 = allru2 + ['b990']
-colors3 = colors2 + ['teal']
+allruall = ['pi', 'hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
+colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
 figs_glob = []
 axs_glob = []
@@ -87,6 +95,10 @@ pimean = dict()
 glomeans = dict()
 yeamean = dict()
 mapmean = dict()
+
+# Read already computed experiments
+glomeans, pimean = pickle.load(open(cart_out + 'bottino_glomeans.p', 'rb'))
+glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 
 for var in var_glob_mean:
     fig, ax = plt.subplots(figsize = (12,8))
@@ -100,8 +112,8 @@ fig_greg, ax_greg = plt.subplots(figsize = (12,8))
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 
 #for na, ru, col in zip(allnams, allru, colors):
-for na, ru, col in zip(allnams3, allru3, colors3):
-#for na, ru, col in zip(allnadd, allrudd, colorsdd):
+#for na, ru, col in zip(allnams3, allru3, colors3):
+for na, ru, col in zip(allnadd2, allruadd2, coloradd2):
     print(ru)
     mem = 'r1'
     if ru in ['ssp585', 'hist']: mem = 'r4'
@@ -207,13 +219,11 @@ for na, ru, col in zip(allnams3, allru3, colors3):
 #ctl.plot_pdfpages(cart_out + 'bottino_glomeans.pdf', figs_glob, True)
 #fig_greg.savefig(cart_out + 'bottino_gregory.pdf')
 
-#pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
-pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
+pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
+#pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
 
-#pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
-pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
-
-sys.exit()
+pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+#pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
 
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -292,7 +302,8 @@ for var in var_glob_mean:
 fig_greg, ax_greg = plt.subplots(figsize = (16,9))
 
 #for na, ru, col in zip(allnams, allru, colors):
-for na, ru, col in zip(allnams3, allru3, colors3):
+#for na, ru, col in zip(allnams3, allru3, colors3):
+for ru, col in zip(allruall, colall):
     print(ru)
 
     for var, fig, ax, vylab in zip(var_glob_mean, figs_glob, axs_glob, var_glob_ylabel):

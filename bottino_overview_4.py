@@ -98,7 +98,7 @@ trendz = pickle.load(open(cart_out + 'trendz.p', 'rb'))
 pimepr = yeamean[('pi', 'pr')].mean('year')
 zerom = pimepr < 50
 
-mask_zerom = False # Mask points with less than 50 mm/yr
+mask_zerom = True # Mask points with less than 50 mm/yr
 
 for ru in allru3:
     trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr

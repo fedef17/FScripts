@@ -67,20 +67,19 @@ if do_pr:
             tas = glomeans[(ru, 'tas')][1]
             tas_anom = tas-pimean['tas']
 
-            # coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 2, cov = True)
-            # x_nu = np.arange(-0.5, 9.6, 0.5)
-            # fitted = np.polyval(coeffs, x_nu)
-            # plt.plot(x_nu, fitted, color = col)
+            coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 2, cov = True)
+            x_nu = np.arange(-0.5, 9.6, 0.5)
+            fitted = np.polyval(coeffs, x_nu)
+            plt.plot(x_nu, fitted, color = col)
 
             #coeffs, covmat = np.polyfit(tas_anom, np.log(pr_anom), deg = 1, cov = True)
-            coeffs, covmat = np.polyfit(tas_anom, np.log(pr), deg = 2, cov = True)
-            x_nu = np.arange(-0.5, 9.6, 0.5)
-            fitted = np.exp(np.polyval(coeffs, x_nu))
-            plt.plot(x_nu, fitted-pimean['pr'], color = col)
+            #coeffs, covmat = np.polyfit(tas_anom, np.log(pr), deg = 2, cov = True)
+            #x_nu = np.arange(-0.5, 9.6, 0.5)
+            #fitted = np.exp(np.polyval(coeffs, x_nu))
+            #plt.plot(x_nu, fitted-pimean['pr'], color = col)
 
-            fitted2 = A*exptas(x_nu+pimean['tas'])
-            plt.plot(x_nu, fitted2-pimean['pr'], color = col, linestyle = '--')
-            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            # fitted2 = A*exptas(x_nu+pimean['tas'])
+            # plt.plot(x_nu, fitted2-pimean['pr'], color = col, linestyle = '--')
 
     plt.grid()
     #plt.legend()
@@ -88,7 +87,26 @@ if do_pr:
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
     plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
-    fig.savefig(cart_out + 'pr_gtas_scatter_CC.pdf')
+    fig.savefig(cart_out + 'pr_gtas_scatter_linear.pdf')
+
+
+    fig, ax = plt.subplots(1, 1, figsize = (16,9))
+    allruok = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b100']
+    colok = [colors[allru.index(ru)] for ru in allruok]
+    for i, (ru, col) in enumerate(zip(allruok, colok)):
+        res = stats.linregress(glomeans[(ru, 'tas')][1], glomeans[(ru, 'pr')][1]/pimean['pr'])
+        rel_trend = 100*res.slope
+        rel_trend_err = 100*res.stderr
+        ax.errorbar(i, rel_trend, yerr = rel_trend_err, color = col, capsize = 3, zorder = 6, lw = 2)
+        ax.scatter(i, rel_trend, color = col, s = 100, label = ru)
+
+    ax.grid(axis = 'y')
+    #plt.legend()
+    ax.set_xticks(range(len(allruok)))
+    ax.set_xticklabels(allruok)
+
+    ax.set_ylabel(r'Prec. trend (%/K)')
+    fig.savefig(cart_out + 'pr_trend_scatter.pdf')
 
     sys.exit()
 

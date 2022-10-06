@@ -78,104 +78,106 @@ nyea = 50
 amoc_pi = pickle.load(open(cart_out + 'amoc_pi.p', 'rb'))
 amoc_all.update(amoc_pi)
 
-cos = 'max'
-fac = 1/1.e9
-cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)][i1:i2]*fac for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
-names = ['pi'] + allru + allru
+for ke in amoc_all:
+    if len(amoc_all[ke]) > 500:
+        print(ke, len(amoc_all[ke]))
+        amoc_all[ke] = amoc_all[ke][:500]
 
-edgecol = np.append(['black'], np.concatenate([('lightslategray', col) for col in colors]))
-fullcol = np.append(['black'], np.concatenate([(col, col) for col in colors]))
+for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cell (Sv)', 'Abyssal cell (Sv)']):
+    fac = 1/1.e9
+    cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)][i1:i2]*fac for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
+    names = ['pi'] + allru + allru
 
-positions = [0.]
-posticks = [0.]
-for i in range(len(allru)):
-    positions.append(positions[-1]+0.7+0.4)
-    positions.append(positions[-1]+0.7)
-    posticks.append(np.mean(positions[-2:]))
+    edgecol = np.append(['black'], np.concatenate([('lightslategray', col) for col in colors]))
+    fullcol = np.append(['black'], np.concatenate([(col, col) for col in colors]))
 
-fig, ax = ctl.boxplot(cose, names, fullcol, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)
-ax.set_xticks(posticks)
-ax.set_xticklabels(['pi'] + allru)
-ax.grid(axis = 'y')
+    positions = [0.]
+    posticks = [0.]
+    for i in range(len(allru)):
+        positions.append(positions[-1]+0.7+0.4)
+        positions.append(positions[-1]+0.7)
+        posticks.append(np.mean(positions[-2:]))
 
-ax.set_ylabel('AMOC (Sv)')
+    fig, ax = ctl.boxplot(cose, names, fullcol, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)
+    ax.set_xticks(posticks)
+    ax.set_xticklabels(['pi'] + allru)
+    ax.grid(axis = 'y')
 
-fig.savefig(cart_out + 'amoc_max_boxplot.pdf')
+    ax.set_ylabel(lab)
 
-##### Adding I experiments
-cos = 'max'
-fac = 1/1.e9
-cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)]*fac for ru in allru_wI]
-names = ['pi'] + allru_wI
+    fig.savefig(cart_out + '{}_boxplot.pdf'.format(cos))
 
-edgecol = ['black'] + colors_wI
-fullcol = ['black'] + colors_wI
+    ##### Adding I experiments
+    cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)]*fac for ru in allru_wI]
+    names = ['pi'] + allru_wI
 
-positions = [0.]
-posticks = [0.]
-for i in range(len(allru)):
-    positions.append(positions[-1]+0.7)
-    posticks.append(positions[-1])
+    edgecol = ['black'] + colors_wI
+    fullcol = ['black'] + colors_wI
 
-fig, ax = ctl.boxplot(cose, names, fullcol, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)
-ax.set_xticks(posticks)
-ax.set_xticklabels(['pi'] + allru_wI)
-ax.grid(axis = 'y')
+    positions = [0.]
+    posticks = [0.]
+    for i in range(len(allru)):
+        positions.append(positions[-1]+0.7)
+        posticks.append(positions[-1])
 
-ax.set_ylabel('AMOC (Sv)')
-fig.savefig(cart_out + 'amoc_max_boxplot_wI.pdf')
+    fig, ax = ctl.boxplot(cose, names, fullcol, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)
+    ax.set_xticks(posticks)
+    ax.set_xticklabels(['pi'] + allru_wI)
+    ax.grid(axis = 'y')
+
+    ax.set_ylabel(lab)
+    fig.savefig(cart_out + '{}_boxplot_wI.pdf'.format(cos))
 
 ### now the amoc depth
-cos = 'wid'
-cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)][i1:i2] for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
-names = ['pi'] + allru
+for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev'], ['Lower level at half maximum (m)']+3*['Depth of max (m)']):
+    cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)][i1:i2] for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
+    names = ['pi'] + allru
 
-fullcol = np.append(['black'], np.concatenate([(col, col) for col in colors]))
-markers = ['o'] + len(colors)*['<','o']
+    fullcol = np.append(['black'], np.concatenate([(col, col) for col in colors]))
+    markers = ['o'] + len(colors)*['<','o']
 
-positions = [0.]
-posticks = [0.]
-for i in range(len(allru)):
-    positions.append(positions[-1]+0.7+0.4)
-    positions.append(positions[-1]+0.7)
-    posticks.append(np.mean(positions[-2:]))
+    positions = [0.]
+    posticks = [0.]
+    for i in range(len(allru)):
+        positions.append(positions[-1]+0.7+0.4)
+        positions.append(positions[-1]+0.7)
+        posticks.append(np.mean(positions[-2:]))
 
-fig, ax = plt.subplots(figsize = (12,8))
+    fig, ax = plt.subplots(figsize = (12,8))
 
-for cos, col, pos, mar in zip(cose, fullcol, positions, markers):
-    ax.scatter(pos, np.mean(cos), color = col, marker = mar, s = 100)
+    for val, col, pos, mar in zip(cose, fullcol, positions, markers):
+        ax.scatter(pos, np.mean(val), color = col, marker = mar, s = 100)
 
-ax.set_xticks(posticks)
-ax.set_xticklabels(['pi'] + allru)
-ax.set_ylabel('Lower level at half maximum (m)')
-ax.invert_yaxis()
-ax.grid(axis = 'y')
+    ax.set_xticks(posticks)
+    ax.set_xticklabels(['pi'] + allru)
+    ax.set_ylabel(lab)
+    ax.invert_yaxis()
+    ax.grid(axis = 'y')
 
-fig.savefig(cart_out + 'amoc_width_scatter.pdf')
+    fig.savefig(cart_out + '{}_scatter.pdf'.format(cos))
 
-### now for the I exps
-cos = 'wid'
-cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)] for ru in allru_wI]
-names = ['pi'] + allru_wI
+    ### now for the I exps
+    cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)] for ru in allru_wI]
+    names = ['pi'] + allru_wI
 
-fullcol = ['black'] + colors_wI
-markers = ['o'] + len(colors)*['o']
+    fullcol = ['black'] + colors_wI
+    markers = ['o'] + len(colors)*['o']
 
-positions = [0.]
-posticks = [0.]
-for i in range(len(allru)):
-    positions.append(positions[-1]+0.7)
-    posticks.append(positions[-1])
+    positions = [0.]
+    posticks = [0.]
+    for i in range(len(allru)):
+        positions.append(positions[-1]+0.7)
+        posticks.append(positions[-1])
 
-fig, ax = plt.subplots(figsize = (12,8))
+    fig, ax = plt.subplots(figsize = (12,8))
 
-for cos, col, pos, mar in zip(cose, fullcol, positions, markers):
-    ax.scatter(pos, np.mean(cos), color = col, marker = mar, s = 100)
+    for val, col, pos, mar in zip(cose, fullcol, positions, markers):
+        ax.scatter(pos, np.mean(val), color = col, marker = mar, s = 100)
 
-ax.set_xticks(posticks)
-ax.set_xticklabels(['pi'] + allru_wI)
-ax.set_ylabel('Lower level at half maximum (m)')
-ax.invert_yaxis()
-ax.grid(axis = 'y')
+    ax.set_xticks(posticks)
+    ax.set_xticklabels(['pi'] + allru_wI)
+    ax.set_ylabel(lab)
+    ax.invert_yaxis()
+    ax.grid(axis = 'y')
 
-fig.savefig(cart_out + 'amoc_width_scatter_wI.pdf')
+    fig.savefig(cart_out + '{}_scatter_wI.pdf'.format(cos))
