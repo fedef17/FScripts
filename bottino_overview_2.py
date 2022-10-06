@@ -32,16 +32,23 @@ plt.rcParams['legend.fontsize'] = 18
 
 #############################################################################
 
+user = os.getlogin()
+
 if os.uname()[1] == 'hobbes':
-    cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
+    cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
+    cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
 elif os.uname()[1] == 'xaru':
-    cart_out = '/home/fedef/Research/lavori/BOTTINO/seasmean/'
+    cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
 elif os.uname()[1] == 'tintin':
-    cart_out = '/home/fabiano/work/lavori/BOTTINO/seasmean/'
+    cart_out = '/home/{}/work/lavori/BOTTINO/seasmean/'.format(os.getlogin())
+    cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
+elif 'login' in os.uname()[1]:
+    cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
+    cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
 
 ctl.mkdir(cart_out)
 
-filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+#filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
 
 allru = ['pi', 'b025', 'b050', 'b100']
 allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
@@ -50,7 +57,7 @@ colors = ['black', 'forestgreen', 'orange', 'violet']
 
 ####################################################################################################
 
-cart_run = '/home/fabiano/Research/git/ece_runtime/run/'
+#
 masfi = cart_run + 'masks.nc'
 cose = xr.load_dataset(masfi)
 oce_mask = cose['RnfA.msk'].values.astype('bool') # 1 over ocean
@@ -118,7 +125,14 @@ for na, ru, col in zip(allnadd2, allruadd2, coloradd2):
     mem = 'r1'
     if ru in ['ssp585', 'hist']: mem = 'r4'
 
-    fils = np.concatenate([glob.glob(filna.format(na, mem, miptab, var)) for var in allvars_2D])
+    if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
+        datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+    else:
+        datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'#.format(fis, miptab, var, var)
+
+    fils = np.concatenate([glob.glob(filna.format(miptab, var, var)) for var in allvars_2D])
 
     if len(fils) == 0:
         print('no files for {}'.format(na))
