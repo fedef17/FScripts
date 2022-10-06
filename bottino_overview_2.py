@@ -32,8 +32,6 @@ plt.rcParams['legend.fontsize'] = 18
 
 #############################################################################
 
-user = os.getlogin()
-
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
     cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
@@ -42,9 +40,10 @@ elif os.uname()[1] == 'xaru':
 elif os.uname()[1] == 'tintin':
     cart_out = '/home/{}/work/lavori/BOTTINO/seasmean/'.format(os.getlogin())
     cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
-elif 'login' in os.uname()[1]:
-    cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
-    cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
+
+user = 'ffabiano'
+cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
+cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
 
 ctl.mkdir(cart_out)
 
