@@ -40,10 +40,10 @@ elif os.uname()[1] == 'xaru':
 elif os.uname()[1] == 'tintin':
     cart_out = '/home/{}/work/lavori/BOTTINO/seasmean/'.format(os.getlogin())
     cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
-
-user = 'ffabiano'
-cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
-cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
+else:
+    user = 'ffabiano'
+    cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
+    cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
 
 ctl.mkdir(cart_out)
 
@@ -72,7 +72,7 @@ allvars_3D = []#'ta ua'.split()
 var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
 #var_glob_mean = 'tas pr clt rlut rsut net_toa rsds rsus rlds rlus hfss hfls net_srf'.split()
 
-# #var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
+var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
 # var_glob_ylabel = var_glob_mean
 #
 # var_map_200 = [] #'clt pr tas rlut uas'.split()  # plot last 200 mean map, stddev, low/high var wrt pi
@@ -104,7 +104,7 @@ mapmean = dict()
 
 # Read already computed experiments
 glomeans, pimean = pickle.load(open(cart_out + 'bottino_glomeans.p', 'rb'))
-glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
+glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb')) # too heavy!
 
 #for na, ru, col in zip(allnams3, allru3, colors3):
 for na, ru in zip(allnadd2, allruadd2):
@@ -133,14 +133,10 @@ for na, ru in zip(allnadd2, allruadd2):
     kose = xr.open_mfdataset(fils, use_cftime = True)
     kose = kose.drop_vars('time_bnds')
 
-    try:
-        #kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-        kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
-        print('assigned net_srf')
-    except Exception as exc:
-        print(exc)
-        print(kose.data_vars)
-        pass
+    kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+    print('assigned net_toa')
+    # kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
+    # print('assigned net_srf')
 
     # Separate for uas
     if add_uas:
@@ -194,7 +190,16 @@ pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
 
 pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
-#pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
+
+for ru in allruall:
+    yeamean_ok = dict()
+    for ke in yeamean:
+        if ru in ke:
+            yeamean_ok[ke] = yeamean[ke]
+    pickle.dump(yeamean_ok, open(cart_out + 'bottino_seasmean_2D_{}.p'.format(ru), 'wb'))
+
+
+# pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
 
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb'))
 
@@ -288,7 +293,7 @@ for ru, col in zip(allruall, colall):
 
         ax.plot(years, glomean-pimean[var], label = ru, color = col)
 
-        if ru == allru3[0]:
+        if ru == 'pi':
             ax.set_ylabel(vylab)
             ax.set_xlabel('Year')
 
