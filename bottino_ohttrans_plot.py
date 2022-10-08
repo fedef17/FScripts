@@ -108,8 +108,8 @@ for ax, tit in zip(axs.flatten(), ['100 m', '700 m', '2000 m']):
     ax.set_title(tit)
     ax.set_xlabel('GTAS (K)')
 
-axs[0,2].legend()
-axs[0,0].set_ylabel('Downward OHT (J/s)')
+axs[2].legend()
+axs[0].set_ylabel('Downward OHT (J/s)')
 
 fig.savefig(cart_out + 'ohtrans_vs_gtas.pdf')
 
