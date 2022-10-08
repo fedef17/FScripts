@@ -91,12 +91,11 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         pino = gigi2.interp(lev = gigi.lev)
 
-        oht = pino*gigi*gigi_a.values[np.newaxis, np.newaxis, ...]
-        # to have real oht must multiply by cp
+        oht = pino*gigi# to have real oht must multiply by cp
 
-        oht_lev = oht.mean('time').sum(['i', 'j'])
+        oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # only multiply for area when integrating horizontally
 
-        oht100 = oht.sel(lev = slice(96., 98.)).mean('time').mean('lev')
+        oht100 = oht.sel(lev = slice(96., 98.)).mean('time').mean('lev') # these are densities of heat transport
         oht700 = oht.sel(lev = slice(696., 698.)).mean('time').mean('lev')
         oht2000 = oht.sel(lev = slice(1944., 1946.)).mean('time').mean('lev')
 
