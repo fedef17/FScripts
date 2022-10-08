@@ -56,8 +56,8 @@ glomeans, pimean, yeamean, _ = gogo
 # allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
 # colors = ['teal', 'forestgreen', 'orange', 'violet']
 
-allruall = ['b990', 'b025', 'b050', 'b065', 'b080', 'b100']
-colall = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+allru = ['b990', 'b025', 'b050', 'b065', 'b080', 'b100']
+colors = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
 cp0 = 3989.245 # J/kg/K
 rho = 1025
