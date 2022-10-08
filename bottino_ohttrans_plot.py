@@ -99,14 +99,9 @@ for ru, col in zip(allru, colors):
 
     grun = ctl.running_mean(gtas, 20, remove_nans = True)
     for cosu, ax in zip([oht100, oht700, oht2000], axs.flatten()):
-        if ru != 'b100':
-            ax.scatter(gtas, cosu, s = 5, color = col, label = ru)
-            larun = ctl.running_mean(cosu, 20, remove_nans = True)
-            ax.plot(grun, larun, color = col, label = ru, lw = 2)
-        else:
-            ax.scatter(gtas[106:], cosu[:394], s = 5, color = col, label = ru)
-            larun = ctl.running_mean(cosu[:394], 20, remove_nans = True)
-            ax.plot(grun, larun, color = col, label = ru, lw = 2)
+        ax.scatter(gtas, cosu, s = 5, color = col, label = ru)
+        larun = ctl.running_mean(cosu, 20, remove_nans = True)
+        ax.plot(grun, larun, color = col, label = ru, lw = 2)
 
 for ax, tit in zip(axs.flatten(), ['100 m', '700 m', '2000 m']):
     ax.grid()
