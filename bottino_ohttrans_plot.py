@@ -162,17 +162,17 @@ for ru, col in zip(allru, colors):
 pickle.dump(oht_patt, open(cart_out + 'ohtrans_patt.p', 'wb'))
 oht_patt = pickle.load(open(cart_out + 'ohtrans_patt.p', 'rb'))
 
-plpa = []
-subt = []
-hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([100, 700, 2000], ['100 m', '700 m', '2000 m']):
+    plpa = []
+    subt = []
+    hatch = []
     for ru in allru:
         plpa.append(oht_patt[(ru, lev, 'fin')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin_{}.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
-for ax in fig.axes[:-1]:
-    ax.set_facecolor('gainsboro')
-fig.savefig(cart_out + 'ohtrans_patt_fin.pdf')
+    for ax in fig.axes[:-1]:
+        ax.set_facecolor('gainsboro')
+    fig.savefig(cart_out + 'ohtrans_patt_fin_{}.pdf'.format(lev))
