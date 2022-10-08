@@ -80,6 +80,10 @@ for ru, col in zip(allru, colors):
 
         filo.close()
 
+        if ru == 'b065':
+            print('AAAAA MISSING 1 YEAR FOR b065!! copying last year twice for now')
+            oht_lev.append(gigi[0])
+
         oht_lev = xr.concat(oht_lev, dim = 'year')*cp0*rho
 
         oht100 = oht_lev.sel(lev = slice(96., 98.)).mean('lev')
@@ -141,6 +145,12 @@ for ru, col in zip(allru, colors):
         oht700.append(oht700_i)
         oht2000.append(oht2000_i)
 
+    if ru == 'b065':
+        print('AAAAA MISSING 1 YEAR FOR b065!! copying last year twice for now')
+        oht100.append(oht100_i)
+        oht700.append(oht700_i)
+        oht2000.append(oht2000_i)
+
     filo.close()
 
     oht100 = np.stack(oht100)
@@ -166,7 +176,7 @@ for lev, tit in zip([100, 700, 2000], ['100 m', '700 m', '2000 m']):
         plpa.append(oht_patt[(ru, lev, 'fin')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 0.008), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Downward heat trasport (J/s)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
 for ax in fig.axes[:-1]:
     ax.set_facecolor('gainsboro')
