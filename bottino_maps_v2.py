@@ -17,7 +17,7 @@ import climdiags as cd
 from matplotlib.colors import LogNorm
 from datetime import datetime
 from matplotlib import colors as mcolors
-import matplotlib.gridspec as gs
+import matplotlib.gridspec as gridspec
 
 from scipy import stats
 import xarray as xr
@@ -57,13 +57,21 @@ colors2 = colors + ['indianred', 'steelblue']
 allnams3 = ['stabilization-hist-1990'] + allnams[1:]
 allru3 = ['b990'] + allru[1:]
 colors3 = ['teal'] + colors[1:]
+
+colors = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+allru = ['pi', 'hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
+allru3 = allru[3:]
+colors3 = colors[3:]
+
 ####################################################################################################
 
-glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
-
-plot_all = False
-
-# This is to calculate the ensemble mean of historical and ssp5
+# glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
+#
+# for ke in list(yeamean.keys()):
+#     if 'tas' not in ke and 'pr' not in ke: del yeamean[ke]
+#
+#
+# # This is to calculate the ensemble mean of historical and ssp5
 # for var in ['tas', 'pr']:
 #     for exp in ['ssp585', 'historical']:
 #         yeamean_hs, seamean_hs = pickle.load(open(cart_in + '../yearmean/bottino_yeamean_3_{}_{}.p'.format(exp, var), 'rb'))
@@ -90,14 +98,16 @@ ypre_trans = 30#50
 ypre_stab = 30
 
 cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
+# coso = yeamean[('b025', 'tas')]
+yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_b025.p', 'rb'))
 coso = yeamean[('b025', 'tas')]
 
-
+#
 # glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
-
-anom_maps = dict() # maps of anomalies
-patt_maps = dict() # maps of anomalies divided by change in global tas
-
+#
+# anom_maps = dict() # maps of anomalies
+# patt_maps = dict() # maps of anomalies divided by change in global tas
+#
 # for varnam, var, cblab in zip(['tas', 'pr', 'pr_rel'], ['tas', 'pr', 'pr'], cb_labels):
 #     cosopi = yeamean[('pi', var)]
 #     cosohist = yeamean[('historical_mean', var)]
@@ -118,7 +128,8 @@ patt_maps = dict() # maps of anomalies divided by change in global tas
 #     if var == 'pr':
 #         thres = pimap < 50.
 #
-#     for ru in ['hist', 'ssp585'] + allru3:
+#     #for ru in ['hist', 'ssp585'] + allru3:
+#     for ru in allru:
 #         coso = yeamean[(ru, var)]
 #         y0 = coso.year[0].values
 #
@@ -153,14 +164,30 @@ patt_maps = dict() # maps of anomalies divided by change in global tas
 #             patt_maps[(varnam, ru, 'stab')] = mappa_stab/(deltatas-deltatas_ini)
 #
 # pickle.dump([anom_maps, patt_maps], open(cart_out + 'all_maps.p', 'wb'))
-del yeamean
-del mapmean
+# del yeamean
+# del mapmean
 anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps.p', 'rb'))
 
+
+def make_fig_axes():
+    proj = ctl.def_projection(visualization = 'Robinson', central_lat_lon = (0.,0.))
+    fig = plt.figure(figsize=(16,12))
+    gs = gridspec.GridSpec(3, 6)
+    axes = []
+    axes.append(fig.add_subplot(gs[0, 1:3], projection = proj))
+    axes.append(fig.add_subplot(gs[0, 3:5], projection = proj))
+    for i in range(1,3):
+        axes.append(fig.add_subplot(gs[i, 0:2], projection = proj))
+        axes.append(fig.add_subplot(gs[i, 2:4], projection = proj))
+        axes.append(fig.add_subplot(gs[i, 4:], projection = proj))
+
+    return fig, axes
+
+
 ## now the figures
-#for varnam in ['tas', 'pr', 'pr_rel']:
 plotanom = False
-for varnam in ['pr', 'pr_rel']:
+for varnam in ['tas', 'pr', 'pr_rel']:
+#for varnam in ['pr', 'pr_rel']:
     # maps of total change at the end of the sims
     if varnam == 'tas':
         cmap = ctl.heatmap_mono()
@@ -190,10 +217,12 @@ for varnam in ['pr', 'pr_rel']:
         # cbran = (-1000., 1000.)
         cblab = 'Precipitation anomaly (mm/year)'
 
-    okru = ['hist', 'b990', 'b025', 'ssp585', 'b050', 'b100']
+    okru = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
     okfi = [anom_maps[(varnam, ru, 'fin')] for ru in okru]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_anom_fin_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.))
+    fig, axes = make_fig_axes()
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_anom_fin_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig)
+    #fig.savefig(cart_out + 'All_anom_fin_{}_newproj.pdf'.format(varnam))
     ###########################
 
     # maps of change per degree of global warming during the simulation (-> stab for the bottins)
@@ -226,15 +255,21 @@ for varnam in ['pr', 'pr_rel']:
         # cbran = (-300., 300.)
         cblab = 'Precipitation change per degree of global warming (mm/year/K)'
 
-    okru = ['hist', 'b990', 'b025', 'ssp585', 'b050', 'b100']
     okfi = [patt_maps[(varnam, ru, 'fin')] if ru in ['hist', 'ssp585'] else patt_maps[(varnam, ru, 'stab')] for ru in okru]
 
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,3), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = n_color_levels)
+    fig, axes = make_fig_axes()
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_stab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = n_color_levels, axs_external = axes, fig_external = fig)
+    #fig.savefig(cart_out + 'All_patt_stab_{}_newproj.pdf'.format(varnam))
 
     #################
     # trans vs stab pattern for each bottin
 
+    continue
+
+    okru = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
     okru = allru3 + 4*['']
     okfi = [patt_maps[(varnam, ru, 'trans')] for ru in allru3] + [patt_maps[(varnam, ru, 'stab')] for ru in allru3]
 
+    fig, axes = make_fig_axes()
     ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_patt_transvsstab_{}_newproj.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), fix_subplots_shape = (2,4), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = n_color_levels)
+    fig.savefig(cart_out + 'All_patt_transvsstab_{}_newproj.pdf'.format(varnam))

@@ -42,14 +42,16 @@ elif os.uname()[1] == 'tintin':
 cart_out += 'nonlin_evol/'
 ctl.mkdir(cart_out)
 
-colors = ['black', 'steelblue', 'teal', 'forestgreen', 'orange', 'violet', 'indianred']
-allru = ['pi', 'hist', 'b990', 'b025', 'b050', 'b100', 'ssp585']
+colors = ['black', 'royalblue', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet', 'crimson']
+allru = ['pi', 'hist', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100', 'ssp585']
 
 ####################################################################################################
 
 cart_in = cart_out + '../seasmean/'
-gogo = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
-glomeans, pimean, yeamean, _ = gogo
+# gogo = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
+# glomeans, pimean, yeamean, _ = gogo
+gogo = pickle.load(open(cart_in + 'bottino_glomeans.p', 'rb'))
+glomeans, pimean = gogo
 
 do_pr = True
 if do_pr:
@@ -91,7 +93,7 @@ if do_pr:
 
 
     fig, ax = plt.subplots(1, 1, figsize = (16,9))
-    allruok = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b100']
+    allruok = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
     colok = [colors[allru.index(ru)] for ru in allruok]
     for i, (ru, col) in enumerate(zip(allruok, colok)):
         res = stats.linregress(glomeans[(ru, 'tas')][1], glomeans[(ru, 'pr')][1]/pimean['pr'])
@@ -107,8 +109,6 @@ if do_pr:
 
     ax.set_ylabel(r'Prec. trend (%/K)')
     fig.savefig(cart_out + 'pr_trend_scatter.pdf')
-
-    sys.exit()
 
     fig = plt.figure(figsize = (16,9))
     for ru, col in zip(allru, colors):
@@ -185,36 +185,36 @@ if do_pr:
     areas = [med_area, tropics, midlat_nh, midlat_sh]
     anams = ['Med', 'Trop', 'NML', 'SML']
 
-    for area, anam in zip(areas, anams):
-        pino = yeamean[('pi', 'pr')]
-        pino_med_pi = ctl.global_mean(ctl.sel_area_xr(pino, area)).mean()
-
-        fig = plt.figure(figsize = (16,9))
-        for ru, col in zip(allru, colors):
-            tas_anom = glomeans[(ru, 'tas')][1]-pimean['tas']
-
-            pino = yeamean[(ru, 'pr')]
-            pino_med = ctl.global_mean(ctl.sel_area_xr(pino, area))
-
-            plt.scatter(tas_anom, pino_med - pino_med_pi, color = col, s = 10, label = ru)
-
-            if ru == 'ssp585':
-                coeffs_ru, covmat_ru = np.polyfit(tas_anom, pino_med - pino_med_pi, deg = 1, cov = True)
-                x_nu = np.arange(tas_anom.min()-0.1, tas_anom.max()+0.2, 0.1)
-                fitted_ru = np.polyval(coeffs_ru, x_nu)
-                plt.plot(x_nu, fitted_ru, color = col, ls = '-', lw = 2)
-                # rume = ctl.running_mean(pino_med-pino_med_pi, 3s0)
-                # teme = ctl.running_mean(tas_anom, 30)
-                # plt.plot(teme, rume, color = col)
-        plt.grid()
-        #plt.legend()
-        ctl.custom_legend(fig, colors, allru)
-        plt.subplots_adjust(bottom = 0.2)
-        plt.xlabel('GTAS anomaly (K)')
-        plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
-        plt.title('Area: {}'.format(anam))
-
-        fig.savefig(cart_out + 'pr_{}_gtas_scatter.pdf'.format(anam))
+    # for area, anam in zip(areas, anams):
+    #     pino = yeamean[('pi', 'pr')]
+    #     pino_med_pi = ctl.global_mean(ctl.sel_area_xr(pino, area)).mean()
+    #
+    #     fig = plt.figure(figsize = (16,9))
+    #     for ru, col in zip(allru, colors):
+    #         tas_anom = glomeans[(ru, 'tas')][1]-pimean['tas']
+    #
+    #         pino = yeamean[(ru, 'pr')]
+    #         pino_med = ctl.global_mean(ctl.sel_area_xr(pino, area))
+    #
+    #         plt.scatter(tas_anom, pino_med - pino_med_pi, color = col, s = 10, label = ru)
+    #
+    #         if ru == 'ssp585':
+    #             coeffs_ru, covmat_ru = np.polyfit(tas_anom, pino_med - pino_med_pi, deg = 1, cov = True)
+    #             x_nu = np.arange(tas_anom.min()-0.1, tas_anom.max()+0.2, 0.1)
+    #             fitted_ru = np.polyval(coeffs_ru, x_nu)
+    #             plt.plot(x_nu, fitted_ru, color = col, ls = '-', lw = 2)
+    #             # rume = ctl.running_mean(pino_med-pino_med_pi, 3s0)
+    #             # teme = ctl.running_mean(tas_anom, 30)
+    #             # plt.plot(teme, rume, color = col)
+    #     plt.grid()
+    #     #plt.legend()
+    #     ctl.custom_legend(fig, colors, allru)
+    #     plt.subplots_adjust(bottom = 0.2)
+    #     plt.xlabel('GTAS anomaly (K)')
+    #     plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    #     plt.title('Area: {}'.format(anam))
+    #
+    #     fig.savefig(cart_out + 'pr_{}_gtas_scatter.pdf'.format(anam))
 
 
 
@@ -252,10 +252,9 @@ if do_pr:
             plt.ylabel(r'LW outgoing radiation at TOA ($W/m^2$)')
         fig.savefig(cart_out + '{}_gtas_scatter.pdf'.format(var))
 
-
 sys.exit()
 
-do_fb = False
+do_fb = True
 if do_fb:
     var = 'net_toa'
     fig, ax = plt.subplots(figsize = (16,9))
@@ -352,55 +351,55 @@ if do_fb:
     fig.savefig(cart_out + 'feedback_evolution_yearly.pdf'.format(var))
 
 
-
-    fig, ax = plt.subplots(figsize = (16,9))
-    for ru, col in zip(allru[2:-1], colors[2:-1]):
-        pr = glomeans[(ru, var)][1]
-
-        pr_anom = pr-np.mean(pr[:10])
-        #pr_anom = ctl.running_mean(pr_anom, 5, remove_nans = True)[::5]
-        #pr_anom = np.mean(np.split(pr_anom, int(len(pr_anom)/5)), axis = 1)
-
-        tas = glomeans[(ru, 'tas')][1]
-        tas_anom = tas - tas[:10].mean()
-        #tas_anom = np.mean(np.split(tas_anom, int(len(tas_anom)/5)), axis = 1)
-        #tas_anom = ctl.running_mean(tas_anom, 5, remove_nans = True)[::5]
-
-        x_nu = np.arange(tas_anom.min(), tas_anom.max(), 0.1)
-
-        pr_ok = []
-        tas_ok = []
-        for xi in x_nu:
-            indi = (tas_anom >= xi) & (tas_anom < xi + 0.1)
-            pr_ok.append(np.mean(pr_anom[indi]))
-            tas_ok.append(np.mean(tas_anom[indi]))
-
-        pr_ok = np.array(pr_ok)
-        tas_ok = np.array(tas_ok)
-
-        ax.scatter(tas_anom, pr_anom, color = col, s = 1)
-        ax.scatter(tas_ok, pr_ok, color = col, s = 5, facecolor = 'none', marker = 'o')
-
-        coeffs, covmat = np.polyfit(tas_ok, pr_ok, deg = 1, cov = True)
-        fitted = np.polyval(coeffs, x_nu)
-        ax.plot(x_nu, fitted, color = col, lw = 2, label = ru)
-
-        coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 1, cov = True)
-        fitted = np.polyval(coeffs, x_nu)
-        ax.plot(x_nu, fitted, color = col, lw = 1, label = ru, ls = '--')
-
-        m, c, err_m, err_c = ctl.linear_regre_witherr(tas_ok, pr_ok)
-        stron = r'{}: $\lambda = {:5.3f} \pm {:5.3f} \ W/m^2/K$'.format(ru, m, err_m)
-        print(stron)
-        ax.text(-0.3, -2-(allru.index(ru)-2)*0.2, stron, fontsize = 14)
-
-    ax.grid()
-    ax.legend()
-    #ctl.custom_legend(fig, colors[2:-1], allru[2:-1])
-    #ax.subplots_adjust(bottom = 0.2)
-    ax.set_xlabel('GTAS change (K)')
-    ax.set_ylabel(r'Change in net incoming TOA ($W/m^2$)')
-    fig.savefig(cart_out + 'feedback_evolution_tasbin.pdf'.format(var))
+    #
+    # fig, ax = plt.subplots(figsize = (16,9))
+    # for ru, col in zip(allru[2:-1], colors[2:-1]):
+    #     pr = glomeans[(ru, var)][1]
+    #
+    #     pr_anom = pr-np.mean(pr[:10])
+    #     #pr_anom = ctl.running_mean(pr_anom, 5, remove_nans = True)[::5]
+    #     #pr_anom = np.mean(np.split(pr_anom, int(len(pr_anom)/5)), axis = 1)
+    #
+    #     tas = glomeans[(ru, 'tas')][1]
+    #     tas_anom = tas - tas[:10].mean()
+    #     #tas_anom = np.mean(np.split(tas_anom, int(len(tas_anom)/5)), axis = 1)
+    #     #tas_anom = ctl.running_mean(tas_anom, 5, remove_nans = True)[::5]
+    #
+    #     x_nu = np.arange(tas_anom.min(), tas_anom.max(), 0.1)
+    #
+    #     pr_ok = []
+    #     tas_ok = []
+    #     for xi in x_nu:
+    #         indi = (tas_anom >= xi) & (tas_anom < xi + 0.1)
+    #         pr_ok.append(np.mean(pr_anom[indi]))
+    #         tas_ok.append(np.mean(tas_anom[indi]))
+    #
+    #     pr_ok = np.array(pr_ok)
+    #     tas_ok = np.array(tas_ok)
+    #
+    #     ax.scatter(tas_anom, pr_anom, color = col, s = 1)
+    #     ax.scatter(tas_ok, pr_ok, color = col, s = 5, facecolor = 'none', marker = 'o')
+    #
+    #     coeffs, covmat = np.polyfit(tas_ok, pr_ok, deg = 1, cov = True)
+    #     fitted = np.polyval(coeffs, x_nu)
+    #     ax.plot(x_nu, fitted, color = col, lw = 2, label = ru)
+    #
+    #     coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 1, cov = True)
+    #     fitted = np.polyval(coeffs, x_nu)
+    #     ax.plot(x_nu, fitted, color = col, lw = 1, label = ru, ls = '--')
+    #
+    #     m, c, err_m, err_c = ctl.linear_regre_witherr(tas_ok, pr_ok)
+    #     stron = r'{}: $\lambda = {:5.3f} \pm {:5.3f} \ W/m^2/K$'.format(ru, m, err_m)
+    #     print(stron)
+    #     ax.text(-0.3, -2-(allru.index(ru)-2)*0.2, stron, fontsize = 14)
+    #
+    # ax.grid()
+    # ax.legend()
+    # #ctl.custom_legend(fig, colors[2:-1], allru[2:-1])
+    # #ax.subplots_adjust(bottom = 0.2)
+    # ax.set_xlabel('GTAS change (K)')
+    # ax.set_ylabel(r'Change in net incoming TOA ($W/m^2$)')
+    # fig.savefig(cart_out + 'feedback_evolution_tasbin.pdf'.format(var))
     ##################################################################
 
     fig_greg, ax_greg = plt.subplots(figsize = (16,9))
@@ -409,7 +408,7 @@ if do_fb:
         print(ru)
         checkdi = True
         if ru in ['hist', 'pi']: checkdi = False
-        ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, mean5yr = False, check_diff=checkdi)
+        ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, mean_nyr = False, check_diff=checkdi)
 
     #ax_greg.legend()
     ax_greg.grid()
@@ -456,7 +455,7 @@ if do_fb:
             stron = r'{}: $\lambda = {:5.3f} \pm {:5.3f} \ W/m^2/K$'.format(ru, m, err_m)
             print(stron)
             #ax.text(-0.3, -1.5-(allru.index(ru)-2)*0.2, stron, fontsize = 14)
-            if spli == 0:
+            if ini == 0:
                 lab = ru
             else:
                 lab = None
@@ -585,6 +584,10 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
                 break
             oht_lev.append(gigi[0])
 
+        if ru == 'b065':
+            print('AAAAA MISSING 1 YEAR FOR b065!! copying last year twice for now')
+            oht_lev.append(gigi[0])
+
         filo.close()
 
         oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
@@ -709,7 +712,7 @@ fig.savefig(carto + 'gamma_vs_gtas.pdf')
 #############################################################
 
 
-fig, axs = plt.subplots(1, 4, figsize = (18,6))
+fig, axs = plt.subplots(2, 3, figsize = (16,9))
 
 for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
     oht1 = oht_all[(ru, 700)]
@@ -728,10 +731,13 @@ for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
     ax.set_title(ru)
     ax.grid()
 
-axs[0].set_ylabel('OHC anomaly (J)')
-axs[1].set_xlabel('Years after stabilization')
+axs[0,0].set_ylabel('OHC anomaly (J)')
+axs[1,0].set_ylabel('OHC anomaly (J)')
+axs[1,0].set_xlabel('Years after stabilization')
+axs[1,1].set_xlabel('Years after stabilization')
+axs[1,2].set_xlabel('Years after stabilization')
 
-ctl.adjust_ax_scale(axs)
+ctl.adjust_ax_scale(axs.flatten())
 ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['> 2000m', '700-2000m', '0-700m'], ncol = 3)
 plt.subplots_adjust(bottom = 0.25)
 fig.savefig(carto + 'oht_deep_all_evol.pdf')
@@ -747,135 +753,132 @@ oht_patt = dict()
 areacello = xr.load_dataset(carto + 'areacello.nc')['areacello']
 regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
-# for ru, col in zip(allru[2:-1], colors[2:-1]):
-#     print(ru)
-#     filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
-#
-#     oht700 = []
-#     oht2000 = []
-#     ohtdeep = []
-#     for i in range(500):
-#         try:
-#             oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
-#         except:
-#             break
-#         oht700.append(oht700_i)
-#         oht2000.append(oht2000_i)
-#         ohtdeep.append(ohtdeep_i)
-#
-#     filo.close()
-#
-#     oht700 = np.stack(oht700)
-#     oht2000 = np.stack(oht2000)
-#     ohtdeep = np.stack(ohtdeep)
-#
-#     # oht700 = oht700/regr_acello.values
-#     # oht2000 = oht2000/regr_acello.values
-#     # ohtdeep = ohtdeep/regr_acello.values
-#
-#     for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
-#         var[var == 0.0] = np.nan
-#
-#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
-#
-#         oht_patt[(ru, lab)] = var_trend
-#         oht_patt[(ru, lab, 'err')] = var_trend_err
-#         oht_patt[(ru, lab, 'pval')] = var_pval
-#
-#         nonan = ~np.isnan(var[0])
-#         gmea = ctl.global_mean(var, lats, mask = nonan)
-#
-#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gmea, var)
-#
-#         oht_patt[(ru, lab, 'rel')] = var_trend
-#         oht_patt[(ru, lab, 'rel_err')] = var_trend_err
-#         oht_patt[(ru, lab, 'rel_pval')] = var_pval
-#
-#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[:100])
-#
-#         oht_patt[(ru, lab, '100')] = var_trend
-#         oht_patt[(ru, lab, '100_err')] = var_trend_err
-#         oht_patt[(ru, lab, '100_pval')] = var_pval
-#
-#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[-100:])
-#
-#         oht_patt[(ru, lab, '500')] = var_trend
-#         oht_patt[(ru, lab, '500_err')] = var_trend_err
-#         oht_patt[(ru, lab, '500_pval')] = var_pval
-#
-#
-#         if lab not in refoht:
-#             refoht[lab] = var[:20].mean(axis = 0) # taking b025 as reference
-#
-#         oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
-#
-# pickle.dump(oht_patt, open(carto + 'temp_patt_deep.p', 'wb'))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    print(ru)
+    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+
+    oht700 = []
+    oht2000 = []
+    ohtdeep = []
+    for i in range(500):
+        try:
+            oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
+        except:
+            break
+        oht700.append(oht700_i)
+        oht2000.append(oht2000_i)
+        ohtdeep.append(ohtdeep_i)
+
+    if ru == 'b065':
+        print('AAAAA MISSING 1 YEAR FOR b065!! copying last year twice for now')
+        oht700.append(oht700_i)
+        oht2000.append(oht2000_i)
+        ohtdeep.append(ohtdeep_i)
+
+    filo.close()
+
+    oht700 = np.stack(oht700)
+    oht2000 = np.stack(oht2000)
+    ohtdeep = np.stack(ohtdeep)
+
+    # oht700 = oht700/regr_acello.values
+    # oht2000 = oht2000/regr_acello.values
+    # ohtdeep = ohtdeep/regr_acello.values
+
+    for var, lab in zip([oht700, oht2000, ohtdeep], [700, 2000, 'deep']):
+        var[var == 0.0] = np.nan
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(len(var)), var)
+
+        oht_patt[(ru, lab)] = var_trend
+        oht_patt[(ru, lab, 'err')] = var_trend_err
+        oht_patt[(ru, lab, 'pval')] = var_pval
+
+        nonan = ~np.isnan(var[0])
+        gmea = ctl.global_mean(var, lats, mask = nonan)
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gmea, var)
+
+        oht_patt[(ru, lab, 'rel')] = var_trend
+        oht_patt[(ru, lab, 'rel_err')] = var_trend_err
+        oht_patt[(ru, lab, 'rel_pval')] = var_pval
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[:100])
+
+        oht_patt[(ru, lab, '100')] = var_trend
+        oht_patt[(ru, lab, '100_err')] = var_trend_err
+        oht_patt[(ru, lab, '100_pval')] = var_pval
+
+        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[-100:])
+
+        oht_patt[(ru, lab, '500')] = var_trend
+        oht_patt[(ru, lab, '500_err')] = var_trend_err
+        oht_patt[(ru, lab, '500_pval')] = var_pval
+
+
+        if lab not in refoht:
+            refoht[lab] = var[:20].mean(axis = 0) # taking b025 as reference
+
+        oht_patt[(ru, lab, 'change')] = var[-20:].mean(axis = 0) - refoht[lab]
+
+pickle.dump(oht_patt, open(carto + 'temp_patt_deep.p', 'wb'))
 oht_patt = pickle.load(open(carto + 'temp_patt_deep.p', 'rb'))
 
-plpa = []
-subt = []
-hatch = []
 #for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
 for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
+    plpa = []
+    subt = []
+    hatch = []
     for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev)])
         hatch.append(oht_patt[(ru, lev, 'pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 0.008), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
-#[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature trend (K/yr)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}.pdf'.format(lev), subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Conservative temperature trend (K/yr)')#, cbar_range = (0., 0.008) , add_hatching = hatch, hatch_styles = ['///', '', ''])
 
-for ax in fig.axes[:-1]:
-    ax.set_facecolor('gainsboro')
-#fig.savefig(carto + 'oht_patt_deep.pdf')
-fig.savefig(carto + 'temp_patt_deep.pdf')
+    for ax in fig.axes[:-1]:
+        ax.set_facecolor('gainsboro')
 
+    fig.savefig(carto + 'temp_patt_ocean_{}.pdf'.format(lev))
 
-plpa = []
-subt = []
-hatch = []
-#for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
-for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
+    plpa = []
+    subt = []
+    hatch = []
     for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, 'rel')])
         hatch.append(oht_patt[(ru, lev, 'rel_pval')] < 0.05)
         subt.append(ru + ': ' + tit)
 
-#divnorm = colors.TwoSlopeNorm(vmin=-1., vcenter=1., vmax=3.5)
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_rel.pdf', subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Cons. temp. trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
-for ax in fig.axes[:-1]:
-    ax.set_facecolor('gainsboro')
-#fig.savefig(carto + 'oht_patt_deep_rel.pdf')
-fig.savefig(carto + 'temp_patt_deep_rel.pdf')
+    #divnorm = colors.TwoSlopeNorm(vmin=-1., vcenter=1., vmax=3.5)
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}_rel.pdf'.format(lev), subtitles = subt, plot_anomalies = False, cmap = ctl.heatmap(), cbar_range = (-1, 3), figsize = (16,9), fix_subplots_shape = (2, 3), cb_label = 'Cons. temp. trend pattern', n_color_levels = 37)#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+    for ax in fig.axes[:-1]:
+        ax.set_facecolor('gainsboro')
+    #fig.savefig(carto + 'oht_patt_deep_rel.pdf')
+    fig.savefig(carto + 'temp_patt_ocean_{}_rel.pdf'.format(lev))
 
-plpa = []
-subt = []
-hatch = []
-#for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
-for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
+    plpa = []
+    subt = []
+    hatch = []
     for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, 'change')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = False, cmap = 'viridis', cbar_range = (0., 5.), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
-#[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_change.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Conservative temperature change (K)')
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}_change.pdf'.format(lev), subtitles = subt, plot_anomalies = False, cmap = 'viridis', figsize = (16,9), fix_subplots_shape = (2, 3), cb_label = 'Conservative temperature change (K)') #, cbar_range = (0., 5.)
 
-for ax in fig.axes[:-1]:
-    ax.set_facecolor('gainsboro')
-fig.savefig(carto + 'temp_patt_deep_change.pdf')
+    for ax in fig.axes[:-1]:
+        ax.set_facecolor('gainsboro')
+    fig.savefig(carto + 'temp_patt_ocean_{}_change.pdf'.format(lev))
 
 
-plpa = []
-subt = []
-hatch = []
-#for lev, tit in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m']):
-for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
+    plpa = []
+    subt = []
+    hatch = []
     for ru, col in zip(allru[2:-1], colors[2:-1]):
         plpa.append(oht_patt[(ru, lev, '500')]-oht_patt[(ru, lev, '100')])
         subt.append(ru + ': ' + tit)
 
-[fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_deep_500-100.pdf', subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), cbar_range = (-0.02, 0.02), n_color_levels = 37, figsize = (16,9), fix_subplots_shape = (3,4), cb_label = 'Cons. temp. trend difference (K/yr) (last - first century)')
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}_500-100.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), n_color_levels = 37, figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Cons. temp. trend difference (K/yr) (last - first century)') #cbar_range = (-0.02, 0.02)
 
-for ax in fig.axes[:-1]:
-    ax.set_facecolor('gainsboro')
-fig.savefig(carto + 'temp_patt_deep_500-100.pdf')
+    for ax in fig.axes[:-1]:
+        ax.set_facecolor('gainsboro')
+    fig.savefig(carto + 'temp_patt_ocean_{}_500-100.pdf'.format(lev))

@@ -93,7 +93,8 @@ allnadd2 = ['stabilization-ssp585-2065', 'stabilization-ssp585-2080']
 colorsadd2 = ['chocolate', 'maroon']
 
 allruall = ['pi', 'hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
-colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+#colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+colall = ['black', 'royalblue', 'crimson', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
 figs_glob = []
 axs_glob = []
@@ -104,99 +105,99 @@ mapmean = dict()
 
 # Read already computed experiments
 glomeans, pimean = pickle.load(open(cart_out + 'bottino_glomeans.p', 'rb'))
-glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb')) # too heavy!
+#glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb')) # too heavy!
 
 #for na, ru, col in zip(allnams3, allru3, colors3):
-for na, ru in zip(allnadd2, allruadd2):
-    print(ru)
-    mem = 'r1'
-    if ru in ['ssp585', 'hist']: mem = 'r4'
-
-    if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
-        datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-    else:
-        datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
-
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'#.format(fis, miptab, var, var)
-
-    fils = np.concatenate([glob.glob(filna.format(miptab, var, var)) for var in allvars_2D])
-
-    if len(fils) == 0:
-        print('no files for {}'.format(na))
-        continue
-
-    # for var in allvars_2D:
-    #     print(var, len(glob.glob(filna.format(na, mem, miptab, var))))
-    #     print(filna.format(na, mem, miptab, var))
-    # continue
-
-    kose = xr.open_mfdataset(fils, use_cftime = True)
-    kose = kose.drop_vars('time_bnds')
-
-    kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-    print('assigned net_toa')
-    # kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
-    # print('assigned net_srf')
-
-    # Separate for uas
-    if add_uas:
-        fils = glob.glob(filna.format(na, mem, miptab, 'uas'))
-        if len(fils) > 0:
-            kosettt = xr.open_mfdataset(fils, use_cftime = True)
-            kosettt = kosettt.drop_vars('time_bnds')
-            kosettt = kosettt.drop_vars('height')
-            kose = kose.assign(uas = kosettt.uas)
-
-    for var in var_glob_mean:
-        print(var)
-        if var not in kose:
-            if ru == 'pi':
-                pimean[var] = 0.
-            continue
-
-        cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
-
-        # coso = cosoye.mean('lon')
-        # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-        glomean = ctl.global_mean(cosoye)
-        glomean_oce = ctl.global_mean(cosoye, mask = oce_mask)
-        glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
-
-        if ru == 'pi':
-            years = cosoye.year.data-2256+2015
-            pimean[var] = np.mean(glomean)
-        else:
-            years = cosoye.year.data
-
-        glomeans[(ru, var)] = (years, glomean)
-
-        glomeans[(ru, var, 'oce')] = (years, glomean_oce)
-        glomeans[(ru, var, 'land')] = (years, glomean_land)
-
-
-    if ru == 'ssp585':
-        continue
-
-    if ru != 'pi':
-        kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
-
-    # for var in var_map_200:
-    #     print(var)
-    #     kose_sclim = ctl.seasonal_climatology(kose[var])
-    #     mapmean[(ru, var)] = kose_sclim
-
-pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
-#pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
-
-pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
-
-for ru in allruall:
-    yeamean_ok = dict()
-    for ke in yeamean:
-        if ru in ke:
-            yeamean_ok[ke] = yeamean[ke]
-    pickle.dump(yeamean_ok, open(cart_out + 'bottino_seasmean_2D_{}.p'.format(ru), 'wb'))
+# for na, ru in zip(allnadd2, allruadd2):
+#     print(ru)
+#     mem = 'r1'
+#     if ru in ['ssp585', 'hist']: mem = 'r4'
+#
+#     if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
+#         datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+#     else:
+#         datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+#
+#     filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'#.format(fis, miptab, var, var)
+#
+#     fils = np.concatenate([glob.glob(filna.format(miptab, var, var)) for var in allvars_2D])
+#
+#     if len(fils) == 0:
+#         print('no files for {}'.format(na))
+#         continue
+#
+#     # for var in allvars_2D:
+#     #     print(var, len(glob.glob(filna.format(na, mem, miptab, var))))
+#     #     print(filna.format(na, mem, miptab, var))
+#     # continue
+#
+#     kose = xr.open_mfdataset(fils, use_cftime = True)
+#     kose = kose.drop_vars('time_bnds')
+#
+#     kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
+#     print('assigned net_toa')
+#     # kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
+#     # print('assigned net_srf')
+#
+#     # Separate for uas
+#     if add_uas:
+#         fils = glob.glob(filna.format(na, mem, miptab, 'uas'))
+#         if len(fils) > 0:
+#             kosettt = xr.open_mfdataset(fils, use_cftime = True)
+#             kosettt = kosettt.drop_vars('time_bnds')
+#             kosettt = kosettt.drop_vars('height')
+#             kose = kose.assign(uas = kosettt.uas)
+#
+#     for var in var_glob_mean:
+#         print(var)
+#         if var not in kose:
+#             if ru == 'pi':
+#                 pimean[var] = 0.
+#             continue
+#
+#         cosoye = kose[var].groupby("time.year").mean().compute()
+#         yeamean[(ru, var)] = cosoye
+#
+#         # coso = cosoye.mean('lon')
+#         # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+#         glomean = ctl.global_mean(cosoye)
+#         glomean_oce = ctl.global_mean(cosoye, mask = oce_mask)
+#         glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
+#
+#         if ru == 'pi':
+#             years = cosoye.year.data-2256+2015
+#             pimean[var] = np.mean(glomean)
+#         else:
+#             years = cosoye.year.data
+#
+#         glomeans[(ru, var)] = (years, glomean)
+#
+#         glomeans[(ru, var, 'oce')] = (years, glomean_oce)
+#         glomeans[(ru, var, 'land')] = (years, glomean_land)
+#
+#
+#     if ru == 'ssp585':
+#         continue
+#
+#     if ru != 'pi':
+#         kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
+#
+#     # for var in var_map_200:
+#     #     print(var)
+#     #     kose_sclim = ctl.seasonal_climatology(kose[var])
+#     #     mapmean[(ru, var)] = kose_sclim
+#
+# pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
+# #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_srf.p', 'wb'))
+#
+# pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D.p', 'wb'))
+#
+# for ru in allruall:
+#     yeamean_ok = dict()
+#     for ke in yeamean:
+#         if ru in ke:
+#             yeamean_ok[ke] = yeamean[ke]
+#     pickle.dump(yeamean_ok, open(cart_out + 'bottino_seasmean_2D_{}.p'.format(ru), 'wb'))
 
 
 # pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
@@ -288,7 +289,7 @@ for ru, col in zip(allruall, colall):
             print('NOT found')
             continue
 
-        cosoye = yeamean[(ru, var)]
+        # cosoye = yeamean[(ru, var)]
         years, glomean = glomeans[(ru, var)]
 
         ax.plot(years, glomean-pimean[var], label = ru, color = col)
@@ -300,7 +301,7 @@ for ru, col in zip(allruall, colall):
     # gregory
     try:
         #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-        ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False)
+        ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
     except Exception as exc:
         print(ru, exc)
         pass
