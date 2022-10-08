@@ -51,11 +51,13 @@ cart_in = cart_out + '../seasmean/'
 gogo = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 glomeans, pimean, yeamean, _ = gogo
 
-allru = ['b990', 'b025', 'b050', 'b100']
-allsyear = [1990, 2025, 2050, 2100]
-allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+# allru = ['b990', 'b025', 'b050', 'b100']
+# allsyear = [1990, 2025, 2050, 2100]
+# allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+# colors = ['teal', 'forestgreen', 'orange', 'violet']
 
-colors = ['teal', 'forestgreen', 'orange', 'violet']
+allruall = ['b990', 'b025', 'b050', 'b065', 'b080', 'b100']
+colall = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
 cp0 = 3989.245 # J/kg/K
 rho = 1025
@@ -93,9 +95,14 @@ for ru, col in zip(allru, colors):
 
     grun = ctl.running_mean(gtas, 20, remove_nans = True)
     for cosu, ax in zip([oht100, oht700, oht2000], axs.flatten()):
-        ax.scatter(gtas, cosu, s = 5, color = col, label = ru)
-        larun = ctl.running_mean(cosu, 20, remove_nans = True)
-        ax.plot(grun, larun, color = col, label = ru, lw = 2)
+        if ru != 'b100':
+            ax.scatter(gtas, cosu, s = 5, color = col, label = ru)
+            larun = ctl.running_mean(cosu, 20, remove_nans = True)
+            ax.plot(grun, larun, color = col, label = ru, lw = 2)
+        else:
+            ax.scatter(gtas[106:], cosu[:394], s = 5, color = col, label = ru)
+            larun = ctl.running_mean(cosu[:394], 20, remove_nans = True)
+            ax.plot(grun, larun, color = col, label = ru, lw = 2)
 
 for ax, tit in zip(axs.flatten(), ['100 m', '700 m', '2000 m']):
     ax.grid()
