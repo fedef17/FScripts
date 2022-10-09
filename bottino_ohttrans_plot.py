@@ -172,7 +172,7 @@ for lev, tit in zip([100, 700, 2000], ['100 m', '700 m', '2000 m']):
         plpa.append(oht_patt[(ru, lev, 'fin')])
         subt.append(ru + ': ' + tit)
 
-    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin_{}.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Downward heat trasport (W/m2)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = cart_out + 'ohtrans_patt_fin_{}.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cbar_range = (-1, 1), cmap = ctl.heatmap(), figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Downward heat trasport (W/m2)')#, add_hatching = hatch, hatch_styles = ['///', '', ''])
 
     for ax in fig.axes[:-1]:
         ax.set_facecolor('gainsboro')
