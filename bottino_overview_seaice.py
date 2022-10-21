@@ -63,10 +63,12 @@ okye = [(2015, 2516), (1850, 2015), (2015, 2101), (1990, 2490), (2025, 2525), (2
 #colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 colall = ['black', 'royalblue', 'crimson', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
-# allru = ['pi', 'b025', 'b050', 'b100']
-# allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
-#
-# colors = ['black', 'forestgreen', 'orange', 'violet']
+##################################################################
+
+allru = ['pi', 'b025', 'b050', 'b100']
+allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+
+colors = ['black', 'forestgreen', 'orange', 'violet']
 
 #############################################################################
 ## SEA ICE
@@ -79,18 +81,18 @@ areaT = np.array(acel['O1t0.srf'].data)
 miptab = 'SImon'
 varnam = 'siconc'
 
-#resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
-resdict = dict()
+resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
+#resdict = dict()
 
 fig, axs = plt.subplots(2,2,figsize = (12,12))
 #
-# allnams2 = ['ssp585', 'historical'] + allnams
-# allru2 = ['ssp585', 'hist'] + allru
-# colors2 = ['indianred', 'steelblue'] + colors
-#
-# allnams3 = allnams2 + ['stabilization-hist-1990']
-# allru3 = allru2 + ['b990']
-# colors3 = colors2 + ['teal']
+allnams2 = ['ssp585', 'historical'] + allnams
+allru2 = ['ssp585', 'hist'] + allru
+colors2 = ['indianred', 'steelblue'] + colors
+
+allnams3 = allnams2 + ['stabilization-hist-1990']
+allru3 = allru2 + ['b990']
+colors3 = colors2 + ['teal']
 
 #for na, ru, col in zip(allnams3, allru3, colors3):
 for ru, col in zip(allruadd2, colorsadd2):
