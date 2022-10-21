@@ -41,16 +41,25 @@ plt.rcParams['axes.axisbelow'] = True
 #
 # colors = ['black', 'forestgreen', 'orange', 'violet']
 
-user = 'ffabiano'
-cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
-cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
+if os.uname()[1] == 'hobbes':
+    cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
+    cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
+elif os.uname()[1] == 'xaru':
+    cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
+elif os.uname()[1] == 'tintin':
+    cart_out = '/home/{}/work/lavori/BOTTINO/seasmean/'.format(os.getlogin())
+    cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
+else:
+    user = 'ffabiano'
+    cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
+    cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
 
 allruadd2 = ['b065', 'b080']
 allnadd2 = ['stabilization-ssp585-2065', 'stabilization-ssp585-2080']
 colorsadd2 = ['chocolate', 'maroon']
 
 allruall = ['pi', 'hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
-okye = [(2015, 2515), (1850, 2015), (2015, 2101), (1990, 2490), (2025, 2525), (2050, 2550), (2065, 2565), (2080, 2580), (2100, 2600)]
+okye = [(2015, 2516), (1850, 2015), (2015, 2101), (1990, 2490), (2025, 2525), (2050, 2550), (2065, 2565), (2080, 2580), (2100, 2600)]
 #colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 colall = ['black', 'royalblue', 'crimson', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
@@ -83,42 +92,42 @@ fig, axs = plt.subplots(2,2,figsize = (12,12))
 # colors3 = colors2 + ['teal']
 
 #for na, ru, col in zip(allnams3, allru3, colors3):
-for ru, col in zip(allruadd2, colorsadd2):
-    print(ru)
-    mem = 'r1'
-    if ru in ['ssp585', 'hist']: mem = 'r4'
-
-    datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-    filist = glob.glob(filna.format(miptab, varnam, varnam))
-
-    #filist = glob.glob(filna.format(na, mem, miptab, varnam))
-    gigi = xr.open_mfdataset(filist, use_cftime=True)
-
-    try:
-        lat = np.array(gigi.lat.data)
-    except:
-        print('lat name is latitude')
-        lat = np.array(gigi.latitude.data)
-
-    seaice = np.array(gigi.siconc.data)
-    #okslat = lat > 40.
-    for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
-        areaok = areaT[okslat]
-        oksi = seaice[:, okslat]
-        oksi[oksi < 15.] = 0.
-        oksi[oksi > 15.] = 1.
-        oksiarea = oksi*areaok[np.newaxis, :]
-        seaicearea = np.nansum(oksiarea, axis = 1)
-
-        dates = np.array(gigi.time.data)
-        okmarch = np.array([da.month == 3 for da in dates])
-        oksept = np.array([da.month == 9 for da in dates])
-
-        resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
-        resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
-
-pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
+# for ru, col in zip(allruadd2, colorsadd2):
+#     print(ru)
+#     mem = 'r1'
+#     if ru in ['ssp585', 'hist']: mem = 'r4'
+#
+#     datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+#     filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+#     filist = glob.glob(filna.format(miptab, varnam, varnam))
+#
+#     #filist = glob.glob(filna.format(na, mem, miptab, varnam))
+#     gigi = xr.open_mfdataset(filist, use_cftime=True)
+#
+#     try:
+#         lat = np.array(gigi.lat.data)
+#     except:
+#         print('lat name is latitude')
+#         lat = np.array(gigi.latitude.data)
+#
+#     seaice = np.array(gigi.siconc.data)
+#     #okslat = lat > 40.
+#     for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
+#         areaok = areaT[okslat]
+#         oksi = seaice[:, okslat]
+#         oksi[oksi < 15.] = 0.
+#         oksi[oksi > 15.] = 1.
+#         oksiarea = oksi*areaok[np.newaxis, :]
+#         seaicearea = np.nansum(oksiarea, axis = 1)
+#
+#         dates = np.array(gigi.time.data)
+#         okmarch = np.array([da.month == 3 for da in dates])
+#         oksept = np.array([da.month == 9 for da in dates])
+#
+#         resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
+#         resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
+#
+# pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
 
 for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
     yeaok = np.arange(ye1, ye2)
