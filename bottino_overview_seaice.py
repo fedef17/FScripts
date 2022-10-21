@@ -89,53 +89,53 @@ allru3 = allru2 + ['b990']
 colors3 = colors2 + ['teal']
 
 #for ru, col in zip(allruadd2, colorsadd2):
-for na, ru, col in zip(allnams3, allru3, colors3):
-    print(ru)
-    mem = 'r1'
-    if ru in ['ssp585', 'hist']: mem = 'r4'
-
-    if os.uname()[1] == 'hobbes':
-        filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
-        filist = glob.glob(filna.format(na, mem, miptab, varnam))
-    else:
-        datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-        filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-        filist = glob.glob(filna.format(miptab, varnam, varnam))
-
-    gigi = xr.open_mfdataset(filist, use_cftime=True)
-
-    try:
-        lat = np.array(gigi.lat.data)
-    except:
-        print('lat name is latitude')
-        lat = np.array(gigi.latitude.data)
-
-    seaice = np.array(gigi.siconc.data)
-    #okslat = lat > 40.
-    for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
-        areaok = areaT[okslat]
-        oksi = seaice[:, okslat]
-        oksi[oksi < 15.] = 0.
-        oksi[oksi > 15.] = 1.
-        oksiarea = oksi*areaok[np.newaxis, :]
-        seaicearea = np.nansum(oksiarea, axis = 1)
-
-        dates = np.array(gigi.time.data)
-        okmarch = np.array([da.month == 3 for da in dates])
-        oksept = np.array([da.month == 9 for da in dates])
-
-        resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
-        resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
-
-pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
+# for na, ru, col in zip(allnams3, allru3, colors3):
+#     print(ru)
+#     mem = 'r1'
+#     if ru in ['ssp585', 'hist']: mem = 'r4'
+#
+#     if os.uname()[1] == 'hobbes':
+#         filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+#         filist = glob.glob(filna.format(na, mem, miptab, varnam))
+#     else:
+#         datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+#         filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+#         filist = glob.glob(filna.format(miptab, varnam, varnam))
+#
+#     gigi = xr.open_mfdataset(filist, use_cftime=True)
+#
+#     try:
+#         lat = np.array(gigi.lat.data)
+#     except:
+#         print('lat name is latitude')
+#         lat = np.array(gigi.latitude.data)
+#
+#     seaice = np.array(gigi.siconc.data)
+#     #okslat = lat > 40.
+#     for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
+#         areaok = areaT[okslat]
+#         oksi = seaice[:, okslat]
+#         oksi[oksi < 15.] = 0.
+#         oksi[oksi > 15.] = 1.
+#         oksiarea = oksi*areaok[np.newaxis, :]
+#         seaicearea = np.nansum(oksiarea, axis = 1)
+#
+#         dates = np.array(gigi.time.data)
+#         okmarch = np.array([da.month == 3 for da in dates])
+#         oksept = np.array([da.month == 9 for da in dates])
+#
+#         resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
+#         resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
+#
+# pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
 
 
 for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
+    print(ru)
     for ii, emi in enumerate(['N', 'S']):
-        yeaok = np.arange(ye1, ye2)
-
         sia_march = resdict[(ru, varnam, 'glomean', 'mar', emi)]
         sia_sept = resdict[(ru, varnam, 'glomean', 'sep', emi)]
+        yeaok = np.arange(ye1, ye1 + len(sia_march))
 
         sima10 = ctl.running_mean(sia_march, 10)
         sise10 = ctl.running_mean(sia_sept, 10)
