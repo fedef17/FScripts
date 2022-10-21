@@ -34,12 +34,6 @@ plt.rcParams['axes.axisbelow'] = True
 # cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
 # ctl.mkdir(cart_out)
 #
-# filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
-#
-# allru = ['pi', 'b025', 'b050', 'b100']
-# allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
-#
-# colors = ['black', 'forestgreen', 'orange', 'violet']
 
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
@@ -94,17 +88,20 @@ allnams3 = allnams2 + ['stabilization-hist-1990']
 allru3 = allru2 + ['b990']
 colors3 = colors2 + ['teal']
 
-#for na, ru, col in zip(allnams3, allru3, colors3):
-for ru, col in zip(allruadd2, colorsadd2):
+#for ru, col in zip(allruadd2, colorsadd2):
+for na, ru, col in zip(allnams3, allru3, colors3):
     print(ru)
     mem = 'r1'
     if ru in ['ssp585', 'hist']: mem = 'r4'
 
-    datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-    filist = glob.glob(filna.format(miptab, varnam, varnam))
+    if os.uname()[1] == 'hobbes':
+        filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+        filist = glob.glob(filna.format(na, mem, miptab, varnam))
+    else:
+        datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+        filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+        filist = glob.glob(filna.format(miptab, varnam, varnam))
 
-    #filist = glob.glob(filna.format(na, mem, miptab, varnam))
     gigi = xr.open_mfdataset(filist, use_cftime=True)
 
     try:
