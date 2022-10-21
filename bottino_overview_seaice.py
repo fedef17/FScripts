@@ -79,7 +79,8 @@ areaT = np.array(acel['O1t0.srf'].data)
 miptab = 'SImon'
 varnam = 'siconc'
 
-resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
+#resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
+resdict = dict()
 
 fig, axs = plt.subplots(2,2,figsize = (12,12))
 #
@@ -92,57 +93,59 @@ fig, axs = plt.subplots(2,2,figsize = (12,12))
 # colors3 = colors2 + ['teal']
 
 #for na, ru, col in zip(allnams3, allru3, colors3):
-# for ru, col in zip(allruadd2, colorsadd2):
-#     print(ru)
-#     mem = 'r1'
-#     if ru in ['ssp585', 'hist']: mem = 'r4'
-#
-#     datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-#     filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-#     filist = glob.glob(filna.format(miptab, varnam, varnam))
-#
-#     #filist = glob.glob(filna.format(na, mem, miptab, varnam))
-#     gigi = xr.open_mfdataset(filist, use_cftime=True)
-#
-#     try:
-#         lat = np.array(gigi.lat.data)
-#     except:
-#         print('lat name is latitude')
-#         lat = np.array(gigi.latitude.data)
-#
-#     seaice = np.array(gigi.siconc.data)
-#     #okslat = lat > 40.
-#     for ii, okslat in zip([0,1], [lat > 40, lat < -40]):
-#         areaok = areaT[okslat]
-#         oksi = seaice[:, okslat]
-#         oksi[oksi < 15.] = 0.
-#         oksi[oksi > 15.] = 1.
-#         oksiarea = oksi*areaok[np.newaxis, :]
-#         seaicearea = np.nansum(oksiarea, axis = 1)
-#
-#         dates = np.array(gigi.time.data)
-#         okmarch = np.array([da.month == 3 for da in dates])
-#         oksept = np.array([da.month == 9 for da in dates])
-#
-#         resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
-#         resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
-#
-# pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
+for ru, col in zip(allruadd2, colorsadd2):
+    print(ru)
+    mem = 'r1'
+    if ru in ['ssp585', 'hist']: mem = 'r4'
+
+    datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+    filist = glob.glob(filna.format(miptab, varnam, varnam))
+
+    #filist = glob.glob(filna.format(na, mem, miptab, varnam))
+    gigi = xr.open_mfdataset(filist, use_cftime=True)
+
+    try:
+        lat = np.array(gigi.lat.data)
+    except:
+        print('lat name is latitude')
+        lat = np.array(gigi.latitude.data)
+
+    seaice = np.array(gigi.siconc.data)
+    #okslat = lat > 40.
+    for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
+        areaok = areaT[okslat]
+        oksi = seaice[:, okslat]
+        oksi[oksi < 15.] = 0.
+        oksi[oksi > 15.] = 1.
+        oksiarea = oksi*areaok[np.newaxis, :]
+        seaicearea = np.nansum(oksiarea, axis = 1)
+
+        dates = np.array(gigi.time.data)
+        okmarch = np.array([da.month == 3 for da in dates])
+        oksept = np.array([da.month == 9 for da in dates])
+
+        resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
+        resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
+
+pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
+
 
 for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
-    yeaok = np.arange(ye1, ye2)
+    for ii, emi in enumerate(['N', 'S']):
+        yeaok = np.arange(ye1, ye2)
 
-    sia_march = resdict[(ru, varnam, 'glomean', 'mar')]
-    sia_sept = resdict[(ru, varnam, 'glomean', 'sep')]
+        sia_march = resdict[(ru, varnam, 'glomean', 'mar', emi)]
+        sia_sept = resdict[(ru, varnam, 'glomean', 'sep', emi)]
 
-    sima10 = ctl.running_mean(sia_march, 10)
-    sise10 = ctl.running_mean(sia_sept, 10)
+        sima10 = ctl.running_mean(sia_march, 10)
+        sise10 = ctl.running_mean(sia_sept, 10)
 
-    axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
-    axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+        axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+        axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
 
-    axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
-    axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+        axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+        axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
 
 axs[0,0].set_title('March')
 axs[0,1].set_title('September')
