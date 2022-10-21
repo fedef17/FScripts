@@ -12,7 +12,7 @@ import netCDF4 as nc
 
 import climtools_lib as ctl
 import climdiags as cd
-import tunlib as tl
+# import tunlib as tl
 
 from matplotlib.colors import LogNorm
 from datetime import datetime
