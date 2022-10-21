@@ -90,7 +90,7 @@ for ru, col in zip(allruadd2, colorsadd2):
 
     datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
     filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-    filist = glob.glob(filna.format(miptab, var, var))
+    filist = glob.glob(filna.format(miptab, varnam, varnam))
 
     #filist = glob.glob(filna.format(na, mem, miptab, varnam))
     gigi = xr.open_mfdataset(filist, use_cftime=True)
