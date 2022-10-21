@@ -31,20 +31,38 @@ plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['axes.axisbelow'] = True
 
 #############################################################################
+# cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
+# ctl.mkdir(cart_out)
+#
+# filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+#
+# allru = ['pi', 'b025', 'b050', 'b100']
+# allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+#
+# colors = ['black', 'forestgreen', 'orange', 'violet']
 
-cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
-ctl.mkdir(cart_out)
+user = 'ffabiano'
+cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/seasmean/'
+cart_run = '/g100_scratch/userexternal/{}/ece3/b00I/runtime/'.format(user)
 
-filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+allruadd2 = ['b065', 'b080']
+allnadd2 = ['stabilization-ssp585-2065', 'stabilization-ssp585-2080']
+colorsadd2 = ['chocolate', 'maroon']
 
-allru = ['pi', 'b025', 'b050', 'b100']
-allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+allruall = ['pi', 'hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
+okye = [(2015, 2515), (1850, 2015), (2015, 2101), (1990, 2490), (2025, 2525), (2050, 2550), (2065, 2565), (2080, 2580), (2100, 2600)]
+#colall = ['black', 'steelblue', 'indianred', 'teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+colall = ['black', 'royalblue', 'crimson', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
-colors = ['black', 'forestgreen', 'orange', 'violet']
+# allru = ['pi', 'b025', 'b050', 'b100']
+# allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2100']
+#
+# colors = ['black', 'forestgreen', 'orange', 'violet']
 
 #############################################################################
 ## SEA ICE
-areacelfi = '/nas/BOTTINO/areas.nc'
+#areacelfi = '/nas/BOTTINO/areas.nc'
+areacelfi = cart_run + 'areas.nc'
 acel = xr.open_dataset(areacelfi)
 areaT = np.array(acel['O1t0.srf'].data)
 
@@ -52,23 +70,29 @@ areaT = np.array(acel['O1t0.srf'].data)
 miptab = 'SImon'
 varnam = 'siconc'
 
-resdict = dict()
+resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
 
 fig, axs = plt.subplots(2,2,figsize = (12,12))
+#
+# allnams2 = ['ssp585', 'historical'] + allnams
+# allru2 = ['ssp585', 'hist'] + allru
+# colors2 = ['indianred', 'steelblue'] + colors
+#
+# allnams3 = allnams2 + ['stabilization-hist-1990']
+# allru3 = allru2 + ['b990']
+# colors3 = colors2 + ['teal']
 
-allnams2 = ['ssp585', 'historical'] + allnams
-allru2 = ['ssp585', 'hist'] + allru
-colors2 = ['indianred', 'steelblue'] + colors
-
-allnams3 = allnams2 + ['stabilization-hist-1990']
-allru3 = allru2 + ['b990']
-colors3 = colors2 + ['teal']
-
-for na, ru, col in zip(allnams3, allru3, colors3):
+#for na, ru, col in zip(allnams3, allru3, colors3):
+for ru, col in zip(allruadd2, colorsadd2):
     print(ru)
     mem = 'r1'
     if ru in ['ssp585', 'hist']: mem = 'r4'
-    filist = glob.glob(filna.format(na, mem, miptab, varnam))
+
+    datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+    filist = glob.glob(filna.format(miptab, var, var))
+
+    #filist = glob.glob(filna.format(na, mem, miptab, varnam))
     gigi = xr.open_mfdataset(filist, use_cftime=True)
 
     try:
@@ -94,41 +118,29 @@ for na, ru, col in zip(allnams3, allru3, colors3):
         resdict[(ru, varnam, 'glomean', 'mar')] = seaicearea[okmarch]
         resdict[(ru, varnam, 'glomean', 'sep')] = seaicearea[oksept]
 
-        if ru != 'pi':
-            yeaok = np.array([da.year for da in dates])
-        else:
-            yeaok = np.array([da.year-2256+2015 for da in dates])
+pickle.dump(resdict, open(cart_out + 'seaicearea.p', 'wb'))
 
-        sima10 = ctl.running_mean(seaicearea[okmarch], 10)
-        sise10 = ctl.running_mean(seaicearea[oksept], 10)
+for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
+    yeaok = np.arange(ye1, ye2)
 
-        axs[ii,0].plot(yeaok[okmarch], sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
-        axs[ii,1].plot(yeaok[oksept], sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+    sia_march = resdict[(ru, varnam, 'glomean', 'mar')]
+    sia_sept = resdict[(ru, varnam, 'glomean', 'sep')]
 
-        axs[ii,0].plot(yeaok[okmarch], seaicearea[okmarch], linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
-        axs[ii,1].plot(yeaok[oksept], seaicearea[oksept], linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+    sima10 = ctl.running_mean(sia_march, 10)
+    sise10 = ctl.running_mean(sia_sept, 10)
 
-    # if ru == 'ssp585':
-    #     continue
-    #
-    # if ru != 'pi':
-    #     ok200 = np.array([da.year > dates[-1].year-200 for da in dates])
-    #     varok = var[ok200]
-    #     dateok = dates[ok200]
-    # else:
-    #     varok = var
-    #     dateok = dates
-    #
-    # resdict[(ru, varnam, 'mean', 'mar')], resdict[(ru, varnam, 'std', 'mar')] = ctl.seasonal_climatology(varok, dateok, 'Mar')
-    # resdict[(ru, varnam, 'mean', 'sep')], resdict[(ru, varnam, 'std', 'sep')] = ctl.seasonal_climatology(varok, dateok, 'Sep')
+    axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+    axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
 
+    axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+    axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
 
 axs[0,0].set_title('March')
 axs[0,1].set_title('September')
 axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
 axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
 #axs[1,1].legend()
-ctl.custom_legend(fig, colors3, allru3, ncol = 4)
+ctl.custom_legend(fig, colall, allruall, ncol = 5)
 fig.savefig(cart_out + 'bottseaice.pdf')
 
 sys.exit()
