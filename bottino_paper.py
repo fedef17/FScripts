@@ -53,6 +53,22 @@ cart_in = cart_out + '../seasmean/'
 gogo = pickle.load(open(cart_in + 'bottino_glomeans.p', 'rb'))
 glomeans, pimean = gogo
 
+
+## calc tas trend at the end of the sim
+filo = open(cart_out + 'trend_gtas.txt', 'w')
+filo.write('Trend of GTAS in last 100 years:\n')
+for ru in allru:
+    yea, tas = glomeans[(ru, 'tas')]
+
+    res = stats.linregress(yea[-100:], tas[-100:]) # trend of last 100 year
+    rel_trend = 100*res.slope
+    rel_trend_err = 100*res.stderr
+
+    print('{} - {:6.4f} +/- {:6.4f} K/cent\n'.format(ru, rel_trend, rel_trend_err))
+    filo.write('{} - {:6.4f} +/- {:6.4f} K/cent\n'.format(ru, rel_trend, rel_trend_err))
+
+filo.close()
+
 do_pr = True
 if do_pr:
     # A coefficient for clausius-clapeyron applied to global pr
@@ -252,9 +268,8 @@ if do_pr:
             plt.ylabel(r'LW outgoing radiation at TOA ($W/m^2$)')
         fig.savefig(cart_out + '{}_gtas_scatter.pdf'.format(var))
 
-sys.exit()
 
-do_fb = True
+do_fb = False
 if do_fb:
     var = 'net_toa'
     fig, ax = plt.subplots(figsize = (16,9))
@@ -733,14 +748,56 @@ for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
 
 axs[0,0].set_ylabel('OHC anomaly (J)')
 axs[1,0].set_ylabel('OHC anomaly (J)')
-axs[1,0].set_xlabel('Years after stabilization')
-axs[1,1].set_xlabel('Years after stabilization')
-axs[1,2].set_xlabel('Years after stabilization')
+
+for j in range(3):
+    axs[0,j].set_xticklabels([])
+    axs[1,j].set_xlabel('Years after stabilization')
+
+for j in range(1, 3):
+    axs[0,j].set_yticklabels([])
+    axs[1,j].set_yticklabels([])
 
 ctl.adjust_ax_scale(axs.flatten())
 ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['> 2000m', '700-2000m', '0-700m'], ncol = 3)
 plt.subplots_adjust(bottom = 0.25)
 fig.savefig(carto + 'oht_deep_all_evol.pdf')
+
+
+fig, axs = plt.subplots(2, 3, figsize = (16,9))
+
+for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
+    oht_tot = oht_all[(ru, 'tot')]
+    oht1 = oht_all[(ru, 700)]/oht_tot
+    oht2 = oht_all[(ru, 2000)]/oht_tot
+    oht3 = oht_all[(ru, 'deep')]/oht_tot
+
+    ax.fill_between(np.arange(len(oht3)), np.zeros(len(oht3)), oht3, color = 'steelblue', alpha = 0.5)
+    ax.fill_between(np.arange(len(oht3)), oht3, oht3+oht2, color = 'forestgreen', alpha = 0.5)
+    ax.fill_between(np.arange(len(oht3)), oht3+oht2, 1., color = 'gold', alpha = 0.5)
+
+    ax.plot(oht3, color = 'steelblue', ls = '-', lw = 2)
+    ax.plot(oht3+oht2, color = 'forestgreen', ls = '-', lw = 2)
+    ax.plot(oht_tot, color = 'gold', ls = '-', lw = 2)
+
+    ax.set_title(ru)
+    ax.grid()
+
+axs[0,0].set_ylabel('Fraction of heat absorbed')
+axs[1,0].set_ylabel('Fraction of heat absorbed')
+
+for j in range(3):
+    axs[0,j].set_xticklabels([])
+    axs[1,j].set_xlabel('Years after stabilization')
+
+for j in range(1, 3):
+    axs[0,j].set_yticklabels([])
+    axs[1,j].set_yticklabels([])
+
+ctl.adjust_ax_scale(axs.flatten())
+ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['> 2000m', '700-2000m', '0-700m'], ncol = 3)
+plt.subplots_adjust(bottom = 0.25)
+fig.savefig(carto + 'oht_deep_all_evol_rel.pdf')
+
 
 #############################################################
 ### maps of OHT trends
