@@ -58,7 +58,7 @@ anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps.p', 'rb'))
 rat1 = patt_maps[('tas', 'b100', 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
 rat2 = patt_maps[('tas', 'b025', 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
 
-ctl.plot_multimap_contour([rat2, rat1], coso.lat, coso.lon, visualization = 'Robinson', subtitles = ['b025/ssp585', 'b100/ssp585'], cbar_range = (0, 2), cmap = ctl.heatmap(), filename = cart_out + 'taspatt_b025_b100_sspratio.pdf', figsize = (16,7), cb_label = 'Ratio of warming rates', cbar_bottomspace = 0.11)
+# ctl.plot_multimap_contour([rat2, rat1], coso.lat, coso.lon, visualization = 'Robinson', subtitles = ['b025/ssp585', 'b100/ssp585'], cbar_range = (0, 2), cmap = ctl.heatmap(), filename = cart_out + 'taspatt_b025_b100_sspratio.pdf', figsize = (16,7), cb_label = 'Ratio of warming patterns', cbar_bottomspace = 0.11)
 
 #ctl.plot_map_contour(rat1, coso.lat, coso.lon, visualization = 'Robinson', cbar_range = (0, 2), cmap = ctl.heatmap(), filename = cart_out + 'taspatt_ssp_vs_b100_ratio.pdf')
 
@@ -101,12 +101,22 @@ for ru, ax, ax2 in zip(['b025', 'b100'], axs, axs2):
     long, latg = np.meshgrid(coso.lon, coso.lat)
 
     #for cos, col, lab in zip([dw, wd, wdd, ww], colors, labels):
-    for cos, col, lab in zip([dw, wdd], ['forestgreen', 'indianred'], ['dry-wet', 'wet-dry']):
-        ax.scatter(long[cos], latg[cos], s = 2, color = col, transform = ccrs.PlateCarree(), label = lab)
+    # for cos, col, lab in zip([dw, wdd], ['forestgreen', 'indianred'], ['dry-wet', 'wet-dry']):
+    #     ax.scatter(long[cos], latg[cos], s = 0.5, color = col, transform = ccrs.PlateCarree(), label = lab)
+
+    cmap = ctl.cmap_shading(['forestgreen', 'white', 'indianred'])
+
+    cose = np.zeros(long.shape)
+    cose[dw] = -1
+    cose[wdd] = 1
+    ax.pcolormesh(coso.lon, coso.lat, cose, vmin = -1, vmax = 1, cmap = cmap, transform = ccrs.PlateCarree())
+
     #ctl.custom_legend(fig, colors, labels, ncol = 4)
     ax.set_title(ru)
 
 ctl.custom_legend(fig, ['forestgreen', 'indianred'], ['dry-wet', 'wet-dry'], ncol = 2)
+#ctl.custom_legend(fig, [cm.get_cmap('PiYG_r')(0), cm.get_cmap('PiYG_r')(1)], ['dry-wet', 'wet-dry'], ncol = 2)
 
 fig2.savefig(cart_out + 'prssp_b025_b100_scatter.png')
 fig.savefig(cart_out + 'map_prssp_b025_b100_scatter.png')
+fig.savefig(cart_out + 'map_prssp_b025_b100_scatter.pdf')

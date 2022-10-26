@@ -771,19 +771,23 @@ for ru, col, ax in zip(allru[2:-1], colors[2:-1], axs.flatten()):
     oht2 = oht_all[(ru, 2000)]/oht_tot
     oht3 = oht_all[(ru, 'deep')]/oht_tot
 
+    for ohcos in [oht1, oht2, oht3, oht_tot]:
+        print(np.mean(ohcos).values)
+
     ax.fill_between(np.arange(len(oht3)), np.zeros(len(oht3)), oht3, color = 'steelblue', alpha = 0.5)
     ax.fill_between(np.arange(len(oht3)), oht3, oht3+oht2, color = 'forestgreen', alpha = 0.5)
     ax.fill_between(np.arange(len(oht3)), oht3+oht2, 1., color = 'gold', alpha = 0.5)
 
     ax.plot(oht3, color = 'steelblue', ls = '-', lw = 2)
     ax.plot(oht3+oht2, color = 'forestgreen', ls = '-', lw = 2)
-    ax.plot(oht_tot, color = 'gold', ls = '-', lw = 2)
+    #ax.plot(oht_tot, color = 'gold', ls = '-', lw = 2)
 
     ax.set_title(ru)
     ax.grid()
 
-axs[0,0].set_ylabel('Fraction of heat absorbed')
-axs[1,0].set_ylabel('Fraction of heat absorbed')
+ax.text(0.05, 0.55, 'Fraction of heat absorbed', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 18)
+#axs[0,0].set_ylabel('Fraction of heat absorbed')
+#axs[1,0].set_ylabel('Fraction of heat absorbed')
 
 for j in range(3):
     axs[0,j].set_xticklabels([])
@@ -798,7 +802,36 @@ ctl.custom_legend(fig, ['steelblue', 'forestgreen', 'gold'], ['> 2000m', '700-20
 plt.subplots_adjust(bottom = 0.25)
 fig.savefig(carto + 'oht_deep_all_evol_rel.pdf')
 
+## Trends in ocean heat content, per layer
+filo = open(cart_out + 'trend_ohc.txt', 'w')
+filo.write('Trend of OHC in last 100 years:\n')
+for cos in [700, 2000, 'deep', 'ml', 'bulk']:
+    filo.write('Layer: '+str(cos)+'\n')
+    for ru in allru:
+        if 'b' in ru:
+            yea = np.arange(len(oht_all[(ru, 700)]))
+            res = stats.linregress(yea[-100:], oht_all[(ru, cos)][-100:]) # trend of last 100 year
+            rel_trend = 100*res.slope
+            rel_trend_err = 100*res.stderr
 
+            print('{} {} - {:10.3e} +/- {:10.3e} J/cent\n'.format(ru, cos, rel_trend, rel_trend_err))
+            filo.write('  {} - {:10.3e} +/- {:10.3e} J/cent\n'.format(ru, rel_trend, rel_trend_err))
+
+filo.close()
+
+for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', 'Mixed-layer (<100 m)', 'Bulk'], [700, 2000, 'deep', 'ml', 'bulk']):
+    cose = [100*np.mean(oht_all[(ru, lev)][-30:]).values/np.mean(oht_all[(ru, 'tot')][-30:]).values for ru in allru if 'b' in ru]
+    strin = ' '+6*'& {:5.0f}\%'+'\\\\'
+    print(nom+strin.format(*cose))
+
+for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', 'Mixed-layer (<100 m)', 'Bulk'], [700, 2000, 'deep', 'ml', 'bulk']):
+    cose = [np.mean(oht_all[(ru, lev)][-30:]).values/1.e24 for ru in allru if 'b' in ru]
+    strin = ' '+6*'& {:5.1f}'+'\\\\'
+    print(nom+strin.format(*cose))
+
+
+
+sys.exit()
 #############################################################
 ### maps of OHT trends
 lats = np.linspace(-89.5, 89.5, 180)
