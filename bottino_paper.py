@@ -525,12 +525,11 @@ if calc_eofs:
 ###########
 carto = cart_out + '../ocean3d/'
 
-# masscell = xr.load_dataset(carto + 'masscello_Omon_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn_222201-222212.nc', use_cftime = True)['masscello']
-# areacell = xr.load_dataset(carto + 'areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc', use_cftime = True)['areacello']
-# massvol = masscell*areacell
-# mavo = massvol.mean('time')
-# ml_mass = mavo.sel(lev = slice(0.,100.)).sum(['lev', 'i', 'j'])
-# bulk_mass = mavo.sel(lev = slice(100., 6000.)).sum(['lev', 'i', 'j'])
+masscell = xr.load_dataset(carto + 'masscello_Omon_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn_222201-222212.nc', use_cftime = True)['masscello']
+areacell = xr.load_dataset(carto + 'areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc', use_cftime = True)['areacello']
+massvol = masscell*areacell
+mavo = massvol.mean('time')
+mavo_lev = mavo.sum(['i','j'])
 
 oce_mass = 1.381107e+21 # global and vertical sum of masscello*areacello (year 2222)
 ml_mass = 3.7352024e+19 # first 100 m globally
@@ -539,6 +538,12 @@ bulk_mass = 1.3436264e+21 # below 100 m globally
 oce_area = 3.6481962e+14 # m2
 
 cp0 = 3989.245 # J/kg/K
+
+ml_depth = 150. # as in Gregory, 2000.
+#max_depth = 2500. # as well
+max_depth = 6000.
+ml_mass = mavo_lev.sel(lev = slice(0.,ml_depth)).sum(['lev'])
+bulk_mass = mavo_lev.sel(lev = slice(ml_depth, max_depth)).sum(['lev'])
 
 t_oceall = dict()
 
@@ -559,7 +564,9 @@ if not read_ts:
         oht_lev.append(gigi[0])
     filo.close()
 
-    oht_lev_pi = xr.concat(oht_lev, dim = 'year').mean('year')*cp0
+    oht_lev = xr.concat(oht_lev, dim = 'year')
+    oht_lev_pi = oht_lev.mean('year')*cp0
+    oht_lev_pi_std = oht_lev.std('year')*cp0
     oht_tot_pi = oht_lev_pi.sum('lev')
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
@@ -567,8 +574,8 @@ if not read_ts:
     oht2_pi = oht_lev_pi.sel(lev = slice(700., 2000.)).sum('lev')
     oht3_pi = oht_lev_pi.sel(lev = slice(2000., 6000.)).sum('lev')
 
-    oht_ml_pi = oht_lev_pi.sel(lev = slice(0., 100.)).sum('lev')
-    oht_bulk_pi = oht_lev_pi.sel(lev = slice(100., 6000.)).sum('lev')
+    oht_ml_pi = oht_lev_pi.sel(lev = slice(0., ml_depth)).sum('lev')
+    oht_bulk_pi = oht_lev_pi.sel(lev = slice(ml_depth, max_depth)).sum('lev')
     t_ml_pi = 273.15 + oht_ml_pi/ml_mass/cp0
     t_bulk_pi = 273.15 + oht_bulk_pi/bulk_mass/cp0
     t_oceall[('pi', 'ml')] = t_ml_pi
@@ -583,7 +590,8 @@ else:
     t_ml_pi = 273.15 + oht_ml_pi/ml_mass/cp0
     t_bulk_pi = 273.15 + oht_bulk_pi/bulk_mass/cp0
 
-
+oht_all[('pi', 't_prof')] = oht_lev_pi/mavo_lev/cp0
+oht_all[('pi', 't_prof_std')] = oht_lev_pi_std/mavo_lev/cp0
 
 fig, ax = plt.subplots(figsize = (16,9))
 fig2, ax2 = plt.subplots(figsize = (16,9))
@@ -606,8 +614,8 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
         filo.close()
 
         oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
-        oht_ml = oht_lev.sel(lev = slice(0., 100.)).sum('lev')
-        oht_bulk = oht_lev.sel(lev = slice(100., 6000.)).sum('lev')
+        oht_ml = oht_lev.sel(lev = slice(0., ml_depth)).sum('lev')
+        oht_bulk = oht_lev.sel(lev = slice(ml_depth, max_depth)).sum('lev')
 
         oht_lev = oht_lev - oht_lev_pi # removing pi base level
         oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
@@ -615,6 +623,8 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
         oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
         oht_tot = oht_lev.sum('lev')
 
+        oht_all[(ru, 't_ini')] = oht_lev[:30].mean('year')/mavo_lev/cp0
+        oht_all[(ru, 't_final')] = oht_lev[-30:].mean('year')/mavo_lev/cp0
 
         oht_all[(ru, 700)] = oht1
         oht_all[(ru, 2000)] = oht2
@@ -691,6 +701,57 @@ fig3.savefig(carto + 'oht_deep_gtas.pdf')
 
 pickle.dump(oht_all, open(carto + 'oht_ts_deep.p', 'wb'))
 
+####
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    ax.plot(oht_all[(ru, 't_final')], oht_all[(ru, 't_final')].lev, color = col, label = ru, lw = 2)
+ax.legend()
+ax.grid()
+ax.invert_yaxis()
+ax.set_ylabel('Depth (m)')
+#ax.set_xlabel('Heat content anomaly (J)')
+ax.set_xlabel('Cons. temperature anomaly (K)')
+fig.savefig(carto + 'otemp_anom_profile.pdf')
+
+####
+fig, ax = plt.subplots(figsize = (16,9))
+piprof = oht_all[('pi', 't_prof')]
+piprof_std = oht_all[('pi', 't_prof_std')]
+ax.fill_betweenx(piprof.lev, piprof-piprof_std, piprof+piprof_std, color = 'grey', alpha = 0.3)
+ax.plot(piprof, piprof.lev, color = 'black', label = 'pi', lw = 2)
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    ax.plot(piprof+oht_all[(ru, 't_ini')], oht_all[(ru, 't_final')].lev, color = col, lw = 2, ls = ':')
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    ax.plot(piprof+oht_all[(ru, 't_final')], oht_all[(ru, 't_final')].lev, color = col, label = ru, lw = 2)
+ax.legend()
+ax.grid()
+ax.invert_yaxis()
+ax.set_ylabel('Depth (m)')
+#ax.set_xlabel('Heat content anomaly (J)')
+ax.set_xlabel('Cons. temperature (K)')
+fig.savefig(carto + 'otemp_abs_profile.pdf')
+
+
+fig, ax = plt.subplots(figsize = (16,9))
+ax.plot(mavo_lev, mavo_lev.lev, lw = 2)
+ax.grid()
+ax.invert_yaxis()
+ax.set_ylabel('Depth (m)')
+ax.set_xlabel('Ocean mass (kg)')
+fig.savefig(carto + 'ocemass_profile.pdf')
+
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    ax.plot(oht_all[(ru, 't_ini')], oht_all[(ru, 't_ini')].lev, color = col, lw = 2, ls = ':')
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    ax.plot(oht_all[(ru, 't_final')], oht_all[(ru, 't_final')].lev, color = col, label = ru, lw = 2)
+ax.legend()
+ax.grid()
+ax.invert_yaxis()
+ax.set_ylabel('Depth (m)')
+#ax.set_xlabel('Heat content anomaly (J)')
+ax.set_xlabel('Cons. temperature anomaly (K)')
+fig.savefig(carto + 'otemp_anom_vsini_profile.pdf')
 
 ### Plot efficiency of heat transfer, as in Armour (2017)
 nlow = 50
@@ -720,10 +781,118 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
 ax.grid()
 ax.legend()
 #ax.set_title('Heat uptake efficiency')
-ax.set_ylabel(r'$\gamma/A_{oce}$ ($W m^{-2} K^{-1}$)')
+ax.set_ylabel(r'$\gamma$ ($W m^{-2} K^{-1}$)')
 ax.set_xlabel('GTAS (K)')
 fig.savefig(carto + 'gamma_vs_gtas.pdf')
 
+
+### Plot efficiency of heat transfer, as in Armour (2017)
+nlow = 50
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    oht_ml = oht_all[(ru, 'ml')] - oht_ml_pi
+    oht_bulk = oht_all[(ru, 'bulk')] - oht_bulk_pi
+    oht_ml = ctl.running_mean(oht_ml, nlow)
+    oht_bulk = ctl.running_mean(oht_bulk, nlow)
+
+    t_ml = t_oceall[(ru, 'ml')] - t_oceall[('pi', 'ml')]
+    t_bulk = t_oceall[(ru, 'bulk')] - t_oceall[('pi', 'bulk')]
+
+    t_ml = ctl.running_mean(t_ml, nlow)
+    t_bulk = ctl.running_mean(t_bulk, nlow)
+
+    gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
+    gtas = ctl.running_mean(gtas, nlow)
+    #gtas = 273.15 + oht1/oce_mass/cp0
+    yeas = np.arange(500)
+    dtbulk = np.gradient(oht_bulk)/(86400*365)
+    #gama = dtbulk/(gtas-t_deep)
+    gama = dtbulk/(t_ml-t_bulk)/oce_area
+    #ax.scatter(gtas, gama, label = ru, color = col)
+    ax.scatter(t_ml-t_bulk, gama, label = ru, color = col)
+    #plt.scatter(yeas, gama, label = ru, color = col, s = 2)
+
+ax.grid()
+ax.legend()
+#ax.set_title('Heat uptake efficiency')
+ax.set_ylabel(r'$\gamma$ ($W m^{-2} K^{-1}$)')
+ax.set_xlabel(r'$T_s-T_d$ (K)')
+fig.savefig(carto + 'gamma_vs_deltaT.pdf')
+
+### Plot efficiency of heat transfer, as in Armour (2017)
+nlow = 50
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    oht_ml = oht_all[(ru, 'ml')] - oht_ml_pi
+    oht_bulk = oht_all[(ru, 'bulk')] - oht_bulk_pi
+    oht_ml = ctl.running_mean(oht_ml, nlow)
+    oht_bulk = ctl.running_mean(oht_bulk, nlow)
+
+    t_ml = t_oceall[(ru, 'ml')] - t_oceall[('pi', 'ml')]
+    t_bulk = t_oceall[(ru, 'bulk')] - t_oceall[('pi', 'bulk')]
+
+    t_ml = ctl.running_mean(t_ml, nlow)
+    t_bulk = ctl.running_mean(t_bulk, nlow)
+
+    gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
+    gtas = ctl.running_mean(gtas, nlow)
+    #gtas = 273.15 + oht1/oce_mass/cp0
+    yeas = np.arange(500)
+    dtbulk = np.gradient(oht_bulk)/(86400*365)
+    #gama = dtbulk/(gtas-t_deep)
+    gama = dtbulk/(t_ml-t_bulk)/oce_area
+    #ax.scatter(gtas, gama, label = ru, color = col)
+    ax.scatter(yeas, gama, label = ru, color = col)
+    #plt.scatter(yeas, gama, label = ru, color = col, s = 2)
+
+ax.grid()
+ax.legend()
+#ax.set_title('Heat uptake efficiency')
+ax.set_ylabel(r'$\gamma$ ($W m^{-2} K^{-1}$)')
+ax.set_xlabel('Years after stabilization')
+fig.savefig(carto + 'gamma_vs_time.pdf')
+
+### Plot efficiency of heat transfer, as in Armour (2017)
+nlow = 50
+fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    oht_ml = oht_all[(ru, 'ml')] - oht_ml_pi
+    oht_bulk = oht_all[(ru, 'bulk')] - oht_bulk_pi
+    oht_ml = ctl.running_mean(oht_ml, nlow)
+    oht_bulk = ctl.running_mean(oht_bulk, nlow)
+
+    t_ml = t_oceall[(ru, 'ml')] - t_oceall[('pi', 'ml')]
+    t_bulk = t_oceall[(ru, 'bulk')] - t_oceall[('pi', 'bulk')]
+    t_ml = ctl.running_mean(t_ml, nlow)
+    t_bulk = ctl.running_mean(t_bulk, nlow)
+
+    yeas = np.arange(500)
+    dtbulk = np.gradient(oht_bulk)/(86400*365)
+
+    nonan = np.isnan(dtbulk)
+    res = stats.linregress(t_ml[~nonan]-t_bulk[~nonan], dtbulk[~nonan])
+    trend = res.slope
+    trend_err = res.stderr
+    print(ru + 'Corr: ', res.rvalue)
+
+    gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
+    gtas = ctl.running_mean(gtas, nlow)
+    #gtas = 273.15 + oht1/oce_mass/cp0
+    #gama = dtbulk/(gtas-t_deep)
+    gama = dtbulk/(t_ml-t_bulk)/oce_area
+    #ax.scatter(gtas, gama, label = ru, color = col)
+    #ax.scatter(yeas, gama, label = ru, color = col)
+    ax.scatter(t_ml-t_bulk, dtbulk/oce_area, label = ru, color = col)
+
+    #plt.scatter(yeas, gama, label = ru, color = col, s = 2)
+
+ax.grid()
+ax.legend()
+#ax.set_title('Heat uptake efficiency')
+#ax.set_ylabel(r'$\gamma/A_{oce}$ ($W m^{-2} K^{-1}$)')
+ax.set_ylabel(r'$C_d \frac{dT_d}{dt}$ (W/$m^2$)')
+ax.set_xlabel(r'$T_s-T_d$ (K)')
+fig.savefig(carto + 'greg2000_dt_vs_tdiff.pdf')
 #############################################################
 
 
