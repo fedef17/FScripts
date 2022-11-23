@@ -33,6 +33,16 @@ else:
     cart = sys.argv[1] # Name of input file (relative path)
     cart_out = sys.argv[2]
 
+if cart[-1] != '/':
+    cart = cart + '/'
+if cart_out[-1] != '/':
+    cart_out = cart_out + '/'
+
+if not os.path.exists(cart_out):
+    os.mkdir(cart_out)
+
+expname = cart[:-1].split('/')[-1]
+
 globon = xr.open_mfdataset(cart + 'GLOBONE_atm_6hrs_*.nc')
 
 #### CLOUDS
@@ -50,7 +60,7 @@ era_cloud = xr.open_mfdataset('/nas/reference/ERAInterim/monthly/tcc/tcc*nc')
 era_cloud_clim = era_cloud.mean('time')
 era_cloud_clim_rg = ctl.regrid_dataset(era_cloud_clim, regrid_to_reference=ceres_clim)
 
-ctl.plot_multimap_contour([cloud_clim_rg, ceres_clim['cldarea_total_mon'], 100*era_cloud_clim_rg['tcc']], figsize = (18,7), subtitles = ['GLOBO KM 312', 'CERES', 'ERAInt'], cb_label = 'Cloud cover', fix_subplots_shape=(1,3), filename = cart_out + 'cloud_check.pdf')
+ctl.plot_multimap_contour([cloud_clim_rg, ceres_clim['cldarea_total_mon'], 100*era_cloud_clim_rg['tcc']], figsize = (18,7), subtitles = ['GLOBO KM 312', 'CERES', 'ERAInt'], cb_label = 'Cloud cover', fix_subplots_shape=(1,3), filename = cart_out + 'cloud_check_{}.pdf'.format(expname))
 
 # ## Shortwave flux at TOA
 varname = 'rsnt'
@@ -65,7 +75,7 @@ var_era_rg = ctl.regrid_dataset(var_era, regrid_to_reference=var_ceres)
 #ctl.plot_multimap_contour([var_rg, var_ceres, var_era_rg], figsize = (18,7), subtitles = ['GLOBO KM 312', 'CERES', 'ERA Int'], cb_label = 'Net SW at TOA', fix_subplots_shape=(1,3))
 
 #ctl.plot_multimap_contour([var_rg, var_ceres, var_rg-var_ceres], figsize = (18,7), subtitles = ['GLOBO KM 312', 'CERES', 'DIFF'], cb_label = 'Net SW at TOA', fix_subplots_shape=(1,3))
-ctl.plot_map_contour(var_rg-var_ceres, cb_label = 'Net SW at TOA bias', plot_anomalies = True, cbar_range=(-50, 50), filename = cart_out + 'net_SW_bias.pdf')
+ctl.plot_map_contour(var_rg-var_ceres, cb_label = 'Net SW at TOA bias', plot_anomalies = True, cbar_range=(-50, 50), filename = cart_out + 'net_SW_bias_{}.pdf'.format(expname))
 
 # ## Precipitation
 varname = 'pr'
@@ -76,4 +86,4 @@ var_rg = ctl.regrid_dataset(var, regrid_to_reference=var_era)
 
 
 ctl.plot_multimap_contour([1.5*var_rg*86400., var_era*1000], figsize = (16,9), subtitles = ['GLOBO KM 312', 'ERA'], cb_label = 'Precipit', fix_subplots_shape=(1,2), cbar_range = (0, 10), cmap='BrBG', filename = cart_out + 'check_pr.pdf')
-ctl.plot_map_contour((var_rg*86400-var_era*1000), figsize = (16,9), title = ['GLOBO KM 312 - ERA'], cb_label = 'Precipit', cbar_range = (-5, 5), cmap='BrBG', filename = cart_out + 'check_pr_bias.pdf')
+ctl.plot_map_contour((var_rg*86400-var_era*1000), figsize = (16,9), title = ['GLOBO KM 312 - ERA'], cb_label = 'Precipit', cbar_range = (-5, 5), cmap='BrBG', filename = cart_out + 'check_pr_bias_{}.pdf'.format(expname))
