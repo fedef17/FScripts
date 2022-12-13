@@ -177,13 +177,13 @@ for ru in allruok:
     pickle.dump(yeamean, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'wb'))
     yeamean = dict()
 
-pickle.dump(glomeans, open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
+pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
 
 yeamean_var = dict()
 for var in ['tas', 'pr', 'net_toa', 'net_srf']:
     for ru in allruok:
-        gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'wb'))
+        gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'rb'))
         yeamean_var[(ru, var)] = gigi[(ru, var)]
 
     pickle.dump(yeamean_var, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'wb'))
