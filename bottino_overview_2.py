@@ -142,7 +142,7 @@ if tip == 'calc':
     #     print(filna.format(na, mem, miptab, var))
     # continue
 
-    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' = 1200})
+    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200})
     kose = kose.drop_vars('time_bnds')
 
     kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
