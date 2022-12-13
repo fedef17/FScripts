@@ -22,6 +22,8 @@ import xarray as xr
 import glob
 import xclim
 
+import psutil
+
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
@@ -34,6 +36,17 @@ plt.rcParams['axes.axisbelow'] = True
 # cart_out = '/home/fabiano/Research/lavori/BOTTINO/seasmean/'
 # ctl.mkdir(cart_out)
 #
+
+logname = 'log_overview_seaice.log'.format(ru)
+logfile = open(logname,'w') #self.name, 'w', 0)
+
+# re-open stdout without buffering
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
+# redirect stdout and stderr to the log file opened above
+os.dup2(logfile.fileno(), sys.stdout.fileno())
+os.dup2(logfile.fileno(), sys.stderr.fileno())
+
 
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
@@ -116,6 +129,9 @@ for ru, col in zip(allruok, colok):
         lat = np.array(gigi.latitude.data)
 
     seaice = np.array(gigi.siconc.data)
+
+    print('total RAM memory used {}:'.format(ru), psutil.virtual_memory()[3]/1.e9)
+
     #okslat = lat > 40.
     for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
         areaok = areaT[okslat]
