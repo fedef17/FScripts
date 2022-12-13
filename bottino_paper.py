@@ -998,6 +998,53 @@ for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', '
     strin = ' '+6*'& {:5.1f}'+'\\\\'
     print(nom+strin.format(*cose))
 
+#############################################################
+## Check deep trend pi
+filo = open(carto + 'oht_piControl.p', 'rb')
+oht_lev = []
+    for i in range(500):
+        try:
+            gigi = pickle.load(filo)
+        except:
+            break
+        oht_lev.append(gigi[0])
+    filo.close()
+
+oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
+oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+oht3_pi_mean = oht3.mean('year')
+
+fig = plt.figure(figsize = (16,9))
+plt.plot(oht3-oht3[:30].mean(), color = 'black', label = 'pi', lw = 2)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        plt.plot(oht_all[(ru, 'deep')] + oht3_pi_mean - oht3[:30].mean(), color = col, label = ru, lw = 2)
+plt.ylabel('Deep ocean heat content anomaly (J)')
+
+plt.xlabel('years')
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi.pdf')
+
+deep_mass = mavo_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+
+fig, ax = plt.subplots(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(np.arange(i+1))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+ax.grid(axis = 'y')
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
 
 
 sys.exit()
