@@ -21,6 +21,8 @@ import xarray as xr
 import glob
 import xclim
 
+import psutil
+
 plt.rcParams['xtick.labelsize'] = 18
 plt.rcParams['ytick.labelsize'] = 18
 titlefont = 22
@@ -31,6 +33,24 @@ plt.rcParams['axes.axisbelow'] = True
 plt.rcParams['legend.fontsize'] = 18
 
 #############################################################################
+
+tip = sys.argv[1]
+
+if tip == 'calc':
+    ru = sys.argv[2]
+
+logname = 'log_oceall_{}.log'.format(ru)
+logfile = open(logname,'w') #self.name, 'w', 0)
+
+# re-open stdout without buffering
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+
+# redirect stdout and stderr to the log file opened above
+os.dup2(logfile.fileno(), sys.stdout.fileno())
+os.dup2(logfile.fileno(), sys.stderr.fileno())
+
+if tip == 'calc':
+    print('Running calculation for {}'.format(ru))
 
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
@@ -70,6 +90,7 @@ add_uas = False
 allvars_3D = []#'ta ua'.split()
 
 #var_glob_mean = 'tas pr clt rlut rsut net_toa'.split()  # plot global timeseries, including ssp585
+#var_glob_mean = 'tas pr clt rlut rsut net_toa rsds rsus rlds rlus hfss hfls net_srf'.split()
 var_glob_mean = 'tas pr clt rlut rsut net_toa rsds rsus rlds rlus hfss hfls net_srf'.split()
 
 var_glob_ylabel = ['Temp. anomaly (K)', r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)', 'Cloud cover', 'Outgoing Longwave Radiation (W m$^{-2}$)', 'Outgoing Shortwave Radiation (W m$^{-2}$)', 'Net incoming TOA flux (W m$^{-2}$)']
@@ -94,9 +115,12 @@ for ke in gigi:
     if 'pi' in gigi:
         glomeans[ke] = gigi[ke]
 
+del gigi
+
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb')) # too heavy!
 
-for ru in allruok:
+#for ru in allruok:
+if tip == 'calc':
     print(ru)
     mem = 'r1'
     if ru in ['ssp585', 'hist']: mem = 'r4'
@@ -118,7 +142,7 @@ for ru in allruok:
     #     print(filna.format(na, mem, miptab, var))
     # continue
 
-    kose = xr.open_mfdataset(fils, use_cftime = True)
+    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' = 1200})
     kose = kose.drop_vars('time_bnds')
 
     kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
@@ -143,7 +167,15 @@ for ru in allruok:
             continue
 
         cosoye = kose[var].groupby("time.year").mean().compute()
-        yeamean[(ru, var)] = cosoye
+
+        print('total RAM memory used after {}:'.format(var), psutil.virtual_memory()[3]/1.e9)
+
+        if var in ['tas', 'pr', 'rlut', 'rsut', 'net_toa', 'net_srf']:
+            yeamean[(ru, var)] = cosoye
+
+        if var == 'net_toa':
+            for vauu in 'tas pr clt rlut rsut net_toa'.split():
+                del kose[vauu]
 
         # coso = cosoye.mean('lon')
         # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
@@ -175,18 +207,33 @@ for ru in allruok:
     #     mapmean[(ru, var)] = kose_sclim
 
     pickle.dump(yeamean, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'wb'))
-    yeamean = dict()
 
-pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
+    pickle.dump(glomeans, open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'wb'))
+
+    del yeamean
+    del glomeans
+    yeamean = dict()
+    glomeans = dict()
+
+#pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
 
-yeamean_var = dict()
-for var in ['tas', 'pr', 'net_toa', 'net_srf']:
+if tip == 'plot':
+    glomeans = dict()
     for ru in allruok:
-        gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'rb'))
-        yeamean_var[(ru, var)] = gigi[(ru, var)]
+        gigi = pickle.load(open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'rb'))
+        glomeans.update(gigi)
 
-    pickle.dump(yeamean_var, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'wb'))
+    pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
+
+    for var in ['tas', 'pr', 'net_toa', 'net_srf']:
+        yeamean_var = dict()
+        for ru in allruok:
+            gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'rb'))
+            yeamean_var[(ru, var)] = gigi[(ru, var)]
+
+        pickle.dump(yeamean_var, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'wb'))
+        del yeamean_var
 
 
 # pickle.dump([glomeans, pimean, yeamean, mapmean], open(cart_out + 'bottino_seasmean_2D_srf.p', 'wb'))
@@ -257,60 +304,61 @@ for var in ['tas', 'pr', 'net_toa', 'net_srf']:
 
 # glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
-figs_glob = []
-axs_glob = []
-for var in var_glob_mean:
-    fig, ax = plt.subplots(figsize = (16,9))
-    axs_glob.append(ax)
-    figs_glob.append(fig)
-    ax.set_title(var)
+if tip == 'plot':
+    figs_glob = []
+    axs_glob = []
+    for var in var_glob_mean:
+        fig, ax = plt.subplots(figsize = (16,9))
+        axs_glob.append(ax)
+        figs_glob.append(fig)
+        ax.set_title(var)
 
-fig_greg, ax_greg = plt.subplots(figsize = (16,9))
+    fig_greg, ax_greg = plt.subplots(figsize = (16,9))
 
-#for na, ru, col in zip(allnams, allru, colors):
-#for na, ru, col in zip(allnams3, allru3, colors3):
-for ru, col in zip(allruall, colall):
-    print(ru)
+    #for na, ru, col in zip(allnams, allru, colors):
+    #for na, ru, col in zip(allnams3, allru3, colors3):
+    for ru, col in zip(allruall, colall):
+        print(ru)
 
-    for var, fig, ax, vylab in zip(var_glob_mean, figs_glob, axs_glob, var_glob_ylabel):
-        print(var)
-        if (ru, var) not in glomeans.keys():
-            print('NOT found')
-            continue
+        for var, fig, ax, vylab in zip(var_glob_mean, figs_glob, axs_glob, var_glob_ylabel):
+            print(var)
+            if (ru, var) not in glomeans.keys():
+                print('NOT found')
+                continue
 
-        # cosoye = yeamean[(ru, var)]
-        years, glomean = glomeans[(ru, var)]
+            # cosoye = yeamean[(ru, var)]
+            years, glomean = glomeans[(ru, var)]
 
-        ax.plot(years, glomean-pimean[var], label = ru, color = col)
+            ax.plot(years, glomean-pimean[var], label = ru, color = col)
 
-        if ru == 'pi':
-            ax.set_ylabel(vylab)
-            ax.set_xlabel('Year')
+            if ru == 'pi':
+                ax.set_ylabel(vylab)
+                ax.set_xlabel('Year')
 
-    # gregory
-    try:
-        #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
-        ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
-    except Exception as exc:
-        print(ru, exc)
-        pass
+        # gregory
+        try:
+            #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+            ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
+        except Exception as exc:
+            print(ru, exc)
+            pass
 
-ax_greg.legend()
-ax_greg.grid()
+    ax_greg.legend()
+    ax_greg.grid()
 
-for ax in axs_glob:
-    ax.legend()
-    ax.grid()
+    for ax in axs_glob:
+        ax.legend()
+        ax.grid()
 
-ctl.plot_pdfpages(cart_out + 'bottino_glomeans_1000.pdf', figs_glob, True, )
+    ctl.plot_pdfpages(cart_out + 'bottino_glomeans_1000.pdf', figs_glob, True, )
 
-ax_greg.set_xlabel('Global mean tas (K)')
-ax_greg.set_ylabel('Global net incoming TOA flux (W/m2)')
-fig_greg.savefig(cart_out + 'bottino_gregory_1000.pdf')
+    ax_greg.set_xlabel('Global mean tas (K)')
+    ax_greg.set_ylabel('Global net incoming TOA flux (W/m2)')
+    fig_greg.savefig(cart_out + 'bottino_gregory_1000.pdf')
 
-ax_greg.set_xlim((-0.5, 0.5))
-ax_greg.set_ylim((-0.5, 0.5))
-fig_greg.savefig(cart_out + 'bottino_gregory_pizoom.pdf')
+    ax_greg.set_xlim((-0.5, 0.5))
+    ax_greg.set_ylim((-0.5, 0.5))
+    fig_greg.savefig(cart_out + 'bottino_gregory_pizoom.pdf')
 
 
 sys.exit()

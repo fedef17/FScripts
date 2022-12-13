@@ -128,13 +128,13 @@ def do_cross(fils, fils2, fia, fil_out):
 
         oht_lev = oht.mean('time').sum(['i', 'j'])
 
-        # oht700 = oht.sel(lev = slice(0., 700.)).mean('time').sum('lev')
-        # oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
-        # oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
+        oht700 = oht.sel(lev = slice(0., 700.)).mean('time').sum('lev')
+        oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
+        oht_deep = oht.sel(lev = slice(2000., 6000.)).mean('time').sum('lev')
 
-        oht700 = gigi.sel(lev = slice(697., 698.)).mean('time').mean('lev')
-        oht2000 = gigi.sel(lev = slice(1945., 1946.)).mean('time').mean('lev')
-        oht_deep = gigi.sel(lev = slice(4093., 4094.)).mean('time').mean('lev')
+        # oht700 = gigi.sel(lev = slice(697., 698.)).mean('time').mean('lev')
+        # oht2000 = gigi.sel(lev = slice(1945., 1946.)).mean('time').mean('lev')
+        # oht_deep = gigi.sel(lev = slice(4093., 4094.)).mean('time').mean('lev')
 
         print('nans', np.sum(np.isnan(oht_deep.values)))
 
