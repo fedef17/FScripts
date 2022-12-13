@@ -135,7 +135,7 @@ if tip == 'calc':
 
     if len(fils) == 0:
         print('no files for {}'.format(na))
-        continue
+        sys.exit()
 
     # for var in allvars_2D:
     #     print(var, len(glob.glob(filna.format(na, mem, miptab, var))))
@@ -195,8 +195,8 @@ if tip == 'calc':
         glomeans[(ru, var, 'land')] = (years, glomean_land)
 
 
-    if ru == 'ssp585':
-        continue
+    # if ru == 'ssp585':
+    #     continue
 
     # if ru != 'pi':
     #     kose = kose.sel(time = kose['time.year'] >= kose['time.year'].data[-1]-200)
