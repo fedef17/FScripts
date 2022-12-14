@@ -52,6 +52,9 @@ os.dup2(logfile.fileno(), sys.stderr.fileno())
 if tip == 'calc':
     print('Running calculation for {}'.format(ru))
 
+process = psutil.Process(os.getpid())
+
+
 if os.uname()[1] == 'hobbes':
     cart_out = '/home/{}/Research/lavori/BOTTINO/seasmean/'.format(os.getlogin())
     cart_run = '/home/{}/Research/git/ece_runtime/run/'.format(os.getlogin())
@@ -119,81 +122,86 @@ del gigi
 
 #glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean_2D.p', 'rb')) # too heavy!
 
-#for ru in allruok:
-if tip == 'calc':
-    print(ru)
-    mem = 'r1'
-    if ru in ['ssp585', 'hist']: mem = 'r4'
+datadir = '/g100_scratch/userexternal/{}/ece3/'.format(user)
 
-    datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-    # else:
-    #     datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
+    """
+    Reads variable from disk or creates variable reading multiple variables from disk.
+    """
+    print(ru, miptab, var)
 
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'#.format(fis, miptab, var, var)
+    filna = datadir + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(ru, miptab, var, var)
 
-    fils = np.concatenate([glob.glob(filna.format(miptab, var, var)) for var in allvars_2D])
+    fils = glob.glob(filna.format(ru, miptab, var, var))
+    fils.sort()
 
     if len(fils) == 0:
-        print('no files for {}'.format(na))
-        sys.exit()
-
-    # for var in allvars_2D:
-    #     print(var, len(glob.glob(filna.format(na, mem, miptab, var))))
-    #     print(filna.format(na, mem, miptab, var))
-    # continue
+        raise ValueError('no files for {} - {}'.format(ru, var))
 
     kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200})
     kose = kose.drop_vars('time_bnds')
+    kose = kose.drop_vars('lat_bnds')
+    kose = kose.drop_vars('lon_bnds')
 
-    kose = kose.assign(net_toa = kose.rsdt - kose.rlut - kose.rsut) # net downward energy flux at TOA
-    print('assigned net_toa')
-    kose = kose.assign(net_srf = kose.rsds + kose.rlds - kose.rsus - kose.rlus - kose.hfss - kose.hfls) # net downward energy flux at srf
-    print('assigned net_srf')
+    cosoye = kose.groupby("time.year").mean()
 
-    # # Separate for uas
-    # if add_uas:
-    #     fils = glob.glob(filna.format(na, mem, miptab, 'uas'))
-    #     if len(fils) > 0:
-    #         kosettt = xr.open_mfdataset(fils, use_cftime = True)
-    #         kosettt = kosettt.drop_vars('time_bnds')
-    #         kosettt = kosettt.drop_vars('height')
-    #         kose = kose.assign(uas = kosettt.uas)
+    return cosoye
+
+
+
+#for ru in allruok:
+if tip == 'calc':
+    cosoye = None
 
     for var in var_glob_mean:
         print(var)
-        if var not in kose:
-            if ru == 'pi':
-                pimean[var] = 0.
-            continue
+        if cosoye is None:
+            cosoye = var_reader(ru, miptab, var)
+        else:
+            coso = var_reader(ru, miptab, var)
+            cosoye.update(coso)
 
-        cosoye = kose[var].groupby("time.year").mean().compute()
+        print('total RAM memory used after {}:'.format(var), process.memory_info().rss/1e9)
 
-        print('total RAM memory used after {}:'.format(var), psutil.virtual_memory()[3]/1.e9)
+    cosoye = cosoye.assign(net_toa = cosoye.rsdt - cosoye.rlut - cosoye.rsut) # net downward energy flux at TOA
+    print('assigned net_toa')
+    cosoye = cosoye.assign(net_srf = cosoye.rsds + cosoye.rlds - cosoye.rsus - cosoye.rlus - cosoye.hfss - cosoye.hfls) # net downward energy flux at srf
+    print('assigned net_srf')
 
-        if var in ['tas', 'pr', 'rlut', 'rsut', 'net_toa', 'net_srf']:
-            yeamean[(ru, var)] = cosoye
+    print('total RAM memory used:', process.memory_info().rss/1e9)
 
-        if var == 'net_toa':
-            for vauu in 'tas pr clt rlut rsut net_toa'.split():
-                del kose[vauu]
+    for var in var_glob_mean:
+        glomean = ctl.global_mean(cosoye[var]).compute()
+        glomean_oce = ctl.global_mean(cosoye[var], mask = oce_mask).compute()
+        glomean_land = ctl.global_mean(cosoye[var], mask = land_mask).compute()
 
-        # coso = cosoye.mean('lon')
-        # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
-        glomean = ctl.global_mean(cosoye)
-        glomean_oce = ctl.global_mean(cosoye, mask = oce_mask)
-        glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
+        print('total RAM memory used in glomean {}:'.format(var), process.memory_info().rss/1e9)
 
-        # if ru == 'pi':
-        #     years = cosoye.year.data-2256+2015
-        #     pimean[var] = np.mean(glomean)
-        # else:
-        #     years = cosoye.year.data
+        if ru == 'pi':
+            years = cosoye.year.data-2256+2015
+            pimean[var] = np.mean(glomean)
+        else:
+            years = glomean.year.data
 
-        glomeans[(ru, var)] = (years, glomean)
+        glomeans[(ru, var)] = (years, glomean.to_numpy())
+        glomeans[(ru, var, 'oce')] = (years, glomean_oce.to_numpy())
+        glomeans[(ru, var, 'land')] = (years, glomean_land.to_numpy())
 
-        glomeans[(ru, var, 'oce')] = (years, glomean_oce)
-        glomeans[(ru, var, 'land')] = (years, glomean_land)
+    pickle.dump(glomeans, open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'wb'))
 
+    print('total RAM memory used after glomeans:', process.memory_info().rss/1e9)
+
+
+    for var in ['tas', 'pr', 'rlut', 'rsut', 'net_toa', 'net_srf']:
+        yeamean[(ru, var)] = cosoye[var].compute()
+        print('total RAM memory used in yeamean {}:'.format(var), process.memory_info().rss/1e9)
+
+    pickle.dump(yeamean, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'wb'))
+
+    # coso = cosoye.mean('lon')
+    # glomean = np.average(coso, weights = abs(np.cos(np.deg2rad(coso.lat))), axis = -1)
+    # glomean_oce = ctl.global_mean(cosoye, mask = oce_mask)
+    # glomean_land = ctl.global_mean(cosoye, mask = ~oce_mask)
 
     # if ru == 'ssp585':
     #     continue
@@ -206,14 +214,6 @@ if tip == 'calc':
     #     kose_sclim = ctl.seasonal_climatology(kose[var])
     #     mapmean[(ru, var)] = kose_sclim
 
-    pickle.dump(yeamean, open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'wb'))
-
-    pickle.dump(glomeans, open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'wb'))
-
-    del yeamean
-    del glomeans
-    yeamean = dict()
-    glomeans = dict()
 
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
