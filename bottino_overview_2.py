@@ -126,7 +126,7 @@ datadir = '/g100_scratch/userexternal/{}/ece3/'.format(user)
 
 def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
     """
-    Reads variable from disk or creates variable reading multiple variables from disk.
+    Reads variable from disk.
     """
     print(ru, miptab, var)
 
@@ -153,7 +153,7 @@ def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
 if tip == 'calc':
     cosoye = None
 
-    for var in var_glob_mean:
+    for var in allvars_2D:
         print(var)
         if cosoye is None:
             cosoye = var_reader(ru, miptab, var)
