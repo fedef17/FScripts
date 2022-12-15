@@ -173,7 +173,7 @@ if tip == 'calc':
     for var in var_glob_mean:
         glomean = ctl.global_mean(cosoye[var]).compute()
         glomean_oce = ctl.global_mean(cosoye[var], mask = oce_mask).compute()
-        glomean_land = ctl.global_mean(cosoye[var], mask = land_mask).compute()
+        glomean_land = ctl.global_mean(cosoye[var], mask = ~oce_mask).compute()
 
         print('total RAM memory used in glomean {}:'.format(var), process.memory_info().rss/1e9)
 
