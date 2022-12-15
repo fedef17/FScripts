@@ -138,7 +138,8 @@ def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
     if len(fils) == 0:
         raise ValueError('no files for {} - {}'.format(ru, var))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200})
+    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, join = 'right') # 'override' è più generale, qui voglio right perchè così è compatibile con gli altri datasets. 
+    # override just picks the coordinate from the first dataset.. in this case the wrong lat
     kose = kose.drop_vars('time_bnds')
     kose = kose.drop_vars('lat_bnds')
     kose = kose.drop_vars('lon_bnds')
@@ -162,6 +163,9 @@ if tip == 'calc':
             cosoye.update(coso)
 
         print('total RAM memory used after {}:'.format(var), process.memory_info().rss/1e9)
+    
+    if len(cosoye.lat) != oce_mask.shape[0]:
+        oce_mask = ctl.regrid_dataset(dataset, regrid_to_reference=cosoye[var][0])
 
     cosoye = cosoye.assign(net_toa = cosoye.rsdt - cosoye.rlut - cosoye.rsut) # net downward energy flux at TOA
     print('assigned net_toa')
