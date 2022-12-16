@@ -29,17 +29,17 @@ ctl.mkdir(cart_out)
 
 ro = 1.025e9
 ####################################################################################################
-allru = ['b990', 'b025', 'b050', 'b100', 'b065', 'b080', 'b00I', 'b80I', 'b65I']
+allru = ['b990', 'b025', 'b050', 'b100', 'b065', 'b080']#, 'b00I', 'b80I', 'b65I']
 miptab = 'Omon'
 var = 'msftyz'
 
 amoc_all = dict()
 for ru in allru:
     print(ru)
-    if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
-        datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
-    else:
-        datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+    #if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
+    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
+    # else:
+    #     datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
 
     fis = 'f1'
     if 'I' in ru:
@@ -100,4 +100,4 @@ for ru in allru:
     amoc_all[(ru, 'aby_max')] = np.stack(aby_max)
     amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_max_lev)
 
-pickle.dump(amoc_all, open(cart_out + 'amoc_all.p', 'wb'))
+pickle.dump(amoc_all, open(cart_out + 'amoc_all_1000.p', 'wb'))

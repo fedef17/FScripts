@@ -62,10 +62,10 @@ cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
 
-if ru in ['b100', 'b050', 'b080', 'b065', 'b990']:
-    cartbase = '/g100_scratch/userexternal/ffabiano/ece3/'
-else:
-    cartbase = '/g100_work/IscrB_QUECLIM/BOTTINO/'
+#if ru in ['b100', 'b050', 'b080', 'b065', 'b990']:
+cartbase = '/g100_scratch/userexternal/ffabiano/ece3/'
+#else:
+#    cartbase = '/g100_work/IscrB_QUECLIM/BOTTINO/'
 
 filna = cartbase + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/*/{}/{}/g*/v*/{}*nc'
 
@@ -190,7 +190,7 @@ allfils.sort()
 allfils2 = glob.glob(filna.format(ru, miptab, mvar, mvar))
 allfils2.sort()
 
-filo = open(cart_out + 'oht_{}.p'.format(ru), 'wb')
+filo = open(cart_out + 'oht_{}_1000.p'.format(ru), 'wb')
 
 #cose = do_cross(allfils)
 print(allfils)
