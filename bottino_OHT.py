@@ -78,6 +78,8 @@ allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilizatio
 
 colors = ['teal', 'forestgreen', 'orange', 'violet']
 
+process = psutil.Process(os.getpid())
+
 ####################################################################################################
 
 miptab = 'Omon'
@@ -111,7 +113,7 @@ def do_cross(fils, fils2, fia, fil_out):
     #for fi1, fi2, fia in zip(fils, fils2, fils_area):
     for fi1, fi2 in zip(fils, fils2):
         print(fi1)
-        print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
+        print('total RAM memory used 1', process.memory_info().rss/1e9)
 
         gigi = xr.load_dataset(fi1, use_cftime = True)['bigthetao']
         gigi2 = xr.load_dataset(fi2, use_cftime = True)['masscello']
@@ -155,7 +157,8 @@ def do_cross(fils, fils2, fia, fil_out):
         #     nuvarz['thetao_'+basnam[:3]] = goggolo
         # gigi = gigi.assign(nuvarz)
 
-        print('total RAM memory used 2:', psutil.virtual_memory()[3]/1.e9)
+        print('total RAM memory used 2', process.memory_info().rss/1e9)
+
         #
         # del nuvarz, goggolo
         #gigi = gigi.drop(['vertices_longitude', 'vertices_latitude'])
@@ -169,11 +172,12 @@ def do_cross(fils, fils2, fia, fil_out):
         # pickle.dump(gogcross, fil_out)
         pickle.dump([oht_lev, zuki700, zuki2000, zuki_deep], fil_out)
 
-        print('total RAM memory used 3:', psutil.virtual_memory()[3]/1.e9)
-
         fil_out.flush()
 
         del gigi, gigi2, oht, oht_lev, zuki700, zuki2000, zuki_deep, oht700, oht2000, oht_deep
+
+        print('total RAM memory used 3', process.memory_info().rss/1e9)
+
 
     #coda.put(cose)
     #return cose
