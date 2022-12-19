@@ -38,8 +38,10 @@ tip = sys.argv[1]
 
 if tip == 'calc':
     ru = sys.argv[2]
+    logname = 'log_overview_{}.log'.format(ru)
+else:
+    logname = 'log_overview_plot.log'
 
-logname = 'log_overview_{}.log'.format(ru)
 logfile = open(logname,'w') #self.name, 'w', 0)
 
 # re-open stdout without buffering
