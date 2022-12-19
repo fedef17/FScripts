@@ -174,7 +174,7 @@ def do_cross(fils, fils2, fia, fil_out):
 
         fil_out.flush()
 
-        for cos in gigi, gigi2, oht, oht_lev, zuki700, zuki2000, zuki_deep, oht700, oht2000, oht_deep:
+        for cos in gigi, gigi2, gigi_a, oht, oht_lev, zuki700, zuki2000, zuki_deep, oht700, oht2000, oht_deep:
             cos.close()
 
         print('total RAM memory used 3', process.memory_info().rss/1e9)
