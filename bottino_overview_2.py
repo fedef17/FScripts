@@ -232,6 +232,7 @@ if tip == 'plot':
 
     pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 
+if tip == 'yeamean':
     for var in ['tas', 'pr', 'net_toa', 'net_srf']:
         yeamean_var = dict()
         for ru in allruok:
