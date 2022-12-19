@@ -333,6 +333,9 @@ if tip == 'plot':
             if (ru, var) not in glomeans.keys():
                 print('NOT found')
                 continue
+            if var not in pimean:
+                print('NOT in pi')
+                continue
 
             # cosoye = yeamean[(ru, var)]
             years, glomean = glomeans[(ru, var)]
