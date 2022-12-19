@@ -105,7 +105,8 @@ var_glob_ylabel += 'rsds rsus rlds rlus hfss hfls net_srf'.split()
 allruok = ['b990', 'b025', 'b050', 'b065', 'b080', 'b100']
 colok = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
 
-#colall = ['black', 'royalblue', 'crimson', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+allruall = ['pi', 'hist', 'ssp585'] + allruok
+colall = ['black', 'royalblue', 'crimson'] + colok
 
 figs_glob = []
 axs_glob = []
