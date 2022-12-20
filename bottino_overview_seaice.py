@@ -37,7 +37,7 @@ plt.rcParams['axes.axisbelow'] = True
 # ctl.mkdir(cart_out)
 #
 
-logname = 'log_overview_seaice.log'.format(ru)
+logname = 'log_overview_seaice.log'
 logfile = open(logname,'w') #self.name, 'w', 0)
 
 # re-open stdout without buffering
