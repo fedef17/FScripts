@@ -118,7 +118,7 @@ mapmean = dict()
 # Read already computed experiments
 gigi, pimean = pickle.load(open(cart_out + 'bottino_glomeans.p', 'rb'))
 for ke in gigi:
-    if 'pi' in gigi:
+    if 'pi' in ke or 'hist' in ke or 'ssp585' in ke:
         glomeans[ke] = gigi[ke]
 
 del gigi
@@ -141,7 +141,7 @@ def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
     if len(fils) == 0:
         raise ValueError('no files for {} - {}'.format(ru, var))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, join = 'right') # 'override' è più generale, qui voglio right perchè così è compatibile con gli altri datasets. 
+    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, join = 'right') # 'override' è più generale, qui voglio right perchè così è compatibile con gli altri datasets.
     # override just picks the coordinate from the first dataset.. in this case the wrong lat
     kose = kose.drop_vars('time_bnds')
     kose = kose.drop_vars('lat_bnds')
@@ -166,7 +166,7 @@ if tip == 'calc':
             cosoye.update(coso)
 
         print('total RAM memory used after {}:'.format(var), process.memory_info().rss/1e9)
-    
+
     if len(cosoye.lat) != oce_mask.shape[0]:
         oce_mask = ctl.regrid_dataset(dataset, regrid_to_reference=cosoye[var][0])
 
@@ -225,16 +225,15 @@ if tip == 'calc':
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
 
-if tip == 'plot':
-    glomeans = dict()
+if tip == 'preplot':
     for ru in allruok:
         gigi = pickle.load(open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'rb'))
         glomeans.update(gigi)
 
     pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 
-if tip == 'yeamean':
     for var in ['tas', 'pr', 'net_toa', 'net_srf']:
+        print(var)
         yeamean_var = dict()
         for ru in allruok:
             gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'rb'))
@@ -313,6 +312,8 @@ if tip == 'yeamean':
 # glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
 if tip == 'plot':
+    glomeans, pimean = pickle.load(open(cart_out + 'bottino_glomeans_1000.p', 'rb'))
+
     figs_glob = []
     axs_glob = []
     for var in var_glob_mean:
