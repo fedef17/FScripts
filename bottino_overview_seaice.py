@@ -77,6 +77,7 @@ allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050'
 
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
+process = psutil.Process(os.getpid())
 #############################################################################
 ## SEA ICE
 #areacelfi = '/nas/BOTTINO/areas.nc'
@@ -130,7 +131,8 @@ for ru, col in zip(allruok, colok):
 
     seaice = np.array(gigi.siconc.data)
 
-    print('total RAM memory used {}:'.format(ru), psutil.virtual_memory()[3]/1.e9)
+    print('total RAM memory used for {}: '.format(ru), process.memory_info().rss/1e9)
+
 
     #okslat = lat > 40.
     for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
@@ -147,6 +149,11 @@ for ru, col in zip(allruok, colok):
 
         resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
         resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
+
+    gigi.close()
+    del seaice, oksi, oksiarea, seaicearea
+
+    print('total RAM memory used after {}: '.format(ru), process.memory_info().rss/1e9)
 
 pickle.dump(resdict, open(cart_out + 'seaicearea_1000.p', 'wb'))
 
