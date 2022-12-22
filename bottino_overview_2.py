@@ -118,7 +118,7 @@ mapmean = dict()
 # Read already computed experiments
 gigi, pimean = pickle.load(open(cart_out + 'bottino_glomeans.p', 'rb'))
 for ke in gigi:
-    if 'pi' in gigi:
+    if 'pi' in ke or 'hist' in ke or 'ssp585' in ke:
         glomeans[ke] = gigi[ke]
 
 del gigi
@@ -174,7 +174,7 @@ if tip == 'calc':
             cosoye.update(coso)
 
         print('total RAM memory used after {}:'.format(var), process.memory_info().rss/1e9)
-    
+
     if len(cosoye.lat) != oce_mask.shape[0]:
         oce_mask = ctl.regrid_dataset(dataset, regrid_to_reference=cosoye[var][0])
 
@@ -233,16 +233,15 @@ if tip == 'calc':
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 #pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans.p', 'wb'))
 
-if tip == 'plot':
-    glomeans = dict()
+if tip == 'preplot':
     for ru in allruok:
         gigi = pickle.load(open(cart_out + 'bottino_glomeans_{}_1000.p'.format(ru), 'rb'))
         glomeans.update(gigi)
 
     pickle.dump([glomeans, pimean], open(cart_out + 'bottino_glomeans_1000.p', 'wb'))
 
-if tip == 'yeamean':
     for var in ['tas', 'pr', 'net_toa', 'net_srf']:
+        print(var)
         yeamean_var = dict()
         for ru in allruok:
             gigi = pickle.load(open(cart_out + 'bottino_seasmean_2D_{}_1000.p'.format(ru), 'rb'))
@@ -321,6 +320,8 @@ if tip == 'yeamean':
 # glomeans, pimean, yeamean, mapmean = pickle.load(open(cart_out + 'bottino_seasmean.p', 'rb'))
 
 if tip == 'plot':
+    glomeans, pimean = pickle.load(open(cart_out + 'bottino_glomeans_1000.p', 'rb'))
+
     figs_glob = []
     axs_glob = []
     for var in var_glob_mean:
@@ -330,6 +331,8 @@ if tip == 'plot':
         ax.set_title(var)
 
     fig_greg, ax_greg = plt.subplots(figsize = (16,9))
+    fig_greg_srf, ax_greg_srf = plt.subplots(figsize = (16,9))
+    fig_greg_inatm, ax_greg_inatm = plt.subplots(figsize = (16,9))
 
     #for na, ru, col in zip(allnams, allru, colors):
     #for na, ru, col in zip(allnams3, allru3, colors3):
@@ -355,15 +358,21 @@ if tip == 'plot':
                 ax.set_xlabel('Year')
 
         # gregory
-        try:
+        #try:
             #ax_greg.plot(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], label = ru, color = col)
+        if (ru, 'net_toa') in glomeans:
             ctl.gregplot_on_ax(ax_greg, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
-        except Exception as exc:
-            print(ru, exc)
-            pass
 
-    ax_greg.legend()
-    ax_greg.grid()
+        if (ru, 'net_srf') in glomeans:
+            ctl.gregplot_on_ax(ax_greg_srf, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_srf')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
+
+        if (ru, 'net_toa') in glomeans and (ru, 'net_srf') in glomeans:
+            ctl.gregplot_on_ax(ax_greg_inatm, glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'net_toa')][1]-glomeans[(ru, 'net_srf')][1], color = col, label = ru, calc_ERF = False, calc_ECS = False, nyea = 10, point_dim = 20)
+
+        # except Exception as exc:
+        #     print(ru, exc)
+        #     pass
+
 
     for ax in axs_glob:
         ax.legend()
@@ -371,9 +380,17 @@ if tip == 'plot':
 
     ctl.plot_pdfpages(cart_out + 'bottino_glomeans_1000.pdf', figs_glob, True, )
 
-    ax_greg.set_xlabel('Global mean tas (K)')
+    for ax in [ax_greg, ax_greg_srf, ax_greg_inatm]:
+        ax.legend()
+        ax.grid()
+        ax.set_xlabel('Global mean tas (K)')
     ax_greg.set_ylabel('Global net incoming TOA flux (W/m2)')
+    ax_greg_srf.set_ylabel('Global net downward surface flux (W/m2)')
+    ax_greg_inatm.set_ylabel('Global net atmospheric imbalance (W/m2)')
+
     fig_greg.savefig(cart_out + 'bottino_gregory_1000.pdf')
+    fig_greg_srf.savefig(cart_out + 'bottino_gregory_1000_srf.pdf')
+    fig_greg_inatm.savefig(cart_out + 'bottino_gregory_1000_inatm.pdf')
 
     ax_greg.set_xlim((-0.5, 0.5))
     ax_greg.set_ylim((-0.5, 0.5))

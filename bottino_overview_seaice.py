@@ -37,7 +37,9 @@ plt.rcParams['axes.axisbelow'] = True
 # ctl.mkdir(cart_out)
 #
 
-logname = 'log_overview_seaice.log'.format(ru)
+tip = sys.argv[1]
+
+logname = 'log_overview_seaice.log'
 logfile = open(logname,'w') #self.name, 'w', 0)
 
 # re-open stdout without buffering
@@ -77,6 +79,7 @@ allnams = ['piControl', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050'
 
 colors = ['black', 'forestgreen', 'orange', 'violet']
 
+process = psutil.Process(os.getpid())
 #############################################################################
 ## SEA ICE
 #areacelfi = '/nas/BOTTINO/areas.nc'
@@ -107,73 +110,84 @@ colok = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'viol
 na = ''
 
 #for ru, col in zip(allruadd2, colorsadd2):
-for ru, col in zip(allruok, colok):
-    print(ru)
-    mem = 'r1'
-    if ru in ['ssp585', 'hist']: mem = 'r4'
+if tip == 'calc':
+    for ru, col in zip(allruok, colok):
+        print(ru)
+        mem = 'r1'
+        if ru in ['ssp585', 'hist']: mem = 'r4'
 
-    if os.uname()[1] == 'hobbes':
-        filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
-        filist = glob.glob(filna.format(na, mem, miptab, varnam))
-    else:
-        datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
-        filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
-        filist = glob.glob(filna.format(miptab, varnam, varnam))
+        if os.uname()[1] == 'hobbes':
+            filna = '/nas/BOTTINO/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/{}/{}i1p1f1/{}/{}/*nc'
+            filist = glob.glob(filna.format(na, mem, miptab, varnam))
+        else:
+            datadir = '/g100_scratch/userexternal/{}/ece3/{}/cmorized/'.format(user, ru)
+            filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'
+            filist = glob.glob(filna.format(miptab, varnam, varnam))
 
-    gigi = xr.open_mfdataset(filist, use_cftime=True)
+        gigi = xr.open_mfdataset(filist, use_cftime=True)
 
-    try:
-        lat = np.array(gigi.lat.data)
-    except:
-        print('lat name is latitude')
-        lat = np.array(gigi.latitude.data)
+        try:
+            lat = np.array(gigi.lat.data)
+        except:
+            print('lat name is latitude')
+            lat = np.array(gigi.latitude.data)
 
-    seaice = np.array(gigi.siconc.data)
+        seaice = np.array(gigi.siconc.data)
 
-    print('total RAM memory used {}:'.format(ru), psutil.virtual_memory()[3]/1.e9)
-
-    #okslat = lat > 40.
-    for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
-        areaok = areaT[okslat]
-        oksi = seaice[:, okslat]
-        oksi[oksi < 15.] = 0.
-        oksi[oksi > 15.] = 1.
-        oksiarea = oksi*areaok[np.newaxis, :]
-        seaicearea = np.nansum(oksiarea, axis = 1)
-
-        dates = np.array(gigi.time.data)
-        okmarch = np.array([da.month == 3 for da in dates])
-        oksept = np.array([da.month == 9 for da in dates])
-
-        resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
-        resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
-
-pickle.dump(resdict, open(cart_out + 'seaicearea_1000.p', 'wb'))
+        print('total RAM memory used for {}: '.format(ru), process.memory_info().rss/1e9)
 
 
-for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
-    print(ru)
-    for ii, emi in enumerate(['N', 'S']):
-        sia_march = resdict[(ru, varnam, 'glomean', 'mar', emi)]
-        sia_sept = resdict[(ru, varnam, 'glomean', 'sep', emi)]
-        yeaok = np.arange(ye1, ye1 + len(sia_march))
+        #okslat = lat > 40.
+        for ii, emi, okslat in zip([0,1], ['N', 'S'], [lat > 40, lat < -40]):
+            areaok = areaT[okslat]
+            oksi = seaice[:, okslat]
+            oksi[oksi < 15.] = 0.
+            oksi[oksi > 15.] = 1.
+            oksiarea = oksi*areaok[np.newaxis, :]
+            seaicearea = np.nansum(oksiarea, axis = 1)
 
-        sima10 = ctl.running_mean(sia_march, 10)
-        sise10 = ctl.running_mean(sia_sept, 10)
+            dates = np.array(gigi.time.data)
+            okmarch = np.array([da.month == 3 for da in dates])
+            oksept = np.array([da.month == 9 for da in dates])
 
-        axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
-        axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+            resdict[(ru, varnam, 'glomean', 'mar', emi)] = seaicearea[okmarch]
+            resdict[(ru, varnam, 'glomean', 'sep', emi)] = seaicearea[oksept]
 
-        axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
-        axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+        gigi.close()
+        del seaice, oksi, oksiarea, seaicearea
 
-axs[0,0].set_title('March')
-axs[0,1].set_title('September')
-axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
-axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
-#axs[1,1].legend()
-ctl.custom_legend(fig, colall, allruall, ncol = 5)
-fig.savefig(cart_out + 'bottseaice_1000.pdf')
+        print('total RAM memory used after {}: '.format(ru), process.memory_info().rss/1e9)
+
+    pickle.dump(resdict, open(cart_out + 'seaicearea_1000.p', 'wb'))
+
+if tip == 'plot':
+    resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
+    resdict_1000 = pickle.load(open(cart_out + 'seaicearea_1000.p', 'rb'))
+    resdict.update(resdict_1000)
+
+    for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
+        print(ru)
+        for ii, emi in enumerate(['N', 'S']):
+            sia_march = resdict[(ru, varnam, 'glomean', 'mar', emi)]
+            sia_sept = resdict[(ru, varnam, 'glomean', 'sep', emi)]
+            yeaok = np.arange(ye1, ye1 + len(sia_march))
+
+            sima10 = ctl.running_mean(sia_march, 10)
+            sise10 = ctl.running_mean(sia_sept, 10)
+
+            axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+            axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+
+            axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+            axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+
+    axs[0,0].set_title('March')
+    axs[0,1].set_title('September')
+    axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
+    axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
+    #axs[1,1].legend()
+    ctl.custom_legend(fig, colall, allruall, ncol = 5)
+    fig.savefig(cart_out + 'bottseaice_1000.pdf')
 
 sys.exit()
 
