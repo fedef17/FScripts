@@ -127,6 +127,10 @@ del gigi
 
 datadir = '/g100_scratch/userexternal/{}/ece3/'.format(user)
 
+def roundlat(ds, ndec = 10):
+    ds = ds.assign_coords(lat = ds.lat.round(ndec))
+    return ds
+
 def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
     """
     Reads variable from disk.
@@ -141,8 +145,12 @@ def var_reader(ru, miptab, var, mem = 'r1', datadir = datadir):
     if len(fils) == 0:
         raise ValueError('no files for {} - {}'.format(ru, var))
 
-    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, join = 'right') # 'override' è più generale, qui voglio right perchè così è compatibile con gli altri datasets. 
+    kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, preprocess = roundlat)
+
+    #kose = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, join = 'right') # 'override' è più generale, qui voglio right perchè così è compatibile con gli altri datasets. 
     # override just picks the coordinate from the first dataset.. in this case the wrong lat
+    #### IMPORTANT!! Avoid join option (both override and right), the values of the dataset with a different coordinate are just set to NaN!!
+    
     kose = kose.drop_vars('time_bnds')
     kose = kose.drop_vars('lat_bnds')
     kose = kose.drop_vars('lon_bnds')
