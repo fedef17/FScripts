@@ -36,16 +36,17 @@ var = 'msftyz'
 amoc_all = dict()
 for ru in allru:
     print(ru)
-    #if ru in ['b990', 'b050', 'b100', 'b080', 'b065']:
-    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
-    # else:
-    #     datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+    if ru in ['b025', 'b050', 'b100', 'b080']:
+        datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
+        filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1{}/{}/{}/g*/v*/{}*nc'.format(fis, miptab, var, var)
+    else:
+        #datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+        datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
+        filna = datadir+'{}/{}/{}*nc'.format(miptab, var, var)
 
     fis = 'f1'
-    if 'I' in ru:
-        fis = 'f3'
+    if 'I' in ru: fis = 'f3'
 
-    filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1{}/{}/{}/g*/v*/{}*nc'.format(fis, miptab, var, var)
     listafi = glob.glob(filna)
     listafi.sort()
 
