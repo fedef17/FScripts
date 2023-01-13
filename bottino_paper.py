@@ -39,7 +39,7 @@ elif os.uname()[1] == 'xaru':
 elif os.uname()[1] == 'tintin':
     cart_out = '/home/fabiano/work/lavori/BOTTINO/'
 
-cart_out += 'nonlin_evol/'
+cart_out += 'nonlin_evol_1000/'
 ctl.mkdir(cart_out)
 
 colors = ['black', 'royalblue', 'lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet', 'crimson']
@@ -50,7 +50,7 @@ allru = ['pi', 'hist', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100', 'ssp585']
 cart_in = cart_out + '../seasmean/'
 # gogo = pickle.load(open(cart_in + 'bottino_seasmean_2D.p', 'rb'))
 # glomeans, pimean, yeamean, _ = gogo
-gogo = pickle.load(open(cart_in + 'bottino_glomeans.p', 'rb'))
+gogo = pickle.load(open(cart_in + 'bottino_glomeans_1000.p', 'rb'))
 glomeans, pimean = gogo
 
 
@@ -456,7 +456,7 @@ if do_fb:
         # pr_anom = pr_anom[gino]
         # tas_anom = tas_anom[gino]
         #for spli in range(nspli):
-        while ini <= 500-wind:
+        while ini <= 1000-wind:
             fin = ini + wind
             print(fin)
 
@@ -599,8 +599,8 @@ fig3, ax3 = plt.subplots(figsize = (16,9))
 for ru, col in zip(allru[2:-1], colors[2:-1]):
     if not read_ts:
         oht_lev = []
-        filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
-        for i in range(500):
+        filo = open(carto + 'oht_{}_1000.p'.format(ru), 'rb')
+        for i in range(1000):
             try:
                 gigi = pickle.load(filo)
             except:
@@ -649,7 +649,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     t_oceall[(ru, 'bulk')] = t_bulk
 
     gtas = glomeans[(ru, 'tas')][1]
-    yeas = np.arange(500)
+    yeas = np.arange(1000)
     # if ru == 'b025':
     #     gtas = gtas[5:]
     #     yeas = yeas[5:]
@@ -771,7 +771,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
     gtas = ctl.running_mean(gtas, nlow)
     #gtas = 273.15 + oht1/oce_mass/cp0
-    yeas = np.arange(500)
+    yeas = np.arange(1000)
     dtbulk = np.gradient(oht_bulk)/(86400*365)
     #gama = dtbulk/(gtas-t_deep)
     gama = dtbulk/(t_ml-t_bulk)/oce_area
@@ -804,7 +804,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
     gtas = ctl.running_mean(gtas, nlow)
     #gtas = 273.15 + oht1/oce_mass/cp0
-    yeas = np.arange(500)
+    yeas = np.arange(1000)
     dtbulk = np.gradient(oht_bulk)/(86400*365)
     #gama = dtbulk/(gtas-t_deep)
     gama = dtbulk/(t_ml-t_bulk)/oce_area
@@ -837,7 +837,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     gtas = glomeans[(ru, 'tas')][1]-pimean['tas']
     gtas = ctl.running_mean(gtas, nlow)
     #gtas = 273.15 + oht1/oce_mass/cp0
-    yeas = np.arange(500)
+    yeas = np.arange(1000)
     dtbulk = np.gradient(oht_bulk)/(86400*365)
     #gama = dtbulk/(gtas-t_deep)
     gama = dtbulk/(t_ml-t_bulk)/oce_area
@@ -866,7 +866,7 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
     t_ml = ctl.running_mean(t_ml, nlow)
     t_bulk = ctl.running_mean(t_bulk, nlow)
 
-    yeas = np.arange(500)
+    yeas = np.arange(1000)
     dtbulk = np.gradient(oht_bulk)/(86400*365)
 
     nonan = np.isnan(dtbulk)
@@ -1035,7 +1035,7 @@ ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 10
 for ru, col in zip(allru, colors):
     if 'b' in ru:
         i += 1
-        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        res = stats.linregress(np.arange(1000), oht_all[(ru, 'deep')]/deep_mass/cp0)
         ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
 
 plt.ylabel('Deep ocean temperature trend (K/cent)')
@@ -1061,12 +1061,12 @@ regr_acello = ctl.regrid_dataset(areacello, lats, lons)
 
 for ru, col in zip(allru[2:-1], colors[2:-1]):
     print(ru)
-    filo = open(carto + 'oht_{}.p'.format(ru), 'rb')
+    filo = open(carto + 'oht_{}_1000.p'.format(ru), 'rb')
 
     oht700 = []
     oht2000 = []
     ohtdeep = []
-    for i in range(500):
+    for i in range(1000):
         try:
             oht_lev_i, oht700_i, oht2000_i, ohtdeep_i = pickle.load(filo)
         except:
@@ -1117,9 +1117,9 @@ for ru, col in zip(allru[2:-1], colors[2:-1]):
 
         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(np.arange(100), var[-100:])
 
-        oht_patt[(ru, lab, '500')] = var_trend
-        oht_patt[(ru, lab, '500_err')] = var_trend_err
-        oht_patt[(ru, lab, '500_pval')] = var_pval
+        oht_patt[(ru, lab, '1000')] = var_trend
+        oht_patt[(ru, lab, '1000_err')] = var_trend_err
+        oht_patt[(ru, lab, '1000_pval')] = var_pval
 
 
         if lab not in refoht:
@@ -1180,11 +1180,11 @@ for lev, tit in zip([700, 2000, 'deep'], ['700 m', '2000 m', '4000 m']):
     subt = []
     hatch = []
     for ru, col in zip(allru[2:-1], colors[2:-1]):
-        plpa.append(oht_patt[(ru, lev, '500')]-oht_patt[(ru, lev, '100')])
+        plpa.append(oht_patt[(ru, lev, '1000')]-oht_patt[(ru, lev, '100')])
         subt.append(ru + ': ' + tit)
 
-    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}_500-100.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), n_color_levels = 37, figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Cons. temp. trend difference (K/yr) (last - first century)') #cbar_range = (-0.02, 0.02)
+    [fig] = ctl.plot_multimap_contour(plpa, lats, lons, visualization = 'Robinson', central_lat_lon = (0., -120.), filename = carto + 'temp_patt_ocean_{}_1000-100.pdf'.format(lev), subtitles = subt, plot_anomalies = True, cmap = ctl.heatmap(), n_color_levels = 37, figsize = (16,9), fix_subplots_shape = (2,3), cb_label = 'Cons. temp. trend difference (K/yr) (last - first century)') #cbar_range = (-0.02, 0.02)
 
     for ax in fig.axes[:-1]:
         ax.set_facecolor('gainsboro')
-    fig.savefig(carto + 'temp_patt_ocean_{}_500-100.pdf'.format(lev))
+    fig.savefig(carto + 'temp_patt_ocean_{}_1000-100.pdf'.format(lev))
