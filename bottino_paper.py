@@ -1002,13 +1002,13 @@ for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', '
 ## Check deep trend pi
 filo = open(carto + 'oht_piControl.p', 'rb')
 oht_lev = []
-    for i in range(500):
-        try:
-            gigi = pickle.load(filo)
-        except:
-            break
-        oht_lev.append(gigi[0])
-    filo.close()
+for i in range(500):
+    try:
+        gigi = pickle.load(filo)
+    except:
+        break
+    oht_lev.append(gigi[0])
+filo.close()
 
 oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
 oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
