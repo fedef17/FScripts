@@ -36,12 +36,14 @@ allru = ['b990', 'b025', 'b050', 'b065', 'b080', 'b100']
 allsyear = [1990, 2025, 2050, 2065, 2080, 2100]
 allnams = ['stabilization-hist-1990', 'stabilization-ssp585-2025', 'stabilization-ssp585-2050', 'stabilization-ssp585-2065', 'stabilization-ssp585-2080', 'stabilization-ssp585-2100']
 
-colors = ['teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+#colors = ['teal', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+colors = ['lightslategray', 'forestgreen', 'orange', 'chocolate', 'maroon', 'violet']
+
 
 allru_wI = ['b065', 'b65I', 'b080', 'b80I', 'b100', 'b00I']
 colors_wI = ['chocolate', 'peru', 'maroon', 'firebrick', 'violet', 'plum']
 
-amoc_all = pickle.load(open('/home/fabiano/Research/lavori/BOTTINO/amoc/amoc_all.p', 'rb'))
+amoc_all = pickle.load(open('/home/fabiano/Research/lavori/BOTTINO/amoc/amoc_all_1000.p', 'rb'))
 
 # pino = xr.load_dataset('/nas/TIPES/Bottino/piControl/msftyz_Omon_EC-Earth3_piControl_r1i1p1f1_gn_1850-2350.nc', use_cftime = True, decode_times=False)['msftyz']
 # amoc_max = pino.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).max(['rlat', 'lev']).values
@@ -78,10 +80,10 @@ nyea = 50
 amoc_pi = pickle.load(open(cart_out + 'amoc_pi.p', 'rb'))
 amoc_all.update(amoc_pi)
 
-for ke in amoc_all:
-    if len(amoc_all[ke]) > 500:
-        print(ke, len(amoc_all[ke]))
-        amoc_all[ke] = amoc_all[ke][:500]
+# for ke in amoc_all:
+#     if len(amoc_all[ke]) > 500:
+#         print(ke, len(amoc_all[ke]))
+#         amoc_all[ke] = amoc_all[ke][:500]
 
 for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cell (Sv)', 'Abyssal cell (Sv)']):
     fac = 1/1.e9
@@ -108,6 +110,8 @@ for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cel
     fig.savefig(cart_out + '{}_boxplot.pdf'.format(cos))
 
     ##### Adding I experiments
+    continue
+
     cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)]*fac for ru in allru_wI]
     names = ['pi'] + allru_wI
 
@@ -157,6 +161,8 @@ for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev'], ['
     fig.savefig(cart_out + '{}_scatter.pdf'.format(cos))
 
     ### now for the I exps
+    continue
+
     cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)] for ru in allru_wI]
     names = ['pi'] + allru_wI
 
@@ -181,3 +187,17 @@ for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev'], ['
     ax.grid(axis = 'y')
 
     fig.savefig(cart_out + '{}_scatter_wI.pdf'.format(cos))
+
+
+# timeseries
+fig = plt.figure(figsize = (16,9))
+
+for ru, col in zip(allru, colors):
+    amind = amoc_all[(ru, 'amoc_max')]/1.e9
+    plt.plot(amind, ls = ":", lw = 0.1, color = col)
+    amoc_low = ctl.running_mean(amind, 20)
+    plt.plot(amoc_low, lw = 2, color = col, label = ru)
+
+plt.legend()
+plt.grid()
+fig.savefig(cart_out + 'amoc_timeseries_1000.pdf')

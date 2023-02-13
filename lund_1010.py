@@ -13,7 +13,7 @@ import netCDF4 as nc
 import climtools_lib as ctl
 import climdiags as cd
 
-from matplotlib.colors import LogNorm
+from matplotlib import colors as mcolors
 from datetime import datetime
 
 from scipy import stats
@@ -48,19 +48,42 @@ allru = ['pi', 'hist', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100', 'ssp585']
 
 cart_out = cart_out + 'simple_maps/'
 
+exp1 = 'b025'
+exp2 = 'b100'
+
 yeamean = pickle.load(open(cart_out + '../seasmean/bottino_seasmean_2D.p', 'rb'))
-coso = yeamean[2][('b025', 'tas')]
+coso = yeamean[2][(exp1, 'tas')]
 del yeamean
 
-anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps.p', 'rb'))
+anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps_1000.p', 'rb'))
 
 # map of temp trends
-rat1 = patt_maps[('tas', 'b100', 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
-rat2 = patt_maps[('tas', 'b025', 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
+rat1 = patt_maps[('tas', exp2, 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
+rat2 = patt_maps[('tas', exp1, 'stab')]/patt_maps[('tas', 'ssp585', 'fin')]
 
-# ctl.plot_multimap_contour([rat2, rat1], coso.lat, coso.lon, visualization = 'Robinson', subtitles = ['b025/ssp585', 'b100/ssp585'], cbar_range = (0, 2), cmap = ctl.heatmap(), filename = cart_out + 'taspatt_b025_b100_sspratio.pdf', figsize = (16,7), cb_label = 'Ratio of warming patterns', cbar_bottomspace = 0.11)
+divnorm = mcolors.TwoSlopeNorm(vmin=0.05, vcenter=1., vmax=2.75)
+ctl.plot_multimap_contour([rat2, rat1], coso.lat, coso.lon, visualization = 'Robinson', subtitles = ['{}/ssp585'.format(exp1), '{}/ssp585'.format(exp2)], cbar_range = (0.05, 2.75), color_norm = divnorm, cmap = ctl.heatmap(), filename = cart_out + 'tas_patt_NEW_p2.pdf', figsize = (16,7), cb_label = 'Ratio of warming patterns', cbar_bottomspace = 0.11, n_color_levels = 28, draw_grid = True)
 
-#ctl.plot_map_contour(rat1, coso.lat, coso.lon, visualization = 'Robinson', cbar_range = (0, 2), cmap = ctl.heatmap(), filename = cart_out + 'taspatt_ssp_vs_b100_ratio.pdf')
+#### Patt map with only ssp585, b025, b100
+cmap = ctl.heatmap()
+cbran = (0.25, 2.95)
+divnorm = mcolors.TwoSlopeNorm(vmin=0.25, vcenter=1., vmax=2.95)
+plotanom = False
+cblab = 'Temperature change per degree of global warming'
+okfigs = [patt_maps[('tas', 'ssp585', 'fin')], patt_maps[('tas', exp1, 'stab')], patt_maps[('tas', exp2, 'stab')]]
+ctl.plot_multimap_contour(okfigs, coso.lat, coso.lon, filename = cart_out + 'tas_patt_NEW_p1.pdf', cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (18, 7), subtitles = ['ssp585', exp1, exp2], color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = 28, fix_subplots_shape = (1, 3), draw_grid = True)
+
+ctl.plot_map_contour(rat1, coso.lat, coso.lon, visualization = 'Robinson', cbar_range = (0.05, 2.75), color_norm = divnorm, cmap = ctl.heatmap(), filename = cart_out + 'taspatt_ssp_vs_{}_ratio.pdf'.format(exp2), n_color_levels = 28, draw_grid = True)
+
+#### Patt map with only ssp585, b025, b100
+c5 = -11
+c95 = 21
+divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
+cmap = 'BrBG'
+cbran = (c5, c95)
+cblab = 'Relative precipitation change per degree of global warming (%/K)'
+okfigs = [patt_maps[('pr_rel', 'ssp585', 'fin')], patt_maps[('pr_rel', exp1, 'stab')], patt_maps[('pr_rel', exp2, 'stab')]]
+ctl.plot_multimap_contour(okfigs, coso.lat, coso.lon, filename = cart_out + 'pr_patt_NEW_p1.pdf', cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (18, 7), subtitles = ['ssp585', exp1, exp2], color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), n_color_levels = 17, fix_subplots_shape = (1, 3), draw_grid = True)
 
 
 fig, axs = ctl.get_cartopy_fig_ax(visualization='Robinson', fix_subplots_shape = (1, 2), figsize = (16,6))
@@ -68,7 +91,7 @@ fig, axs = ctl.get_cartopy_fig_ax(visualization='Robinson', fix_subplots_shape =
 fig2, axs2 = plt.subplots(1, 2, figsize = (16,9))
 ### map of prec trends
 
-for ru, ax, ax2 in zip(['b025', 'b100'], axs, axs2):
+for ru, ax, ax2 in zip([exp1, exp2], axs, axs2):
     ziup = patt_maps[('pr_rel', ru, 'stab')]
     piuk = patt_maps[('pr_rel', 'ssp585', 'fin')]
 
@@ -117,6 +140,6 @@ for ru, ax, ax2 in zip(['b025', 'b100'], axs, axs2):
 ctl.custom_legend(fig, ['forestgreen', 'indianred'], ['dry-wet', 'wet-dry'], ncol = 2)
 #ctl.custom_legend(fig, [cm.get_cmap('PiYG_r')(0), cm.get_cmap('PiYG_r')(1)], ['dry-wet', 'wet-dry'], ncol = 2)
 
-fig2.savefig(cart_out + 'prssp_b025_b100_scatter.png')
-fig.savefig(cart_out + 'map_prssp_b025_b100_scatter.png')
-fig.savefig(cart_out + 'map_prssp_b025_b100_scatter.pdf')
+fig2.savefig(cart_out + 'prssp_{}_{}_scatter.png'.format(exp1, exp2))
+fig.savefig(cart_out + 'map_prssp_{}_{}_scatter.png'.format(exp1, exp2))
+fig.savefig(cart_out + 'map_prssp_{}_{}_scatter.pdf'.format(exp1, exp2))

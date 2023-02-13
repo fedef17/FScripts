@@ -69,15 +69,94 @@ for ru in allru:
 
 filo.close()
 
+print('200 years')
+for ru in allru:
+    yea, tas = glomeans[(ru, 'tas')]
+
+    res = stats.linregress(yea[-200:], tas[-200:]) # trend of last 200 year
+    rel_trend = 100*res.slope
+    rel_trend_err = 100*res.stderr
+
+    print('{} - {:6.4f} +/- {:6.4f} K/cent\n'.format(ru, rel_trend, rel_trend_err))
+    #filo.write('{} - {:6.4f} +/- {:6.4f} K/cent\n'.format(ru, rel_trend, rel_trend_err))
+print('500 years')
+for ru in allru:
+    yea, tas = glomeans[(ru, 'tas')]
+
+    res = stats.linregress(yea[-500:], tas[-500:]) # trend of last 500 year
+    rel_trend = 100*res.slope
+    rel_trend_err = 100*res.stderr
+
+    print('{} - {:6.4f} +/- {:6.4f} K/cent\n'.format(ru, rel_trend, rel_trend_err))
+
+filo = open(cart_out + 'final_gtas.txt', 'w')
+filo.write('Final GTAS increase (last 30 years):\n')
+for ru in allru:
+    yea, tas = glomeans[(ru, 'tas')]
+
+    deltatas = np.mean(tas[-30:])-pimean['tas']
+    print('{} - {:6.4f} K\n'.format(ru, deltatas))
+    filo.write('{} - {:6.4f} K\n'.format(ru, deltatas))
+
+filo.close()
+
+print(pimean['net_toa'])
+
+filo = open(cart_out + 'final_netTOA.txt', 'w')
+filo.write('Final net TOA (last 30 years):\n')
+for ru in allru:
+    yea, tas = glomeans[(ru, 'net_toa')]
+
+    deltatas = np.mean(tas[-30:])
+    print('{} - {:6.4f} W/m2\n'.format(ru, deltatas))
+    filo.write('{} - {:6.4f} W/m2\n'.format(ru, deltatas))
+
+filo.close()
+
+filo = open(cart_out + 'final_netSRF.txt', 'w')
+filo.write('Final net SFC (last 30 years):\n')
+for ru in allru[2:-1]:
+    yea, tas = glomeans[(ru, 'net_srf')]
+
+    deltatas = np.mean(tas[-30:])
+    print('{} - {:6.4f} W/m2\n'.format(ru, deltatas))
+    filo.write('{} - {:6.4f} W/m2\n'.format(ru, deltatas))
+
+filo.close()
+
+### Determine up to which point the trend is significant
+for ru in allru:
+    print(ru)
+    tas = glomeans[(ru, 'tas')][1]
+    for n in np.arange(0, 951, 10):
+        if n > len(tas)-10: continue
+        pio = mk.original_test(tas[n:])
+        print(n, pio.trend, pio.p)
+
+
 do_pr = True
 if do_pr:
+    plt.rcParams['xtick.labelsize'] = 28
+    plt.rcParams['ytick.labelsize'] = 28
+    titlefont = 28
+    plt.rcParams['figure.titlesize'] = titlefont
+    plt.rcParams['axes.titlesize'] = 28
+    plt.rcParams['axes.labelsize'] = 28
+    plt.rcParams['axes.axisbelow'] = True
+    plt.rcParams['legend.fontsize'] = 28
+
+
     # A coefficient for clausius-clapeyron applied to global pr
     exptas = lambda t : np.exp(17.625*(t-273.15)/(t-30.11))
     A = pimean['pr']/exptas(pimean['tas'])
 
-    fig = plt.figure(figsize = (16,9))
+    fig = plt.figure(figsize = (16,12))
     for ru, col in zip(allru, colors):
-        plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'pr')][1]-pimean['pr'], color = col, s = 10, label = ru)
+        if ru[0] == 'b':
+            s = 1
+        else:
+            s = 10
+        plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'pr')][1]-pimean['pr'], color = col, s = s, label = ru)
 
         if ru == 'ssp585':
             pr = glomeans[(ru, 'pr')][1]
@@ -85,8 +164,11 @@ if do_pr:
             tas = glomeans[(ru, 'tas')][1]
             tas_anom = tas-pimean['tas']
 
-            coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 2, cov = True)
-            x_nu = np.arange(-0.5, 9.6, 0.5)
+            coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 1, cov = True)
+            x_nu = np.arange(-0.5, 10.1, 0.5)
+            fitted = np.polyval(coeffs, x_nu)
+            plt.plot(x_nu, fitted, color = col, ls = '--')
+            x_nu = np.arange(1, 6.6, 0.5)
             fitted = np.polyval(coeffs, x_nu)
             plt.plot(x_nu, fitted, color = col)
 
@@ -101,12 +183,48 @@ if do_pr:
 
     plt.grid()
     #plt.legend()
-    ctl.custom_legend(fig, colors, allru)
+    ctl.custom_legend(fig, colors, allru, fontsize = 24, add_space_below = 0.03)
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
     plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
     fig.savefig(cart_out + 'pr_gtas_scatter_linear.pdf')
 
+
+    fig = plt.figure(figsize = (16,12))
+    for ru, col in zip(allru, colors):
+        if ru[0] == 'b':
+            s = 1
+        else:
+            s = 10
+        plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'pr')][1]-pimean['pr'], color = col, s = s, label = ru)
+
+        if ru == 'ssp585':
+            pr = glomeans[(ru, 'pr')][1]
+            pr_anom = pr-pimean['pr']
+            tas = glomeans[(ru, 'tas')][1]
+            tas_anom = tas-pimean['tas']
+
+            coeffs, covmat = np.polyfit(tas_anom, pr_anom, deg = 2, cov = True)
+            x_nu = np.arange(-0.5, 10.1, 0.5)
+            fitted = np.polyval(coeffs, x_nu)
+            plt.plot(x_nu, fitted, color = col)
+
+            #coeffs, covmat = np.polyfit(tas_anom, np.log(pr_anom), deg = 1, cov = True)
+            #coeffs, covmat = np.polyfit(tas_anom, np.log(pr), deg = 2, cov = True)
+            #x_nu = np.arange(-0.5, 9.6, 0.5)
+            #fitted = np.exp(np.polyval(coeffs, x_nu))
+            #plt.plot(x_nu, fitted-pimean['pr'], color = col)
+
+            # fitted2 = A*exptas(x_nu+pimean['tas'])
+            # plt.plot(x_nu, fitted2-pimean['pr'], color = col, linestyle = '--')
+
+    plt.grid()
+    #plt.legend()
+    ctl.custom_legend(fig, colors, allru, fontsize = 24, add_space_below = 0.03)
+    plt.subplots_adjust(bottom = 0.2)
+    plt.xlabel('GTAS anomaly (K)')
+    plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    fig.savefig(cart_out + 'pr_gtas_scatter_quadratic.pdf')
 
     fig, ax = plt.subplots(1, 1, figsize = (16,9))
     allruok = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
@@ -115,8 +233,11 @@ if do_pr:
         res = stats.linregress(glomeans[(ru, 'tas')][1], glomeans[(ru, 'pr')][1]/pimean['pr'])
         rel_trend = 100*res.slope
         rel_trend_err = 100*res.stderr
-        ax.errorbar(i, rel_trend, yerr = rel_trend_err, color = col, capsize = 3, zorder = 6, lw = 2)
-        ax.scatter(i, rel_trend, color = col, s = 100, label = ru)
+        ax.errorbar(i, rel_trend, yerr = rel_trend_err, color = col, capsize = 5, zorder = 6, lw = 4)
+        ax.scatter(i, rel_trend, color = col, s = 200, label = ru)
+
+        deltaT = np.mean(glomeans[(ru, 'tas')][1][-10:])-np.mean(glomeans[(ru, 'tas')][1][:10])
+        print(ru, rel_trend, np.log(1 + rel_trend * deltaT)/deltaT)
 
     ax.grid(axis = 'y')
     #plt.legend()
@@ -520,6 +641,14 @@ if calc_eofs:
             plotanom = True
         ctl.plot_multimap_contour([solver_ssp.eofs()[0], solver.eofs()[0]], lat, lon, cmap = cma, plot_anomalies = plotanom, figsize = (16,9), filename = cart_out + '{}_eof_sspvsb100.pdf'.format(var), color_percentiles = (2,98), subtitles = ['ssp585', 'b100'], cb_label = 'First EOF of {} (normalized)'.format(var))
 
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
+titlefont = 22
+plt.rcParams['figure.titlesize'] = titlefont
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['axes.axisbelow'] = True
+plt.rcParams['legend.fontsize'] = 18
 
 ###################################################
 ###########
@@ -565,8 +694,12 @@ if not read_ts:
     filo.close()
 
     oht_lev = xr.concat(oht_lev, dim = 'year')
+    # oht_lev_pi = oht_lev.mean('year')*cp0
+    # oht_lev_pi_std = oht_lev.std('year')*cp0
+    oht_lev = oht_lev.sel(year = slice(70, 120))  ### CONSIDERING LAST 50 YEARS BEFORE BRANCHING OF HISTORICAL r4
     oht_lev_pi = oht_lev.mean('year')*cp0
     oht_lev_pi_std = oht_lev.std('year')*cp0
+
     oht_tot_pi = oht_lev_pi.sum('lev')
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
@@ -999,6 +1132,10 @@ for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', '
     print(nom+strin.format(*cose))
 
 #############################################################
+
+## historical r4 starts at year 2380 of piControl. piControl (official r1) starts from 2259, so historical r4 starts at year 121.
+
+
 ## Check deep trend pi
 filo = open(carto + 'oht_piControl.p', 'rb')
 oht_lev = []

@@ -28,7 +28,7 @@ plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 titlefont = 24
 plt.rcParams['figure.titlesize'] = titlefont
-plt.rcParams['axes.titlesize'] = 28
+plt.rcParams['axes.titlesize'] = 24
 plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['axes.axisbelow'] = True
 
@@ -94,7 +94,7 @@ varnam = 'siconc'
 resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
 #resdict = dict()
 
-fig, axs = plt.subplots(2,2,figsize = (12,12))
+fig, axs = plt.subplots(2,2,figsize = (16,9))
 #
 allnams2 = ['ssp585', 'historical'] + allnams
 allru2 = ['ssp585', 'hist'] + allru
@@ -164,29 +164,39 @@ if tip == 'plot':
     resdict = pickle.load(open(cart_out + 'seaicearea.p', 'rb'))
     resdict_1000 = pickle.load(open(cart_out + 'seaicearea_1000.p', 'rb'))
     resdict.update(resdict_1000)
+    print('plot')
 
     for ru, col, (ye1, ye2) in zip(allruall, colall, okye):
         print(ru)
         for ii, emi in enumerate(['N', 'S']):
             sia_march = resdict[(ru, varnam, 'glomean', 'mar', emi)]
             sia_sept = resdict[(ru, varnam, 'glomean', 'sep', emi)]
+
+            if emi == 'N':
+                sia_summer = sia_sept
+                sia_winter = sia_march
+            else:
+                sia_summer = sia_march
+                sia_winter = sia_sept
+
             yeaok = np.arange(ye1, ye1 + len(sia_march))
 
-            sima10 = ctl.running_mean(sia_march, 10)
-            sise10 = ctl.running_mean(sia_sept, 10)
+            siwi10 = ctl.running_mean(sia_winter, 10)
+            sisu10 = ctl.running_mean(sia_summer, 10)
 
-            axs[ii,0].plot(yeaok, sima10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
-            axs[ii,1].plot(yeaok, sise10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+            axs[ii,0].plot(yeaok, siwi10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+            axs[ii,1].plot(yeaok, sisu10, linestyle='solid', marker = 'None', color = col, label = ru, linewidth = 2)
+            axs[ii,0].plot(yeaok, sia_winter, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
+            axs[ii,1].plot(yeaok, sia_summer, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
 
-            axs[ii,0].plot(yeaok, sia_march, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
-            axs[ii,1].plot(yeaok, sia_sept, linestyle='solid', color = col, alpha = 0.3, linewidth = 0.5)
-
-    axs[0,0].set_title('March')
-    axs[0,1].set_title('September')
+    axs[0,0].set_title('winter')
+    axs[0,1].set_title('summer')
     axs[0,0].set_ylabel(r'Sea ice extent (m$^2$)')
     axs[1,0].set_ylabel(r'Sea ice extent (m$^2$)')
+    axs[0,0].text(0.05, 0.7, 'Arctic', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 24)
+    axs[0,0].text(0.05, 0.3, 'Antarctic', horizontalalignment='center', verticalalignment='center', rotation='vertical',transform=fig.transFigure, fontsize = 24)
     #axs[1,1].legend()
-    ctl.custom_legend(fig, colall, allruall, ncol = 5)
+    ctl.custom_legend(fig, colall, allruall, ncol = 5, add_space_below = 0.06)
     fig.savefig(cart_out + 'bottseaice_1000.pdf')
 
 sys.exit()

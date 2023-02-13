@@ -75,115 +75,115 @@ cb_labels = ['Temp. anomaly (K)', 'Prec. anomaly (mm/year)', 'Relative change']
 
 glomeans, pimean = pickle.load(open(cart_in + 'bottino_glomeans_1000.p', 'rb'))
 
-for var in ['tas', 'pr']:
-    yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'rb'))
-    for ru in ['pi', 'hist', 'ssp585']:
-        yeamean_add = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}.p'.format(ru), 'rb'))
+# for var in ['tas', 'pr']:
+#     yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'rb'))
+#     for ru in ['pi', 'hist', 'ssp585']:
+#         yeamean_add = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}.p'.format(ru), 'rb'))
 
-        for ke in list(yeamean_add):
-            if var not in ke: del yeamean_add[ke]
-        yeamean.update(yeamean_add)
+#         for ke in list(yeamean_add):
+#             if var not in ke: del yeamean_add[ke]
+#         yeamean.update(yeamean_add)
 
-    coso = yeamean[('b025', var)]
+#     coso = yeamean[('b025', var)]
 
-    # This is to calculate the ensemble mean of historical and ssp5
-    for exp in ['ssp585', 'historical']:
-        yeamean_hs, seamean_hs = pickle.load(open(cart_in + '../yearmean/bottino_yeamean_3_{}_{}.p'.format(exp, var), 'rb'))
-        if exp == 'ssp585':
-            memok = yeamean_hs[(exp, 'members')]
+#     # This is to calculate the ensemble mean of historical and ssp5
+#     for exp in ['ssp585', 'historical']:
+#         yeamean_hs, seamean_hs = pickle.load(open(cart_in + '../yearmean/bottino_yeamean_3_{}_{}.p'.format(exp, var), 'rb'))
+#         if exp == 'ssp585':
+#             memok = yeamean_hs[(exp, 'members')]
 
-        yeamean[(exp+'_mean', var)] = yeamean_hs[(exp, 'ensmean', var)]
-        yeamean[(exp+'_std', var)] = yeamean_hs[(exp, 'ensstd', var)]
+#         yeamean[(exp+'_mean', var)] = yeamean_hs[(exp, 'ensmean', var)]
+#         yeamean[(exp+'_std', var)] = yeamean_hs[(exp, 'ensstd', var)]
 
-        continue
-        print(yeamean[(exp+'_mean', var)].shape)
+#         continue
+#         print(yeamean[(exp+'_mean', var)].shape)
 
-        print(memok)
-        lenmin = np.min([len(yeamean_hs[(exp, mem, var)]) for mem in memok])
-        cosoye = np.mean([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
+#         print(memok)
+#         lenmin = np.min([len(yeamean_hs[(exp, mem, var)]) for mem in memok])
+#         cosoye = np.mean([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
 
-        # cosok = xr.DataArray(data = cosoye, dims = ['year', 'lat', 'lon'], coords = [sssssssssssss], name = 'tos')
+#         # cosok = xr.DataArray(data = cosoye, dims = ['year', 'lat', 'lon'], coords = [sssssssssssss], name = 'tos')
 
-        yeamean[(exp+'_mean', var)] = cosoye
-        cosoye = np.std([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
-        yeamean[(exp+'_std', var)] = cosoye
-
-
-    if var == 'tas':
-        glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
+#         yeamean[(exp+'_mean', var)] = cosoye
+#         cosoye = np.std([yeamean_hs[(exp, mem, var)][-lenmin:] for mem in memok], axis = 0)
+#         yeamean[(exp+'_std', var)] = cosoye
 
 
-    #for varnam, var, cblab in zip(['tas', 'pr', 'pr_rel'], ['tas', 'pr', 'pr'], cb_labels):
-    for tip in ['', '_rel']:
-        if tip == '_rel' and var == 'tas': continue
-        varnam = var + tip
+#     if var == 'tas':
+#         glotas_hissp = np.concatenate([ctl.global_mean(yeamean[('historical_mean', 'tas')], coso.lat), ctl.global_mean(yeamean[('ssp585_mean', 'tas')], coso.lat)])
 
-        cosopi = yeamean[('pi', var)]
-        cosohist = yeamean[('historical_mean', var)]
-        cosossp = yeamean[('ssp585_mean', var)]
 
-        cosohistssp = np.concatenate([cosohist, cosossp], axis = 0)
-        yeahissp = np.arange(1970, 2101)
+#     #for varnam, var, cblab in zip(['tas', 'pr', 'pr_rel'], ['tas', 'pr', 'pr'], cb_labels):
+#     for tip in ['', '_rel']:
+#         if tip == '_rel' and var == 'tas': continue
+#         varnam = var + tip
 
-        fact = 1
-        if var == 'pr':
-            fact = 60*60*24*365
+#         cosopi = yeamean[('pi', var)]
+#         cosohist = yeamean[('historical_mean', var)]
+#         cosossp = yeamean[('ssp585_mean', var)]
 
-        pimap = fact*cosopi.mean('year').values
+#         cosohistssp = np.concatenate([cosohist, cosossp], axis = 0)
+#         yeahissp = np.arange(1970, 2101)
 
-        pirun = ctl.running_mean(cosopi, ypre_stab)
-        pistd = (cosopi-pirun).std('year').values # this can be used for the significance
+#         fact = 1
+#         if var == 'pr':
+#             fact = 60*60*24*365
 
-        if var == 'pr':
-            thres = pimap < 50.
+#         pimap = fact*cosopi.mean('year').values
 
-        #for ru in ['hist', 'ssp585'] + allru3:
-        for ru in allru:
-            coso = yeamean[(ru, var)]
-            y0 = coso.year[0].values
+#         pirun = ctl.running_mean(cosopi, ypre_stab)
+#         pistd = (cosopi-pirun).std('year').values # this can be used for the significance
 
-            if ru in ['hist', 'ssp585']:
-                yrang = ypre_trans # using shorter period for transient
-            else:
-                yrang = ypre_stab
+#         if var == 'pr':
+#             thres = pimap < 50.
+
+#         #for ru in ['hist', 'ssp585'] + allru3:
+#         for ru in allru:
+#             coso = yeamean[(ru, var)]
+#             y0 = coso.year[0].values
+
+#             if ru in ['hist', 'ssp585']:
+#                 yrang = ypre_trans # using shorter period for transient
+#             else:
+#                 yrang = ypre_stab
             
-            equi = fact*coso[-yrang:].mean('year').values
-            deltatas = glomeans[(ru, 'tas')][1][-yrang:].mean()-pimean['tas']
+#             equi = fact*coso[-yrang:].mean('year').values
+#             deltatas = glomeans[(ru, 'tas')][1][-yrang:].mean()-pimean['tas']
 
-            if varnam == 'pr_rel':
-                equi[thres] = np.nan
-                mappa = 100*((equi-pimap)/pimap)
-            else:
-                mappa = equi-pimap
+#             if varnam == 'pr_rel':
+#                 equi[thres] = np.nan
+#                 mappa = 100*((equi-pimap)/pimap)
+#             else:
+#                 mappa = equi-pimap
 
-            anom_maps[(varnam, ru, 'fin')] = mappa
-            patt_maps[(varnam, ru, 'fin')] = mappa/deltatas
+#             anom_maps[(varnam, ru, 'fin')] = mappa
+#             patt_maps[(varnam, ru, 'fin')] = mappa/deltatas
 
-            if ru in allru3:
-                deltatas_ini = glotas_hissp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0)].mean()-pimean['tas']
-                transient = fact*np.mean(cosohistssp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0), ...], axis = 0)
+#             if ru in allru3:
+#                 deltatas_ini = glotas_hissp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0)].mean()-pimean['tas']
+#                 transient = fact*np.mean(cosohistssp[(yeahissp >= y0-ypre_trans) & (yeahissp < y0), ...], axis = 0)
 
-                if varnam == 'pr_rel':
-                    transient[thres] = np.nan
-                    mappa_trans = 100*(transient-pimap)/pimap
-                    mappa_stab = 100*(equi-transient)/pimap
-                else:
-                    mappa_trans = transient-pimap
-                    mappa_stab = equi-transient
+#                 if varnam == 'pr_rel':
+#                     transient[thres] = np.nan
+#                     mappa_trans = 100*(transient-pimap)/pimap
+#                     mappa_stab = 100*(equi-transient)/pimap
+#                 else:
+#                     mappa_trans = transient-pimap
+#                     mappa_stab = equi-transient
 
-                anom_maps[(varnam, ru, 'trans')] = mappa_trans
-                patt_maps[(varnam, ru, 'trans')] = mappa_trans/deltatas_ini
+#                 anom_maps[(varnam, ru, 'trans')] = mappa_trans
+#                 patt_maps[(varnam, ru, 'trans')] = mappa_trans/deltatas_ini
 
-                anom_maps[(varnam, ru, 'stab')] = mappa_stab
-                patt_maps[(varnam, ru, 'stab')] = mappa_stab/(deltatas-deltatas_ini)
+#                 anom_maps[(varnam, ru, 'stab')] = mappa_stab
+#                 patt_maps[(varnam, ru, 'stab')] = mappa_stab/(deltatas-deltatas_ini)
 
-    print('Finished ', var)
-    del yeamean
+#     print('Finished ', var)
+#     del yeamean
 
-pickle.dump([anom_maps, patt_maps], open(cart_out + 'all_maps_1000.p', 'wb'))
-# anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps_1000.p', 'rb'))
-# yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_b025.p', 'rb'))
-# coso = yeamean[('b025', 'tas')]
+# pickle.dump([anom_maps, patt_maps], open(cart_out + 'all_maps_1000.p', 'wb'))
+anom_maps, patt_maps = pickle.load(open(cart_out + 'all_maps_1000.p', 'rb'))
+yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_b025.p', 'rb'))
+coso = yeamean[('b025', 'tas')]
 
 def make_fig_axes():
     proj = ctl.def_projection(visualization = 'Robinson', central_lat_lon = (0.,0.))
@@ -208,12 +208,14 @@ for varnam in ['tas', 'pr', 'pr_rel']:
     if varnam == 'tas':
         cmap = ctl.heatmap_mono()
         cbran = (0., 20)
+        n_color_levels = 21
         divnorm = None
         plotanom = False
         cblab = 'Temperature anomaly (K)'
     elif varnam == 'pr_rel':
-        c5 = -50
-        c95 = 100
+        c5 = -55
+        c95 = 105
+        n_color_levels = 17
         divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
         cmap = 'BrBG'
         cbran = (c5, c95)
@@ -222,8 +224,9 @@ for varnam in ['tas', 'pr', 'pr_rel']:
         # plotanom = True
         cblab = 'Relative precipitation change (%)'
     elif varnam == 'pr':
-        c5 = -500
-        c95 = 1000
+        n_color_levels = 17
+        c5 = -550
+        c95 = 1050
         divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
         cmap = 'BrBG'
         cbran = (c5, c95)
@@ -237,21 +240,22 @@ for varnam in ['tas', 'pr', 'pr_rel']:
     okfi = [anom_maps[(varnam, ru, 'fin')] for ru in okru]
 
     fig, axes = make_fig_axes()
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_anom_fin_{}_newproj_1000.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig)
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out + 'All_anom_fin_{}_newproj_1000.pdf'.format(varnam), cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, n_color_levels = n_color_levels)
     #fig.savefig(cart_out + 'All_anom_fin_{}_newproj.pdf'.format(varnam))
     ###########################
 
     # maps of change per degree of global warming during the simulation (-> stab for the bottins)
-    n_color_levels = 27
     if varnam == 'tas':
+        n_color_levels = 28
         cmap = ctl.heatmap()
-        cbran = (0.25, 3.25)
+        cbran = (0.25, 2.95)
         divnorm = mcolors.TwoSlopeNorm(vmin=0., vcenter=1., vmax=3.5)
         plotanom = False
         cblab = 'Temperature change per degree of global warming'
     elif varnam == 'pr_rel':
-        c5 = -10
-        c95 = 20
+        n_color_levels = 17
+        c5 = -11
+        c95 = 21
         divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=0., vmax=c95)
         cmap = 'BrBG'
         cbran = (c5, c95)
@@ -260,6 +264,7 @@ for varnam in ['tas', 'pr', 'pr_rel']:
         #plotanom = True
         cblab = 'Relative precipitation change per degree of global warming (%/K)'
     elif varnam == 'pr':
+        n_color_levels = 27
         c5 = -150
         c95 = 300
         cbran = (c5, c95)
