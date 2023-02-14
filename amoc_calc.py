@@ -135,7 +135,7 @@ for ru in allru:
     coso_fin = xr.open_mfdataset(fi_ini, use_cftime = True)[var]
     mocstr_fin = coso_fin.mean('time')
 
-    amoc_2D[(ru, 'fin')] = coso_fin
-    amoc_2D[(ru, 'ini')] = coso_ini
+    amoc_2D[(ru, 'fin')] = coso_fin.compute()
+    amoc_2D[(ru, 'ini')] = coso_ini.compute()
 
 pickle.dump(amoc_2D, open(cart_out + 'amoc_2D_1000.p', 'wb'))
