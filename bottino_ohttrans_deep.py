@@ -131,9 +131,9 @@ if ru in ['b025', 'b050', 'b100', 'b080']:
     filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
     filna2 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var2, var2)
 else:
-    #datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
-    datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
+    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
     filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
+    datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
     filna2 = datadir+'{}/{}/{}*nc'.format(miptab, var2, var2)
 
 allfils = glob.glob(filna1)
