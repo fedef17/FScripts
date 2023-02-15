@@ -76,49 +76,29 @@ var2 = 'wo'
 fia = '/g100_scratch/userexternal/ffabiano/ece3/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
 gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
-#def do_cross(fils, fils2, fils_area, fil_out):
 def do_cross(fils, fils2, gigi_a, fil_out):
     print("I'm process", os.getpid())
     # Getting % usage of virtual_memory ( 3rd field)
 
-    #cose = []
-    #for fi1, fi2, fia in zip(fils, fils2, fils_area):
-    for fi1, fi2 in zip(fils, fils2):
-        print(fi1)
-        #print('total RAM memory used 1:', psutil.virtual_memory()[3]/1.e9)
-        print('total RAM memory used 1', process.memory_info().rss/1e9)
+    gigi = xr.open_mfdataset(fils, use_cftime = True)['bigthetao']
+    gigi2 = xr.open_mfdataset(fils2, use_cftime = True)['wo']
 
-        gigi = xr.load_dataset(fi1, use_cftime = True)['bigthetao']
-        gigi2 = xr.load_dataset(fi2, use_cftime = True)['wo']
+    pino = gigi2.interp(lev = gigi.lev)
 
-        pino = gigi2.interp(lev = gigi.lev)
+    oht = pino*gigi ## T*w
 
-        oht = pino*gigi ## T*w
+    oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
 
-        oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
+    dtdz = gigi.differentiate('lev') ## dT/dz
+    dtdz_lev = (dtdz*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
 
-        dtdz = gigi.differentiate('lev') ## dT/dz
-        dtdz_lev = (dtdz*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
+    print('total RAM memory used 2', process.memory_info().rss/1e9)
 
-        # oht100 = oht.sel(lev = slice(96., 98.)).mean('time').mean('lev') # these are densities of heat transport
-        # oht700 = oht.sel(lev = slice(696., 698.)).mean('time').mean('lev')
-        # oht2000 = oht.sel(lev = slice(1944., 1946.)).mean('time').mean('lev')
+    oht_lev = oht_lev.compute()
+    dtdz_lev = dtdz_lev.compute()
 
-        # zuki100 = ctl.regrid_dataset(oht100, lats, lons)
-        # zuki700 = ctl.regrid_dataset(oht700, lats, lons)
-        # zuki2000 = ctl.regrid_dataset(oht2000, lats, lons)
+    pickle.dump([oht_lev, dtdz_lev], fil_out)
 
-        print('total RAM memory used 2', process.memory_info().rss/1e9)
-
-        #pickle.dump([oht_lev, dtdz_lev, zuki100, zuki700, zuki2000], fil_out)
-        pickle.dump([oht_lev, dtdz_lev], fil_out)
-
-        fil_out.flush()
-
-        del gigi, gigi2, oht, oht_lev, dtdz_lev#, zuki100, zuki700, zuki2000, oht100, oht700, oht2000
-
-    #coda.put(cose)
-    #return cose
     return
 
 n_proc = 10
@@ -141,7 +121,7 @@ allfils.sort()
 allfils2 = glob.glob(filna2)
 allfils2.sort()
 
-filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
+filo = open(cart_out + 'ohtrans_ts_{}.p'.format(ru), 'wb')
 
 #cose = do_cross(allfils)
 print(allfils[0])
