@@ -76,12 +76,18 @@ var2 = 'wo'
 fia = '/g100_scratch/userexternal/ffabiano/ece3/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
 gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
+def roundlat(ds, ndec = 10):
+    ds = ds.assign_coords(lat = ds.lat.round(ndec))
+    return ds
+
 def do_cross(fils, fils2, gigi_a, fil_out):
     print("I'm process", os.getpid())
     # Getting % usage of virtual_memory ( 3rd field)
 
-    gigi = xr.open_mfdataset(fils, use_cftime = True)['bigthetao']
-    gigi2 = xr.open_mfdataset(fils2, use_cftime = True)['wo']
+    gigi = xr.open_mfdataset(fils, use_cftime = True, chunks={'time' : 1200}, preprocess = roundlat)['bigthetao']
+    gigi2 = xr.open_mfdataset(fils2, use_cftime = True, chunks={'time' : 1200}, preprocess = roundlat)['wo']
+
+    print('Read lazy')
 
     pino = gigi2.interp(lev = gigi.lev)
 
@@ -95,7 +101,9 @@ def do_cross(fils, fils2, gigi_a, fil_out):
     print('total RAM memory used 2', process.memory_info().rss/1e9)
 
     oht_lev = oht_lev.compute()
+    print('Done oht_lev')
     dtdz_lev = dtdz_lev.compute()
+    print('Done dtdz_lev')
 
     pickle.dump([oht_lev, dtdz_lev], fil_out)
 
