@@ -132,10 +132,10 @@ for ru in allru:
 
     fi_fin = listafi[-n_yea:]
     print(fi_fin[0])
-    coso_fin = xr.open_mfdataset(fi_ini, use_cftime = True)[var]
+    coso_fin = xr.open_mfdataset(fi_fin, use_cftime = True)[var]
     mocstr_fin = coso_fin.mean('time')
 
-    amoc_2D[(ru, 'fin')] = coso_fin.compute()
-    amoc_2D[(ru, 'ini')] = coso_ini.compute()
+    amoc_2D[(ru, 'ini')] = mocstr_ini.compute()
+    amoc_2D[(ru, 'fin')] = mocstr_fin.compute()
 
 pickle.dump(amoc_2D, open(cart_out + 'amoc_2D_1000.p', 'wb'))
