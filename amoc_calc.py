@@ -33,78 +33,92 @@ allru = ['b990', 'b025', 'b050', 'b100', 'b065', 'b080']#, 'b00I', 'b80I', 'b65I
 miptab = 'Omon'
 var = 'msftyz'
 
-# amoc_all = dict()
+amoc_all = dict()
 
-# for ru in allru:
-#     print(ru)
-#     if ru in ['b025', 'b050', 'b100', 'b080']:
-#         datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
-#         filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1{}/{}/{}/g*/v*/{}*nc'.format(fis, miptab, var, var)
-#     else:
-#         #datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
-#         datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
-#         filna = datadir+'{}/{}/{}*nc'.format(miptab, var, var)
+for ru in allru:
+    print(ru)
+    if ru in ['b025', 'b050', 'b100', 'b080']:
+        datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
+        filna = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1{}/{}/{}/g*/v*/{}*nc'.format(fis, miptab, var, var)
+    else:
+        #datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+        datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
+        filna = datadir+'{}/{}/{}*nc'.format(miptab, var, var)
 
-#     fis = 'f1'
-#     if 'I' in ru: fis = 'f3'
+    fis = 'f1'
+    if 'I' in ru: fis = 'f3'
 
-#     listafi = glob.glob(filna)
-#     listafi.sort()
+    listafi = glob.glob(filna)
+    listafi.sort()
 
-#     amoc_max = []
-#     amoc_max_lev = []
-#     amoc_wid = []
-#     aabw_max = []
-#     aabw_max_lev = []
-#     aby_max = []
-#     aby_max_lev = []
-#     for fi in listafi:
-#         print(fi)
-#         coso = xr.load_dataset(fi, use_cftime = True)[var]
-#         amax = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['rlat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
-#         amoc_max.append(amax)
+    amoc_max = []
+    amoc_max_lev = []
+    amoc_wid = []
+    aabw_max = []
+    aabw_max_lev = []
+    aby_max = []
+    aby_max_lev = []
+    smoc_max = []
+    smoc_max_lev = []
 
-#         zuki = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').argmax(['rlat', 'lev'])
-#         maxlev = coso.sel(lev = slice(500., 2000.)).lev[zuki['lev']].values
-#         amoc_max_lev.append(maxlev)
+    for fi in listafi:
+        print(fi)
+        coso = xr.load_dataset(fi, use_cftime = True)[var]
+        amax = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').max(['rlat', 'lev']).values # basin = 1 should be Atlantic, 0 global, 2 indian/pacific
+        amoc_max.append(amax)
 
-#         gino = coso.sel(basin = 1, rlat = slice(30, 50)).mean('time')
-#         zino = np.all(gino.values < amax/2., axis = 1)
-#         for i, lev in enumerate(coso.lev):
-#             if np.all(zino[i:]):
-#                 awid = lev.values
-#                 break
+        zuki = coso.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).mean('time').argmax(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(500., 2000.)).lev[zuki['lev']].values
+        amoc_max_lev.append(maxlev)
 
-#         amoc_wid.append(awid)
-#         print(amax, awid)
+        gino = coso.sel(basin = 1, rlat = slice(30, 50)).mean('time')
+        zino = np.all(gino.values < amax/2., axis = 1)
+        for i, lev in enumerate(coso.lev):
+            if np.all(zino[i:]):
+                awid = lev.values
+                break
 
-#         ### AABW
-#         amax = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').min(['rlat', 'lev']).values
-#         aabw_max.append(amax)
+        amoc_wid.append(awid)
+        print(amax, awid)
 
-#         zuki = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').argmin(['rlat', 'lev'])
-#         maxlev = coso.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
-#         aabw_max_lev.append(maxlev)
+        ### AABW
+        amax = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').min(['rlat', 'lev']).values
+        aabw_max.append(amax)
 
-#         ### abyssal amoc
-#         amax = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').min(['rlat', 'lev']).values
-#         aby_max.append(amax)
+        zuki = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).mean('time').argmin(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
+        aabw_max_lev.append(maxlev)
 
-#         zuki = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').argmin(['rlat', 'lev'])
-#         maxlev = coso.sel(lev = slice(2500., 4500.)).lev[zuki['lev']].values
-#         aby_max_lev.append(maxlev)
+        ### SMOC
+        amax = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -40)).mean('time').max(['rlat', 'lev']).values
+        smoc_max.append(amax)
 
-#     amoc_all[(ru, 'amoc_max')] = np.stack(amoc_max)
-#     amoc_all[(ru, 'amoc_wid')] = np.stack(amoc_wid)
-#     amoc_all[(ru, 'amoc_maxlev')] = np.stack(amoc_max_lev)
-#     amoc_all[(ru, 'aabw_max')] = np.stack(aabw_max)
-#     amoc_all[(ru, 'aabw_maxlev')] = np.stack(aabw_max_lev)
-#     amoc_all[(ru, 'aby_max')] = np.stack(aby_max)
-#     amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_max_lev)
+        zuki = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -40)).mean('time').argmax(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
+        smoc_max_lev.append(maxlev)
 
-# pickle.dump(amoc_all, open(cart_out + 'amoc_all_1000.p', 'wb'))
+        ### abyssal amoc
+        amax = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').min(['rlat', 'lev']).values
+        aby_max.append(amax)
+
+        zuki = coso.sel(basin = 0, lev = slice(2500., 4500.)).mean('time').argmin(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(2500., 4500.)).lev[zuki['lev']].values
+        aby_max_lev.append(maxlev)
+
+    amoc_all[(ru, 'amoc_max')] = np.stack(amoc_max)
+    amoc_all[(ru, 'amoc_wid')] = np.stack(amoc_wid)
+    amoc_all[(ru, 'amoc_maxlev')] = np.stack(amoc_max_lev)
+    amoc_all[(ru, 'aabw_max')] = np.stack(aabw_max)
+    amoc_all[(ru, 'aabw_maxlev')] = np.stack(aabw_max_lev)
+    amoc_all[(ru, 'aby_max')] = np.stack(aby_max)
+    amoc_all[(ru, 'aby_maxlev')] = np.stack(aby_max_lev)
+    amoc_all[(ru, 'smoc_max')] = np.stack(smoc_max)
+    amoc_all[(ru, 'smoc_maxlev')] = np.stack(smoc_max_lev)
+
+pickle.dump(amoc_all, open(cart_out + 'amoc_all_1000.p', 'wb'))
 
 #######
+sys.exit()
 
 amoc_2D = dict()
 n_yea = 30
