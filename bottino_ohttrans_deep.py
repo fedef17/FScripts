@@ -47,12 +47,12 @@ cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
-if ru in ['b100', 'b050', 'b080', 'b065', 'b990']:
-    cartbase = '/g100_scratch/userexternal/ffabiano/ece3/'
-else:
-    cartbase = '/g100_work/IscrB_QUECLIM/BOTTINO/'
+# if ru in ['b100', 'b050', 'b080', 'b065', 'b990']:
+#     cartbase = '/g100_scratch/userexternal/ffabiano/ece3/'
+# else:
+#     cartbase = '/g100_work/IscrB_QUECLIM/BOTTINO/'
 
-filna = cartbase + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/*/{}/{}/g*/v*/{}*nc'
+# filna = cartbase + '{}/cmorized/cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/*/{}/{}/g*/v*/{}*nc'
 
 ####################################################################################################
 
@@ -91,9 +91,12 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         pino = gigi2.interp(lev = gigi.lev)
 
-        oht = pino*gigi# to have real oht must multiply by cp
+        oht = pino*gigi ## T*w
 
-        oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # only multiply for area when integrating horizontally
+        oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
+
+        dtdz = gigi.differentiate('lev') ## dT/dz
+        dtdz_lev = (dtdz*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
 
         oht100 = oht.sel(lev = slice(96., 98.)).mean('time').mean('lev') # these are densities of heat transport
         oht700 = oht.sel(lev = slice(696., 698.)).mean('time').mean('lev')
@@ -105,12 +108,12 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         print('total RAM memory used 2:', psutil.virtual_memory()[3]/1.e9)
 
-        pickle.dump([oht_lev, zuki100, zuki700, zuki2000], fil_out)
+        pickle.dump([oht_lev, dtdz_lev, zuki100, zuki700, zuki2000], fil_out)
 
         print('total RAM memory used 3:', psutil.virtual_memory()[3]/1.e9)
         fil_out.flush()
 
-        del gigi, gigi2, oht, oht_lev, zuki100, zuki700, zuki2000, oht100, oht700, oht2000
+        del gigi, gigi2, oht, oht_lev, dtdz_lev, zuki100, zuki700, zuki2000, oht100, oht700, oht2000
 
     #coda.put(cose)
     #return cose
@@ -121,9 +124,19 @@ n_proc = 10
 
 print(ru)
 
-allfils = glob.glob(filna.format(ru, miptab, var1, var1))
+if ru in ['b025', 'b050', 'b100', 'b080']:
+    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
+    filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
+    filna2 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var2, var2)
+else:
+    #datadir = '/g100_work/IscrB_QUECLIM/BOTTINO/{}/cmorized/'.format(ru)
+    datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
+    filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
+    filna2 = datadir+'{}/{}/{}*nc'.format(miptab, var2, var2)
+
+allfils = glob.glob(filna1)
 allfils.sort()
-allfils2 = glob.glob(filna.format(ru, miptab, var2, var2))
+allfils2 = glob.glob(filna2)
 allfils2.sort()
 
 filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
@@ -132,7 +145,7 @@ filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
 print(allfils[0])
 print(allfils2[0])
 
-do_cross(allfils[:500], allfils2[:500], gigi_a, filo)
+do_cross(allfils, allfils2, gigi_a, filo)
 
 filo.close()
 
