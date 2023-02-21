@@ -97,6 +97,8 @@ def do_cross(fils, fils2, gigi_a, fil_out):
 
         oht_lev = (oht*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
 
+        print(oht_lev.mean())
+
         dtdz = gigi.differentiate('lev') ## dT/dz
         dtdz_lev = (dtdz*gigi_a.values[np.newaxis, np.newaxis, ...]).mean('time').sum(['i', 'j']) # integrating horizontally and averaging over time
 
