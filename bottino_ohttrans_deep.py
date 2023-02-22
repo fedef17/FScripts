@@ -149,7 +149,7 @@ filo = open(cart_out + 'ohtrans_{}.p'.format(ru), 'wb')
 print(allfils[0])
 print(allfils2[0])
 
-do_cross(allfils, allfils2, gigi_a, filo)
+do_cross(allfils[-265:], allfils2[-265:], gigi_a, filo)
 
 filo.close()
 
