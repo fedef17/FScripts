@@ -28,8 +28,7 @@ import psutil
 
 #############################################################################
 
-#ru = sys.argv[1]
-ru = 'pi'
+ru = sys.argv[1]
 
 # open our log file
 # logname = 'log_ocetrans_{}.log'.format(ru)
