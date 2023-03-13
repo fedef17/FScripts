@@ -92,11 +92,11 @@ for ru in allru:
         ### SMOC
         # amax = coso.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -40)).mean('time').max(['rlat', 'lev']).values
         #amax = coso.sel(basin = 0, lev = slice(2000., None), rlat = slice(-90, -35)).mean('time').min(['rlat', 'lev']).values
-        amax = coso.sel(basin = 0, lev = slice(2000., None), rlat = slice(-90, -35)).mean(['time', 'lev']).min('rlat').values
+        amax = coso.sel(basin = 0, lev = slice(3000., 4000.), rlat = slice(-50, -30)).mean(['time', 'lev']).min('rlat').values
         smoc_max.append(amax)
 
-        zuki = coso.sel(basin = 0, lev = slice(2000., None), rlat = slice(-90, -35)).mean('time').argmin(['rlat', 'lev'])
-        maxlev = coso.sel(lev = slice(2000., None)).lev[zuki['lev']].values
+        zuki = coso.sel(basin = 0, lev = slice(3000., 4500.), rlat = slice(-50, -30)).mean('time').argmin(['rlat', 'lev'])
+        maxlev = coso.sel(lev = slice(3000., 4500.)).lev[zuki['lev']].values
         smoc_max_lev.append(maxlev)
 
         ### abyssal amoc
