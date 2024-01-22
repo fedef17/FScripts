@@ -43,7 +43,7 @@ def precalc_splines(cart_out):
     spldic = None
     spldic_der = None
 
-    precalc_splines = False
+    precalc_splines = True
     if precalc_splines:
         print('precalculating splines....')
         spldic = dict()
@@ -265,7 +265,7 @@ def jac_calc_change_var(forc, param, var, newpar_val, method = 'deriv_edge', der
         return var_change_glob, None
 
 
-def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge', calc_zonal = True):
+def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge', calc_zonal = True, **kwargs):
     """
     Simply sums the change for each param.
     """
@@ -276,7 +276,7 @@ def calc_change_var_allparams(forc, var, newpar_set, method = 'deriv_edge', calc
         var_change_zonal = None
 
     for param in newpar_set:
-        cglob, czon = calc_change_var(forc, param, var, newpar_set[param], method = method, calc_zonal = calc_zonal)
+        cglob, czon = calc_change_var(forc, param, var, newpar_set[param], method = method, calc_zonal = calc_zonal, **kwargs)
         var_change_glob += cglob
         if calc_zonal:
             var_change_zonal += czon
