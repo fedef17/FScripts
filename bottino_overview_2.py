@@ -383,7 +383,7 @@ if tip == 'plot':
     for ax in [ax_greg, ax_greg_srf, ax_greg_inatm]:
         ax.legend()
         ax.grid()
-        ax.set_xlabel('Global mean tas (K)')
+        ax.set_xlabel('GTAS anomaly (K)')
     ax_greg.set_ylabel('Global net incoming TOA flux (W/m2)')
     ax_greg_srf.set_ylabel('Global net downward surface flux (W/m2)')
     ax_greg_inatm.set_ylabel('Global net atmospheric imbalance (W/m2)')

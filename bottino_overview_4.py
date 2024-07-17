@@ -15,6 +15,8 @@ import climdiags as cd
 #from tunlib import gregplot_on_ax
 
 from matplotlib.colors import LogNorm
+from matplotlib import colors as mcolors
+import matplotlib.gridspec as gridspec
 from datetime import datetime
 
 from scipy import stats
@@ -29,6 +31,8 @@ plt.rcParams['figure.titlesize'] = titlefont
 plt.rcParams['axes.titlesize'] = 18
 plt.rcParams['axes.labelsize'] = 15
 plt.rcParams['axes.axisbelow'] = True
+plt.rcParams['hatch.linewidth'] = 0.6
+plt.rcParams['hatch.color'] = 'black'
 
 #############################################################################
 
@@ -82,119 +86,165 @@ def make_fig_axes():
 
 
 # century trends. or bicentury?
-from matplotlib import colors
-
 fact = 60*60*24*365
 
 trendz = dict()
-for var in ['tas', 'pr']:#, 'clt', 'rlut']:
-    print(var)
-    yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'rb'))
+# for var in ['tas', 'pr']:#, 'clt', 'rlut']:
+#     print(var)
+#     yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}_1000.p'.format(var), 'rb'))
 
-    for ru in ['pi', 'hist', 'ssp585']:
-        yeamean_add = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}.p'.format(ru), 'rb'))
+#     for ru in ['pi', 'hist', 'ssp585']:
+#         yeamean_add = pickle.load(open(cart_in + 'bottino_seasmean_2D_{}.p'.format(ru), 'rb'))
 
-        for ke in list(yeamean_add):
-            if var not in ke: del yeamean_add[ke]
-        yeamean.update(yeamean_add)
+#         for ke in list(yeamean_add):
+#             if var not in ke: del yeamean_add[ke]
+#         yeamean.update(yeamean_add)
 
-    for ru in allru:
-        print(ru)
-        gtas = glomeans[(ru, 'tas')][1]
-        g50 = ctl.butter_filter(gtas, 50)
+#     for ru in allru:
+#         print(ru)
+#         gtas = glomeans[(ru, 'tas')][1]
+#         g50 = ctl.butter_filter(gtas, 50)
 
-        # if ru[0] == 'b':
-        #     for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
-        #         print(cent)
-        #         coso = yeamean[(ru, var)][start:end]
-        #         # print(coso.shape, gtas.shape)
+#         # if ru[0] == 'b':
+#         #     for cent, start, end in zip(['1st', '2nd', '5th'], [0, 100, 200], [100, 200, 500]):
+#         #         print(cent)
+#         #         coso = yeamean[(ru, var)][start:end]
+#         #         # print(coso.shape, gtas.shape)
 
-        #         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50[start:end], coso)
+#         #         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50[start:end], coso)
 
-        #         trendz[(var, ru, cent)] = var_trend
-        #         trendz[(var, ru, cent, 'err')] = var_trend_err
-        #         trendz[(var, ru, cent, 'pval')] = var_pval
+#         #         trendz[(var, ru, cent)] = var_trend
+#         #         trendz[(var, ru, cent, 'err')] = var_trend_err
+#         #         trendz[(var, ru, cent, 'pval')] = var_pval
 
-        coso = yeamean[(ru, var)]
-        if var == 'pr':
-            coso = coso * fact
+#         coso = yeamean[(ru, var)]
+#         if var == 'pr':
+#             coso = coso * fact
 
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50, coso)
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(g50, coso)
 
-        trendz[(var, ru)] = var_trend
-        trendz[(var, ru, 'err')] = var_trend_err
-        trendz[(var, ru, 'pval')] = var_pval
+#         trendz[(var, ru)] = var_trend
+#         trendz[(var, ru, 'err')] = var_trend_err
+#         trendz[(var, ru, 'pval')] = var_pval
 
-        var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gtas, coso)
+#         ## Trend with 10-year chunks
+#         if ru == 'pi':
+#             continue
+#         elif ru == 'ssp585' or ru == 'hist':
+#             cosett = []
+#             gspli = []
+#             n = 0
+#             while n < len(coso):
+#                 cosett.append(coso[n:n+10].mean('year'))
+#                 gspli.append(np.mean(gtas[n:n+10]))
+#                 n += 5
+#             cosett = xr.concat(cosett, 'year')
+#             gspli = np.array([np.mean(co) for co in gspli])
+#         else:
+#             pino = np.split(coso, 100, axis = 0)
+#             cosett = [co.mean('year') for co in pino]
+#             cosett = xr.concat(cosett, 'year')
+#             gspli = np.split(gtas, 100)
+#             gspli = np.array([np.mean(co) for co in gspli])
 
-        trendz[(var, ru, 'nofilt')] = var_trend
-        trendz[(var, ru, 'nofilt', 'err')] = var_trend_err
-        trendz[(var, ru, 'nofilt', 'pval')] = var_pval
+#         var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gspli, cosett)
 
-# ## creating relative trend for pr
-pimepr = np.array(fact*yeamean[('pi', 'pr')].mean('year'))
-zerom = np.array(pimepr < 50)
+#         trendz[(var, ru, 'chunks')] = var_trend
+#         trendz[(var, ru, 'chunks', 'err')] = var_trend_err
+#         trendz[(var, ru, 'chunks', 'pval')] = var_pval
 
-mask_zerom = True # Mask points with less than 50 mm/yr
+#         # var_trend, var_intercept, var_trend_err, var_intercept_err, var_pval = ctl.calc_trend_climatevar(gtas, coso)
 
-for ru in allru:
-    trendz[('pr_rel', ru)] = trendz[('pr', ru)]/pimepr
-    trendz[('pr_rel', ru, 'pval')] = trendz[('pr', ru, 'pval')]
-    # for cent in ['1st', '2nd', '5th']:
-    #     if ('pr', ru, cent) in trendz:
-    #         trendz[('pr_rel', ru, cent)] = trendz[('pr', ru, cent)]/pimepr
-    #         trendz[('pr_rel', ru, cent, 'pval')] = trendz[('pr', ru, cent, 'pval')]
+#         # trendz[(var, ru, 'nofilt')] = var_trend
+#         # trendz[(var, ru, 'nofilt', 'err')] = var_trend_err
+#         # trendz[(var, ru, 'nofilt', 'pval')] = var_pval
 
-    if mask_zerom:
-        trendz[('pr_rel', ru)][zerom] = np.nan
+# # ## creating relative trend for pr
+# pimepr = np.array(fact*yeamean[('pi', 'pr')].mean('year'))
+# zerom = np.array(pimepr < 50)
 
-    trendz[('pr_rel', ru, 'nofilt')] = trendz[('pr', ru, 'nofilt')]/pimepr
-    trendz[('pr_rel', ru, 'nofilt', 'pval')] = trendz[('pr', ru, 'nofilt', 'pval')]
+# mask_zerom = True # Mask points with less than 50 mm/yr
 
-    if mask_zerom:
-        trendz[('pr_rel', ru, 'nofilt')][zerom] = np.nan
+# for ru in allru[1:]:
+#     trendz[('pr_rel', ru)] = 100*trendz[('pr', ru)]/pimepr
+#     trendz[('pr_rel', ru, 'pval')] = trendz[('pr', ru, 'pval')]
+#     # for cent in ['1st', '2nd', '5th']:
+#     #     if ('pr', ru, cent) in trendz:
+#     #         trendz[('pr_rel', ru, cent)] = trendz[('pr', ru, cent)]/pimepr
+#     #         trendz[('pr_rel', ru, cent, 'pval')] = trendz[('pr', ru, cent, 'pval')]
 
-pickle.dump(trendz, open(cart_out + 'trendz_1000.p', 'wb'))
+#     if mask_zerom:
+#         trendz[('pr_rel', ru)][zerom] = np.nan
+
+#     trendz[('pr_rel', ru, 'chunks')] = 100*trendz[('pr', ru, 'chunks')]/pimepr
+#     trendz[('pr_rel', ru, 'chunks', 'pval')] = trendz[('pr', ru, 'chunks', 'pval')]
+
+#     if mask_zerom:
+#         trendz[('pr_rel', ru, 'chunks')][zerom] = np.nan
+
+#     # trendz[('pr_rel', ru, 'nofilt')] = 100*trendz[('pr', ru, 'nofilt')]/pimepr
+#     # trendz[('pr_rel', ru, 'nofilt', 'pval')] = trendz[('pr', ru, 'nofilt', 'pval')]
+
+#     # if mask_zerom:
+#     #     trendz[('pr_rel', ru, 'nofilt')][zerom] = np.nan
+
+# pickle.dump(trendz, open(cart_out + 'trendz_1000.p', 'wb'))
 
 ####################################
 
 trendz = pickle.load(open(cart_out + 'trendz_1000.p', 'rb'))
 
+yeamean = pickle.load(open(cart_in + 'bottino_seasmean_2D_b025.p', 'rb'))
 coso = yeamean[('b025', 'tas')]
 
 #Figures
 vcenall = [1., 0., 0., 0., 0.]
 cmapall = [ctl.heatmap(), 'BrBG', 'BrBG', 'BrBG', ctl.heatmap()]
-cblabs = ['Temperature pattern (K/K)', 'Relative precipitation pattern (%/K)', 'Precipitation pattern (mm/day/K)', 'Cloud pattern (%/K)', 'OLR pattern (W/m2/K)']
+cblabs = ['Temperature change per degree of global warming (K/K)', 'Precipitation change per degree of global warming (mm/year/K)', 'Relative precipitation change per degree of global warming (%/K)', 'Cloud pattern (%/K)', 'OLR pattern (W/m2/K)']
+cbrans = [(0.25, 3.05), (-150, 300), (-11, 21)]
+clevs = [29, 27, 17]
+
+p_th = 0.05
 
 #for var, vcen, cmap, cblab in zip(['tas', 'pr', 'pr_rel', 'clt', 'rlut'], vcenall, cmapall, cblabs):
-for var, vcen, cmap, cblab in zip(['tas', 'pr', 'pr_rel'], vcenall, cmapall, cblabs):
+for var, vcen, cmap, cblab, cbran, clev in zip(['tas', 'pr', 'pr_rel'], vcenall, cmapall, cblabs, cbrans, clevs):
+    print(var)
+
     figtrend = []
     fighatch = []
     tits = []
 
     okru = ['hist', 'ssp585', 'b990', 'b025', 'b050', 'b065', 'b080', 'b100']
     okfi = [trendz[(var, ru)] for ru in okru]
-    okha = [trendz[(var, ru, 'pval')] < 0.05 for ru in okru]
+    okha = [trendz[(var, ru, 'pval')] <= p_th for ru in okru]
     oktit = okru
 
-    c5 = np.percentile(okfi, 5)
-    c95 = np.percentile(okfi, 95)
+    c5 = np.nanpercentile(okfi, 5)
+    c95 = np.nanpercentile(okfi, 95)
+    print(c5, c95)
 
-    divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=vcen, vmax=c95)
+    #divnorm = mcolors.TwoSlopeNorm(vmin=c5, vcenter=vcen, vmax=c95)
+    divnorm = mcolors.TwoSlopeNorm(vmin=cbran[0], vcenter=vcen, vmax=cbran[1])
     plotanom = False
 
     fig, axes = make_fig_axes()
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+f'{varnam}_trendzfull_vs_ssp_1000.pdf', cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, add_hatching = okha, hatch_styles = ['////', '', ''])#, n_color_levels = n_color_levels)
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+f'{var}_trendzfull_vs_ssp_1000.pdf', cmap = cmap, plot_anomalies = plotanom, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, add_hatching = okha, hatch_styles = ['////', '', ''], n_color_levels = clev, cbar_range = cbran)
 
-
-    ## Now without 50 year lowpass for GTAS
-    okfi = [trendz[(var, ru, 'nofilt')] for ru in okru]
-    okha = [trendz[(var, ru, 'nofilt', 'pval')] < 0.05 for ru in okru]
+    ## Now with the 10-yr chunks
+    okfi = [trendz[(var, ru, 'chunks')] for ru in okru]
+    okha = [trendz[(var, ru, 'chunks', 'pval')] < p_th for ru in okru]
     oktit = okru
 
     fig, axes = make_fig_axes()
-    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+f'{varnam}_trendzfull_vs_ssp_1000_nofilt.pdf', cmap = cmap, plot_anomalies = plotanom, cbar_range = cbran, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, add_hatching = okha, hatch_styles = ['////', '', ''])#, n_color_levels = n_color_levels)
+    ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+f'{var}_trendzfull_vs_ssp_1000_chunks.pdf', cmap = cmap, plot_anomalies = plotanom, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, add_hatching = okha, hatch_styles = ['////', '', ''], n_color_levels = clev, cbar_range = cbran)
+
+    # ## Now without 50 year lowpass for GTAS
+    # okfi = [trendz[(var, ru, 'nofilt')] for ru in okru]
+    # okha = [trendz[(var, ru, 'nofilt', 'pval')] < p_th for ru in okru]
+    # oktit = okru
+
+    # fig, axes = make_fig_axes()
+    # ctl.plot_multimap_contour(okfi, coso.lat, coso.lon, filename = cart_out+f'{var}_trendzfull_vs_ssp_1000_nofilt.pdf', cmap = cmap, plot_anomalies = plotanom, figsize = (16, 9), subtitles = okru, color_norm = divnorm, cb_label = cblab, visualization = 'Robinson', central_lat_lon = (0.,0.), axs_external = axes, fig_external = fig, add_hatching = okha, hatch_styles = ['////', '', ''], n_color_levels = clev, cbar_range = cbran)
 
 
 ### OLD PLOTS

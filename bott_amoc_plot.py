@@ -45,35 +45,46 @@ colors_wI = ['chocolate', 'peru', 'maroon', 'firebrick', 'violet', 'plum']
 
 amoc_all = pickle.load(open('/home/fabiano/Research/lavori/BOTTINO/amoc/amoc_all_1000.p', 'rb'))
 
-# pino = xr.load_dataset('/nas/TIPES/Bottino/piControl/msftyz_Omon_EC-Earth3_piControl_r1i1p1f1_gn_1850-2350.nc', use_cftime = True, decode_times=False)['msftyz']
-# amoc_max = pino.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).max(['rlat', 'lev']).values
-# amoc_pi[('pi', 'amoc_max')] = amoc_max
-# gino = pino.sel(basin = 1, rlat = slice(30, 50))
-# zino = np.all(gino.values < amoc_max[:, np.newaxis, np.newaxis]/2., axis = 2)
-# amoc_wid = []
-# for co in zino:
-#     for i, lev in enumerate(pino.lev):
-#             if np.all(co[i:]):
-#                 amoc_wid.append(lev.values)
-#                 break
-# amoc_wid = np.stack(amoc_wid)
-# amoc_pi[('pi', 'amoc_wid')] = amoc_wid
-#
-# zuki = pino.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).argmax(['rlat', 'lev'])
-# amoc_max_lev = pino.sel(lev = slice(500., 2000.)).lev[zuki['lev']].values
-# amoc_pi[('pi', 'amoc_maxlev')] = amoc_max_lev
-#
-# amax = pino.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).min(['rlat', 'lev']).values
-# amoc_pi[('pi', 'aabw_max')] = amax
-# zuki = pino.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).argmin(['rlat', 'lev'])
-# amoc_pi[('pi', 'aabw_maxlev')] = pino.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
-#
-# amax = pino.sel(basin = 0, lev = slice(2500., 4500.)).min(['rlat', 'lev']).values
-# amoc_pi[('pi', 'aby_max')] = amax
-# zuki = pino.sel(basin = 0, lev = slice(2500., 4500.)).argmin(['rlat', 'lev'])
-# amoc_pi[('pi', 'aby_maxlev')] = pino.sel(lev = slice(2500., 4500.)).lev[zuki['lev']].values
-#
-# pickle.dump(amoc_pi, open(cart_out + 'amoc_pi.p', 'wb'))
+amoc_pi = dict()
+
+pino = xr.load_dataset('/nas/TIPES/Bottino/piControl/msftyz_Omon_EC-Earth3_piControl_r1i1p1f1_gn_1850-2350.nc', use_cftime = True, decode_times=False)['msftyz']
+amoc_max = pino.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).max(['rlat', 'lev']).values
+amoc_pi[('pi', 'amoc_max')] = amoc_max
+gino = pino.sel(basin = 1, rlat = slice(30, 50))
+zino = np.all(gino.values < amoc_max[:, np.newaxis, np.newaxis]/2., axis = 2)
+amoc_wid = []
+for co in zino:
+    for i, lev in enumerate(pino.lev):
+            if np.all(co[i:]):
+                amoc_wid.append(lev.values)
+                break
+amoc_wid = np.stack(amoc_wid)
+amoc_pi[('pi', 'amoc_wid')] = amoc_wid
+
+zuki = pino.sel(basin = 1, rlat = slice(30, 50), lev = slice(500., 2000.)).argmax(['rlat', 'lev'])
+amoc_max_lev = pino.sel(lev = slice(500., 2000.)).lev[zuki['lev']].values
+amoc_pi[('pi', 'amoc_maxlev')] = amoc_max_lev
+
+amax = pino.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).min(['rlat', 'lev']).values
+amoc_pi[('pi', 'aabw_max')] = amax
+zuki = pino.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -60)).argmin(['rlat', 'lev'])
+amoc_pi[('pi', 'aabw_maxlev')] = pino.sel(lev = slice(500., 3000.)).lev[zuki['lev']].values
+
+amax = pino.sel(basin = 0, lev = slice(2500., 4500.)).min(['rlat', 'lev']).values
+amoc_pi[('pi', 'aby_max')] = amax
+zuki = pino.sel(basin = 0, lev = slice(2500., 4500.)).argmin(['rlat', 'lev'])
+amoc_pi[('pi', 'aby_maxlev')] = pino.sel(lev = slice(2500., 4500.)).lev[zuki['lev']].values
+
+#amax = pino.sel(basin = 0, lev = slice(500., 3000.), rlat = slice(-90, -40)).max(['rlat', 'lev']).values
+#amax = pino.sel(basin = 0, lev = slice(2000., None), rlat = slice(-90, -35)).min(['rlat', 'lev']).values
+#amax = pino.sel(basin = 0, lev = slice(2000., None), rlat = slice(-90, -35)).mean('lev').min('rlat').values
+amax = pino.sel(basin = 0, lev = slice(3000., 4000.), rlat = slice(-50, -30)).mean('lev').min('rlat').values
+amoc_pi[('pi', 'smoc_max')] = amax
+zuki = pino.sel(basin = 0, lev = slice(3000., 4000.), rlat = slice(-50, -30)).argmin(['rlat', 'lev'])
+maxlev = pino.sel(lev = slice(3000., 4000.)).lev[zuki['lev']].values
+amoc_pi[('pi', 'smoc_maxlev')] = maxlev
+
+pickle.dump(amoc_pi, open(cart_out + 'amoc_pi.p', 'wb'))
 
 nyea = 50
 
@@ -85,7 +96,7 @@ amoc_all.update(amoc_pi)
 #         print(ke, len(amoc_all[ke]))
 #         amoc_all[ke] = amoc_all[ke][:500]
 
-for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cell (Sv)', 'Abyssal cell (Sv)']):
+for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max', 'smoc_max'], ['AMOC (Sv)', 'AABW cell (Sv)', 'Abyssal cell (Sv)', 'Southern Ocean MOC (Sv)']):
     fac = 1/1.e9
     cose = [amoc_all[('pi', cos)]*fac] + [amoc_all[(ru, cos)][i1:i2]*fac for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
     names = ['pi'] + allru + allru
@@ -96,8 +107,8 @@ for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cel
     positions = [0.]
     posticks = [0.]
     for i in range(len(allru)):
-        positions.append(positions[-1]+0.7+0.4)
-        positions.append(positions[-1]+0.7)
+        positions.append(positions[-1]+0.9+0.5)
+        positions.append(positions[-1]+0.9)
         posticks.append(np.mean(positions[-2:]))
 
     fig, ax = ctl.boxplot(cose, names, fullcol, positions = positions, edge_colors = edgecol, plot_mean = False, plot_minmax = False, plot_ensmeans = False)
@@ -133,7 +144,7 @@ for cos, lab in zip(['amoc_max', 'aabw_max', 'aby_max'], ['AMOC (Sv)', 'AABW cel
     fig.savefig(cart_out + '{}_boxplot_wI.pdf'.format(cos))
 
 ### now the amoc depth
-for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev'], ['Lower level at half maximum (m)']+3*['Depth of max (m)']):
+for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev', 'smoc_maxlev'], ['Lower level at half maximum (m)']+4*['Depth of max (m)']):
     cose = [amoc_all[('pi', cos)]] + [amoc_all[(ru, cos)][i1:i2] for ru in allru for (i1, i2) in [(0, nyea), (-nyea, None)]]
     names = ['pi'] + allru
 
@@ -143,8 +154,8 @@ for cos, lab in zip(['amoc_wid', 'amoc_maxlev', 'aabw_maxlev', 'aby_maxlev'], ['
     positions = [0.]
     posticks = [0.]
     for i in range(len(allru)):
-        positions.append(positions[-1]+0.7+0.4)
-        positions.append(positions[-1]+0.7)
+        positions.append(positions[-1]+0.9+0.5)
+        positions.append(positions[-1]+0.9)
         posticks.append(np.mean(positions[-2:]))
 
     fig, ax = plt.subplots(figsize = (12,8))

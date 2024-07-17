@@ -1,0 +1,169 @@
+# coding: utf-8
+500*1000*18
+500*1000*19
+get_ipython().run_line_magic('run', 'bottino_paper.py')
+oht_all.keys()
+oht1_pi, oht2_pi, oht3_pi, oht_tot_pi, oht_ml_pi, oht_bulk_pi = pickle.load(open(carto + 'oht_ts_picontrol.p', 'rb'))
+plt.ion()
+plt.close('all')
+plt.figure()
+oht1_pi
+filo = open(carto + 'oht_piControl.p', 'rb')
+oht_lev = []
+for i in range(500):
+    try:
+        gigi = pickle.load(filo)
+    except:
+        break
+    oht_lev.append(gigi[0])
+filo.close()
+
+oht_lev = xr.concat(oht_lev, dim = 'year')
+oht_lev
+oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
+oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
+oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+plt.plot(oht3)
+oht_lev = oht_lev*cp0
+oht1 = oht_lev.sel(lev = slice(0., 700.)).sum('lev')
+oht2 = oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
+oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+oht_all.keys()
+oht_all[('b080', 'deep')]
+oht1
+oht2
+oht3
+oht3_pi_mean = oht3.mean('year')
+plt.figure()
+plt.plot(oht3)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        plt.plot(oht_all[(ru, 'deep')] + oht3_pi_mean)
+        
+plt.figure()
+plt.plot(oht3, color = 'black', label = 'pi')
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        plt.plot(oht_all[(ru, 'deep')] + oht3_pi_mean, color = col, label = ru)
+        
+        
+plt.ylabel('Deep ocean heat content (J)')
+plt.figure()
+plt.plot(oht3-oht3[:30].mean(), color = 'black', label = 'pi')
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        plt.plot(oht_all[(ru, 'deep')] + oht3_pi_mean - oht3[:30].mean(), color = col, label = ru)
+        
+        
+        
+plt.ylabel('Deep ocean heat content anomaly (J)')
+plt.legend()
+get_ipython().run_line_magic('history', '')
+masscell = xr.load_dataset(carto + 'masscello_Omon_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn_222201-222212.nc', use_cftime = True)['masscello']
+areacell = xr.load_dataset(carto + 'areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc', use_cftime = True)['areacello']
+massvol = masscell*areacell
+mavo = massvol.mean('time')
+mavo_lev = mavo.sum(['i','j'])
+mavo_lev
+deep_mass = mavo_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+deep_mass
+oce_mass
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+res
+res.slope
+100*res.slope
+fig = plt.figure(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+plt.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 50)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        plt.plot(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 50)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(range(i))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
+fig = plt.figure(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+plt.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 50)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        plt.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 50)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(range(i))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
+fig, ax = plt.subplots(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(range(i))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+ax.grid('y')
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
+['pi'] + [ru for ru in allru if 'b' in ru]
+i
+ax.set_xticks(np.arange(i))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+ax.grid('y')
+np.arange(i)
+np.arange(i)
+fig, ax = plt.subplots(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(np.arange(i+1))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+ax.grid('y')
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
+fig, ax = plt.subplots(figsize = (16,9))
+
+i=0
+res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
+for ru, col in zip(allru, colors):
+    if 'b' in ru:
+        i += 1
+        res = stats.linregress(np.arange(500), oht_all[(ru, 'deep')]/deep_mass/cp0)
+        ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
+
+plt.ylabel('Deep ocean temperature trend (K/cent)')
+ax.set_xticks(np.arange(i+1))
+ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+ax.grid(axis = 'y')
+
+plt.legend()
+fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')

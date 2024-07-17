@@ -128,7 +128,17 @@ def do_cross(fils, fils2, fia, fil_out):
         # bigthetao is C
         # to have real oht must multiply by cp
 
-        oht_lev = oht.mean('time').sum(['i', 'j'])
+        oht_lev = oht.mean('time')
+
+        # oht_lev_basin = dict()
+        # for basnam in basnames:
+        #     pinzu = np.array(subbas[basnam])
+        #     pinzu[pinzu == 0] = np.nan
+        
+        #     goggolo = oht_lev*pinzu[np.newaxis, np.newaxis, ...]
+        #     oht_lev_basin[basnam] = goggolo.sum(['i', 'j'])
+
+        oht_lev = oht_lev.sum(['i', 'j'])
 
         oht700 = oht.sel(lev = slice(0., 700.)).mean('time').sum('lev')
         oht2000 = oht.sel(lev = slice(700., 2000.)).mean('time').sum('lev')
@@ -147,15 +157,6 @@ def do_cross(fils, fils2, fia, fil_out):
         print(zuki_deep)
         print(zuki_deep.max(), zuki_deep.min(), zuki_deep.mean())
         print('nans', np.sum(np.isnan(zuki_deep.values)))
-
-        # nuvarz = dict()
-        # for basnam in basnames:
-        #     pinzu = np.array(subbas[basnam])
-        #     pinzu[pinzu == 0] = np.nan
-        #
-        #     goggolo = gigi['thetao']*pinzu[np.newaxis, np.newaxis, ...]
-        #     nuvarz['thetao_'+basnam[:3]] = goggolo
-        # gigi = gigi.assign(nuvarz)
 
         print('total RAM memory used 2', process.memory_info().rss/1e9)
 

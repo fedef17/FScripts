@@ -28,22 +28,23 @@ import psutil
 
 #############################################################################
 
-ru = sys.argv[1]
+#ru = sys.argv[1]
+ru = 'pi'
 
 # open our log file
-logname = 'log_ocetrans_{}.log'.format(ru)
-logfile = open(logname,'w') #self.name, 'w', 0)
+# logname = 'log_ocetrans_{}.log'.format(ru)
+# logfile = open(logname,'w') #self.name, 'w', 0)
 
-# re-open stdout without buffering
-sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+# # re-open stdout without buffering
+# sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
 
-# redirect stdout and stderr to the log file opened above
-os.dup2(logfile.fileno(), sys.stdout.fileno())
-os.dup2(logfile.fileno(), sys.stderr.fileno())
+# # redirect stdout and stderr to the log file opened above
+# os.dup2(logfile.fileno(), sys.stdout.fileno())
+# os.dup2(logfile.fileno(), sys.stderr.fileno())
 
 print('total RAM memory used 0:', psutil.virtual_memory()[3]/1.e9)
 
-cart_out = '/g100_work/IscrB_QUECLIM/BOTTINO/bottino_an/'
+cart_out = '/home/fabiano/Research/lavori/BOTTINO/'
 cart_out = cart_out + 'ocean3d/'
 ctl.mkdir(cart_out)
 
@@ -57,9 +58,6 @@ ctl.mkdir(cart_out)
 ####################################################################################################
 process = psutil.Process(os.getpid())
 
-basnames = ['atlmsk', 'indmsk', 'pacmsk']
-subbas = xr.load_dataset(cart_out + 'subbasins.nc')
-
 lats = np.linspace(-89.5, 89.5, 180)
 lons = np.linspace(0, 359, 360)
 
@@ -70,12 +68,10 @@ print('total RAM memory used 0:', process.memory_info().rss/1e9)
 miptab = 'Omon'
 var1 = 'bigthetao'
 var2 = 'wo'
-#var3 = 'masscello'
-
 # miptab2 = 'Ofx'
 # var3 = 'areacello'
 
-fia = '/g100_scratch/userexternal/ffabiano/ece3/b050/cmorized/cmor_2222/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/stabilization-ssp585-2050/r1i1p1f1/Ofx/areacello/gn/v20210315/areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
+fia = cart_out + 'areacello_Ofx_EC-Earth3_stabilization-ssp585-2050_r1i1p1f1_gn.nc' # areacello is the same for all
 gigi_a = xr.load_dataset(fia, use_cftime = True)['areacello']
 
 #def do_cross(fils, fils2, fils_area, fil_out):
@@ -130,17 +126,10 @@ n_proc = 10
 
 print(ru)
 
-if ru in ['b025', 'b050', 'b100', 'b080']:
-    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
-    filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
-    filna2 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var2, var2)
-#    filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var3, var3)
-else:
-    datadir = '/g100_scratch/userexternal/ffabiano/ece3/{}/cmorized/'.format(ru)
-    filna1 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var1, var1)
-    datadir = '/g100_scratch/userexternal/ffabiano/irods_data/{}/'.format(ru)
-    filna2 = datadir+'{}/{}/{}*nc'.format(miptab, var2, var2)
-#    filna3 = datadir+'cmor_*/CMIP6/LongRunMIP/EC-Earth-Consortium/EC-Earth3/*/r1i1p1f1/{}/{}/g*/v*/{}*nc'.format(miptab, var3, var3)
+datadir = '/nas/archive_CMIP6/CMIP6/model-output/EC-Earth-Consortium/EC-Earth3/piControl/ocean/Omon/r1i1p1f1/'
+
+filna1 = datadir+'{}/{}*nc'.format(var1, var1)
+filna2 = datadir+'{}/{}*nc'.format(var2, var2)
 
 allfils = glob.glob(filna1)
 allfils.sort()

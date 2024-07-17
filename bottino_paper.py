@@ -20,6 +20,7 @@ from scipy import stats
 import xarray as xr
 import glob
 import xclim
+import pymannkendall as mk
 
 plt.rcParams['xtick.labelsize'] = 18
 plt.rcParams['ytick.labelsize'] = 18
@@ -133,7 +134,7 @@ for ru in allru:
         pio = mk.original_test(tas[n:])
         print(n, pio.trend, pio.p)
 
-
+fact = 60*60*24
 do_pr = True
 if do_pr:
     plt.rcParams['xtick.labelsize'] = 28
@@ -156,11 +157,11 @@ if do_pr:
             s = 1
         else:
             s = 10
-        plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], glomeans[(ru, 'pr')][1]-pimean['pr'], color = col, s = s, label = ru)
+        plt.scatter(glomeans[(ru, 'tas')][1]-pimean['tas'], fact*(glomeans[(ru, 'pr')][1]-pimean['pr']), color = col, s = s, label = ru)
 
         if ru == 'ssp585':
             pr = glomeans[(ru, 'pr')][1]
-            pr_anom = pr-pimean['pr']
+            pr_anom = fact*(pr-pimean['pr'])
             tas = glomeans[(ru, 'tas')][1]
             tas_anom = tas-pimean['tas']
 
@@ -186,7 +187,7 @@ if do_pr:
     ctl.custom_legend(fig, colors, allru, fontsize = 24, add_space_below = 0.03)
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
-    plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'Prec. anomaly (mm/day)')
     fig.savefig(cart_out + 'pr_gtas_scatter_linear.pdf')
 
 
@@ -200,7 +201,7 @@ if do_pr:
 
         if ru == 'ssp585':
             pr = glomeans[(ru, 'pr')][1]
-            pr_anom = pr-pimean['pr']
+            pr_anom = fact*(pr-pimean['pr'])
             tas = glomeans[(ru, 'tas')][1]
             tas_anom = tas-pimean['tas']
 
@@ -223,7 +224,7 @@ if do_pr:
     ctl.custom_legend(fig, colors, allru, fontsize = 24, add_space_below = 0.03)
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
-    plt.ylabel(r'Prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'Prec. anomaly (mm/day)')
     fig.savefig(cart_out + 'pr_gtas_scatter_quadratic.pdf')
 
     fig, ax = plt.subplots(1, 1, figsize = (16,9))
@@ -251,7 +252,7 @@ if do_pr:
     for ru, col in zip(allru, colors):
         if ru in ['pi', 'hist', 'ssp585']: continue
         pr = glomeans[(ru, 'pr')][1]
-        pr_anom = pr-pimean['pr']
+        pr_anom = fact*(pr-pimean['pr'])
         tas_anom = glomeans[(ru, 'tas')][1]-pimean['tas']
 
         pr_anom_nl = pr - np.exp(np.polyval(coeffs, tas_anom))
@@ -277,14 +278,14 @@ if do_pr:
     ctl.custom_legend(fig, colors[2:-1], allru[2:-1])
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('GTAS anomaly (K)')
-    plt.ylabel(r'Stabilization prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'Stabilization prec. anomaly (mm/day)')
     fig.savefig(cart_out + 'pr_gtas_nonlin_scatter.pdf')
 
     fig = plt.figure(figsize = (16,9))
     for ru, col in zip(allru, colors):
         if ru in ['pi', 'hist', 'ssp585']: continue
         pr = glomeans[(ru, 'pr')][1]
-        pr_anom = pr-pimean['pr']
+        pr_anom = fact*(pr-pimean['pr'])
         tas_anom = glomeans[(ru, 'tas')][1]-pimean['tas']
 
         # pr_anom_nl = pr_anom - np.polyval(coeffs, tas_anom)
@@ -307,7 +308,7 @@ if do_pr:
     ctl.custom_legend(fig, colors[2:-1], allru[2:-1])
     plt.subplots_adjust(bottom = 0.2)
     plt.xlabel('Years after stabilization')
-    plt.ylabel(r'Stabilization prec. anomaly (kg m$^{-2}$ s$^{-1}$)')
+    plt.ylabel(r'Stabilization prec. anomaly (mm/day)')
     fig.savefig(cart_out + 'pr_gtas_nonlin_scatter_years.pdf')
 
 
@@ -390,7 +391,7 @@ if do_pr:
         fig.savefig(cart_out + '{}_gtas_scatter.pdf'.format(var))
 
 
-do_fb = False
+do_fb = True
 if do_fb:
     var = 'net_toa'
     fig, ax = plt.subplots(figsize = (16,9))
@@ -405,10 +406,10 @@ if do_fb:
         tas_anom = tas - tas[:10].mean()
         #tas_anom = ctl.running_mean(tas_anom, 5, remove_nans = True)[::5]
 
-        # ordering for temp
-        gino = np.argsort(tas_anom)
-        tas_anom = tas_anom[gino]
-        pr_anom = pr_anom[gino]
+        # ordering for temp # NO! this is different than removing the fast manifold
+        #gino = np.argsort(tas_anom)
+        #tas_anom = tas_anom[gino]
+        #pr_anom = pr_anom[gino]
 
         pr_anom = np.mean(np.split(pr_anom, int(len(pr_anom)/5)), axis = 1)
         tas_anom = np.mean(np.split(tas_anom, int(len(tas_anom)/5)), axis = 1)
@@ -696,10 +697,13 @@ if not read_ts:
     oht_lev = xr.concat(oht_lev, dim = 'year')
     # oht_lev_pi = oht_lev.mean('year')*cp0
     # oht_lev_pi_std = oht_lev.std('year')*cp0
+    oht_all[('pi', 700)] = cp0*oht_lev.sel(lev = slice(0., 700.)).sum('lev')
+    oht_all[('pi', 2000)] = cp0*oht_lev.sel(lev = slice(700., 2000.)).sum('lev')
+    oht_all[('pi', 'deep')] = cp0*oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+
     oht_lev = oht_lev.sel(year = slice(70, 120))  ### CONSIDERING LAST 50 YEARS BEFORE BRANCHING OF HISTORICAL r4
     oht_lev_pi = oht_lev.mean('year')*cp0
     oht_lev_pi_std = oht_lev.std('year')*cp0
-
     oht_tot_pi = oht_lev_pi.sum('lev')
     t_deep_pi = 273.15 + oht_tot_pi/oce_mass/cp0
 
@@ -864,8 +868,29 @@ ax.set_ylabel('Depth (m)')
 ax.set_xlabel('Cons. temperature (K)')
 fig.savefig(carto + 'otemp_abs_profile.pdf')
 
-
+#######################################################
+## Conto stima vertical heat diffusion
+print('Conto stima heat diffusion')
 fig, ax = plt.subplots(figsize = (16,9))
+for ru, col in zip(allru[2:-1], colors[2:-1]):
+    tgrad_ini = (piprof+oht_all[(ru, 't_ini')]).differentiate('lev')
+    tgrad_fin = (piprof+oht_all[(ru, 't_final')]).differentiate('lev')
+    ax.plot(tgrad_ini, oht_all[(ru, 't_final')].lev, color = col, lw = 2, ls = ':')
+    ax.plot(tgrad_fin, oht_all[(ru, 't_final')].lev, color = col, lw = 2, label = ru)
+
+ax.grid()
+ax.invert_yaxis()
+ax.set_ylim(900., 3000.)
+ax.set_xlim(-0.01, 0.)
+ax.invert_yaxis()
+ax.set_ylabel('Depth (m)')
+#ax.set_xlabel('Heat content anomaly (J)')
+ax.set_xlabel('Cons. temperature gradient (K/m)')
+fig.savefig(carto + 'otemp_gradient_profile.pdf')
+
+#######################################################
+
+fig, ax = plt.subplots(figsize = (12,8))
 ax.plot(mavo_lev, mavo_lev.lev, lw = 2)
 ax.grid()
 ax.invert_yaxis()
@@ -873,7 +898,7 @@ ax.set_ylabel('Depth (m)')
 ax.set_xlabel('Ocean mass (kg)')
 fig.savefig(carto + 'ocemass_profile.pdf')
 
-fig, ax = plt.subplots(figsize = (16,9))
+fig, ax = plt.subplots(figsize = (12,8))
 for ru, col in zip(allru[2:-1], colors[2:-1]):
     ax.plot(oht_all[(ru, 't_ini')], oht_all[(ru, 't_ini')].lev, color = col, lw = 2, ls = ':')
 for ru, col in zip(allru[2:-1], colors[2:-1]):
@@ -885,6 +910,9 @@ ax.set_ylabel('Depth (m)')
 #ax.set_xlabel('Heat content anomaly (J)')
 ax.set_xlabel('Cons. temperature anomaly (K)')
 fig.savefig(carto + 'otemp_anom_vsini_profile.pdf')
+
+
+sys.exit()
 
 ### Plot efficiency of heat transfer, as in Armour (2017)
 nlow = 50
@@ -1126,9 +1154,9 @@ for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', '
     strin = ' '+6*'& {:5.0f}\%'+'\\\\'
     print(nom+strin.format(*cose))
 
-for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', 'Mixed-layer (<100 m)', 'Bulk'], [700, 2000, 'deep', 'ml', 'bulk']):
+for nom, lev in zip(['Upper (< 700 m)', 'Mid (700-2000 m)', 'Deep (> 2000 m)', 'Mixed-layer (<100 m)', 'Bulk', 'Tot'], [700, 2000, 'deep', 'ml', 'bulk', 'tot']):
     cose = [np.mean(oht_all[(ru, lev)][-30:]).values/1.e24 for ru in allru if 'b' in ru]
-    strin = ' '+6*'& {:5.1f}'+'\\\\'
+    strin = ' '+6*'& {:5.2f}'+'\\\\'
     print(nom+strin.format(*cose))
 
 #############################################################
@@ -1151,37 +1179,48 @@ oht_lev = xr.concat(oht_lev, dim = 'year')*cp0
 oht3 = oht_lev.sel(lev = slice(2000., 6000.)).sum('lev')
 oht3_pi_mean = oht3.mean('year')
 
-fig = plt.figure(figsize = (16,9))
-plt.plot(oht3-oht3[:30].mean(), color = 'black', label = 'pi', lw = 2)
-for ru, col in zip(allru, colors):
-    if 'b' in ru:
-        plt.plot(oht_all[(ru, 'deep')] + oht3_pi_mean - oht3[:30].mean(), color = col, label = ru, lw = 2)
-plt.ylabel('Deep ocean heat content anomaly (J)')
+for lay, tit, levok in zip([700, 2000, 'deep'], ['0-700m', '700-2000m', '> 2000 m'], [(0, 700), (700, 2000), (2000, 6000)]):
+    fig = plt.figure(figsize = (16,9))
+    plt.plot(oht3-oht3[:30].mean(), color = 'black', label = 'pi', lw = 2)
+    for ru, col in zip(allru, colors):
+        if 'b' in ru:
+            plt.plot(oht_all[(ru, lay)] + oht3_pi_mean - oht3[:30].mean(), color = col, label = ru, lw = 2)
+    
+    if lay =='deep':
+        plt.ylabel('Deep ocean heat content anomaly (J)')
+    else:
+        plt.ylabel('Ocean heat content anomaly (J) in: '+tit)
 
-plt.xlabel('years')
-plt.legend()
-fig.savefig(carto + 'drift_deep_ocean_vs_pi.pdf')
+    plt.xlabel('years')
+    plt.legend()
+    fig.savefig(carto + 'drift_{}_ocean_vs_pi.pdf'.format(lay))
 
-deep_mass = mavo_lev.sel(lev = slice(2000., 6000.)).sum('lev')
+    deep_mass = mavo_lev.sel(lev = slice(levok[0], levok[1])).sum('lev')
 
-fig, ax = plt.subplots(figsize = (16,9))
+    fig, ax = plt.subplots(figsize = (16,9))
 
-i=0
-res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
-ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
-for ru, col in zip(allru, colors):
-    if 'b' in ru:
-        i += 1
-        res = stats.linregress(np.arange(1000), oht_all[(ru, 'deep')]/deep_mass/cp0)
-        ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
+    i=0
+    res = stats.linregress(np.arange(500), oht3/deep_mass/cp0)
+    ax.scatter(i, 100*res.slope, marker = 'D', color = 'black', label = 'pi', s = 100)
+    for ru, col in zip(allru, colors):
+        if 'b' in ru:
+            i += 1
+            res = stats.linregress(np.arange(1000), oht_all[(ru, lay)]/deep_mass/cp0)
+            ax.scatter(i, 100*res.slope, marker = 'D', color = col, label = ru, s = 100)
 
-plt.ylabel('Deep ocean temperature trend (K/cent)')
-ax.set_xticks(np.arange(i+1))
-ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
-ax.grid(axis = 'y')
 
-plt.legend()
-fig.savefig(carto + 'drift_deep_ocean_vs_pi_trend.pdf')
+    if lay =='deep':
+        plt.ylabel('Deep ocean temperature trend (K/cent)')
+    else:
+        plt.ylabel('Ocean temperature trend (K/cent) in: '+tit)
+    
+    ax.set_ylim([0., 0.12])
+    ax.set_xticks(np.arange(i+1))
+    ax.set_xticklabels(['pi'] + [ru for ru in allru if 'b' in ru])
+    ax.grid(axis = 'y')
+
+    plt.legend()
+    fig.savefig(carto + 'drift_{}_ocean_vs_pi_trend.pdf'.format(lay))
 
 
 sys.exit()
