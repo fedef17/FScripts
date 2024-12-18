@@ -88,8 +88,8 @@ for mem in stabilization-hist-1990 stabilization-ssp585-2025 stabilization-ssp58
             fi
 
             # Clean up temporary file
-            rm -f $outdir/tmp/*nc
-            if $do_regrid; then rm -f $outdir_regrid/tmp/*nc; fi
+            rm -rf $outdir/tmp/
+            if $do_regrid; then rm -rf $outdir_regrid/tmp/; fi
         fi
 
 
