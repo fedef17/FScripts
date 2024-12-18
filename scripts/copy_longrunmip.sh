@@ -65,9 +65,9 @@ for mem in stabilization-hist-1990 stabilization-ssp585-2025 stabilization-ssp58
             done
 
             # Use cdo to merge files and extract variable
-            cdo -merge $outdir/tmp/*nc "$output_file"
+            cdo cat $outdir/tmp/*nc "$output_file"
             if $do_regrid; then
-                cdo -merge $outdir_regrid/tmp/*nc "$output_file_regrid"
+                cdo cat $outdir_regrid/tmp/*nc "$output_file_regrid"
             fi
 
             # Check if the output file was created successfully
