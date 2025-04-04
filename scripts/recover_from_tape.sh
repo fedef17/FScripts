@@ -6,7 +6,6 @@
 #SBATCH --nodes=1                      # Number of nodes
 #SBATCH --ntasks-per-node=1            # Number of tasks
 #SBATCH --mem=8G                       # Memory per node
-#SBATCH --partition=normal             # Partition name
 
 # Validate arguments
 if [ $# -ne 3 ]; then
