@@ -8,9 +8,16 @@
 #SBATCH --mem=8G                       # Memory per node
 #SBATCH --partition=normal             # Partition name
 
-expname='c4c9'
-START_YEAR=1850
-END_YEAR=1999
+# Validate arguments
+if [ $# -ne 3 ]; then
+    echo "ERROR: Required arguments missing"
+    echo "Usage: $0 <expname> <start_year> <end_year>"
+    exit 1
+fi
+
+expname=$1
+START_YEAR=$2
+END_YEAR=$3
 
 # Configuration
 BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
