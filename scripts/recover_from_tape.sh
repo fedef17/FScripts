@@ -65,7 +65,7 @@ for (( YEAR=START_YEAR; YEAR<=END_YEAR; YEAR++ )); do
     # Find and copy specified variables
     for var in "${VARIABLES[@]}"; do
         echo "[$(date)] Processing variable $var for year $YEAR"
-        find "${TEMP_DIR}" -type f -name "*${var}*" -exec mv {} "${OUTPUT_DIR}/${var}/" \;
+        find "${TEMP_YEAR_DIR}" -type f -name "*${var}*" -exec mv {} "${OUTPUT_DIR}/${var}/" \;
     done
     
     # Clean up
