@@ -23,7 +23,9 @@ END_YEAR=$3
 BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
 ARCHIVE_PATTERN="${expname}_cmorized_%Y.part.aa" # Archive naming pattern (%Y will be replaced with year)
 OUTPUT_DIR="$SCRATCH/tunecs_coupled/${expname}/"   # Final output directory
+
 VARIABLES=("ts" "tas" "hus" "ta" "rsus" "rsds" "rlut" "rsut" "rlutcs" "rsutcs") # Variables to keep
+miptab='Amon' # to keep all tabs, write "*" here
 
 echo "Starting job $SLURM_JOB_ID at $(date)"
 
@@ -65,7 +67,7 @@ for (( YEAR=START_YEAR; YEAR<=END_YEAR; YEAR++ )); do
     # Find and copy specified variables
     for var in "${VARIABLES[@]}"; do
         echo "[$(date)] Processing variable $var for year $YEAR"
-        find "${TEMP_YEAR_DIR}" -type f -name "*${var}*" -exec mv {} "${OUTPUT_DIR}/${var}/" \;
+        find "${TEMP_YEAR_DIR}" -type f -name "*${var}_${miptab}*" -exec mv {} "${OUTPUT_DIR}/${var}/" \;
     done
     
     # Clean up
