@@ -78,7 +78,7 @@ for mem in stabilization-hist-1990 stabilization-ssp585-2025 stabilization-ssp58
                 exit 1
             fi
 
-            if do_regrid; then
+            if $do_regrid; then
                 if [[ -f "$output_file_regrid" ]]; then
                     echo "Merged file created: $output_file_regrid"
                 else
