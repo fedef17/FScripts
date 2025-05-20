@@ -412,7 +412,8 @@ def create_basin_data(output_file, ds_target, drainage_basin_id, arrival_point_i
     
     return result
 
-# cart + 'herold_etal_eocene_runoff_1x1.nc'
+# run with: python epochal_ece4_runoff.py -s /abs-path-to-dir/herold_etal_eocene_runoff_1x1.nc -r /abs-path-to-dir/runoff_maps.nc
+# output written in runoff_maps_new.nc in the script's folder
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Duplicate job configuration for experiments.")
