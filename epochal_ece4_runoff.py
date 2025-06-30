@@ -466,8 +466,9 @@ if __name__ == "__main__":
     print(rnf_map_merged_final.min(), rnf_map_merged_final.max())
     print(arrival_id.min(), arrival_id.max())
 
-    ## Setting calving to zero
-    calving_id = np.zeros(arrival_id.shape)-2
+    ## Setting calving equal to runoff
+    print("WARNING!! Setting calving_id equal to arrival_id! To be changed if ice sheets are present")
+    calving_id = arrival_id.copy()
 
     rnf_pd = xr.load_dataset(args.runoff_file)
     create_basin_data('runoff_map_new.nc', rnf_pd, rnf_map_merged_final, arrival_id, calving_id, oroslope.longitude, oroslope.latitude)
