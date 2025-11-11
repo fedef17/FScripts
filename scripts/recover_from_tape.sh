@@ -23,8 +23,8 @@ BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing
 ARCHIVE_PATTERN="${expname}_cmorized_%Y.part.aa" # Archive naming pattern (%Y will be replaced with year)
 OUTPUT_DIR="$SCRATCH/tunecs_coupled/${expname}/"   # Final output directory
 
-# VARIABLES=("ts" "tas" "hus" "ta" "rsus" "rsds" "rlut" "rsut" "rlutcs" "rsutcs") # Variables to keep
-VARIABLES=("rsdt")
+#VARIABLES=("ts" "tas" "hus" "ta" "rsus" "rsds" "rlut" "rsut" "rsdt" "rlutcs" "rsutcs") # Variables to keep
+VARIABLES=("tas" "rlut" "rsut" "rsutcs" "rlutcs") # Variables to keep
 miptab='Amon' # to keep all tabs, write "*" here
 
 echo "Starting job $SLURM_JOB_ID at $(date)"
