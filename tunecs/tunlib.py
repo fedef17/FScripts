@@ -10,8 +10,8 @@ from matplotlib import cm
 import pickle
 import netCDF4 as nc
 
-import climtools_lib as ctl
-import climdiags as cd
+from climtools import climtools_lib as ctl
+from climtools import climdiags as cd
 
 from matplotlib.colors import LogNorm
 from datetime import datetime

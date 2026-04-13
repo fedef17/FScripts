@@ -19,12 +19,15 @@ START_YEAR=$2
 END_YEAR=$3
 
 # Configuration
-BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
-ARCHIVE_PATTERN="${expname}_cmorized_%Y.part.aa" # Archive naming pattern (%Y will be replaced with year)
+#BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
+BASE_DIR="ec:/ccpd/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
+ARCHIVE_PATTERN="${expname}_cmorized_%Y.part.??" # Archive naming pattern (%Y will be replaced with year)
 OUTPUT_DIR="$SCRATCH/tunecs_coupled/${expname}/"   # Final output directory
 
 #VARIABLES=("ts" "tas" "hus" "ta" "rsus" "rsds" "rlut" "rsut" "rsdt" "rlutcs" "rsutcs") # Variables to keep
-VARIABLES=("tas" "rlut" "rsut" "rsutcs" "rlutcs") # Variables to keep
+#VARIABLES=("tas" "rlut" "rsut" "rsutcs" "rlutcs") # Variables to keep
+#VARIABLES=("hur")
+VARIABLES=("clt" "clivi" "clwvi") # Variables to keep
 miptab='Amon' # to keep all tabs, write "*" here
 
 echo "Starting job $SLURM_JOB_ID at $(date)"
@@ -50,16 +53,38 @@ for (( YEAR=START_YEAR; YEAR<=END_YEAR; YEAR++ )); do
     # Create temporary directory for this year
     TEMP_YEAR_DIR=$(mktemp -d -p "$OUTPUT_DIR" temp_${YEAR}_XXXXXX)
     
-    # Extract archive
-    echo "[$(date)] Extracting $ARCHIVE_FILE..."
-    ecp $ARCHIVE_FILE .
-
+    # Copy all split parts matching the pattern
+    echo "[$(date)] Copying archive parts for year $YEAR..."
+    ecp "${ARCHIVE_FILE}" .
     if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to copy ${ARCHIVE_FILE}"
+        echo "ERROR: Failed to copy archive parts for year $YEAR"
         continue
     fi
 
-    tar -xf ${okfile} -C "$TEMP_YEAR_DIR"
+    # Check how many parts are on disk
+    PART_FILES=( $(ls ${okfile} 2>/dev/null | sort) )
+    N_PARTS=${#PART_FILES[@]}
+    if [[ $N_PARTS -eq 0 ]]; then
+        echo "ERROR: No archive parts found on disk for year $YEAR after copy"
+        continue
+    fi
+    echo "[$(date)] Found $N_PARTS part(s) on disk: ${PART_FILES[*]}"
+
+    # Rebuild the split archive if needed, or use single part directly
+    if [[ $N_PARTS -gt 1 ]]; then
+        RECONSTRUCTED="cmorized_${YEAR}_reconstructed.tar"
+        echo "[$(date)] Reconstructing archive from $N_PARTS parts..."
+        cat "${PART_FILES[@]}" > "$RECONSTRUCTED"
+        if [[ $? -ne 0 ]]; then
+            echo "ERROR: Failed to reconstruct archive for year $YEAR"
+            continue
+        fi
+    else
+        RECONSTRUCTED="${PART_FILES[0]}"
+        echo "[$(date)] Single part found"
+    fi
+
+    tar -xf "$RECONSTRUCTED" -C "$TEMP_YEAR_DIR"
     
     # Process extracted files
     cd "$TEMP_YEAR_DIR" || { echo "Failed to cd to $TEMP_YEAR_DIR" >&2; exit 1; }
@@ -73,7 +98,7 @@ for (( YEAR=START_YEAR; YEAR<=END_YEAR; YEAR++ )); do
     # Clean up
     cd - || exit
     rm -rf "$TEMP_YEAR_DIR"
-    rm ${okfile}
+    rm -f "${PART_FILES[@]}" "$RECONSTRUCTED"
 done
 
 echo "[$(date)] Processing complete. Results are in $OUTPUT_DIR"
