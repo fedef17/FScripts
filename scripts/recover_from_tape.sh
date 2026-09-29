@@ -19,15 +19,17 @@ START_YEAR=$2
 END_YEAR=$3
 
 # Configuration
-#BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
-BASE_DIR="ec:/ccpd/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
+BASE_DIR="ec:/ccff/ece3/tunecs/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
+#BASE_DIR="ec:/ccpd/${expname}/cmorized/"      # Directory containing yearly tar archives (full path on tape)
 ARCHIVE_PATTERN="${expname}_cmorized_%Y.part.??" # Archive naming pattern (%Y will be replaced with year)
 OUTPUT_DIR="$SCRATCH/tunecs_coupled/${expname}/"   # Final output directory
 
+VARIABLES=("ts") # Variables to keep
+#VARIABLES=("rsus" "rsds" "ts" "ta" "hus" "rlut" "rsut" "rlutcs" "rsutcs") # Variables to keep
 #VARIABLES=("ts" "tas" "hus" "ta" "rsus" "rsds" "rlut" "rsut" "rsdt" "rlutcs" "rsutcs") # Variables to keep
 #VARIABLES=("tas" "rlut" "rsut" "rsutcs" "rlutcs") # Variables to keep
 #VARIABLES=("hur")
-VARIABLES=("clt" "clivi" "clwvi") # Variables to keep
+#VARIABLES=("clt" "clivi" "clwvi") # Variables to keep
 miptab='Amon' # to keep all tabs, write "*" here
 
 echo "Starting job $SLURM_JOB_ID at $(date)"

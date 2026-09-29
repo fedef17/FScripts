@@ -9,7 +9,7 @@ set -euo pipefail
  
 # --- config ---
 ORIG_DIR="${SCRATCH}/ece4/"
-DEST_DIR="ec:/ccff/ece4/tuning/TL63/"
+DEST_DIR_GEN="ec:/ccff/ece4/tuning/"
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: $(basename "$0") <name> [name2 ...]"
@@ -43,6 +43,17 @@ for name in "${NAMES[@]}"; do
   if [[ ! -d "$src" || -L "$src" ]]; then
     echo "[SKIP] '$src' is not a real directory."
     continue
+  fi
+
+  if [[ -d "$src/63l_2" ]]; then
+    echo "this is low res"
+    DEST_DIR=${DEST_DIR_GEN}'TL63/' 
+  elif [[ -d "$src/255l_2" ]]; then
+    echo "this is standard res"
+    DEST_DIR=${DEST_DIR_GEN}'TL255/' 
+  else
+    echo 'DIR NOT FOUND!'
+    exit
   fi
  
   echo "[$(date '+%H:%M:%S')] Processing '$name' ..."

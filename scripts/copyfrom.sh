@@ -20,30 +20,20 @@ echo $expname
 #, $year1, $year2
 
 username=fabiano
-ipaddress=tintin.bo.isac.cnr.it
+ipaddress=hobbes.bo.isac.cnr.it
 
 # TARGETDIR=/gpfs/scratch/userexternal/pdavini0/ece3/${expname}/output/
 # OUTDIR=/scratch/ms/it/ccff/cinbkp/ece3/${expname}/output/
-TARGETDIR=/ec/res4/scratch/ecme3038/ece4/${expname}/output/oifs
-OUTDIR=/work/users/clima/fabiano/ece4/sim_marianna/${expname}/
+#TARGETDIR=/ec/res4/scratch/ecme3038/ece4/${expname}/output/oifs
+#OUTDIR=/work/users/clima/fabiano/ece4/sim_marianna/${expname}/
+OUTDIR=/data-hobbes/fabiano/TunECS/coupled/c4c9/for_fb/
+TARGETDIR=/lus/h2resw01/scratch/ccff/tunecs_coupled/c4c9_ok/
 
 #rsync -av --append-verify --progress -e "ssh" ffabiano@login.galileo.cineca.it:/gpfs/scratch/userexternal/pdavini0/ece3/b025/output/Output_20* ece3/b025/output/
 
-copycommand="rsync -av --append-verify --progress"
+copycommand="rsync -avL --append-verify --progress"
 
-# loop until succeed for three times
-# function smartcopy {
-#         ok_year=$1
-#         MAX_RETRIES=20; i=0; rcheck=255
-#         while ( [[ $rcheck -ne 0 ]] && [[ $i -lt $MAX_RETRIES ]] ) ; do
-#                 i=$(($i+1))
-# 		echo "$copycommand -e "ssh -T -o Compression=no -x" ${username}@${ipaddress}:${TARGETDIR}Output_${ok_year} ${OUTDIR}"
-#                 $copycommand -e "ssh -T -o Compression=no -x" ${username}@${ipaddress}:${TARGETDIR}Output_${ok_year} ${OUTDIR}
-#                 rcheck=$?
-#         done
-# }
-
-function smartcopy {
+function smartcopy_1 {
         MAX_RETRIES=1000; i=0; rcheck=255
         while ( [[ $rcheck -ne 0 ]] && [[ $i -lt $MAX_RETRIES ]] ) ; do
                 i=$(($i+1))
@@ -53,8 +43,17 @@ function smartcopy {
         done
 }
 
+function smartcopy_2 {
+        MAX_RETRIES=1000; i=0; rcheck=255
+        while ( [[ $rcheck -ne 0 ]] && [[ $i -lt $MAX_RETRIES ]] ) ; do
+                i=$(($i+1))
+		echo "$copycommand -e "ssh -T -o Compression=no -x" ${username}@${ipaddress}:${OUTDIR} ${TARGETDIR}"
+                $copycommand -e "ssh -T -o Compression=no -x" ${username}@${ipaddress}:${OUTDIR} ${TARGETDIR}
+                rcheck=$?
+        done
+}
 
-smartcopy
+smartcopy_2
 echo 'All done!'
 
 exit 0
